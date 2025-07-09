@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF9E5">
+
+    <!-- 🔙 뒤로가기 버튼 -->
+    <ImageButton
+        android:id="@+id/backButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="8dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/back_button"
+        android:src="@android:drawable/ic_menu_revert"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
+    <!-- 📌 공휴일 이름 -->
+    <TextView
+        android:id="@+id/holidayTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/backButton"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="16dp"
+        android:textColor="@android:color/black"
+        android:textSize="14sp" />
+
+    <!-- 📅 월 셀렉터 -->
+    <LinearLayout
+        android:id="@+id/monthSelector"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/holidayTextView"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/buttonPreviousMonth"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_chevron_left"
+            android:contentDescription="@string/prev_month"
+            app:tint="@android:color/black" />
+
+        <TextView
+            android:id="@+id/textViewMonthYear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2025년 7월"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@android:color/black"
+            android:layout_marginHorizontal="16dp" />
+
+        <ImageButton
+            android:id="@+id/buttonNextMonth"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_chevron_right"
+            android:contentDescription="@string/next_month"
+            app:tint="@android:color/black" />
+    </LinearLayout>
+
+    <!-- 🗓 캘린더 뷰 -->
+    <com.kizitonwose.calendar.view.CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/monthSelector"
+        android:layout_margin="8dp"
+        app:cv_dayViewResource="@layout/example_day_view"
+        app:cv_monthHeaderResource="@layout/example_month_header" />
+
+    <!-- 💭 꿈 리스트 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewDreams"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@id/calendarView"
+        android:layout_above="@id/adViewCalendar"
+        android:layout_marginTop="8dp"
+        android:padding="16dp"
+        android:clipToPadding="false" />
+
+    <!-- 📢 광고 -->
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adViewCalendar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:adSize="BANNER"
+        app:adUnitId="ca-app-pub-1742201279182732/8682841157" />
+</RelativeLayout>

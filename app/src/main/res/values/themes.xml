@@ -1,0 +1,20 @@
+<resources>
+
+    <!-- 앱 전체 테마 -->
+    <style name="Theme.DreaminDream" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:colorBackground">@color/dark_background</item>
+        <item name="android:textColorPrimary">@color/textPrimary</item>
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+    </style>
+
+    <!-- SplashActivity 전용 (API 30 이하 대응) -->
+    <style name="Theme.DreaminDream.Splash" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@color/dark_background</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
+
+
+
+
+</resources>

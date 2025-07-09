@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FFCA28</color> <!-- Yellow gold -->
+    <color name="primary_gradient_start">#3A0CA3</color> <!-- 진보라 -->
+    <color name="primary_gradient_end">#4361EE</color> <!-- 밝은 파랑 -->
+    <color name="glass_background">#40FFFFFF</color> <!-- Glass 효과용 투명 흰색 -->
+    <color name="bubble_bg">#F5F5F5</color> <!-- 말풍선 배경 -->
+    <color name="nebula_overlay">#44263366</color> <!-- 배경 어두운 오버레이 -->
+    <color name="your_purple">#4A148C</color> <!-- 보라 -->
+    <color name="your_black">#000000</color> <!-- 글자용 -->
+    <color name="your_light_background">#FFF9E5</color> <!-- 크림 배경 -->
+
+    <color name="purpleHighlight">#CA6EF6</color>
+
+
+    <color name="colorPrimaryDark">#1A1333</color> <!-- Deep navy -->
+    <color name="colorAccent">#5D5FBD</color> <!-- Input background -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="background">#1A1333</color>
+    <color name="hintText">#BDBDBD</color>
+    <color name="inputBackground">#493F75</color> <!-- Purple-like -->
+    <color name="buttonText">#000000</color>
+    <color name="button_default_color">#EEEEEE</color>
+    <color name="button_pressed_color">#CCCCCC</color>
+    <color name="dark_background">#1D1D2F</color>
+    <color name="textPrimary">#FFFFFF</color>
+    <color name="card_background">#2E2651</color> <!-- 카드 배경 (보라+딥톤) -->
+    <color name="textSecondary">#BBBBBB</color> <!-- 해몽 결과용 보조 텍스트 -->
+
+</resources>

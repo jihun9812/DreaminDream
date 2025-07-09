@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 기본 & 네비게이션 -->
+    <string name="app_name">DreamInDream</string>
+    <string name="home_title">Dream in Dream</string>
+    <string name="back_button">뒤로가기</string>
+    <string name="app_logo_description">앱 로고</string>
+    <string name="back_arrow">←</string>
+    <string name="left_arrow">←</string>
+    <string name="right_arrow">→</string>
+    <string name="desc_prev_month">Previous month</string>
+    <string name="desc_next_month">Next month</string>
+
+    <!-- 캘린더/달력 -->
+    <string name="calendar_title_placeholder">2025년 7월</string>
+    <string name="dream_list_label">🌙 오늘의 꿈 기록</string>
+    <string name="calendar_dream_list_title">선택한 날짜의 꿈 목록:</string>
+    <string name="selected_date_default">날짜</string>
+    <string name="selected_date_placeholder">날짜 선택됨</string>
+    <string name="prev_month">이전 달</string>
+    <string name="next_month">다음 달</string>
+    <string name="desc_calendar">캘린더</string>
+    <string name="desc_dream_scroll">꿈 기록 스크롤</string>
+    <string name="year_month_format">%1$d년 %2$d월</string>
+
+    <!-- 해몽/꿈/운세 -->
+    <string name="btn_dream">해몽</string>
+    <string name="btn_calendar">달력 보기</string>
+    <string name="btn_fortune">오늘의 운세 보기</string>
+    <string name="fortune_placeholder">운세 결과표시</string>
+    <string name="fortune_result_placeholder">운세 결과가 여기에 표시됩니다.</string>
+    <string name="dream_list_title">📝 %1$s 꿈 기록</string>
+    <string name="dream_star_text">어떤 꿈을 꾸었나요?</string>
+    <string name="btn_dream_en">Dream Interpretation</string>
+    <string name="hint_input">여기에 꿈을 입력해주세요! </string>
+    <string name="button_interpret">해몽하기</string>
+    <string name="result_default">해몽 결과가 여기에 표시됩니다.</string>
+
+    <!-- 설정/프로필/정보 -->
+    <string name="settings_button">설정</string>
+    <string name="setting_title">설정</string>
+    <string name="title_user_info">🌙 사용자 정보</string>
+    <string name="settings_background_desc">설정 배경 이미지</string>
+    <string name="label_nickname">닉네임</string>
+    <string name="hint_nickname">닉네임을 입력하세요</string>
+    <string name="label_birthdate">생년월일</string>
+    <string name="hint_birthdate">YYYY-MM-DD</string>
+    <string name="label_gender">성별</string>
+    <string name="gender_male">남성</string>
+    <string name="gender_female">여성</string>
+    <string name="label_mbti">MBTI</string>
+    <string name="hint_mbti">MBTI를 입력하세요 (예: INFP)</string>
+    <string name="button_save">저장하기</string>
+    <string name="edit">수정</string>
+    <string name="label_profile_summary">🌟 프로필 정보</string>
+    <string name="info_summary">저장된 정보를 기반으로 오늘의 운세가 제공됩니다.</string>
+
+    <!-- 기타/오류/안내 -->
+    <string name="error_missing_info">️설정에서 닉네임, 생일, MBTI를 입력해주세요.</string>
+    <string name="error_fetch_failed">결과를 불러올 수 없습니다.</string>
+    <string name="toast_saved">저장되었습니다</string>
+    <string name="forward_arrow">→</string>
+
+    <!-- Array (성별 선택) -->
+    <string-array name="gender_array">
+        <item>남성</item>
+        <item>여성</item>
+        <item>기타</item>
+    </string-array>
+</resources>

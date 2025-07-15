@@ -14,9 +14,24 @@
         android:layout_height="48dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/back_button"
-        android:src="@android:drawable/ic_menu_revert"
+        android:src="@drawable/ic_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- 오늘 날짜 텍스트 -->
+    <TextView
+        android:id="@+id/dateText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="25sp"
+        android:textColor="#9674D3"
+        android:fontFamily="@font/pretendard_medium"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/backButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="6dp"
+        android:gravity="center"/>
 
     <!-- 꿈 입력창 -->
     <EditText
@@ -26,7 +41,7 @@
         android:hint="@string/hint_input"
         android:background="@drawable/edittext_background"
         android:textColor="@color/textPrimary"
-        android:textColorHint="@color/hintText"
+        android:textColorHint="@color/bubble_bg"
         android:padding="16dp"
         android:textSize="16sp"
         android:gravity="top|start"
@@ -49,22 +64,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />
 
-    <!-- 결과 카드 -->
+    <!-- 결과 카드(항상 보임) -->
     <ScrollView
         android:id="@+id/resultScrollView"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/interpretButton"
-        app:layout_constraintBottom_toTopOf="@id/adView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="0dp">
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="0dp"
             style="@style/DreamCardView">
 
             <LinearLayout
@@ -83,6 +97,21 @@
             </LinearLayout>
         </androidx.cardview.widget.CardView>
     </ScrollView>
+
+    <!-- Lottie 애니메이션 (결과 바로 아래에! 항상 광고 위) -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieLoading"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        app:lottie_rawRes="@raw/just_flow_teal"
+        app:lottie_loop="true"
+        app:layout_constraintTop_toBottomOf="@id/resultScrollView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/adView"
+        />
 
     <!-- 애드몹 광고 -->
     <com.google.android.gms.ads.AdView

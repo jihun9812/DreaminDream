@@ -28,49 +28,57 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/fortune_loading"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/adView_fortune"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fortuneButton"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/just_flow_teal" />
+
     <ScrollView
         android:id="@+id/fortuneScrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/fortuneButton"
-        app:layout_constraintBottom_toTopOf="@id/fortune_progress"
+        app:layout_constraintBottom_toTopOf="@id/fortune_loading"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="-200dp">
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/fortuneCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="8dp"
-            android:backgroundTint="#281F42">
+            app:cardCornerRadius="24dp"
+            android:backgroundTint="#8890D0"
+            android:layout_margin="10dp"
+            android:minHeight="80dp"
+            app:cardElevation="14dp" >
 
-            <TextView
-                android:id="@+id/fortune_result"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/fortune_placeholder"
-                android:textSize="16sp"
-                android:textColor="#FFFFFF"
-                android:padding="20dp"
-                android:gravity="center"/>
-        </androidx.cardview.widget.CardView>
-    </ScrollView>
+        <TextView
+            android:id="@+id/fortune_result"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/fortune_placeholder"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:padding ="32dp"
+            android:gravity="center" />
 
-    <ProgressBar
-        android:id="@+id/fortune_progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/fortuneButton"
-        app:layout_constraintBottom_toTopOf="@id/adView_fortune"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp" />
 
-    <com.google.android.gms.ads.AdView
+    </androidx.cardview.widget.CardView>
+</ScrollView>
+
+<com.google.android.gms.ads.AdView
         android:id="@+id/adView_fortune"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

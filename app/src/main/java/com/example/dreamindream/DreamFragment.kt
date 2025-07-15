@@ -8,6 +8,7 @@ import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
+import com.airbnb.lottie.LottieAnimationView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.AdView
@@ -26,7 +27,8 @@ class DreamFragment : Fragment() {
     private lateinit var prefs: SharedPreferences
     private lateinit var resultTextView: TextView
     private lateinit var dreamEditText: EditText
-    private lateinit var loadingView: ProgressBar
+    private lateinit var lottieLoading: LottieAnimationView
+    private lateinit var dateText: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,8 +45,16 @@ class DreamFragment : Fragment() {
         // UI 초기화
         dreamEditText = view.findViewById(R.id.dreamEditText)
         resultTextView = view.findViewById(R.id.resultTextView)
+        lottieLoading = view.findViewById(R.id.lottieLoading)
+        dateText = view.findViewById(R.id.dateText)
 
-        // ✅ 공통 애니메이션 함수
+        // 오늘 날짜 표시
+        dateText.text = getToday()
+
+        // 로딩 애니는 처음엔 안보임
+        lottieLoading.visibility = View.GONE
+
+        // 공통 클릭 애니메이션
         fun View.applyScaleClick(action: () -> Unit) {
             this.setOnClickListener {
                 it.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.scale_up))
@@ -76,11 +86,25 @@ class DreamFragment : Fragment() {
         return view
     }
 
+    // 오늘 날짜 문자열 반환 (ex: 2025년 7월 11일 (금))
+    private fun getToday(): String {
+        val today = Calendar.getInstance()
+        val year = today.get(Calendar.YEAR)
+        val month = today.get(Calendar.MONTH) + 1
+        val day = today.get(Calendar.DAY_OF_MONTH)
+        val weekDayKor = arrayOf("일", "월", "화", "수", "목", "금", "토")
+        val dayOfWeek = weekDayKor[today.get(Calendar.DAY_OF_WEEK) - 1]
+        return "${year}년 ${month}월 ${day}일 (${dayOfWeek})"
+    }
+
     private fun showLoading() {
-        resultTextView.text = "🔮 해몽 중입니다..."
+        lottieLoading.visibility = View.VISIBLE
+        lottieLoading.playAnimation()
     }
 
     private fun hideLoading(result: String) {
+        lottieLoading.cancelAnimation()
+        lottieLoading.visibility = View.GONE
         resultTextView.text = result
     }
 

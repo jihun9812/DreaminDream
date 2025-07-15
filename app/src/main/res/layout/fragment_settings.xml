@@ -1,6 +1,7 @@
 <!-- res/layout/fragment_settings.xml -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFF9E5">
@@ -22,7 +23,7 @@
                 android:layout_height="48dp"
                 android:layout_gravity="start"
                 android:background="@android:color/transparent"
-                android:src="@android:drawable/ic_menu_revert"
+                android:src="@drawable/ic_back"
                 android:contentDescription="뒤로가기" />
 
             <TextView
@@ -58,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="생년월일"
-                android:textColor="#444444" />
+                android:textColor="@color/black" />
 
             <EditText
                 android:id="@+id/edit_birthdate"
@@ -73,12 +74,30 @@
                 android:padding="12dp"
                 android:layout_marginBottom="12dp" />
 
+            <!-- 태어난 시간 추가 영역 -->
+            <TextView
+                android:id="@+id/label_birthtime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="태어난 시간"
+                android:textColor="@color/black" />
+
+            <Spinner
+                android:id="@+id/spinner_birthtime"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:minHeight="48dp"
+                android:background="@drawable/bg_fade"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp" />
+
+
             <TextView
                 android:id="@+id/label_gender"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="성별"
-                android:textColor="#444444" />
+                android:textColor="@color/black" />
 
             <RadioGroup
                 android:id="@+id/radioGroup_gender"
@@ -96,7 +115,8 @@
                     android:id="@+id/radio_female"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="여성" />
+                    android:text="여성"
+                    tools:ignore="HardcodedText" />
             </RadioGroup>
 
             <TextView
@@ -104,7 +124,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="MBTI"
-                android:textColor="#444444" />
+                android:textColor="@color/black" />
 
             <EditText
                 android:id="@+id/edit_MBTI"

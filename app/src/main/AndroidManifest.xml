@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.dreamindream">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -13,10 +14,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DreaminDream">
 
+        <!-- 🔧 Manifest 충돌 해결용 설정 -->
+        <property
+            android:name="android.adservices.AD_SERVICES_CONFIG"
+            android:resource="@xml/gma_ad_services_config"
+            tools:replace="android:resource" />
+
         <!-- AdMob 앱 ID -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-1742201279182732~2775090110" />
+
+        <!-- 🔔 FCM 수신 서비스 등록 -->
+        <service
+            android:name=".MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
         <!-- SplashActivity: 앱 실행 진입점 -->
         <activity
@@ -29,13 +45,10 @@
             </intent-filter>
         </activity>
 
-
         <!-- 홈 화면을 포함한 실제 앱 화면 -->
         <activity
             android:name=".MainActivity"
             android:exported="true" />
-
-
     </application>
 
 </manifest>

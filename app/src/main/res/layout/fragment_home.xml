@@ -12,7 +12,7 @@
         android:layout_height="48dp"
         android:layout_alignParentEnd="true"
         android:layout_margin="16dp"
-        android:src="@drawable/ic_settings_gear_vector"
+        android:src="@drawable/ic_setting"
         android:background="@android:color/transparent"
         android:contentDescription="@string/settings_button" />
 

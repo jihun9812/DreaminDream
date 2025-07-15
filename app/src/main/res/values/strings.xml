@@ -55,6 +55,14 @@
     <string name="label_profile_summary">🌟 프로필 정보</string>
     <string name="info_summary">저장된 정보를 기반으로 오늘의 운세가 제공됩니다.</string>
 
+    <!--  setting에 있는 spinner 부분 색상 -->
+    <color name="spinner_hint_gray">#A99F9F</color> <!-- 연회색 -->
+    <color name="spinner_text">#111111</color>      <!-- 일반 텍스트색 (검정) -->
+
+
+
+
+
     <!-- 기타/오류/안내 -->
     <string name="error_missing_info">️설정에서 닉네임, 생일, MBTI를 입력해주세요.</string>
     <string name="error_fetch_failed">결과를 불러올 수 없습니다.</string>

@@ -17,7 +17,7 @@ class HomeFragment : Fragment() {
         val aiMessage = view.findViewById<TextView>(R.id.ai_message)
         val btnDream = view.findViewById<Button>(R.id.btn_dream)
 
-        // ✅ 오늘의 GPT 메시지 불러오기
+        //  오늘의 GPT 메시지 불러오기
         aiMessage.text = "✨ 오늘의 해몽 메시지를 불러오는 중이에요..."
         DailyMessageManager.getMessage(requireContext()) { msg ->
             activity?.runOnUiThread {

@@ -3,10 +3,13 @@ package com.example.dreamindream
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
+import com.airbnb.lottie.LottieAnimationView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import okhttp3.*
@@ -23,8 +26,9 @@ class FortuneFragment : Fragment() {
     private val apiKey = BuildConfig.OPENAI_API_KEY
     private lateinit var prefs: SharedPreferences
     private lateinit var resultText: TextView
-    private lateinit var progressBar: ProgressBar
+    private lateinit var loadingView: LottieAnimationView
     private lateinit var button: Button
+    private lateinit var cardView: CardView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,13 +37,17 @@ class FortuneFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_fortune, container, false)
 
         resultText = view.findViewById(R.id.fortune_result)
-        progressBar = view.findViewById(R.id.fortune_progress)
+        loadingView = view.findViewById(R.id.fortune_loading)
         button = view.findViewById(R.id.fortuneButton)
+        cardView = view.findViewById(R.id.fortuneCard)
 
         prefs = requireContext().getSharedPreferences("user_info", Context.MODE_PRIVATE)
         view.findViewById<AdView>(R.id.adView_fortune).loadAd(AdRequest.Builder().build())
 
-        // 공통 클릭 애니메이션
+        // CardView는 처음에 작게(wrap_content) 시작
+        cardView.post { setCardMin() }
+
+        // 버튼 클릭 애니메이션 + 로직
         fun View.applyScaleClick(action: () -> Unit) {
             this.setOnClickListener {
                 it.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.scale_up))
@@ -47,26 +55,15 @@ class FortuneFragment : Fragment() {
             }
         }
 
-        val today = getToday()
-        val savedDate = prefs.getString("fortune_date", "")
-        val savedFortune = prefs.getString("fortune_result", "")
-
-        // 캐시된 운세 표시
-        if (today == savedDate && !savedFortune.isNullOrBlank()) {
-            resultText.text = savedFortune
-            button.isEnabled = false
-            button.text = "오늘 운세 확인 완료"
-        }
-
-        // 운세 보기 버튼
         button.applyScaleClick {
+            setCardMin() // 결과 전엔 항상 작게
             val userInfo = checkUserInfo()
             if (userInfo != null) {
                 fetchFortune(userInfo)
             }
         }
 
-        // 뒤로가기 버튼
+        // 뒤로가기
         view.findViewById<ImageButton>(R.id.backButton).applyScaleClick {
             parentFragmentManager.beginTransaction()
                 .setCustomAnimations(
@@ -80,6 +77,22 @@ class FortuneFragment : Fragment() {
         }
 
         return view
+    }
+
+    // CardView 작게 (wrap_content + minHeight)
+    private fun setCardMin() {
+        val params = cardView.layoutParams
+        params.height = LinearLayout.LayoutParams.WRAP_CONTENT
+        cardView.layoutParams = params
+    }
+
+    // CardView 크게 (400dp)
+    private fun setCardLarge() {
+        val params = cardView.layoutParams
+        params.height = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP, 400f, resources.displayMetrics
+        ).toInt()
+        cardView.layoutParams = params
     }
 
     private fun getToday(): String {
@@ -104,7 +117,9 @@ class FortuneFragment : Fragment() {
         val (nickname, mbti, birth) = userInfo
         val prompt = buildPrompt(nickname, mbti, birth)
 
-        progressBar.visibility = View.VISIBLE
+        // --- Lottie 로딩 애니메이션 시작 ---
+        loadingView.visibility = View.VISIBLE
+        loadingView.playAnimation()
         resultText.text = ""
 
         val requestBody = JSONObject().apply {
@@ -126,8 +141,10 @@ class FortuneFragment : Fragment() {
         OkHttpClient().newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 requireActivity().runOnUiThread {
-                    progressBar.visibility = View.GONE
+                    loadingView.cancelAnimation()
+                    loadingView.visibility = View.GONE
                     resultText.text = getString(R.string.error_fetch_failed)
+                    setCardMin()
                 }
             }
 
@@ -148,14 +165,10 @@ class FortuneFragment : Fragment() {
                 }
 
                 requireActivity().runOnUiThread {
-                    progressBar.visibility = View.GONE
+                    loadingView.cancelAnimation()
+                    loadingView.visibility = View.GONE
                     resultText.text = fortuneResult
-                    prefs.edit()
-                        .putString("fortune_date", getToday())
-                        .putString("fortune_result", fortuneResult)
-                        .apply()
-                    button.isEnabled = false
-                    button.text = "오늘 운세 확인 완료"
+                    setCardLarge()
                 }
             }
         })

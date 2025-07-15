@@ -29,6 +29,15 @@ class SettingsFragment : Fragment() {
     private lateinit var infoSummary: TextView
     private lateinit var infoDetails: TextView
     private lateinit var loadingSpinner: ProgressBar
+    private lateinit var birthTimeSpinner: Spinner
+
+    // 태어난 시간 목록 (지지)
+    private val birthTimes = listOf(
+        "선택안함", "자시 (23:00~01:00)", "축시 (01:00~03:00)", "인시 (03:00~05:00)",
+        "묘시 (05:00~07:00)", "진시 (07:00~09:00)", "사시 (09:00~11:00)",
+        "오시 (11:00~13:00)", "미시 (13:00~15:00)", "신시 (15:00~17:00)",
+        "유시 (17:00~19:00)", "술시 (19:00~21:00)", "해시 (21:00~23:00)"
+    )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
@@ -42,9 +51,44 @@ class SettingsFragment : Fragment() {
         infoSummary = view.findViewById(R.id.text_info_summary)
         infoDetails = view.findViewById(R.id.text_user_info)
         loadingSpinner = view.findViewById(R.id.progress_saving)
+        birthTimeSpinner = view.findViewById(R.id.spinner_birthtime)
 
+        // ===== 커스텀 Spinner 어댑터 적용! =====
+        val adapter = object : ArrayAdapter<String>(
+            requireContext(),
+            R.layout.spinner_item,
+            birthTimes
+        ) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val v = super.getView(position, convertView, parent) as TextView
+                if (position == 0) {
+                    v.setTextColor(resources.getColor(R.color.spinner_hint_gray, null))
+                } else {
+                    v.setTextColor(resources.getColor(R.color.spinner_text, null))
+                }
+                return v
+            }
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val v = super.getDropDownView(position, convertView, parent) as TextView
+                if (position == 0) {
+                    v.setTextColor(resources.getColor(R.color.spinner_hint_gray, null))
+                } else {
+                    v.setTextColor(resources.getColor(R.color.spinner_text, null))
+                }
+                return v
+            }
+        }
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
+        birthTimeSpinner.adapter = adapter
+
+// 선택 시 0번(힌트) 선택 방지하려면:
+        birthTimeSpinner.setSelection(0, false)
+        // ================================
+
+        // 광고
         view.findViewById<AdView>(R.id.adView_settings).loadAd(AdRequest.Builder().build())
 
+        // 뒤로가기
         view.findViewById<ImageButton>(R.id.btn_back_settings).setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .setCustomAnimations(
@@ -113,10 +157,12 @@ class SettingsFragment : Fragment() {
         val birth = prefs.getString("birthdate", "")
         val nickname = prefs.getString("nickname", "")
         val mbti = prefs.getString("mbti", "")
+        val birthTime = prefs.getString("birth_time", "선택안함")
 
         birthEdit.setText(birth)
         nicknameEdit.setText(nickname)
         mbtiEdit.setText(mbti)
+        birthTimeSpinner.setSelection(birthTimes.indexOf(birthTime))
 
         if (gender == "남성") view?.findViewById<RadioButton>(R.id.radio_male)?.isChecked = true
         if (gender == "여성") view?.findViewById<RadioButton>(R.id.radio_female)?.isChecked = true
@@ -131,14 +177,18 @@ class SettingsFragment : Fragment() {
             R.id.radio_female -> "여성"
             else -> ""
         }
-
         val mbti = mbtiEdit.text.toString().trim()
+        val birthTime = birthTimeSpinner.selectedItem as String
         if (gender.isEmpty()) {
             Toast.makeText(requireContext(), "성별을 선택해주세요.", Toast.LENGTH_SHORT).show()
             return false
         }
         if (mbti.isEmpty()) {
             Toast.makeText(requireContext(), "MBTI를 입력해주세요.", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        if (birthTime == "선택안함") {
+            Toast.makeText(requireContext(), "태어난 시간을 선택해주세요.", Toast.LENGTH_SHORT).show()
             return false
         }
         return true
@@ -154,6 +204,7 @@ class SettingsFragment : Fragment() {
         val birth = birthEdit.text.toString()
         val nickname = nicknameEdit.text.toString()
         val mbti = mbtiEdit.text.toString().uppercase(Locale.ROOT)
+        val birthTime = birthTimeSpinner.selectedItem as String
 
         val mbtiMeaning = when (mbti) {
             "INFP" -> "이상주의적이며 감성적인 사람. 몽환적이고 의미 있는 꿈을 많이 꿉니다."
@@ -180,12 +231,14 @@ class SettingsFragment : Fragment() {
             putString("birthdate", birth)
             putString("nickname", nickname)
             putString("mbti", mbti)
+            putString("birth_time", birthTime)
             apply()
         }
 
         infoDetails.text = """
             🧑 닉네임: $nickname
             🎂 생일: $birth
+            🕰️ 태어난 시간: $birthTime
             ⚧️ 성별: $selectedGender
             🔮 MBTI: $mbti
             💬 $mbtiMeaning
@@ -197,17 +250,19 @@ class SettingsFragment : Fragment() {
     private fun toggleEditMode(editMode: Boolean) {
         isEditMode = editMode
 
-        val view = view ?: return // view가 아직 준비 안 된 경우 방지
+        val view = view ?: return
 
         val editViews = listOf(
             genderGroup,
             birthEdit,
             nicknameEdit,
             mbtiEdit,
+            birthTimeSpinner,
             view.findViewById(R.id.label_gender),
             view.findViewById(R.id.label_birthdate),
             view.findViewById(R.id.label_nickname),
-            view.findViewById(R.id.label_mbti)
+            view.findViewById(R.id.label_mbti),
+            view.findViewById(R.id.label_birthtime)
         )
 
         val showViews = listOf(infoSummary, infoDetails)
@@ -217,8 +272,6 @@ class SettingsFragment : Fragment() {
 
         saveButton.text = if (editMode) "저장" else "수정"
     }
-
-
 
     private fun showLoading() {
         infoDetails.text = "로딩 중..."

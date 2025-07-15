@@ -5,6 +5,12 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services") //  Firebase 연동 추가
+    id("com.google.firebase.crashlytics") // 어플 crash 나면 firebase로 체크가능
+    //크래시 위치 및 로그
+    //기기 정보 (모델, OS 버전 등)
+    //유저 수/빈도별 그룹
+
 }
 
 val localProperties = Properties().apply {
@@ -53,7 +59,7 @@ android {
 
     buildFeatures {
         buildConfig = true
-        viewBinding = true  //  viewBinding 추가
+        viewBinding = true
     }
 
     packaging {
@@ -65,6 +71,14 @@ android {
 
 dependencies {
 
+    //  Firebase SDK 추가
+    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-firestore-ktx") //유저꿈 저장
+    implementation("com.google.firebase:firebase-messaging") // 팝업메세지
+    implementation("com.google.firebase:firebase-config-ktx:21.6.0")
+
+
     implementation("com.kizitonwose.calendar:view:2.3.0")
     implementation("com.airbnb.android:lottie:6.4.0")
     implementation("com.google.android.gms:play-services-ads:22.6.0")
@@ -74,7 +88,6 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.google.android.material:material:1.12.0")
-
     implementation("androidx.cardview:cardview:1.0.0")
 
     implementation(libs.androidx.core.ktx)

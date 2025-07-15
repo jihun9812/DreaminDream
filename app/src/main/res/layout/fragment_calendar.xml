@@ -13,11 +13,11 @@
         android:layout_margin="8dp"
         android:background="@android:color/transparent"
         android:contentDescription="@string/back_button"
-        android:src="@android:drawable/ic_menu_revert"
+        android:src="@drawable/ic_back"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true" />
 
-    <!-- 📌 공휴일 이름 -->
+    <!--  공휴일 이름 -->
     <TextView
         android:id="@+id/holidayTextView"
         android:layout_width="wrap_content"
@@ -28,7 +28,7 @@
         android:textColor="@android:color/black"
         android:textSize="14sp" />
 
-    <!-- 📅 월 셀렉터 -->
+    <!--  월 셀렉터 -->
     <LinearLayout
         android:id="@+id/monthSelector"
         android:layout_width="match_parent"

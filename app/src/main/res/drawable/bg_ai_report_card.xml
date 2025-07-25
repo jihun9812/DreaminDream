@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 그림자(음영) 레이어 -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#207A55D3"/> <!-- 아주 연한 그림자(보라톤 12% 투명) -->
+            <corners android:radius="20dp"/>
+        </shape>
+    </item>
+    <!-- 메인 카드(반투명, 밝은 보라) -->
+    <item android:left="2dp" android:top="2dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#CCF7F3FF"/> <!-- 연보라+반투명(80%) -->
+            <corners android:radius="18dp"/>
+        </shape>
+    </item>
+</layer-list>

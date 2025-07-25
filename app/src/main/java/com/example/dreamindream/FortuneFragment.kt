@@ -3,7 +3,6 @@ package com.example.dreamindream
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
@@ -12,6 +11,7 @@ import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
+import com.google.firebase.auth.FirebaseAuth
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -20,6 +20,8 @@ import org.json.JSONObject
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.constraintlayout.widget.ConstraintLayout
+
 
 class FortuneFragment : Fragment() {
 
@@ -28,7 +30,8 @@ class FortuneFragment : Fragment() {
     private lateinit var resultText: TextView
     private lateinit var loadingView: LottieAnimationView
     private lateinit var button: Button
-    private lateinit var cardView: CardView
+    private lateinit var fortuneCard: CardView
+    private var isExpanded = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,15 +42,23 @@ class FortuneFragment : Fragment() {
         resultText = view.findViewById(R.id.fortune_result)
         loadingView = view.findViewById(R.id.fortune_loading)
         button = view.findViewById(R.id.fortuneButton)
-        cardView = view.findViewById(R.id.fortuneCard)
+        fortuneCard = view.findViewById(R.id.fortuneCard)
 
-        prefs = requireContext().getSharedPreferences("user_info", Context.MODE_PRIVATE)
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+        prefs = requireContext().getSharedPreferences("user_info_$userId", Context.MODE_PRIVATE)
         view.findViewById<AdView>(R.id.adView_fortune).loadAd(AdRequest.Builder().build())
 
-        // CardView는 처음에 작게(wrap_content) 시작
-        cardView.post { setCardMin() }
+        // ✅ 테스트용: 항상 새로 보게 (운영 시 제거)
+        prefs.edit().remove("fortune_${getToday()}").apply()
 
-        // 버튼 클릭 애니메이션 + 로직
+        val today = getToday()
+        val cachedResult = prefs.getString("fortune_$today", null)
+        if (cachedResult != null) {
+            resultText.text = cachedResult
+            expandFortuneCard(view)
+            button.isEnabled = false
+        }
+
         fun View.applyScaleClick(action: () -> Unit) {
             this.setOnClickListener {
                 it.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.scale_up))
@@ -56,14 +67,12 @@ class FortuneFragment : Fragment() {
         }
 
         button.applyScaleClick {
-            setCardMin() // 결과 전엔 항상 작게
             val userInfo = checkUserInfo()
             if (userInfo != null) {
-                fetchFortune(userInfo)
+                fetchFortune(userInfo, today, view)
             }
         }
 
-        // 뒤로가기
         view.findViewById<ImageButton>(R.id.backButton).applyScaleClick {
             parentFragmentManager.beginTransaction()
                 .setCustomAnimations(
@@ -77,22 +86,6 @@ class FortuneFragment : Fragment() {
         }
 
         return view
-    }
-
-    // CardView 작게 (wrap_content + minHeight)
-    private fun setCardMin() {
-        val params = cardView.layoutParams
-        params.height = LinearLayout.LayoutParams.WRAP_CONTENT
-        cardView.layoutParams = params
-    }
-
-    // CardView 크게 (400dp)
-    private fun setCardLarge() {
-        val params = cardView.layoutParams
-        params.height = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP, 400f, resources.displayMetrics
-        ).toInt()
-        cardView.layoutParams = params
     }
 
     private fun getToday(): String {
@@ -113,13 +106,27 @@ class FortuneFragment : Fragment() {
         }
     }
 
-    private fun fetchFortune(userInfo: Triple<String, String, String>) {
+    private fun fetchFortune(userInfo: Triple<String, String, String>, today: String, view: View) {
         val (nickname, mbti, birth) = userInfo
         val prompt = buildPrompt(nickname, mbti, birth)
 
-        // --- Lottie 로딩 애니메이션 시작 ---
+        // 로딩 시작 - 위에서 뚝 떨어지는 애니메이션 (더 통통 튀게)
+        loadingView.alpha = 0f
+        loadingView.translationY = -300f
+        loadingView.scaleX = 0.3f
+        loadingView.scaleY = 0.3f
         loadingView.visibility = View.VISIBLE
+        loadingView.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(700)
+            .setInterpolator(android.view.animation.BounceInterpolator())
+            .start()
         loadingView.playAnimation()
+
+        fortuneCard.visibility = View.GONE
         resultText.text = ""
 
         val requestBody = JSONObject().apply {
@@ -144,7 +151,7 @@ class FortuneFragment : Fragment() {
                     loadingView.cancelAnimation()
                     loadingView.visibility = View.GONE
                     resultText.text = getString(R.string.error_fetch_failed)
-                    setCardMin()
+                    expandFortuneCard(view)
                 }
             }
 
@@ -168,39 +175,91 @@ class FortuneFragment : Fragment() {
                     loadingView.cancelAnimation()
                     loadingView.visibility = View.GONE
                     resultText.text = fortuneResult
-                    setCardLarge()
+                    expandFortuneCard(view)
+                    prefs.edit().putString("fortune_$today", fortuneResult).apply()
+                    button.isEnabled = false
                 }
             }
         })
     }
 
+    private fun expandFortuneCard(view: View?) {
+        if (isExpanded) return
+        isExpanded = true
+
+        val rootLayout = view?.findViewById<ConstraintLayout>(R.id.root_fortune_layout)
+        val scrollView = view?.findViewById<ScrollView>(R.id.resultScrollView)
+        val resultText = view?.findViewById<TextView>(R.id.fortune_result)
+
+        // 카드뷰 보이기 (위에서 아래로)
+        fortuneCard.alpha = 0f
+        fortuneCard.scaleX = 0.8f
+        fortuneCard.scaleY = 0.8f
+        fortuneCard.translationY = -150f
+        fortuneCard.visibility = View.VISIBLE
+
+        // 카드뷰 슬라이드다운 애니메이션 - 부드럽게
+        fortuneCard.animate()
+            .alpha(1f)
+            .scaleX(1f)
+            .scaleY(1f)
+            .translationY(0f)
+            .setDuration(900)
+            .setStartDelay(100)
+            .setInterpolator(android.view.animation.DecelerateInterpolator(1.5f))
+            .start()
+
+        // 높이 확장 애니메이션
+        val newHeight = (resources.displayMetrics.heightPixels * 0.66).toInt()
+        val currentHeight = scrollView?.height ?: 80
+
+        android.animation.ValueAnimator.ofInt(currentHeight, newHeight).apply {
+            duration = 700
+            startDelay = 300
+            interpolator = android.view.animation.DecelerateInterpolator()
+            addUpdateListener { animator ->
+                val animatedValue = animator.animatedValue as Int
+                scrollView?.layoutParams?.height = animatedValue
+                scrollView?.requestLayout()
+            }
+            start()
+        }
+
+        resultText?.maxLines = Integer.MAX_VALUE
+        resultText?.ellipsize = null
+    }
+
     private fun buildPrompt(nickname: String, mbti: String, birth: String): String {
         return """
-        너는 오늘의 운세를 제공하는 AI야. 아래 사용자 정보를 기반으로 재미있고 직관적인 오늘의 운세를 작성해줘.
+        오늘의 운세 제공 AI입니다. 아래 정보로 운세를 작성하세요.
 
         [사용자 정보]
         - 닉네임: $nickname
-        - MBTI: $mbti
+        - MBTI: $mbti  
         - 생일: $birth
 
-        [작성 형식]
-        각 항목에 대해 0~100점 사이의 점수를 제공하고, 점수에 따라 아래와 같은 설명을 덧붙여줘:
-        - 60점 이하: 주의할 점이나 피해야 할 행동
-        - 61점 이상: 추천하는 행동이나 기회
+        [필수 작성 규칙]
+        1. 무조건 "오늘의 운세를 보여드릴게요 $nickname 님!"으로 시작
+        2. 각 항목마다 점수(0-100점) 필수 표시
+        3. 존댓말 사용
+        4. 간결하고 명확하게 작성
 
-        항목:
-        1. 총운
-        2. 재물운
-        3. 연애운
-        4. 학업/직장운
-        5. 로또 운세 및 추천 번호 (6자리)
+        [운세 항목 - 순서대로]
+        1. 총운 (점수/100)
+        2. 재물운 (점수/100)  
+        3. 연애운 (점수/100)
+        4. 학업/직장운 (점수/100)
+        5. 로또운 + 추천번호 6자리 (점수/100)
 
-        [추가 요청]
-        - 문장은 자연스럽고 사용자에게 말을 거는 듯한 말투로 써줘.
-        - 마지막에 오늘의 재미 요소나 유머 한 줄도 추가해줘.
-        - 모든 결과는 오늘 하루 동안만 유효하다는 느낌을 줘.
+        [점수별 가이드]
+        - 60점↓: 주의사항, 피할 행동
+        - 61점↑: 추천 행동, 기회
 
-        결과는 사용자에게 바로 보여질 형식이야. 너무 길거나 어렵지 않게 구성해줘.
+        [마무리]
+        - 오늘 하루 한정 운세임을 명시
+        - 재미있는 한줄 추가
+
+        즉시 운세 결과만 출력하세요. 설명 없이 바로 시작하세요.
     """.trimIndent()
     }
 }

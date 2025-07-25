@@ -1,18 +1,27 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- 앱 테마 -->
+    <!-- 앱 루트 스타일 -->
     <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:statusBarColor">@color/dark_background</item>
-        <item name="android:navigationBarColor">@color/dark_background</item>
-        <item name="android:windowBackground">@color/dark_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">#FFF9E5</item>
+        <item name="android:fontFamily">@font/pretendard_medium</item>
     </style>
 
-    <!-- 유리버튼 (Glass Effect) -->
+    <!-- 스플래시/온보딩용 -->
+    <style name="Theme.DreaminDream.TransparentFullScreen" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:fontFamily">@font/pretendard_medium</item>
+    </style>
+
+    <!-- 버튼 -->
     <style name="GlassButton">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">56dp</item>
-        <item name="android:background">@drawable/button_glass</item>
         <item name="android:textColor">@color/bubble_bg</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:padding">12dp</item>
@@ -29,34 +38,77 @@
         <item name="android:elevation">2dp</item>
     </style>
 
-    <!-- 카드뷰 스타일 -->
+    <!-- 카드뷰 -->
     <style name="DreamCardView" parent="Base.CardView">
         <item name="cardCornerRadius">20dp</item>
         <item name="cardElevation">8dp</item>
         <item name="android:backgroundTint">#848DC8</item>
     </style>
 
-    <!-- 캘린더 날짜 -->
+    <!-- 캘린더 -->
     <style name="CalendarDateText" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/black</item>
     </style>
 
-    <!-- 캘린더 요일 -->
     <style name="CalendarWeekdayText" parent="TextAppearance.AppCompat.Medium">
         <item name="android:textSize">12sp</item>
         <item name="android:textColor">#888888</item>
     </style>
 
-    <!--  DatePicker용 커스텀 테마 -->
+    <style name="CalendarWeekday">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#333</item>
+        <item name="android:fontFamily">@font/pretendard_bold</item>
+    </style>
 
-        <!-- MaterialDatePicker에 적용할 커스텀 스타일 -->
+    <!-- 날짜 선택기 (DatePicker) -->
     <style name="MyDatePickerStyle" parent="ThemeOverlay.Material3.MaterialCalendar">
-        <item name="colorOnPrimary">@color/your_black</item>
-        <item name="colorOnSurface">@color/your_black</item>
+        <item name="materialCalendarTheme">@style/MyDatePickerColorTheme</item>
+    </style>
 
+    <style name="MyDatePickerColorTheme" parent="Theme.Material3.DayNight.Dialog">
+        <item name="colorPrimary">#9575CD</item>
+        <item name="colorOnPrimary">#FEF6E4</item>
+        <item name="colorSurface">#FEF6E4</item>
+        <item name="colorOnSurface">#4A148C</item>
+        <item name="android:windowBackground">#FEF6E4</item>
+    </style>
+
+    <style name="DatePickerHeadline" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:textColor">#4A148C</item>
+    </style>
+
+    <style name="DatePickerBody" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">#333333</item>
     </style>
 
 
+    <style name="CustomMaterial3AlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <!-- 배경색 -->
+        <item name="colorSurface">@color/colorAccent</item>
+
+        <!-- 제목 텍스트 색상 -->
+        <item name="colorOnSurface">@color/black</item>
+
+        <!-- 확인 버튼 색상 -->
+        <item name="colorPrimary">@color/black</item>
+
+        <!-- 취소 버튼 색상 -->
+        <item name="colorOnSurfaceVariant">@color/black</item>
+
+        <!-- 모서리 둥글게 -->
+        <item name="shapeAppearanceSmallComponent">@style/RoundedCorners</item>
+    </style>
+
+    <style name="RoundedCorners" parent="ShapeAppearance.Material3.Corner.Medium">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
 
 </resources>

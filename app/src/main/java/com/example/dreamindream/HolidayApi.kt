@@ -7,8 +7,7 @@ import java.io.IOException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-// 공휴일 데이터 클래스
-data class Holiday(val date: LocalDate, val name: String)
+
 
 object HolidayApi {
 

@@ -12,7 +12,20 @@
           "package_name": "com.example.dreamindream"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "886944015637-h12o49ko1s2hfkbg6i8cvnis49qfu6ee.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dreamindream",
+            "certificate_hash": "7db25166b27892546ccc6503a53728d0b7b50ba7"
+          }
+        },
+        {
+          "client_id": "886944015637-96pcphpcqug6pga1v9aogdcg4bfr7mav.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCI1aEqU1dr02WoEvZBsFtdVsnZeN5dWE0"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "886944015637-96pcphpcqug6pga1v9aogdcg4bfr7mav.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -12,6 +12,8 @@ import com.airbnb.lottie.LottieAnimationView
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.AdView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -28,7 +30,6 @@ class DreamFragment : Fragment() {
     private lateinit var resultTextView: TextView
     private lateinit var dreamEditText: EditText
     private lateinit var lottieLoading: LottieAnimationView
-    private lateinit var dateText: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,19 +43,11 @@ class DreamFragment : Fragment() {
 
         prefs = requireContext().getSharedPreferences("dream_history", Context.MODE_PRIVATE)
 
-        // UI 초기화
         dreamEditText = view.findViewById(R.id.dreamEditText)
         resultTextView = view.findViewById(R.id.resultTextView)
         lottieLoading = view.findViewById(R.id.lottieLoading)
-        dateText = view.findViewById(R.id.dateText)
-
-        // 오늘 날짜 표시
-        dateText.text = getToday()
-
-        // 로딩 애니는 처음엔 안보임
         lottieLoading.visibility = View.GONE
 
-        // 공통 클릭 애니메이션
         fun View.applyScaleClick(action: () -> Unit) {
             this.setOnClickListener {
                 it.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.scale_up))
@@ -78,23 +71,12 @@ class DreamFragment : Fragment() {
         // 해몽 버튼
         view.findViewById<Button>(R.id.interpretButton).applyScaleClick {
             val dreamText = dreamEditText.text.toString().trim()
-            if (validateInput(dreamText)) {
+            if (validateInputSmart(dreamText)) {
                 fetchInterpretation(dreamText)
             }
         }
 
         return view
-    }
-
-    // 오늘 날짜 문자열 반환 (ex: 2025년 7월 11일 (금))
-    private fun getToday(): String {
-        val today = Calendar.getInstance()
-        val year = today.get(Calendar.YEAR)
-        val month = today.get(Calendar.MONTH) + 1
-        val day = today.get(Calendar.DAY_OF_MONTH)
-        val weekDayKor = arrayOf("일", "월", "화", "수", "목", "금", "토")
-        val dayOfWeek = weekDayKor[today.get(Calendar.DAY_OF_WEEK) - 1]
-        return "${year}년 ${month}월 ${day}일 (${dayOfWeek})"
     }
 
     private fun showLoading() {
@@ -108,9 +90,15 @@ class DreamFragment : Fragment() {
         resultTextView.text = result
     }
 
-    private fun validateInput(input: String): Boolean {
-        val bannedStarters = listOf("안녕", "gpt", "hello", "how are you", "what is", "tell me", "chatgpt", "who are you", "날씨", "시간")
-        val isSmallTalk = bannedStarters.any { input.lowercase().startsWith(it) }
+    private fun validateInputSmart(input: String): Boolean {
+        val bannedStarters = listOf(
+            "안녕", "gpt", "hello", "how are you", "what is", "tell me", "chatgpt",
+            "who are you", "날씨 알려줘", "시간 알려줘", "몇시", "몇 시"
+        )
+        val lower = input.lowercase().trim()
+        val isSmallTalk = bannedStarters.any { lower.startsWith(it) }
+        val isShortSingleWord = lower.length < 8 && (lower in listOf("날씨", "시간"))
+        val isQuestion = (lower.endsWith("?") || lower.startsWith("왜") || lower.startsWith("뭐야"))
         val isMathOnly = Regex("^\\s*\\d+\\s*[-+*/]\\s*\\d+\\s*$").containsMatchIn(input)
         val isGibberish = input.count { it.isLetterOrDigit() } < (input.length / 2)
 
@@ -119,7 +107,7 @@ class DreamFragment : Fragment() {
                 resultTextView.text = "꿈 내용을 입력해주세요."
                 false
             }
-            input.length < 10 || isSmallTalk || isMathOnly || isGibberish -> {
+            input.length < 10 || isSmallTalk || isShortSingleWord || isQuestion || isMathOnly || isGibberish -> {
                 resultTextView.text = "의미 있는 꿈 내용을 구체적으로 입력해주세요."
                 false
             }
@@ -135,14 +123,16 @@ class DreamFragment : Fragment() {
             put("temperature", 0.7)
             put("messages", JSONArray().put(
                 JSONObject().put("role", "user").put("content", """
-너는 지금부터 꿈을 예지몽처럼 분석하는 전문가 역할을 수행해야 해. 다른 종류의 해몽은 절대 하지 마. 반드시 예지몽이라는 전제 하에 다음 꿈 내용을 분석해.
+너는 지금부터 꿈을 예지몽처럼 분석하는 전문가다. 아래 꿈은 예지몽이라고 가정하고 다음 조건에 따라 분석하라.
 
 [분석 기준]
-- 반드시 이 꿈이 **미래에 실제로 일어날 수 있는 사건**을 암시하는 것으로 가정해.
-- 꿈 속 **인물, 배경, 행동, 감정**을 세부적으로 해석해서, 그 요소가 어떤 미래 사건을 예고하는지 구체적으로 설명해.
-- 현실 세계에서 발생할 수 있는 **구체적인 일이나 변화**를 반드시 예시로 들어줘.
-- 막연한 해석이나 조언은 금지하고, 반드시 예지몽처럼 직결된 결과만 말해.
-- 마지막에는 이 꿈이 예고하는 미래 사건을 한 줄로 요약해.
+- 꿈 내용을 바로 분석하라. 서론이나 설명 없이 곧바로 해석 시작
+-설명은 존댓말로 성심껏.
+- 인물, 배경, 행동, 감정 요소를 분석해 현실에서 발생할 수 있는 구체적인 사건으로 연결
+- 심리적 조언이나 모호한 말 금지. 반드시 실제로 일어날 수 있는 사건으로 예측
+- 마지막에 예고된 사건을 **한 줄로 요약**
+- 그 뒤에 이 꿈이 길몽인지 흉몽인지 **짧은 한줄로 판단**
+- 마지막에는 **"조심할 점"과 "해야 할 점"**을 각각 1~2줄로 정리
 
 [꿈 내용]
 \"\"\"$prompt\"\"\"
@@ -191,6 +181,7 @@ class DreamFragment : Fragment() {
     }
 
     private fun saveDream(dream: String, result: String) {
+        // 1) 로컬 저장
         val dateKey = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA).format(Date())
         val savedArray = JSONArray(prefs.getString(dateKey, "[]") ?: "[]")
         savedArray.put(JSONObject().apply {
@@ -199,6 +190,20 @@ class DreamFragment : Fragment() {
         })
         prefs.edit {
             putString(dateKey, savedArray.toString())
+        }
+
+        // 2) Firestore 저장
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val db = FirebaseFirestore.getInstance()
+            val data = hashMapOf(
+                "dream" to dream,
+                "result" to result,
+                "timestamp" to System.currentTimeMillis()
+            )
+            db.collection("users").document(userId)
+                .collection("dreams").document(dateKey)
+                .collection("entries").add(data)
         }
     }
 }

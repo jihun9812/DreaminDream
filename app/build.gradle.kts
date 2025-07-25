@@ -7,9 +7,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services") //  Firebase 연동 추가
     id("com.google.firebase.crashlytics") // 어플 crash 나면 firebase로 체크가능
-    //크래시 위치 및 로그
-    //기기 정보 (모델, OS 버전 등)
-    //유저 수/빈도별 그룹
 
 }
 
@@ -77,9 +74,19 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore-ktx") //유저꿈 저장
     implementation("com.google.firebase:firebase-messaging") // 팝업메세지
     implementation("com.google.firebase:firebase-config-ktx:21.6.0")
+    implementation("com.google.firebase:firebase-auth-ktx")
 
 
-    implementation("com.kizitonwose.calendar:view:2.3.0")
+
+    // google gradle 추가.
+
+    implementation ("com.google.android.gms:play-services-auth:21.1.0")
+
+
+//ai 분석 바 차트
+    implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    implementation("com.kizitonwose.calendar:view:2.5.0")
     implementation("com.airbnb.android:lottie:6.4.0")
     implementation("com.google.android.gms:play-services-ads:22.6.0")
     implementation("androidx.core:core-splashscreen:1.0.1")

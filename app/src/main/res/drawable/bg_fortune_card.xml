@@ -1,0 +1,18 @@
+<!-- res/drawable/bg_fortune_card.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:startColor="#A1ACDC"
+                android:endColor="#8E8CF0"
+                android:angle="90"/>
+            <corners android:radius="24dp"/>
+        </shape>
+    </item>
+    <item android:right="2dp" android:left="2dp" android:top="2dp" android:bottom="2dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#33FFFFFF" />
+            <corners android:radius="24dp"/>
+        </shape>
+    </item>
+</layer-list>

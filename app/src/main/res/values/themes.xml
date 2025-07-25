@@ -1,20 +1,20 @@
 <resources>
 
-    <!-- 앱 전체 테마 -->
+    <!-- 앱 전체 테마 (상·하단 투명 + 연한 배경색) -->
     <style name="Theme.DreaminDream" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:colorBackground">@color/dark_background</item>
-        <item name="android:textColorPrimary">@color/textPrimary</item>
-        <item name="android:statusBarColor">?attr/colorSurface</item>
-        <item name="android:navigationBarColor">?attr/colorSurface</item>
+        <item name="android:colorBackground">#FFF9E5</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowLightStatusBar">true</item> <!-- 상태바 아이콘 어둡게 -->
+        <item name="android:fontFamily">@font/pretendard_medium</item>
     </style>
 
-    <!-- SplashActivity 전용 (API 30 이하 대응) -->
+    <!-- SplashActivity 전용 테마 -->
     <style name="Theme.DreaminDream.Splash" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowBackground">@color/dark_background</item>
+        <item name="android:windowBackground">#FFF9E5</item>
         <item name="android:windowFullscreen">true</item>
     </style>
-
-
-
 
 </resources>

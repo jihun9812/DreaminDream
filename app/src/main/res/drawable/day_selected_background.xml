@@ -1,5 +1,6 @@
-<!-- res/drawable/day_selected_background.xml -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
-    <solid android:color="#80FFD54F" /> <!-- 밝은 노랑 계열 반투명 -->
-    <size android:width="40dp" android:height="40dp" />
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+    <solid android:color="#AD8C9EFF" />
+    <size android:width="30dp" android:height="32dp" />
 </shape>

@@ -26,7 +26,7 @@ object DailyMessageManager {
             return
         }
 
-        val prompt = "꿈 해몽 전문가 AI가 하루에 하나씩 말하는 조언 멘트. 1문장. 신비롭고 친근한 말투."
+        val prompt = "꿈 해몽 전문가 AI가 하루에 하나씩 말하는 조언 멘트 짧게 40단어 이내. 신비롭고 친근한 말투."
 
         val json = """
             {

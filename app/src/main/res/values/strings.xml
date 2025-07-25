@@ -27,8 +27,7 @@
     <string name="btn_dream">해몽</string>
     <string name="btn_calendar">달력 보기</string>
     <string name="btn_fortune">오늘의 운세 보기</string>
-    <string name="fortune_placeholder">운세 결과표시</string>
-    <string name="fortune_result_placeholder">운세 결과가 여기에 표시됩니다.</string>
+    <string name="fortune_placeholder">운세 결과가 여기에 표시됩니다.</string>
     <string name="dream_list_title">📝 %1$s 꿈 기록</string>
     <string name="dream_star_text">어떤 꿈을 꾸었나요?</string>
     <string name="btn_dream_en">Dream Interpretation</string>
@@ -54,12 +53,73 @@
     <string name="edit">수정</string>
     <string name="label_profile_summary">🌟 프로필 정보</string>
     <string name="info_summary">저장된 정보를 기반으로 오늘의 운세가 제공됩니다.</string>
+    <string name="default_web_client_id">886944015637-96pcphpcqug6pga1v9aogdcg4bfr7mav.apps.googleusercontent.com</string>
 
-    <!--  setting에 있는 spinner 부분 색상 -->
-    <color name="spinner_hint_gray">#A99F9F</color> <!-- 연회색 -->
-    <color name="spinner_text">#111111</color>      <!-- 일반 텍스트색 (검정) -->
+    <!-- login.xml 부분 string -->
+    <string name="login_slogan">꿈에서 해답을찾다</string>
+    <string name="login_guide">아직 회원이 아니라면, 회원가입 후 이용해보세요!\n구글 로그인/체험 모드로도 바로 사용 가능!</string>
+    <string name="dreamin_slogan1"> </string>
+    <string name="login_password_confirm_hint">비밀번호 확인</string>
+    <string name="login_findpw">비밀번호 찾기</string>
+    <string name="login_findpw_send">이메일로 전송</string>
+    <string name="text_divider"> / </string>
+    <string name="login_email_hint">이메일</string>
+    <string name="login_password_hint">비밀번호</string>
+    <string name="login_btn_login">로그인</string>
+    <string name="login_btn_signup">회원가입</string>
+    <string name="login_btn_google">구글 로그인</string>
+    <string name="login_btn_guest">체험</string>
+    <string name="privacy_and_version">v1.07 Dream in Dream | 개인정보처리방침</string>
+    <string name="brand_logo_desc">Dream in Dream </string>
+
+    <string name="ok">확인</string>
+    <string name="selected">선택됨</string>
 
 
+
+    <!--Home Fragment -->
+    <string name="ai_no_dream">아직 꿈 기록이 없어요</string>
+    <string name="ai_report_guide">꿈을 기록하면 AI가 주간 분석을 보여줍니다.</string>
+    <string name="ai_not_enough_data">분석 데이터 부족</string>
+    <string name="ai_need_more">분석을 위해 꿈 기록이 좀 더 필요해요.</string>
+    <string name="ai_loading">AI 주간 꿈 분석 중...</string>
+    <string name="ai_loading2">AI가 주간 꿈 분석을 생성 중입니다.</string>
+    <string name="ai_report_fail">AI 분석 실패</string>
+    <string name="ai_retry">잠시 후 다시 시도해 주세요.</string>
+    <string name="ai_report_summary">이번 주 꿈 분석 요약</string>
+    <string name="ai_emotion_keywords_ai">감정: %1$s\n키워드: %2$s\nAI: %3$s</string>
+    <string name="ai_report_button">AI 리포트</string>
+    <string name="ai_msg_loading">✨ 오늘의 해몽 메시지를 불러오는 중이에요...</string>
+
+
+    <string name="ai_emotion_keywords_simple">감정: %1$s\n키워드: %2$s</string>
+
+    <!-- calendar  부분~~ 채윤이 내꺼 -->
+    <string name="calendar_icon_desc">달력 아이콘</string>
+
+
+
+    <!-- ai 분석 string -->
+    <string name="dream_report_title">AI 주간 꿈 리포트</string>
+    <string name="dream_icon_desc">꿈 아이콘</string>
+    <string name="no_data_label">꿈 기록이 없어요!</string>
+    <string name="weekly_keywords_label">주간 키워드: </string>
+    <string name="ai_analysis_label">AI 분석:</string>
+    <string name="btn_back_home">홈으로 돌아가기</string>
+
+    <!-- 추가된 로그인 관련 문자열들 -->
+    <string name="forgot_password">비밀번호 찾기</string>
+    <string name="sign_up">회원가입</string>
+    <string name="cancel">취소</string>
+    <string name="sign_up_title">회원가입</string>
+    <string name="sign_up_button">회원가입</string>
+    <string name="email_hint">이메일</string>
+    <string name="password_hint">비밀번호</string>
+    <string name="password_confirm_hint">비밀번호 확인</string>
+    <string name="password_reset_title">비밀번호 재설정</string>
+    <string name="send_reset_email">비밀번호 재설정 메일 발송</string>
+    <string name="google_login">구글로 로그인</string>
+    <string name="close">닫기</string>
 
 
 
@@ -75,4 +135,8 @@
         <item>여성</item>
         <item>기타</item>
     </string-array>
+
+    <!--  setting에 있는 spinner 부분 색상 -->
+    <color name="spinner_hint_gray">#A99F9F</color> <!-- 연회색 -->
+    <color name="spinner_text">#111111</color>      <!-- 일반 텍스트색 (검정) -->
 </resources>

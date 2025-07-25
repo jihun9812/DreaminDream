@@ -1,15 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="4dp">
+    android:layout_height="40dp"
+    android:layout_margin="1dp">
 
     <TextView
         android:id="@+id/calendarDayText"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_gravity="center"
         android:gravity="center"
-        android:textSize="14sp"
-        android:background="@drawable/day_background"
-        android:textColor="@android:color/black" />
+        android:textColor="@android:color/black"
+        android:textSize="13sp"
+        android:fontFamily="sans-serif-medium" />
+
+    <!-- 꿈해몽 표시용 점 (더 작게) -->
+    <View
+        android:id="@+id/dreamIndicator"
+        android:layout_width="3dp"
+        android:layout_height="3dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/dream_indicator_dot"
+        android:visibility="gone" />
+
 </FrameLayout>

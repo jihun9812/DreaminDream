@@ -16,8 +16,18 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         Log.d("FCM", "FCM 토큰: $token")
-        // 서버에 토큰 등록하는 로직 여기에 가능
+
+        // 로그인된 유저의 userId 가져오기
+        val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        // Firestore에 토큰 저장
+        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        db.collection("users").document(userId)
+            .update("fcmToken", token)
+            .addOnSuccessListener { Log.d("FCM", "토큰 Firestore 저장 성공") }
+            .addOnFailureListener { Log.e("FCM", "토큰 저장 실패", it) }
     }
+
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)

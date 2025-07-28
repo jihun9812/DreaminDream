@@ -1,7 +1,7 @@
 package com.example.dreamindream
 
 import android.content.Context
-import androidx.core.content.edit
+import com.google.firebase.firestore.FirebaseFirestore
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -11,28 +11,39 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 object DailyMessageManager {
-    private const val PREF_NAME = "daily_message"
-    private const val KEY_DATE = "cached_date"
-    private const val KEY_TEXT = "cached_text"
+
+    private val db = FirebaseFirestore.getInstance()
 
     fun getMessage(context: Context, onResult: (String) -> Unit) {
-        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         val today = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
-        val lastDate = prefs.getString(KEY_DATE, null)
-        val cached = prefs.getString(KEY_TEXT, null)
 
-        if (today == lastDate && !cached.isNullOrEmpty()) {
-            onResult(cached)
-            return
-        }
+        // Firestore에서 오늘 날짜 메시지 확인
+        db.collection("daily_messages").document(today).get()
+            .addOnSuccessListener { doc ->
+                val cached = doc.getString("message")
+                if (!cached.isNullOrEmpty()) {
+                    onResult(cached) // ✅ 있으면 그걸 보여줌 (모든 사용자 공통)
+                } else {
+                    // ✅ 없으면 GPT 호출 후 Firestore에 저장
+                    fetchFromGPT { message ->
+                        db.collection("daily_messages").document(today)
+                            .set(mapOf("message" to message))
+                        onResult(message)
+                    }
+                }
+            }
+            .addOnFailureListener {
+                onResult("오늘의 메시지를 불러올 수 없어요...")
+            }
+    }
 
-        val prompt = "꿈 해몽 전문가 AI가 하루에 하나씩 말하는 조언 멘트 짧게 40단어 이내. 신비롭고 친근한 말투."
-
+    private fun fetchFromGPT(onResult: (String) -> Unit) {
+        val prompt = "설명없이 빨리 전문 꿈해몽가답게 오늘의 조언멘트를 짧게 적어줘 한문장 존댓말로.."
         val json = """
             {
               "model": "gpt-3.5-turbo",
               "messages": [{"role": "user", "content": "$prompt"}],
-              "max_tokens": 50
+              "max_tokens": 80
             }
         """.trimIndent()
 
@@ -46,7 +57,7 @@ object DailyMessageManager {
 
         OkHttpClient().newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                onResult("오늘의 메시지를 불러올 수 없어요 🥲")
+                onResult("GPT 호출 실패... 메시지를 가져올 수 없어요.")
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -55,11 +66,6 @@ object DailyMessageManager {
                     .getJSONObject(0)
                     .getJSONObject("message")
                     .getString("content")
-
-                prefs.edit {
-                    putString(KEY_DATE, today)
-                    putString(KEY_TEXT, res)
-                }
 
                 onResult(res)
             }

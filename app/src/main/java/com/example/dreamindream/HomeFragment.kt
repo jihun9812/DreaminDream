@@ -52,14 +52,9 @@ class HomeFragment : Fragment() {
         // 기존 결과 불러오기 시도
         uid?.let {
             FirestoreManager.loadWeeklyReport(it) { feeling, keywords, analysis ->
-                if (feeling.isNotBlank() && keywords.isNotEmpty() && analysis.isNotBlank()) {
+                if (feeling.isNotBlank() && keywords.isNotEmpty() && analysis.isNotBlank() && weekDreams.isNotEmpty()) {
                     aiReportTitle.text = getString(R.string.ai_report_summary)
-                    aiReportSummary.text = getString(
-                        R.string.ai_emotion_keywords_ai,
-                        feeling,
-                        keywords.joinToString(", "),
-                        analysis
-                    )
+                    aiReportSummary.text = "감정: $feeling\n키워드: ${keywords.joinToString(", ")}"
                     lastFeeling = feeling
                     lastKeywords = keywords
                     lastAnalysis = analysis

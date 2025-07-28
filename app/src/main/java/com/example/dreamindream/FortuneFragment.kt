@@ -7,6 +7,7 @@ import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.cardview.widget.CardView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.gms.ads.AdRequest
@@ -20,8 +21,6 @@ import org.json.JSONObject
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import androidx.constraintlayout.widget.ConstraintLayout
-
 
 class FortuneFragment : Fragment() {
 
@@ -46,10 +45,8 @@ class FortuneFragment : Fragment() {
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
         prefs = requireContext().getSharedPreferences("user_info_$userId", Context.MODE_PRIVATE)
-        view.findViewById<AdView>(R.id.adView_fortune).loadAd(AdRequest.Builder().build())
 
-        // ✅ 테스트용: 항상 새로 보게 (운영 시 제거)
-        prefs.edit().remove("fortune_${getToday()}").apply()
+        view.findViewById<AdView>(R.id.adView_fortune).loadAd(AdRequest.Builder().build())
 
         val today = getToday()
         val cachedResult = prefs.getString("fortune_$today", null)
@@ -110,7 +107,7 @@ class FortuneFragment : Fragment() {
         val (nickname, mbti, birth) = userInfo
         val prompt = buildPrompt(nickname, mbti, birth)
 
-        // 로딩 시작 - 위에서 뚝 떨어지는 애니메이션 (더 통통 튀게)
+        // 애니메이션 시작
         loadingView.alpha = 0f
         loadingView.translationY = -300f
         loadingView.scaleX = 0.3f
@@ -191,14 +188,12 @@ class FortuneFragment : Fragment() {
         val scrollView = view?.findViewById<ScrollView>(R.id.resultScrollView)
         val resultText = view?.findViewById<TextView>(R.id.fortune_result)
 
-        // 카드뷰 보이기 (위에서 아래로)
         fortuneCard.alpha = 0f
         fortuneCard.scaleX = 0.8f
         fortuneCard.scaleY = 0.8f
         fortuneCard.translationY = -150f
         fortuneCard.visibility = View.VISIBLE
 
-        // 카드뷰 슬라이드다운 애니메이션 - 부드럽게
         fortuneCard.animate()
             .alpha(1f)
             .scaleX(1f)
@@ -209,7 +204,6 @@ class FortuneFragment : Fragment() {
             .setInterpolator(android.view.animation.DecelerateInterpolator(1.5f))
             .start()
 
-        // 높이 확장 애니메이션
         val newHeight = (resources.displayMetrics.heightPixels * 0.66).toInt()
         val currentHeight = scrollView?.height ?: 80
 
@@ -231,35 +225,39 @@ class FortuneFragment : Fragment() {
 
     private fun buildPrompt(nickname: String, mbti: String, birth: String): String {
         return """
-        오늘의 운세 제공 AI입니다. 아래 정보로 운세를 작성하세요.
+오늘의 운세를 제공하는 AI입니다. 아래 정보를 바탕으로 운세를 작성해 주세요.
 
-        [사용자 정보]
-        - 닉네임: $nickname
-        - MBTI: $mbti  
-        - 생일: $birth
+[사용자 정보]
+- 닉네임: $nickname
+- MBTI: $mbti  
+- 생년월일: $birth
 
-        [필수 작성 규칙]
-        1. 무조건 "오늘의 운세를 보여드릴게요 $nickname 님!"으로 시작
-        2. 각 항목마다 점수(0-100점) 필수 표시
-        3. 존댓말 사용
-        4. 간결하고 명확하게 작성
+[작성 규칙]
+1. 반드시 아래 문장으로 시작하세요:  
+   "우주의 기운으로 받는 오늘의 운세를 보여드릴게요, $nickname 님!"
+2. 각 항목에는 점수 (0~100점)를 반드시 포함하세요.
+3. 존댓말을 사용하세요.
+4. 간결하고 명확하게 작성하세요.
 
-        [운세 항목 - 순서대로]
-        1. 총운 (점수/100)
-        2. 재물운 (점수/100)  
-        3. 연애운 (점수/100)
-        4. 학업/직장운 (점수/100)
-        5. 로또운 + 추천번호 6자리 (점수/100)
+[운세 항목 – 아래 순서대로 작성]
+1. 총운 (점수 / 100점) – 항목 2~4의 평균에 기반해 작성
+2. 재물운 (점수 / 100점)  
+3. 연애운 (점수 / 100점)
+4. 학업/직장운 (점수 / 100점)
+5. 로또운 (점수 / 100점) + 추천 번호 6자리
 
-        [점수별 가이드]
-        - 60점↓: 주의사항, 피할 행동
-        - 61점↑: 추천 행동, 기회
+→ 각 항목마다 반드시 간결한 설명 문장을 1개 이상 포함하세요.  
+→ 절대 점수만 적지 말고, 설명을 생략하지 마세요.
 
-        [마무리]
-        - 오늘 하루 한정 운세임을 명시
-        - 재미있는 한줄 추가
+[점수별 작성 기준]
+- 60점 이하: 주의사항 또는 피해야 할 행동
+- 61점 이상: 추천 행동 또는 기회 제시
 
-        즉시 운세 결과만 출력하세요. 설명 없이 바로 시작하세요.
-    """.trimIndent()
+[마무리]
+- 마지막에 희망찬 한 줄 코멘트를 추가하세요  
+오늘은... 으로 시작하는 문장으로 마무리하세요.
+
+※ 지금 즉시 운세 결과만 출력하세요. 설명 없이 바로 시작하세요.
+        """.trimIndent()
     }
 }

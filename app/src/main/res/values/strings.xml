@@ -21,16 +21,19 @@
     <string name="next_month">다음 달</string>
     <string name="desc_calendar">캘린더</string>
     <string name="desc_dream_scroll">꿈 기록 스크롤</string>
-    <string name="year_month_format">%1$d년 %2$d월</string>
+
+
+    <string name="dream_usage_count">💭 해몽 가능 횟수: %1$d회</string>
+
+
 
     <!-- 해몽/꿈/운세 -->
-    <string name="btn_dream">해몽</string>
-    <string name="btn_calendar">달력 보기</string>
-    <string name="btn_fortune">오늘의 운세 보기</string>
-    <string name="fortune_placeholder">운세 결과가 여기에 표시됩니다.</string>
-    <string name="dream_list_title">📝 %1$s 꿈 기록</string>
+    <string name="btn_dream">꿈해몽</string>
+    <string name="btn_calendar">꿈달력 </string>
+    <string name="btn_fortune">행운보기</string>
+
+
     <string name="dream_star_text">어떤 꿈을 꾸었나요?</string>
-    <string name="btn_dream_en">Dream Interpretation</string>
     <string name="hint_input">여기에 꿈을 입력해주세요! </string>
     <string name="button_interpret">해몽하기</string>
     <string name="result_default">해몽 결과가 여기에 표시됩니다.</string>

@@ -42,7 +42,7 @@
         android:layout_marginHorizontal="16dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
-        android:backgroundTint="#B4C0EB"
+        android:backgroundTint="#CFCBFF"
         app:layout_constraintTop_toBottomOf="@id/dreamIcon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -62,6 +62,19 @@
                 android:textSize="17sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="6dp" />
+            <TextView
+                android:id="@+id/usageTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="오늘 남은 해몽 기회: 3회"
+                android:textColor="#4B3F14"
+                android:textSize="14sp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="4dp"
+                app:layout_constraintTop_toBottomOf="@id/editCard"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
 
             <EditText
                 android:id="@+id/dreamEditText"
@@ -84,11 +97,12 @@
         android:id="@+id/interpretButton"
         android:layout_width="0dp"
         android:layout_height="60dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginEnd="30dp"
+        android:layout_marginStart="130dp"
+        android:layout_marginEnd="130dp"
         android:layout_marginTop="10dp"
-        style="@style/GlassButton"
+        android:backgroundTint="#F8906C"
         android:text="@string/button_interpret"
+        android:textColor="#000000"
         app:layout_constraintTop_toBottomOf="@id/editCard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -105,11 +119,12 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
             android:layout_marginBottom="12dp"
-            android:layout_marginHorizontal="4dp"
+            android:layout_marginHorizontal="16dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="8dp"
-            android:backgroundTint="#B4C0EB">
+            android:backgroundTint="#CFCBFF">
 
             <LinearLayout
                 android:layout_width="match_parent"

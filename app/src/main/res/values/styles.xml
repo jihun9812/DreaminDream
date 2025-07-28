@@ -6,6 +6,7 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowBackground">#FFF9E5</item>
         <item name="android:fontFamily">@font/pretendard_medium</item>
+
     </style>
 
     <!-- 스플래시/온보딩용 -->
@@ -26,6 +27,7 @@
         <item name="android:textAllCaps">false</item>
         <item name="android:padding">12dp</item>
         <item name="android:textSize">17sp</item>
+        <item name="android:backgroundTint">#FFA07A</item>
         <item name="android:fontFamily">@font/pretendard_medium</item>
     </style>
 

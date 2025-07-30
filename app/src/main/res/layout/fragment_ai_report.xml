@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF9E5"
+    android:background="@drawable/main_ground"
     android:fitsSystemWindows="true">
 
     <!-- Scrollable 콘텐츠 -->
@@ -59,7 +59,7 @@
                         android:text="주간 꿈 리포트"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:textColor="#6C3DF4"
+                        android:textColor="#0C2C44"
                         android:fontFamily="@font/pretendard_bold"
                         android:layout_marginBottom="10dp"/>
 
@@ -135,7 +135,7 @@
                         android:text="@string/btn_back_home"
                         android:textSize="15sp"
                         app:cornerRadius="24dp"
-                        app:backgroundTint="#7A55D3"
+                        app:backgroundTint="#0C2C44"
                         android:textColor="#fff"
                         app:icon="@drawable/ic_back"
                         app:iconPadding="8dp"

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF9E5"
+    android:background="@drawable/main_ground"
     android:fitsSystemWindows="true">
 
     <!-- 상단 타이틀 바 (RelativeLayout로 변경, 중앙 배치) -->
@@ -63,7 +63,7 @@
             android:background="?selectableItemBackgroundBorderless"
             android:src="@drawable/ic_chevron_left"
             android:contentDescription="@string/prev_month"
-            app:tint="@android:color/black" />
+            app:tint="@color/white" />
 
         <TextView
             android:id="@+id/textViewMonthYear"
@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:text="2025년 7월"
             android:textSize="18sp"
-            android:textColor="@android:color/black"
+            android:textColor="@color/white"
             android:textStyle="bold"
             android:layout_marginHorizontal="12dp" />
 
@@ -82,7 +82,7 @@
             android:background="?selectableItemBackgroundBorderless"
             android:src="@drawable/ic_chevron_right"
             android:contentDescription="@string/next_month"
-            app:tint="@android:color/black" />
+            app:tint="@color/white" />
     </LinearLayout>
 
     <!-- 캘린더 뷰 (더 작게, 여백 줄임) -->
@@ -92,7 +92,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/monthSelector"
         android:layout_marginHorizontal="4dp"
-        android:layout_marginTop="0dp"
+        android:layout_marginTop="-5dp"
         app:cv_dayViewResource="@layout/example_day_view"
         app:cv_monthHeaderResource="@layout/example_month_header" />
 
@@ -103,8 +103,7 @@
         android:layout_height="0dp"
         android:layout_below="@id/calendarView"
         android:layout_above="@id/adViewCalendar"
-        android:layout_marginTop="4dp"
-
+        android:layout_marginTop="5dp"
         android:clipToPadding="false" />
 
     <!-- 광고 -->

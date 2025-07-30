@@ -1,17 +1,21 @@
 package com.example.dreamindream
-import androidx.core.content.edit
+
+import android.app.AlertDialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.text.Html
+import android.util.Log
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
 import com.example.dreamindream.ads.AdManager
+import com.example.dreamindream.DreamResultDialog
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -24,22 +28,24 @@ import org.json.JSONObject
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import android.app.AlertDialog
-import android.text.Html
+import java.util.concurrent.Executors
 
 class DreamFragment : Fragment() {
 
     private val apiKey = BuildConfig.OPENAI_API_KEY
     private lateinit var prefs: SharedPreferences
-    private lateinit var resultTextView: TextView
     private lateinit var dreamEditText: EditText
     private lateinit var lottieLoading: LottieAnimationView
     private lateinit var usageTextView: TextView
+    private lateinit var interpretButton: Button
 
     private val MAX_FREE_CALLS = 1
     private val MAX_AD_CALLS = 2
     private val PREF_KEY_DATE = "dream_last_date"
     private val PREF_KEY_COUNT = "dream_count"
+
+    private val client = OkHttpClient()
+    private val executor = Executors.newSingleThreadExecutor()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,11 +60,11 @@ class DreamFragment : Fragment() {
         prefs = requireContext().getSharedPreferences("dream_history", Context.MODE_PRIVATE)
 
         dreamEditText = view.findViewById(R.id.dreamEditText)
-        resultTextView = view.findViewById(R.id.resultTextView)
         lottieLoading = view.findViewById(R.id.lottieLoading)
         usageTextView = view.findViewById(R.id.usageTextView)
-        lottieLoading.visibility = View.GONE
+        interpretButton = view.findViewById(R.id.interpretButton)
 
+        lottieLoading.visibility = View.GONE
         updateUsageText()
 
         fun View.applyScaleClick(action: () -> Unit) {
@@ -80,7 +86,9 @@ class DreamFragment : Fragment() {
                 .commit()
         }
 
-        view.findViewById<Button>(R.id.interpretButton).applyScaleClick {
+        interpretButton.applyScaleClick {
+            prefs.edit().putInt(PREF_KEY_COUNT, 0).apply()
+
             val dreamText = dreamEditText.text.toString().trim()
             if (!validateInputSmart(dreamText)) return@applyScaleClick
 
@@ -89,43 +97,34 @@ class DreamFragment : Fragment() {
             var count = prefs.getInt(PREF_KEY_COUNT, 0)
 
             if (savedDate != today) {
-                prefs.edit {
-                    putString(PREF_KEY_DATE, today)
-                    putInt(PREF_KEY_COUNT, 0)
-                }
+                prefs.edit().putString(PREF_KEY_DATE, today).putInt(PREF_KEY_COUNT, 0).apply()
                 count = 0
             }
 
-
             when {
                 count < MAX_FREE_CALLS -> {
-                    fetchInterpretation(dreamText)
-                    prefs.edit {
-                        putInt(PREF_KEY_COUNT, count + 1)
-                    }
-                    updateUsageText()
-
+                    startInterpretation(dreamText, count)
                 }
                 count < MAX_FREE_CALLS + MAX_AD_CALLS -> {
                     showAdPrompt {
                         val updatedDreamText = dreamEditText.text.toString().trim()
                         if (validateInputSmart(updatedDreamText)) {
-                            fetchInterpretation(updatedDreamText)
-                            prefs.edit {
-                                putInt(PREF_KEY_COUNT, count + 1)
-                            }
-                            updateUsageText()
-
+                            startInterpretation(updatedDreamText, count)
                         }
                     }
                 }
-                else -> {
-                    showLimitDialog()
-                }
+                else -> showLimitDialog()
             }
         }
 
         return view
+    }
+
+    private fun startInterpretation(text: String, count: Int) {
+        interpretButton.isEnabled = false
+        fetchInterpretation(text)
+        prefs.edit().putInt(PREF_KEY_COUNT, count + 1).apply()
+        updateUsageText()
     }
 
     private fun updateUsageText() {
@@ -134,7 +133,6 @@ class DreamFragment : Fragment() {
         val count = if (savedDate == today) prefs.getInt(PREF_KEY_COUNT, 0) else 0
         val remaining = (MAX_FREE_CALLS + MAX_AD_CALLS) - count
         usageTextView.text = getString(R.string.dream_usage_count, remaining.coerceAtLeast(0))
-
     }
 
     private fun showAdPrompt(onAccept: () -> Unit) {
@@ -145,7 +143,7 @@ class DreamFragment : Fragment() {
         dialogView.findViewById<Button>(R.id.btnWatchAd).setOnClickListener {
             dialog.dismiss()
             AdManager.showAd(requireActivity(), {
-                onAccept()  // 광고 시청 완료 후 실행
+                onAccept()
             }, {
                 Snackbar.make(requireView(), "광고를 완료해야 해몽이 가능합니다.", Snackbar.LENGTH_SHORT).show()
             })
@@ -158,7 +156,6 @@ class DreamFragment : Fragment() {
         dialog.window?.setDimAmount(0.5f)
         dialog.show()
     }
-
 
     private fun showLimitDialog() {
         AlertDialog.Builder(requireContext())
@@ -174,6 +171,7 @@ class DreamFragment : Fragment() {
     }
 
     private fun showLoading() {
+        if (lottieLoading.visibility == View.VISIBLE) return
         lottieLoading.visibility = View.VISIBLE
         lottieLoading.playAnimation()
     }
@@ -181,6 +179,8 @@ class DreamFragment : Fragment() {
     private fun hideLoading(result: String) {
         lottieLoading.cancelAnimation()
         lottieLoading.visibility = View.GONE
+        interpretButton.isEnabled = true
+
         val styled = Html.fromHtml(
             result.replace("💭 꿈이 전하는 메시지", "<font color='#4B0082'><b>💭 꿈이 전하는 메시지</b></font>")
                 .replace("🧠 꿈속 상징의 의미", "<br><font color='#006400'><b>🧠 꿈속 상징의 의미</b></font>")
@@ -188,8 +188,10 @@ class DreamFragment : Fragment() {
                 .replace("☀️ 운세 활용 팁", "<br><font color='#DAA520'><b>☀️ 운세 활용 팁</b></font>")
                 .replace("🎯 오늘의 행동 포인트", "<br><font color='#4682B4'><b>🎯 오늘의 행동 포인트</b></font>"),
             Html.FROM_HTML_MODE_LEGACY
-        )
-        resultTextView.text = styled
+        ).toString()
+
+        DreamResultDialog(requireContext(), result).show()
+
     }
 
     private fun validateInputSmart(input: String): Boolean {
@@ -204,11 +206,11 @@ class DreamFragment : Fragment() {
 
         return when {
             input.isBlank() -> {
-                resultTextView.text = "꿈 내용을 입력해주세요."
+                Toast.makeText(requireContext(), "꿈 내용을 입력해주세요.", Toast.LENGTH_SHORT).show()
                 false
             }
             input.length < 10 || isSmallTalk || isShortSingleWord || isQuestion || isMathOnly || isGibberish -> {
-                resultTextView.text = "의미 있는 꿈 내용을 구체적으로 입력해주세요."
+                Toast.makeText(requireContext(), "의미 있는 꿈 내용을 구체적으로 입력해주세요.", Toast.LENGTH_SHORT).show()
                 false
             }
             else -> true
@@ -225,28 +227,28 @@ class DreamFragment : Fragment() {
                 JSONObject().apply {
                     put("role", "user")
                     put("content", """
-                너는 지금부터 꿈을 예지몽처럼 분석하는 전문가야. 아래 꿈은 예지몽이라고 가정했고 다음과 같이 분석해.
+                        너는 지금부터 꿈을 예지몽처럼 분석하는 전문가야. 아래 꿈은 예지몽이라고 가정했고 다음과 같이 분석해.
 
-                [분석 항목]
-                💭 꿈이 전하는 메시지  
-                🧠 꿈속 상징의 의미  
-                📌 예지 포인트 요약  
-                ☀️ 운세 활용 팁  
-                🎯 오늘의 행동 포인트  
+                        [분석 항목]
+                        💭 꿈이 전하는 메시지  
+                        🧠 꿈속 상징의 의미  
+                        📌 예지 포인트 요약  
+                        ☀️ 운세 활용 팁  
+                        🎯 오늘의 행동 포인트  
 
-                각 항목은 정확하고 간결하게 작성하고, 이모티콘은 그대로 사용해줘.  
-                꼭 현실적으로 일어날 수 있는 사건을 기반으로 분석해.
+                        각 항목은 정확하고 간결하게 작성하고, 이모티콘은 그대로 사용해줘.  
+                        꼭 현실적으로 일어날 수 있는 사건을 기반으로 분석해.
 
-                [꿈 내용]
-                \"$prompt\"
-            """.trimIndent())
+                        [꿈 내용]
+                        "$prompt"
+                    """.trimIndent())
                 }
             ))
         }
 
         val body = requestJson.toString().toRequestBody("application/json".toMediaType())
 
-        OkHttpClient().newCall(
+        client.newCall(
             Request.Builder()
                 .url("https://api.openai.com/v1/chat/completions")
                 .post(body)
@@ -255,6 +257,7 @@ class DreamFragment : Fragment() {
                 .build()
         ).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                Log.e("DreamFragment", "GPT 요청 실패", e)
                 requireActivity().runOnUiThread {
                     hideLoading("해몽 결과를 받아올 수 없습니다.")
                 }
@@ -262,15 +265,21 @@ class DreamFragment : Fragment() {
 
             override fun onResponse(call: Call, response: Response) {
                 val responseText = if (response.isSuccessful) {
-                    try {
-                        JSONObject(response.body?.string() ?: "")
-                            .getJSONArray("choices")
-                            .getJSONObject(0)
-                            .getJSONObject("message")
-                            .getString("content")
-                            .trim()
-                    } catch (_: Exception) {
-                        "결과 파싱 오류"
+                    val rawBody = response.body?.string() ?: ""
+                    if (rawBody.length > 10000) {
+                        "결과가 너무 커서 해몽을 표시할 수 없습니다."
+                    } else {
+                        try {
+                            JSONObject(rawBody)
+                                .getJSONArray("choices")
+                                .getJSONObject(0)
+                                .getJSONObject("message")
+                                .getString("content")
+                                .trim()
+                        } catch (e: Exception) {
+                            Log.e("DreamFragment", "파싱 실패", e)
+                            "결과 파싱 오류"
+                        }
                     }
                 } else {
                     "해몽 요청 실패 (${response.code})"
@@ -278,6 +287,9 @@ class DreamFragment : Fragment() {
 
                 requireActivity().runOnUiThread {
                     hideLoading(responseText)
+                }
+
+                executor.execute {
                     saveDream(prompt, responseText)
                 }
             }
@@ -287,25 +299,23 @@ class DreamFragment : Fragment() {
     private fun saveDream(dream: String, result: String) {
         val dateKey = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA).format(Date())
         val savedArray = JSONArray(prefs.getString(dateKey, "[]") ?: "[]")
+        if (savedArray.length() >= 10) savedArray.remove(0)
+
         savedArray.put(JSONObject().apply {
             put("dream", dream)
             put("result", result)
         })
-        prefs.edit {
-            putString(dateKey, savedArray.toString())
-        }
+        prefs.edit().putString(dateKey, savedArray.toString()).apply()
 
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-        if (userId != null) {
-            val db = FirebaseFirestore.getInstance()
-            val data = hashMapOf(
-                "dream" to dream,
-                "result" to result,
-                "timestamp" to System.currentTimeMillis()
-            )
-            db.collection("users").document(userId)
-                .collection("dreams").document(dateKey)
-                .collection("entries").add(data)
-        }
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val db = FirebaseFirestore.getInstance()
+        val data = hashMapOf(
+            "dream" to dream,
+            "result" to result,
+            "timestamp" to System.currentTimeMillis()
+        )
+        db.collection("users").document(userId)
+            .collection("dreams").document(dateKey)
+            .collection("entries").add(data)
     }
 }

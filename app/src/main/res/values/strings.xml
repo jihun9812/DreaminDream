@@ -2,7 +2,7 @@
 <resources>
     <!-- 기본 & 네비게이션 -->
     <string name="app_name">DreamInDream</string>
-    <string name="home_title">Dream in Dream</string>
+    <string name="home_title">Dream In Dream</string>
     <string name="back_button">뒤로가기</string>
     <string name="app_logo_description">앱 로고</string>
     <string name="back_arrow">←</string>

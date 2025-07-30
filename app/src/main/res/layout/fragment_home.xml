@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF9E5">
+    android:background="@drawable/main_ground">
 
     <!-- 설정 버튼 -->
     <ImageButton
@@ -11,7 +11,7 @@
         android:layout_width="48dp"
         android:layout_height="68dp"
         android:layout_alignParentEnd="true"
-        android:layout_margin="20dp"
+        android:layout_margin="30dp"
         android:src="@drawable/ic_setting"
         android:background="@android:color/transparent"
         android:contentDescription="Settings Button" />
@@ -31,9 +31,13 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="18dp"
             android:fontFamily="@font/pretendard_bold"
-            android:text="DREAM IN DREAM"
-            android:textColor="#7A55D3"
-            android:textSize="23sp" />
+            android:text="Dream In Dream"
+            android:textColor= "#81ABC3"
+            android:shadowColor="#502B80"
+            android:textSize="30sp"
+            android:shadowDx="0"
+            android:shadowDy="1"
+            android:shadowRadius="2"/>
 
         <!-- AI 꿈 리포트 카드뷰 -->
         <androidx.cardview.widget.CardView
@@ -41,7 +45,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="28dp"
-            app:cardBackgroundColor="#ECE6FF"
+            app:cardBackgroundColor= "#FF0C2C44"
             app:cardCornerRadius="20dp"
             app:cardElevation="13dp"
             app:cardUseCompatPadding="true">
@@ -74,7 +78,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/pretendard_medium"
                         android:text="이번 주 꿈 분석 요약"
-                        android:textColor="#4A148C"
+                        android:textColor="#E4E2E2"
                         android:textSize="15sp" />
 
                     <TextView
@@ -96,7 +100,7 @@
                     android:elevation="0dp"
                     android:text="AI 리포트"
                     android:textColor="#fff"
-                    app:backgroundTint="#7A55D3"
+                    app:backgroundTint="#81ABC3"
                     app:cornerRadius="18dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -120,34 +124,94 @@
 
             <TextView
                 android:id="@+id/ai_message"
-                style="@style/BubbleText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
+                android:textColor="@color/white"
                 android:layout_weight="1"
-                android:text="오늘의 행운 메시지를 불러오는 중이에요..." />
+                android:text="오늘의 행운 메시지를 불러오는 중이에요..."
+                android:translationZ="1dp" />
         </LinearLayout>
 
         <!-- 버튼 그룹 -->
-        <Button
-            android:id="@+id/btn_dream"
-            style="@style/GlassButton"
-            android:text="@string/btn_dream"
-            android:textColor="@color/black" />
+        <LinearLayout
+            android:id="@+id/button_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btn_calendar"
-            style="@style/GlassButton"
-            android:layout_marginTop="16dp"
-            android:text="@string/btn_calendar"
-            android:textColor="@color/black" />
+            <!-- 해몽 버튼 -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_dream"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#0C2C44"
+                android:elevation="16dp"
+                android:minWidth="0dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/btn_dream"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:translationZ="4dp"
+                app:icon="@drawable/ic_dream"
+                app:iconGravity="textStart"
+                app:iconPadding="6dp"
+                app:iconTint="@color/white"
 
-        <Button
-            android:id="@+id/btn_fortune"
-            style="@style/GlassButton"
-            android:layout_marginTop="16dp"
-            android:text="@string/btn_fortune"
-            android:textColor="@color/black" />
+                />
+
+            <Space
+                android:layout_width="12dp"
+                android:layout_height="wrap_content" />
+
+            <!-- 캘린더 버튼 -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_calendar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#0C2C44"
+                android:elevation="16dp"
+                android:minWidth="0dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/btn_calendar"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:translationZ="4dp"
+                app:icon="@drawable/ic_calendar_moon"
+                app:iconGravity="textStart"
+                app:iconPadding="6dp"
+                app:iconTint="@color/white" />
+
+            <Space
+                android:layout_width="12dp"
+                android:layout_height="wrap_content" />
+
+            <!-- 운세 버튼 -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_fortune"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#0C2C44"
+                android:elevation="16dp"
+                android:minWidth="0dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:text="@string/btn_fortune"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:translationZ="4dp"
+                app:icon="@drawable/ic_fortune"
+                app:iconGravity="textStart"
+                app:iconPadding="6dp"
+                app:iconTint="@color/white" />
+        </LinearLayout>
+
 
     </LinearLayout>
 </RelativeLayout>

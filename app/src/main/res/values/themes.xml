@@ -9,6 +9,8 @@
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowLightStatusBar">true</item> <!-- 상태바 아이콘 어둡게 -->
         <item name="android:fontFamily">@font/pretendard_medium</item>
+        <item name="colorControlActivated">#7A55D3</item>
+
     </style>
 
     <!-- SplashActivity 전용 테마 -->

@@ -3,7 +3,7 @@
     android:id="@+id/splashRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="#123E5A">
 
     <!-- 배경 이미지 -->
     <ImageView

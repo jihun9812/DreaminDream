@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:background="@drawable/bg_bottomsheet_blur"
+    android:background="@color/white"
     android:padding="24dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -14,6 +14,7 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:gravity="center"
+        android:textColor="@color/black"
         android:paddingBottom="12dp" />
 
     <TextView
@@ -21,6 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="광고를 시청하시면 해몽 기회를 1회 더 받아 보세요!"
+        android:textColor="@color/black"
         android:gravity="center"
         android:textSize="15sp"
         android:paddingBottom="20dp" />
@@ -33,7 +35,7 @@
 
         <Button
             android:id="@+id/btnWatchAd"
-            android:backgroundTint="#FF8800"
+            android:backgroundTint="#123E5A"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="광고 보기"
@@ -43,7 +45,7 @@
         <Button
             android:id="@+id/btnCancel"
             android:layout_width="0dp"
-            android:backgroundTint="#FF8800"
+            android:backgroundTint="#123E5A"
             android:layout_height="wrap_content"
             android:text="취소"
             android:layout_weight="1"

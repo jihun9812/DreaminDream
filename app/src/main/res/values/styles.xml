@@ -19,6 +19,12 @@
         <item name="android:fontFamily">@font/pretendard_medium</item>
     </style>
 
+    <style name="TransparentDialog" parent="Theme.MaterialComponents.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+
+
     <!-- 버튼 -->
     <style name="GlassButton">
         <item name="android:layout_width">match_parent</item>

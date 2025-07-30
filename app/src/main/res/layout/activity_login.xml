@@ -43,7 +43,7 @@
                 <!-- 타이틀/슬로건 -->
                 <TextView
                     android:text="@string/home_title"
-                    android:textColor="#7A55D3"
+                    android:textColor="#123E5A"
                     android:textSize="26sp"
                     android:textStyle="bold"
                     android:gravity="center"
@@ -92,7 +92,7 @@
                     android:textAllCaps="false"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:backgroundTint="#7A55D3"
+                    android:backgroundTint="#123E5A"
                     android:textColor="#FFF"
                     android:layout_marginBottom="8dp"
                     android:minHeight="48dp"/>
@@ -192,8 +192,8 @@
                     android:layout_height="48dp"
                     android:layout_gravity="center"
                     android:text="체험하기"
-                    android:backgroundTint="#FFD180"
-                    android:textColor="@color/black"
+                    android:backgroundTint="#123E5A"
+                    android:textColor="@color/white"
                     android:minHeight="48dp"
                     android:layout_marginTop="10dp"/>
 
@@ -376,7 +376,7 @@
         android:id="@+id/privacy_and_version"
         android:text="@string/privacy_and_version"
         android:textSize="11sp"
-        android:textColor="#FAFAFA"
+        android:textColor="#040404"
         android:gravity="center"
         android:background="@android:color/transparent"
         android:layout_width="match_parent"

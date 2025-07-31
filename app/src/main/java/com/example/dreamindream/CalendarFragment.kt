@@ -3,8 +3,8 @@ package com.example.dreamindream
 import android.graphics.Color
 import android.os.Bundle
 import android.view.*
-import android.view.animation.AnimationUtils
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dreamindream.databinding.FragmentCalendarBinding
@@ -27,10 +27,9 @@ class CalendarFragment : Fragment() {
     private val holidays = mutableListOf<Holiday>()
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy년 M월")
 
-    // 색상 상수
     private val colorRed = Color.parseColor("#F44336")
     private val colorBlue = Color.parseColor("#2196F3")
-    private val colorBlack = Color.parseColor("#333333")
+    private val colorBlack = Color.parseColor("#000000")
     private val colorOrange = Color.parseColor("#FF9800")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -40,6 +39,22 @@ class CalendarFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // 뒤로가기 시 홈으로 슬라이드 전환
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                parentFragmentManager.beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_left,
+                        R.anim.slide_out_right,
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_left
+                    )
+                    .replace(R.id.fragment_container, HomeFragment())
+                    .disallowAddToBackStack()
+                    .commit()
+            }
+        })
 
         val currentMonth = YearMonth.now()
         val daysOfWeek = daysOfWeek(DayOfWeek.SUNDAY)
@@ -53,7 +68,6 @@ class CalendarFragment : Fragment() {
         setupRecyclerView()
         setupAds()
 
-        // Firestore에서 모든 꿈 날짜 불러오고 SharedPreferences에 저장 후 점 표시 갱신
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
             FirestoreManager.getAllDreamDates(requireContext(), userId) {
@@ -142,30 +156,19 @@ class CalendarFragment : Fragment() {
 
     private fun setupEventListeners() {
         binding.buttonPreviousMonth.setOnClickListener {
-            binding.calendarView.findFirstVisibleMonth()?.yearMonth?.minusMonths(1)?.let { targetMonth ->
-                binding.calendarView.smoothScrollToMonth(targetMonth)
-                updateMonthText(targetMonth)
-            }
+            binding.calendarView.findFirstVisibleMonth()?.yearMonth?.minusMonths(1)
+                ?.let { targetMonth ->
+                    binding.calendarView.smoothScrollToMonth(targetMonth)
+                    updateMonthText(targetMonth)
+                }
         }
 
         binding.buttonNextMonth.setOnClickListener {
-            binding.calendarView.findFirstVisibleMonth()?.yearMonth?.plusMonths(1)?.let { targetMonth ->
-                binding.calendarView.smoothScrollToMonth(targetMonth)
-                updateMonthText(targetMonth)
-            }
-        }
-
-        binding.backButton.setOnClickListener {
-            it.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.scale_up))
-            parentFragmentManager.beginTransaction()
-                .setCustomAnimations(
-                    R.anim.slide_in_left,
-                    R.anim.slide_out_right,
-                    R.anim.slide_in_right,
-                    R.anim.slide_out_left
-                )
-                .replace(R.id.fragment_container, HomeFragment())
-                .commit()
+            binding.calendarView.findFirstVisibleMonth()?.yearMonth?.plusMonths(1)
+                ?.let { targetMonth ->
+                    binding.calendarView.smoothScrollToMonth(targetMonth)
+                    updateMonthText(targetMonth)
+                }
         }
     }
 

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import com.google.android.gms.ads.AdRequest
@@ -74,13 +75,6 @@ class SettingsFragment : Fragment() {
 
         view.findViewById<AdView>(R.id.adView_settings).loadAd(AdRequest.Builder().build())
 
-        view.findViewById<ImageButton>(R.id.backButton).setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right, R.anim.slide_in_right, R.anim.slide_out_left)
-                .replace(R.id.fragment_container, HomeFragment())
-                .commit()
-        }
-
         birthEdit.setOnClickListener { showDatePicker() }
 
         mbtiEdit.doAfterTextChanged {
@@ -93,7 +87,6 @@ class SettingsFragment : Fragment() {
 
         loadingSpinner.visibility = View.GONE
 
-        // 🔥 Firebase에서 프로필 동기화
         FirestoreManager.getUserProfile(userId) { profileMap ->
             if (profileMap != null) {
                 prefs.edit().apply {
@@ -102,7 +95,6 @@ class SettingsFragment : Fragment() {
                 }
             }
             loadUserInfo(view)
-
         }
 
         saveButton.setOnClickListener {
@@ -121,8 +113,7 @@ class SettingsFragment : Fragment() {
             }
         }
 
-        val logoutButton = view.findViewById<Button>(R.id.btn_logout)
-        logoutButton.setOnClickListener {
+        view.findViewById<Button>(R.id.btn_logout).setOnClickListener {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("로그아웃")
                 .setMessage("정말 로그아웃 하시겠어요?")
@@ -137,6 +128,26 @@ class SettingsFragment : Fragment() {
         }
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    parentFragmentManager.beginTransaction()
+                        .setCustomAnimations(
+                            R.anim.slide_in_left,
+                            R.anim.slide_out_right,
+                            R.anim.slide_in_right,
+                            R.anim.slide_out_left
+                        )
+                        .replace(R.id.fragment_container, HomeFragment())
+                        .disallowAddToBackStack()
+                        .commit()
+                }
+            })
     }
 
     private fun showDatePicker() {
@@ -188,7 +199,6 @@ class SettingsFragment : Fragment() {
 
     private fun updateInfoDisplay(view: View, gender: String, birth: String, birthTime: String, nickname: String, mbti: String) {
         val mbtiMeaning = getMbtiMeaning(mbti)
-
         val displayText = buildString {
             append("🧑 닉네임: ").append(nickname).append("\n")
             append("🎂 생일: ").append(birth).append("\n")
@@ -197,7 +207,6 @@ class SettingsFragment : Fragment() {
             append("🔮 MBTI: ").append(mbti).append("\n")
             append("💬 ").append(mbtiMeaning)
         }
-
         infoDetails.text = displayText
         view.findViewById<View>(R.id.card_user_info).visibility = View.VISIBLE
     }
@@ -236,37 +245,30 @@ class SettingsFragment : Fragment() {
         val birthTime = birthTimeSpinner.selectedItem as String
 
         if (gender.isEmpty()) {
-            Toast.makeText(requireContext(), "성별을 선택해주세요.", Toast.LENGTH_SHORT).show()
-            return false
+            Toast.makeText(requireContext(), "성별을 선택해주세요.", Toast.LENGTH_SHORT).show(); return false
         }
         if (nickname.isEmpty()) {
-            Toast.makeText(requireContext(), "닉네임을 입력해주세요.", Toast.LENGTH_SHORT).show()
-            return false
+            Toast.makeText(requireContext(), "닉네임을 입력해주세요.", Toast.LENGTH_SHORT).show(); return false
         }
         if (birth.isEmpty()) {
-            Toast.makeText(requireContext(), "생년월일을 선택해주세요.", Toast.LENGTH_SHORT).show()
-            return false
+            Toast.makeText(requireContext(), "생년월일을 선택해주세요.", Toast.LENGTH_SHORT).show(); return false
         }
         if (mbti.isEmpty()) {
-            Toast.makeText(requireContext(), "MBTI를 입력해주세요.", Toast.LENGTH_SHORT).show()
-            return false
+            Toast.makeText(requireContext(), "MBTI를 입력해주세요.", Toast.LENGTH_SHORT).show(); return false
         }
         if (birthTime == "선택안함") {
-            Toast.makeText(requireContext(), "태어난 시간을 선택해주세요.", Toast.LENGTH_SHORT).show()
-            return false
+            Toast.makeText(requireContext(), "태어난 시간을 선택해주세요.", Toast.LENGTH_SHORT).show(); return false
         }
         return true
     }
 
     private fun saveUserInfo() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-
         val selectedGender = when (genderGroup.checkedRadioButtonId) {
             R.id.radio_male -> "남성"
             R.id.radio_female -> "여성"
             else -> ""
         }
-
         val birth = birthEdit.text.toString()
         val nickname = nicknameEdit.text.toString()
         val mbti = mbtiEdit.text.toString().uppercase(Locale.ROOT)
@@ -294,7 +296,6 @@ class SettingsFragment : Fragment() {
     private fun toggleEditMode(editMode: Boolean) {
         isEditMode = editMode
         val view = view ?: return
-
         val editViews = listOf(
             genderGroup, birthEdit, nicknameEdit, mbtiEdit, birthTimeSpinner,
             view.findViewById(R.id.label_gender),
@@ -303,7 +304,6 @@ class SettingsFragment : Fragment() {
             view.findViewById(R.id.label_mbti),
             view.findViewById(R.id.label_birthtime)
         )
-
         val showViews = listOf(infoSummary, infoDetails)
         val cardUserInfo = view.findViewById<View>(R.id.card_user_info)
 
@@ -319,9 +319,7 @@ class SettingsFragment : Fragment() {
             saveButton.text = "수정"
         }
 
-        if (editMode) {
-            loadUserDataToFields()
-        }
+        if (editMode) loadUserDataToFields()
     }
 
     private fun loadUserDataToFields() {

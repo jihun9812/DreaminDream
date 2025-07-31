@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.cardview.widget.CardView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
@@ -70,19 +71,26 @@ class FortuneFragment : Fragment() {
             }
         }
 
-        view.findViewById<ImageButton>(R.id.backButton).applyScaleClick {
-            parentFragmentManager.beginTransaction()
-                .setCustomAnimations(
-                    R.anim.slide_in_left,
-                    R.anim.slide_out_right,
-                    R.anim.slide_in_right,
-                    R.anim.slide_out_left
-                )
-                .replace(R.id.fragment_container, HomeFragment())
-                .commit()
-        }
-
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                parentFragmentManager.beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_left,
+                        R.anim.slide_out_right,
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_left
+                    )
+                    .replace(R.id.fragment_container, HomeFragment())
+                    .disallowAddToBackStack()
+                    .commit()
+            }
+        })
     }
 
     private fun getToday(): String {
@@ -107,7 +115,6 @@ class FortuneFragment : Fragment() {
         val (nickname, mbti, birth) = userInfo
         val prompt = buildPrompt(nickname, mbti, birth)
 
-        // 애니메이션 시작
         loadingView.alpha = 0f
         loadingView.translationY = -300f
         loadingView.scaleX = 0.3f

@@ -9,10 +9,10 @@ import android.util.Log
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
 import com.example.dreamindream.ads.AdManager
-import com.example.dreamindream.DreamResultDialog
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
@@ -74,21 +74,7 @@ class DreamFragment : Fragment() {
             }
         }
 
-        view.findViewById<ImageButton>(R.id.backButton).applyScaleClick {
-            parentFragmentManager.beginTransaction()
-                .setCustomAnimations(
-                    R.anim.slide_in_left,
-                    R.anim.slide_out_right,
-                    R.anim.slide_in_right,
-                    R.anim.slide_out_left
-                )
-                .replace(R.id.fragment_container, HomeFragment())
-                .commit()
-        }
-
         interpretButton.applyScaleClick {
-            prefs.edit().putInt(PREF_KEY_COUNT, 0).apply()
-
             val dreamText = dreamEditText.text.toString().trim()
             if (!validateInputSmart(dreamText)) return@applyScaleClick
 
@@ -118,6 +104,26 @@ class DreamFragment : Fragment() {
         }
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    parentFragmentManager.beginTransaction()
+                        .setCustomAnimations(
+                            R.anim.slide_in_left,
+                            R.anim.slide_out_right,
+                            R.anim.slide_in_right,
+                            R.anim.slide_out_left
+                        )
+                        .replace(R.id.fragment_container, HomeFragment())
+                        .disallowAddToBackStack()
+                        .commit()
+                }
+            })
     }
 
     private fun startInterpretation(text: String, count: Int) {
@@ -191,7 +197,6 @@ class DreamFragment : Fragment() {
         ).toString()
 
         DreamResultDialog(requireContext(), result).show()
-
     }
 
     private fun validateInputSmart(input: String): Boolean {

@@ -32,11 +32,11 @@
             android:layout_marginBottom="18dp"
             android:fontFamily="@font/pretendard_bold"
             android:text="Dream In Dream"
-            android:textColor= "#81ABC3"
-            android:shadowColor="#502B80"
-            android:textSize="30sp"
-            android:shadowDx="0"
-            android:shadowDy="1"
+            android:textColor= "#C32986DC"
+            android:shadowColor="#C3ADE6FF"
+            android:textSize="35sp"
+            android:shadowDx="2"
+            android:shadowDy="2"
             android:shadowRadius="2"/>
 
         <!-- AI 꿈 리포트 카드뷰 -->
@@ -100,7 +100,7 @@
                     android:elevation="0dp"
                     android:text="AI 리포트"
                     android:textColor="#fff"
-                    app:backgroundTint="#81ABC3"
+                    app:backgroundTint="#3D6C89"
                     app:cornerRadius="18dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>

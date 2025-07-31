@@ -14,17 +14,6 @@
         android:layout_alignParentTop="true"
         android:padding="12dp">
 
-        <!-- 뒤로가기 버튼 (왼쪽 고정) -->
-        <ImageButton
-            android:id="@+id/backButton"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/back_button"
-            android:src="@drawable/ic_back"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true" />
-
         <!-- 캘린더 달 아이콘 (진짜 중앙) -->
         <ImageView
             android:id="@+id/calendarMoonIcon"
@@ -93,6 +82,7 @@
         android:layout_below="@id/monthSelector"
         android:layout_marginHorizontal="4dp"
         android:layout_marginTop="-5dp"
+        android:background="#8BBDBDBD"
         app:cv_dayViewResource="@layout/example_day_view"
         app:cv_monthHeaderResource="@layout/example_month_header" />
 

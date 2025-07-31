@@ -149,7 +149,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun navigateTo(fragment: Fragment) {
-        parentFragmentManager.beginTransaction()
+        val transaction = parentFragmentManager.beginTransaction()
             .setCustomAnimations(
                 R.anim.slide_in_right,
                 R.anim.slide_out_left,
@@ -157,9 +157,15 @@ class HomeFragment : Fragment() {
                 R.anim.slide_out_right
             )
             .replace(R.id.fragment_container, fragment)
-            .addToBackStack(null)
-            .commit()
+
+        // HomeFragment는 백스택에 추가하지 않음
+        if (fragment !is HomeFragment) {
+            transaction.addToBackStack(null)
+        }
+
+        transaction.commit()
     }
+
 
     private fun getThisWeekDreamList(): List<String> {
         val dreams = mutableListOf<String>()

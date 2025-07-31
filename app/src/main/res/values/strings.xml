@@ -21,9 +21,16 @@
     <string name="next_month">다음 달</string>
     <string name="desc_calendar">캘린더</string>
     <string name="desc_dream_scroll">꿈 기록 스크롤</string>
-
-
     <string name="dream_usage_count">💭 해몽 가능 횟수: %1$d회</string>
+
+
+    <!-- ai report -->
+    <string name="empty_icon_desc">분석 데이터 없음 아이콘</string>
+    <string name="report_title">주간 꿈 리포트</string>
+    <string name="report_empty_title">꿈 분석 데이터가 부족해요</string>
+    <string name="report_empty_subtitle">꿈을 꾸고 기록하면\nAI 분석 결과가 나타납니다</string>
+    <string name="report_keywords_placeholder">감정: ...\n키워드: ...</string>
+    <string name="report_ai_comment_placeholder">AI 분석 : ...</string>
 
 
 
@@ -82,7 +89,7 @@
 
     <!--Home Fragment -->
     <string name="ai_no_dream">아직 꿈 기록이 없어요</string>
-    <string name="ai_report_guide">꿈을 기록하면 AI가 주간 분석을 보여줍니다.</string>
+    <string name="ai_report_guide">주간 AI 꿈 분석</string>
     <string name="ai_not_enough_data">분석 데이터 부족</string>
     <string name="ai_need_more">분석을 위해 꿈 기록이 좀 더 필요해요.</string>
     <string name="ai_loading">AI 주간 꿈 분석 중...</string>

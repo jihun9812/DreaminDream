@@ -5,20 +5,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-import com.google.android.material.button.MaterialButton
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.AdView
-
 
 class AIReportFragment : Fragment() {
 
@@ -37,12 +36,10 @@ class AIReportFragment : Fragment() {
         MobileAds.initialize(requireContext())
         view.findViewById<AdView>(R.id.adView_ai).loadAd(AdRequest.Builder().build())
 
-
         keywordsText = view.findViewById(R.id.text_keywords)
         aiComment = view.findViewById(R.id.text_ai_comment)
         emptyIconLayout = view.findViewById(R.id.empty_icon_layout)
         barChart = view.findViewById(R.id.emotion_bar_chart)
-        val btnBack = view.findViewById<MaterialButton>(R.id.btn_back_home)
 
         val feeling = arguments?.getString("feeling")
         val keywords = arguments?.getStringArrayList("keywords")
@@ -54,20 +51,15 @@ class AIReportFragment : Fragment() {
             loadIfEnoughDreams()
         }
 
-        btnBack.setOnClickListener {
-            parentFragmentManager.popBackStack()
-        }
-
         return view
     }
 
     private fun loadIfEnoughDreams() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return showEmpty()
 
-        val sdf = SimpleDateFormat("yyyy-'W'ww", Locale.KOREA)
-        val weekKey = sdf.format(Date())
-
+        val weekKey = SimpleDateFormat("yyyy-'W'ww", Locale.KOREA).format(Date())
         val db = FirebaseFirestore.getInstance()
+
         db.collection("users").document(uid)
             .collection("dreams").document(weekKey)
             .collection("entries")
@@ -95,10 +87,10 @@ class AIReportFragment : Fragment() {
     }
 
     private fun updateUI(feeling: String, keywords: List<String>, analysis: String) {
-        emptyIconLayout.visibility = View.GONE
-        keywordsText.visibility = View.VISIBLE
-        aiComment.visibility = View.VISIBLE
-        barChart.visibility = View.VISIBLE
+        emptyIconLayout.isVisible = false
+        keywordsText.isVisible = true
+        aiComment.isVisible = true
+        barChart.isVisible = true
 
         keywordsText.text = "감정: $feeling\n키워드: ${keywords.joinToString(", ")}"
         aiComment.text = "AI 분석 : $analysis"
@@ -106,10 +98,10 @@ class AIReportFragment : Fragment() {
     }
 
     private fun showEmpty() {
-        emptyIconLayout.visibility = View.VISIBLE
-        keywordsText.visibility = View.GONE
-        aiComment.visibility = View.GONE
-        barChart.visibility = View.GONE
+        emptyIconLayout.isVisible = true
+        keywordsText.isVisible = false
+        aiComment.isVisible = false
+        barChart.isVisible = false
     }
 
     private fun setupEmotionBarChart(chart: BarChart, feelingText: String) {
@@ -121,14 +113,15 @@ class AIReportFragment : Fragment() {
         }
 
         val entry = BarEntry(0f, score)
-        val dataSet = BarDataSet(listOf(entry), "감정 강도")
-        dataSet.color = when (label) {
-            "불안", "슬픔", "공포", "우울", "외로움", "지침", "분노" -> 0xFFE57373.toInt()
-            "행복", "희망", "설렘", "긍정", "기쁨", "평온", "사랑", "감사" -> 0xFF81C784.toInt()
-            else -> 0xFF64B5F6.toInt()
+        val dataSet = BarDataSet(listOf(entry), "감정 강도").apply {
+            color = when (label) {
+                "불안", "슬픔", "공포", "우울", "외로움", "지침", "분노" -> 0xFFE57373.toInt()
+                "행복", "희망", "설렘", "긍정", "기쁨", "평온", "사랑", "감사" -> 0xFF81C784.toInt()
+                else -> 0xFF64B5F6.toInt()
+            }
+            valueTextSize = 13f
+            valueTextColor = 0xFF444444.toInt()
         }
-        dataSet.valueTextSize = 13f
-        dataSet.valueTextColor = 0xFF444444.toInt()
 
         chart.data = BarData(dataSet)
         chart.setScaleEnabled(false)
@@ -145,6 +138,7 @@ class AIReportFragment : Fragment() {
             textColor = 0xFF888888.toInt()
             textSize = 12f
         }
+
         chart.axisRight.isEnabled = false
 
         chart.xAxis.apply {

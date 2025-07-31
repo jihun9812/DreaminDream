@@ -2,6 +2,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -13,28 +14,15 @@
         android:padding="16dp"
         android:fitsSystemWindows="true">
 
-        <ImageButton
-            android:id="@+id/backButton"
-            android:layout_width="38dp"
-            android:layout_height="38dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="12dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/back_button"
-            android:src="@drawable/ic_back"
-            android:scaleType="fitCenter"
-            android:adjustViewBounds="true"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
+        <!-- 아이콘을 상단 중앙으로 고정 -->
         <ImageView
             android:id="@+id/dreamIcon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="-36dp"
-            android:src="@drawable/ic_dream"
+            android:layout_width="32dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="12dp"
             android:contentDescription="@string/app_name"
-            app:layout_constraintTop_toBottomOf="@id/backButton"
+            android:src="@drawable/ic_dream"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
 
@@ -42,11 +30,12 @@
             android:id="@+id/editCard"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:layout_marginHorizontal="16dp"
             app:cardCornerRadius="26dp"
             app:cardElevation="8dp"
             android:backgroundTint="#0C2C44"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dreamIcon"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintVertical_bias="0.3"
             app:layout_constraintStart_toStartOf="parent"
@@ -89,7 +78,6 @@
                     android:textColorHint="#CACACA"
                     android:padding="12dp"
                     android:textSize="16sp"
-
                     android:gravity="top|start"
                     android:inputType="textMultiLine|textCapSentences|textNoSuggestions"
                     android:autofillHints="none" />

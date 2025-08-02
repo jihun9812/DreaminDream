@@ -38,14 +38,15 @@ object DailyMessageManager {
     }
 
     private fun fetchFromGPT(onResult: (String) -> Unit) {
-        val prompt = "설명없이 빨리 전문 꿈해몽가답게 오늘의 조언멘트를 짧게 적어줘 한문장 존댓말로.."
+        val prompt = "설명과 서사없이 전문 꿈해몽가답게 오늘의 조언멘트를 짧게 적어줘 한문장 존댓말로.."
         val json = """
             {
               "model": "gpt-3.5-turbo",
               "messages": [{"role": "user", "content": "$prompt"}],
-              "max_tokens": 80
+              "max_tokens": 85
             }
-        """.trimIndent()
+        """
+            .trimIndent()
 
         val body = json.toRequestBody("application/json".toMediaTypeOrNull())
 

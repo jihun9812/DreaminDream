@@ -75,25 +75,28 @@
     </LinearLayout>
 
     <!-- 캘린더 뷰 (더 작게, 여백 줄임) -->
+
+    <!-- 꿈 리스트 (더 많은 공간 확보) -->
+
     <com.kizitonwose.calendar.view.CalendarView
         android:id="@+id/calendarView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/monthSelector"
         android:layout_marginHorizontal="4dp"
-        android:layout_marginTop="-5dp"
-        android:background="#8BBDBDBD"
+        android:layout_marginTop="35dp"
+        android:background="#AD4E4E4E"
         app:cv_dayViewResource="@layout/example_day_view"
         app:cv_monthHeaderResource="@layout/example_month_header" />
 
-    <!-- 꿈 리스트 (더 많은 공간 확보) -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewDreams"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_below="@id/calendarView"
         android:layout_above="@id/adViewCalendar"
         android:layout_marginTop="5dp"
+        android:layout_marginBottom="60dp"
         android:clipToPadding="false" />
 
     <!-- 광고 -->

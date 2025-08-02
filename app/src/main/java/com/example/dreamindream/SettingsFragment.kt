@@ -136,16 +136,19 @@ class SettingsFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    parentFragmentManager.beginTransaction()
-                        .setCustomAnimations(
-                            R.anim.slide_in_left,
-                            R.anim.slide_out_right,
-                            R.anim.slide_in_right,
-                            R.anim.slide_out_left
-                        )
-                        .replace(R.id.fragment_container, HomeFragment())
-                        .disallowAddToBackStack()
-                        .commit()
+                    val current = parentFragmentManager.findFragmentById(R.id.fragment_container)
+                    if (current !is HomeFragment) {
+                        parentFragmentManager.beginTransaction()
+                            .setCustomAnimations(
+                                R.anim.slide_in_left,
+                                R.anim.slide_out_right,
+                                R.anim.slide_in_right,
+                                R.anim.slide_out_left
+                            )
+                            .replace(R.id.fragment_container, HomeFragment())
+                            .disallowAddToBackStack()
+                            .commit()
+                    }
                 }
             })
     }

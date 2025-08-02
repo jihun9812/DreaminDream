@@ -3,6 +3,7 @@ package com.example.dreamindream
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.animation.ScaleAnimation
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -30,17 +31,16 @@ class LoginActivity : AppCompatActivity() {
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
         val skipLoginButton = findViewById<Button>(R.id.btn_skip_login)
-        skipLoginButton.setOnClickListener {
+        skipLoginButton.applyPressEffect {
             auth.signInAnonymously()
                 .addOnSuccessListener {
-                    saveUserInfoToFirestore()  // 익명 유저라도 기록해두면 좋아
-                    showCardLoadingAndDownloadHolidays()  // MainActivity 이동 포함
+                    saveUserInfoToFirestore()
+                    showCardLoadingAndDownloadHolidays()
                 }
                 .addOnFailureListener {
                     Toast.makeText(this, "비로그인 실패: ${it.message}", Toast.LENGTH_SHORT).show()
                 }
         }
-
 
         loginCardContent = findViewById(R.id.loginCardContent)
         val loginPanel = findViewById<LinearLayout>(R.id.loginPanel)
@@ -49,9 +49,9 @@ class LoginActivity : AppCompatActivity() {
 
         val btnSignupClose = findViewById<ImageButton>(R.id.btn_signup_close)
         val btnFindpwClose = findViewById<ImageButton>(R.id.btn_findpw_close)
-
         val emailInput = findViewById<EditText>(R.id.input_email)
         val passwordInput = findViewById<EditText>(R.id.input_password)
+
         val loginButton = findViewById<Button>(R.id.btn_login)
         val googleButton = findViewById<ImageButton>(R.id.btn_google)
         val goSignup = findViewById<TextView>(R.id.goSignup)
@@ -67,37 +67,42 @@ class LoginActivity : AppCompatActivity() {
         val findPwBtn = findViewById<Button>(R.id.btn_findpw)
         val findPwCancelBtn = findViewById<Button>(R.id.btn_findpw_cancel)
 
-        goSignup.setOnClickListener {
+        goSignup.applyPressEffect {
             loginPanel.visibility = View.GONE
             signupPanel.visibility = View.VISIBLE
         }
-        goFindPw.setOnClickListener {
+
+        goFindPw.applyPressEffect {
             loginPanel.visibility = View.GONE
             findPwPanel.visibility = View.VISIBLE
         }
-        signupCancelBtn.setOnClickListener {
+
+        signupCancelBtn.applyPressEffect {
             signupPanel.visibility = View.GONE
             loginPanel.visibility = View.VISIBLE
         }
-        findPwCancelBtn.setOnClickListener {
-            findPwPanel.visibility = View.GONE
-            loginPanel.visibility = View.VISIBLE
-        }
-        btnSignupClose.setOnClickListener {
-            signupPanel.visibility = View.GONE
-            loginPanel.visibility = View.VISIBLE
-        }
-        btnFindpwClose.setOnClickListener {
+
+        findPwCancelBtn.applyPressEffect {
             findPwPanel.visibility = View.GONE
             loginPanel.visibility = View.VISIBLE
         }
 
-        loginButton.setOnClickListener {
+        btnSignupClose.applyPressEffect {
+            signupPanel.visibility = View.GONE
+            loginPanel.visibility = View.VISIBLE
+        }
+
+        btnFindpwClose.applyPressEffect {
+            findPwPanel.visibility = View.GONE
+            loginPanel.visibility = View.VISIBLE
+        }
+
+        loginButton.applyPressEffect {
             val email = emailInput.text.toString().trim()
             val pw = passwordInput.text.toString()
             if (email.isBlank() || pw.isBlank()) {
                 Toast.makeText(this, "이메일/비밀번호를 입력하세요.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+                return@applyPressEffect
             }
             auth.signInWithEmailAndPassword(email, pw)
                 .addOnSuccessListener {
@@ -114,17 +119,17 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
 
-        signupBtn.setOnClickListener {
+        signupBtn.applyPressEffect {
             val email = signupEmail.text.toString().trim()
             val pw = signupPw.text.toString()
             val pw2 = signupPwConfirm.text.toString()
             if (email.isBlank() || pw.isBlank() || pw2.isBlank()) {
                 Toast.makeText(this, "모든 항목을 입력하세요.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+                return@applyPressEffect
             }
             if (pw != pw2) {
                 Toast.makeText(this, "비밀번호가 일치하지 않습니다.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+                return@applyPressEffect
             }
             auth.createUserWithEmailAndPassword(email, pw)
                 .addOnSuccessListener {
@@ -141,11 +146,11 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
 
-        findPwBtn.setOnClickListener {
+        findPwBtn.applyPressEffect {
             val email = findPwEmail.text.toString().trim()
             if (email.isBlank()) {
                 Toast.makeText(this, "이메일을 입력하세요.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+                return@applyPressEffect
             }
             auth.sendPasswordResetEmail(email)
                 .addOnSuccessListener {
@@ -158,7 +163,7 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
 
-        googleButton.setOnClickListener {
+        googleButton.applyPressEffect {
             val signInIntent = googleSignInClient.signInIntent
             googleSignInLauncher.launch(signInIntent)
         }
@@ -238,7 +243,24 @@ class LoginActivity : AppCompatActivity() {
             "last_login" to System.currentTimeMillis()
         )
 
-
         userRef.set(userData, SetOptions.merge())
+    }
+
+    //  눌림 효과 애니메이션 함수
+    private fun View.applyPressEffect(scale: Float = 0.95f, duration: Long = 100L, action: () -> Unit) {
+        this.setOnClickListener {
+            val anim = ScaleAnimation(
+                1f, scale, 1f, scale,
+                (this.width / 2).toFloat(), (this.height / 2).toFloat()
+            ).apply {
+                this.duration = duration
+                fillAfter = true
+            }
+            this.startAnimation(anim)
+            this.postDelayed({
+                this.clearAnimation()
+                action()
+            }, duration)
+        }
     }
 }

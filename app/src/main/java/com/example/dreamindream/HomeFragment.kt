@@ -49,7 +49,6 @@ class HomeFragment : Fragment() {
 
         val weekDreams = getThisWeekDreamList()
 
-        // 기존 결과 불러오기 시도
         uid?.let {
             FirestoreManager.loadWeeklyReport(it) { feeling, keywords, analysis ->
                 if (feeling.isNotBlank() && keywords.isNotEmpty() && analysis.isNotBlank() && weekDreams.isNotEmpty()) {
@@ -84,12 +83,29 @@ class HomeFragment : Fragment() {
                 action()
             }
         }
+
         view.findViewById<Button>(R.id.btn_dream).applyScaleClick { navigateTo(DreamFragment()) }
         view.findViewById<Button>(R.id.btn_calendar).applyScaleClick { navigateTo(CalendarFragment()) }
         view.findViewById<Button>(R.id.btn_fortune).applyScaleClick { navigateTo(FortuneFragment()) }
         view.findViewById<ImageButton>(R.id.btn_settings).applyScaleClick { navigateTo(SettingsFragment()) }
 
         return view
+    }
+
+    private fun navigateTo(fragment: Fragment) {
+        val current = parentFragmentManager.findFragmentById(R.id.fragment_container)
+        if (current?.javaClass == fragment.javaClass) return
+
+        parentFragmentManager.beginTransaction()
+            .setCustomAnimations(
+                R.anim.slide_in_right,
+                R.anim.slide_out_left,
+                R.anim.slide_in_left,
+                R.anim.slide_out_right
+            )
+            .replace(R.id.fragment_container, fragment)
+            .disallowAddToBackStack()
+            .commit()
     }
 
     private fun analyzeWeeklyDreams(
@@ -148,25 +164,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun navigateTo(fragment: Fragment) {
-        val transaction = parentFragmentManager.beginTransaction()
-            .setCustomAnimations(
-                R.anim.slide_in_right,
-                R.anim.slide_out_left,
-                R.anim.slide_in_left,
-                R.anim.slide_out_right
-            )
-            .replace(R.id.fragment_container, fragment)
-
-        // HomeFragment는 백스택에 추가하지 않음
-        if (fragment !is HomeFragment) {
-            transaction.addToBackStack(null)
-        }
-
-        transaction.commit()
-    }
-
-
     private fun getThisWeekDreamList(): List<String> {
         val dreams = mutableListOf<String>()
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
@@ -179,7 +176,11 @@ class HomeFragment : Fragment() {
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
         for (dateKey in weekDates) {
-            val jsonArr = try { JSONArray(prefs.getString(dateKey, "[]")) } catch (_: Exception) { JSONArray() }
+            val jsonArr = try {
+                JSONArray(prefs.getString(dateKey, "[]"))
+            } catch (_: Exception) {
+                JSONArray()
+            }
             for (i in 0 until jsonArr.length()) {
                 val dreamObj = jsonArr.optJSONObject(i)
                 dreamObj?.getString("dream")?.let { dreams.add(it) }
@@ -204,7 +205,8 @@ class HomeFragment : Fragment() {
                 감정: 행복
                 키워드: 여행, 강아지, 바다
                 AI 분석: 당신의 꿈은 밝은 에너지가 느껴지며, 즐거움과 여유를 반영하고 있어요.
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
 
         val requestBody = JSONObject().apply {
@@ -225,6 +227,7 @@ class HomeFragment : Fragment() {
             override fun onFailure(call: Call, e: IOException) {
                 requireActivity().runOnUiThread { onError?.invoke(e) }
             }
+
             override fun onResponse(call: Call, response: Response) {
                 val responseText = if (response.isSuccessful) {
                     try {
@@ -234,8 +237,12 @@ class HomeFragment : Fragment() {
                             .getJSONObject("message")
                             .getString("content")
                             .trim()
-                    } catch (_: Exception) { "" }
-                } else { "" }
+                    } catch (_: Exception) {
+                        ""
+                    }
+                } else {
+                    ""
+                }
 
                 val feeling = Regex("""감정:\s*([^\n]+)""").find(responseText)?.groupValues?.get(1)?.trim() ?: "불명"
                 val keywords = Regex("""키워드:\s*([^\n]+)""").find(responseText)

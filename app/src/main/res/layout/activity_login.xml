@@ -21,8 +21,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="32dp"
-        app:cardCornerRadius="22dp"
-        app:cardElevation="8dp"
+        app:cardCornerRadius="32dp"
+        app:cardElevation="2dp"
         app:cardBackgroundColor="#CCFFFFFF"
         app:cardUseCompatPadding="true">
 
@@ -44,16 +44,17 @@
                 <TextView
                     android:text="@string/home_title"
                     android:textColor="#123E5A"
-                    android:textSize="26sp"
+                    android:textSize="29sp"
                     android:textStyle="bold"
                     android:gravity="center"
                     android:layout_marginBottom="6dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/jalnan"/>
                 <TextView
                     android:text="@string/login_slogan"
                     android:textColor="#888"
-                    android:textSize="13sp"
+                    android:textSize="14sp"
                     android:gravity="center"
                     android:layout_marginBottom="20dp"
                     android:layout_width="match_parent"
@@ -86,18 +87,21 @@
                     android:autofillHints="password"/>
 
                 <!-- 로그인 버튼 -->
-                <Button
-                    android:id="@+id/btn_login"
-                    android:text="@string/login_btn_login"
-                    android:textAllCaps="false"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:backgroundTint="#123E5A"
-                    android:textColor="#FFF"
-                    android:layout_marginBottom="8dp"
-                    android:minHeight="48dp"/>
 
                 <!-- 회원가입/비번찾기 (로그인 버튼 바로 아래) -->
+                <Button
+                    android:id="@+id/btn_login"
+                    android:layout_width="140dp"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="8dp"
+                    android:backgroundTint="#123E5A"
+                    android:minHeight="48dp"
+                    android:text="@string/login_btn_login"
+                    android:textAllCaps="false"
+
+                    android:textColor="#FFF"
+                    android:textStyle="bold" />
+
                 <LinearLayout
                     android:orientation="horizontal"
                     android:gravity="center"
@@ -147,8 +151,8 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginTop="12dp">
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginTop="-20dp">
 
                     <View
                         android:layout_width="0dp"
@@ -173,25 +177,27 @@
                 </LinearLayout>
 
                 <!-- 구글 로그인 버튼 (ImageButton으로 복원) -->
+
                 <ImageButton
                     android:id="@+id/btn_google"
                     android:layout_width="189dp"
                     android:layout_height="48dp"
                     android:layout_gravity="center"
                     android:background="@android:color/transparent"
-                    android:src="@drawable/btn_google"
-                    android:scaleType="fitCenter"
-                    android:contentDescription="@string/login_btn_google"
-                    android:minHeight="48dp"
                     android:clickable="true"
-                    android:focusable="true" />
+                    android:contentDescription="@string/login_btn_google"
+                    android:focusable="true"
+                    android:minHeight="48dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/btn_google" />
 
                 <Button
                     android:id="@+id/btn_skip_login"
-                    android:layout_width="189dp"
+                    android:layout_width="140dp"
                     android:layout_height="48dp"
                     android:layout_gravity="center"
-                    android:text="체험하기"
+                    android:text="체험"
+                    android:textStyle="bold"
                     android:backgroundTint="#123E5A"
                     android:textColor="@color/white"
                     android:minHeight="48dp"
@@ -232,7 +238,7 @@
 
                 <TextView
                     android:text="@string/sign_up_title"
-                    android:textColor="#7A55D3"
+                    android:textColor="#123E5A"
                     android:textSize="22sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="18dp"
@@ -282,7 +288,7 @@
                     android:textAllCaps="false"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:backgroundTint="#7A55D3"
+                    android:backgroundTint="#123E5A"
                     android:textColor="#FFF"
                     android:layout_marginBottom="6dp"
                     android:minHeight="48dp"/>
@@ -293,7 +299,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:backgroundTint="#EEE"
-                    android:textColor="#7A55D3"
+                    android:textColor="#123E5A"
                     android:minHeight="48dp"/>
             </LinearLayout>
 
@@ -328,7 +334,7 @@
 
                 <TextView
                     android:text="@string/password_reset_title"
-                    android:textColor="#7A55D3"
+                    android:textColor="#123E5A"
                     android:textSize="22sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="18dp"
@@ -354,7 +360,7 @@
                     android:textAllCaps="false"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:backgroundTint="#7A55D3"
+                    android:backgroundTint="#123E5A"
                     android:textColor="#FFF"
                     android:layout_marginBottom="6dp"
                     android:minHeight="48dp"/>
@@ -365,7 +371,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:backgroundTint="#EEE"
-                    android:textColor="#7A55D3"
+                    android:textColor="#123E5A"
                     android:minHeight="48dp"/>
             </LinearLayout>
         </FrameLayout>

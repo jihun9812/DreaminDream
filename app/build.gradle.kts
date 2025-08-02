@@ -76,8 +76,6 @@ dependencies {
     implementation("com.google.firebase:firebase-config-ktx:21.6.0")
     implementation("com.google.firebase:firebase-auth-ktx")
 
-
-
     // google gradle 추가.
 
     implementation ("com.google.android.gms:play-services-auth:21.1.0")

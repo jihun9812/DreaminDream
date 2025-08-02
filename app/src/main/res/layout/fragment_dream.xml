@@ -87,8 +87,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:layout_marginTop="16dp"
+                    android:backgroundTint="#41061B2A"
                     android:text="@string/button_interpret"
-                    android:backgroundTint="#41051724"
                     android:textColor="@android:color/white"
                     android:textSize="15sp" />
             </LinearLayout>

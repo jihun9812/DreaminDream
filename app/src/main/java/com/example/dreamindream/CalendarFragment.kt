@@ -41,20 +41,25 @@ class CalendarFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // 뒤로가기 시 홈으로 슬라이드 전환
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                parentFragmentManager.beginTransaction()
-                    .setCustomAnimations(
-                        R.anim.slide_in_left,
-                        R.anim.slide_out_right,
-                        R.anim.slide_in_right,
-                        R.anim.slide_out_left
-                    )
-                    .replace(R.id.fragment_container, HomeFragment())
-                    .disallowAddToBackStack()
-                    .commit()
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val current = parentFragmentManager.findFragmentById(R.id.fragment_container)
+                    if (current !is HomeFragment) {
+                        parentFragmentManager.beginTransaction()
+                            .setCustomAnimations(
+                                R.anim.slide_in_left,
+                                R.anim.slide_out_right,
+                                R.anim.slide_in_right,
+                                R.anim.slide_out_left
+                            )
+                            .replace(R.id.fragment_container, HomeFragment())
+                            .disallowAddToBackStack()
+                            .commit()
+                    }
+                }
+            })
+
 
         val currentMonth = YearMonth.now()
         val daysOfWeek = daysOfWeek(DayOfWeek.SUNDAY)

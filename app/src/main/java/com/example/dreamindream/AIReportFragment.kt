@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.charts.BarChart
@@ -52,6 +53,30 @@ class AIReportFragment : Fragment() {
         }
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // 뒤로가기 시 홈으로 이동
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val current = parentFragmentManager.findFragmentById(R.id.fragment_container)
+                    if (current !is HomeFragment) {
+                        parentFragmentManager.beginTransaction()
+                            .setCustomAnimations(
+                                R.anim.slide_in_left,
+                                R.anim.slide_out_right,
+                                R.anim.slide_in_right,
+                                R.anim.slide_out_left
+                            )
+                            .replace(R.id.fragment_container, HomeFragment())
+                            .disallowAddToBackStack()
+                            .commit()
+                    }
+                }
+            })
     }
 
     private fun loadIfEnoughDreams() {

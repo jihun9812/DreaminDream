@@ -1,0 +1,109 @@
+[debug] [2025-08-01T20:21:51.550Z] ----------------------------------------------------------------------
+[debug] [2025-08-01T20:21:51.552Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\kathy060415\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only functions:sendTestPushSingle --force
+[debug] [2025-08-01T20:21:51.553Z] CLI Version:   14.11.2
+[debug] [2025-08-01T20:21:51.553Z] Platform:      win32
+[debug] [2025-08-01T20:21:51.553Z] Node Version:  v22.18.0
+[debug] [2025-08-01T20:21:51.553Z] Time:          Sat Aug 02 2025 04:21:51 GMT+0800 (Singapore Standard Time)
+[debug] [2025-08-01T20:21:51.553Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-08-01T20:21:51.728Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-08-01T20:21:51.728Z] > authorizing via signed-in user (dhy04051@gmail.com)
+[debug] [2025-08-01T20:21:51.728Z] [iam] checking project dreamindream-439e6 for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2025-08-01T20:21:51.729Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:21:51.730Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:21:51.730Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/dreamindream-439e6:testIamPermissions [none]
+[debug] [2025-08-01T20:21:51.730Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/dreamindream-439e6:testIamPermissions x-goog-quota-user=projects/dreamindream-439e6
+[debug] [2025-08-01T20:21:51.731Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/dreamindream-439e6:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-08-01T20:21:52.836Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/dreamindream-439e6:testIamPermissions 200
+[debug] [2025-08-01T20:21:52.836Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/dreamindream-439e6:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-08-01T20:21:52.837Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:21:52.837Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:21:52.837Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/dreamindream-439e6/serviceAccounts/dreamindream-439e6@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2025-08-01T20:21:52.837Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/dreamindream-439e6/serviceAccounts/dreamindream-439e6@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2025-08-01T20:21:54.121Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/dreamindream-439e6/serviceAccounts/dreamindream-439e6@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2025-08-01T20:21:54.121Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/dreamindream-439e6/serviceAccounts/dreamindream-439e6@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[info] 
+[info] === Deploying to 'dreamindream-439e6'...
+[info] 
+[info] i  deploying functions 
+[info] +  functions: Finished running predeploy script. 
+[debug] [2025-08-01T20:21:54.127Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:21:54.127Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:21:54.127Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/dreamindream-439e6 [none]
+[debug] [2025-08-01T20:21:54.384Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/dreamindream-439e6 200
+[debug] [2025-08-01T20:21:54.384Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/dreamindream-439e6 {"projectNumber":"886944015637","projectId":"dreamindream-439e6","lifecycleState":"ACTIVE","name":"DreaminDream","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-07-09T03:01:13.487499Z"}
+[info] i  functions: preparing codebase default for deployment 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[info] i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[debug] [2025-08-01T20:21:54.389Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:21:54.389Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:21:54.389Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/dreamindream-439e6/adminSdkConfig [none]
+[debug] [2025-08-01T20:21:54.935Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/dreamindream-439e6/adminSdkConfig 200
+[debug] [2025-08-01T20:21:54.935Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/dreamindream-439e6/adminSdkConfig {"projectId":"dreamindream-439e6","storageBucket":"dreamindream-439e6.firebasestorage.app"}
+[debug] [2025-08-01T20:21:54.936Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:21:54.936Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:21:54.936Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/dreamindream-439e6/configs [none]
+[debug] [2025-08-01T20:21:55.247Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/dreamindream-439e6/configs 200
+[debug] [2025-08-01T20:21:55.247Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/dreamindream-439e6/configs {}
+[debug] [2025-08-01T20:21:55.251Z] Validating nodejs source
+[warn] !  functions: Runtime Node.js 18 was deprecated on 2025-04-30 and will be decommissioned on 2025-10-30, after which you will not be able to deploy without upgrading. Consider upgrading now to avoid disruption. See https://cloud.google.com/functions/docs/runtime-support for full details on the lifecycle policy 
+[debug] [2025-08-01T20:21:56.333Z] > [functions] package.json contents: {
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "18"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^13.4.0",
+    "firebase-functions": "^6.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0",
+    "eslint-config-google": "^0.14.0",
+    "firebase-functions-test": "^3.1.0"
+  },
+  "private": true
+}
+[debug] [2025-08-01T20:21:56.333Z] Building nodejs source
+[info] i  functions: Loading and analyzing source code for codebase default to determine what to deploy 
+[debug] [2025-08-01T20:21:56.335Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-08-01T20:21:56.341Z] Found firebase-functions binary at 'C:\Users\kathy060415\StudioProjects\DreaminDream\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8451
+
+[debug] [2025-08-01T20:21:57.210Z] Got response from /__/functions.yaml {"endpoints":{"sendTestPushToAll":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"sendTestPushToAll"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[info] i  extensions: ensuring required API firebaseextensions.googleapis.com is enabled... 
+[debug] [2025-08-01T20:22:01.251Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-08-01T20:22:01.251Z] > authorizing via signed-in user (dhy04051@gmail.com)
+[debug] [2025-08-01T20:22:01.251Z] [iam] checking project dreamindream-439e6 for permissions ["firebase.projects.get","firebaseextensions.instances.list"]
+[debug] [2025-08-01T20:22:01.251Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:22:01.251Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:22:01.251Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/dreamindream-439e6:testIamPermissions [none]
+[debug] [2025-08-01T20:22:01.251Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/dreamindream-439e6:testIamPermissions x-goog-quota-user=projects/dreamindream-439e6
+[debug] [2025-08-01T20:22:01.251Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/dreamindream-439e6:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[debug] [2025-08-01T20:22:02.288Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/dreamindream-439e6:testIamPermissions 200
+[debug] [2025-08-01T20:22:02.288Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/dreamindream-439e6:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[debug] [2025-08-01T20:22:02.289Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:22:02.289Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:22:02.289Z] >>> [apiv2][query] GET https://firebaseextensions.googleapis.com/v1beta/projects/dreamindream-439e6/instances pageSize=100&pageToken=
+[debug] [2025-08-01T20:22:03.471Z] <<< [apiv2][status] GET https://firebaseextensions.googleapis.com/v1beta/projects/dreamindream-439e6/instances 200
+[debug] [2025-08-01T20:22:03.472Z] <<< [apiv2][body] GET https://firebaseextensions.googleapis.com/v1beta/projects/dreamindream-439e6/instances {}
+[info] i  functions: preparing functions directory for uploading... 
+[info] i  functions: packaged C:\Users\kathy060415\StudioProjects\DreaminDream\functions (71.61 KB) for uploading 
+[debug] [2025-08-01T20:22:03.508Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:22:03.508Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:22:03.509Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v1/projects/dreamindream-439e6/locations/-/functions [none]
+[debug] [2025-08-01T20:22:04.208Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v1/projects/dreamindream-439e6/locations/-/functions 200
+[debug] [2025-08-01T20:22:04.208Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v1/projects/dreamindream-439e6/locations/-/functions {}
+[debug] [2025-08-01T20:22:04.209Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:22:04.209Z] Checked if tokens are valid: true, expires at: 1754081574638
+[debug] [2025-08-01T20:22:04.209Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/dreamindream-439e6/locations/-/functions filter=environment%3D%22GEN_2%22

@@ -2,13 +2,15 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <!-- 배경 애니메이션 -->
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/bg_lottie"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#F5080C23"
         app:lottie_rawRes="@raw/hwwprmbqc9"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
@@ -22,69 +24,72 @@
         android:layout_gravity="center"
         android:layout_margin="32dp"
         app:cardCornerRadius="32dp"
-        app:cardElevation="2dp"
+        app:cardElevation="0dp"
         app:cardBackgroundColor="#CCFFFFFF"
         app:cardUseCompatPadding="true">
 
         <FrameLayout
             android:id="@+id/loginCardContent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:padding="12dp">
 
             <!-- 로그인 패널 -->
             <LinearLayout
                 android:id="@+id/loginPanel"
-                android:orientation="vertical"
-                android:padding="28dp"
-                android:gravity="center_horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="28dp">
 
                 <!-- 타이틀/슬로건 -->
                 <TextView
-                    android:text="@string/home_title"
-                    android:textColor="#123E5A"
-                    android:textSize="29sp"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:layout_marginBottom="6dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/jalnan"/>
+                    android:layout_marginBottom="6dp"
+                    android:fontFamily="@font/jalnan"
+                    android:gravity="center"
+                    android:text="@string/home_title"
+                    android:textColor="#123E5A"
+                    android:textSize="24sp"
+                    android:textStyle="bold" />
+
                 <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:gravity="center"
                     android:text="@string/login_slogan"
                     android:textColor="#888"
-                    android:textSize="14sp"
-                    android:gravity="center"
-                    android:layout_marginBottom="20dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:textSize="14sp" />
 
                 <!-- 이메일/비밀번호 -->
                 <EditText
                     android:id="@+id/input_email"
-                    android:hint="@string/login_email_hint"
-                    android:inputType="textEmailAddress"
-                    android:layout_marginBottom="10dp"
-                    android:background="@drawable/edittext_bg_blur"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:textColorHint="#999999"
-                    android:textColor="#000000"
+                    android:layout_marginBottom="10dp"
+                    android:autofillHints="emailAddress"
+                    android:background="@drawable/edittext_bg_blur"
+                    android:hint="@string/login_email_hint"
                     android:importantForAutofill="yes"
-                    android:autofillHints="emailAddress"/>
+                    android:inputType="textEmailAddress"
+                    android:textColor="#000000"
+                    android:textColorHint="#999999" />
+
                 <EditText
                     android:id="@+id/input_password"
-                    android:hint="@string/login_password_hint"
-                    android:inputType="textPassword"
-                    android:background="@drawable/edittext_bg_blur"
-                    android:layout_marginBottom="12dp"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:textColorHint="#999999"
-                    android:textColor="#000000"
+                    android:layout_marginBottom="12dp"
+                    android:autofillHints="password"
+                    android:background="@drawable/edittext_bg_blur"
+                    android:hint="@string/login_password_hint"
                     android:importantForAutofill="yes"
-                    android:autofillHints="password"/>
+                    android:inputType="textPassword"
+                    android:textColor="#000000"
+                    android:textColorHint="#999999" />
 
                 <!-- 로그인 버튼 -->
 
@@ -103,56 +108,56 @@
                     android:textStyle="bold" />
 
                 <LinearLayout
-                    android:orientation="horizontal"
-                    android:gravity="center"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="18dp">
+                    android:layout_marginBottom="18dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/goFindPw"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/forgot_password"
-                        android:textColor="#888"
-                        android:textSize="14sp"
                         android:clickable="true"
                         android:focusable="true"
+                        android:minHeight="48dp"
                         android:padding="12dp"
-                        android:minHeight="48dp" />
+                        android:text="@string/forgot_password"
+                        android:textColor="#888"
+                        android:textSize="14sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text=" / "
-                        android:textColor="#888"
-                        android:textSize="14sp"
+                        android:clickable="false"
+                        android:focusable="false"
                         android:paddingStart="0dp"
                         android:paddingEnd="4dp"
-                        android:clickable="false"
-                        android:focusable="false"/>
+                        android:text=" / "
+                        android:textColor="#888"
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/goSignup"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/sign_up"
-                        android:textColor="#888"
-                        android:textSize="14sp"
                         android:clickable="true"
                         android:focusable="true"
+                        android:minHeight="48dp"
                         android:padding="12dp"
-                        android:minHeight="48dp"/>
+                        android:text="@string/sign_up"
+                        android:textColor="#888"
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <!-- 구분선과 or (구글 버튼 위에 명확하게) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
+                    android:layout_marginTop="-20dp"
                     android:layout_marginBottom="3dp"
-                    android:layout_marginTop="-20dp">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <View
                         android:layout_width="0dp"
@@ -163,11 +168,11 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
                         android:text="or"
                         android:textColor="#888"
-                        android:textSize="16sp"
-                        android:paddingStart="14dp"
-                        android:paddingEnd="14dp" />
+                        android:textSize="16sp" />
 
                     <View
                         android:layout_width="0dp"
@@ -196,13 +201,12 @@
                     android:layout_width="140dp"
                     android:layout_height="48dp"
                     android:layout_gravity="center"
-                    android:text="체험"
-                    android:textStyle="bold"
+                    android:layout_marginTop="10dp"
                     android:backgroundTint="#123E5A"
-                    android:textColor="@color/white"
                     android:minHeight="48dp"
-                    android:layout_marginTop="10dp"/>
-
+                    android:text="체험"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
 
 
             </LinearLayout>
@@ -210,11 +214,11 @@
             <!-- 회원가입 패널 -->
             <LinearLayout
                 android:id="@+id/signupPanel"
-                android:orientation="vertical"
-                android:padding="28dp"
-                android:gravity="center_horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="28dp"
                 android:visibility="gone">
 
                 <!-- X 닫기 버튼 -->
@@ -228,89 +232,92 @@
                         android:layout_height="32dp"
                         android:layout_gravity="end"
                         android:background="?attr/selectableItemBackgroundBorderless"
-                        android:src="@drawable/ic_close"
+                        android:clickable="true"
                         android:contentDescription="닫기"
-                        android:scaleType="center"
-                        android:padding="0dp"
                         android:focusable="true"
-                        android:clickable="true"/>
+                        android:padding="0dp"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_close" />
                 </FrameLayout>
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="18dp"
                     android:text="@string/sign_up_title"
                     android:textColor="#123E5A"
                     android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="18dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/signup_email"
-                    android:hint="@string/email_hint"
-                    android:inputType="textEmailAddress"
-                    android:background="@drawable/edittext_bg_blur"
-                    android:layout_marginBottom="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:textColorHint="#999999"
-                    android:textColor="#000000"
+                    android:layout_marginBottom="10dp"
+                    android:autofillHints="emailAddress"
+                    android:background="@drawable/edittext_bg_blur"
+                    android:hint="@string/email_hint"
                     android:importantForAutofill="yes"
-                    android:autofillHints="emailAddress"/>
+                    android:inputType="textEmailAddress"
+                    android:textColor="#000000"
+                    android:textColorHint="#999999" />
+
                 <EditText
                     android:id="@+id/signup_password"
-                    android:hint="@string/password_hint"
-                    android:inputType="textPassword"
-                    android:background="@drawable/edittext_bg_blur"
-                    android:layout_marginBottom="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:textColorHint="#999999"
-                    android:textColor="#000000"
+                    android:layout_marginBottom="10dp"
+                    android:autofillHints="newPassword"
+                    android:background="@drawable/edittext_bg_blur"
+                    android:hint="@string/password_hint"
                     android:importantForAutofill="yes"
-                    android:autofillHints="newPassword"/>
+                    android:inputType="textPassword"
+                    android:textColor="#000000"
+                    android:textColorHint="#999999" />
+
                 <EditText
                     android:id="@+id/signup_password_confirm"
-                    android:hint="@string/password_confirm_hint"
-                    android:inputType="textPassword"
-                    android:background="@drawable/edittext_bg_blur"
-                    android:layout_marginBottom="16dp"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:textColorHint="#999999"
-                    android:textColor="#000000"
+                    android:layout_marginBottom="16dp"
+                    android:autofillHints="newPassword"
+                    android:background="@drawable/edittext_bg_blur"
+                    android:hint="@string/password_confirm_hint"
                     android:importantForAutofill="yes"
-                    android:autofillHints="newPassword"/>
+                    android:inputType="textPassword"
+                    android:textColor="#000000"
+                    android:textColorHint="#999999" />
 
                 <Button
                     android:id="@+id/btn_signup"
-                    android:text="@string/sign_up_button"
-                    android:textAllCaps="false"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:backgroundTint="#123E5A"
-                    android:textColor="#FFF"
                     android:layout_marginBottom="6dp"
-                    android:minHeight="48dp"/>
+                    android:backgroundTint="#123E5A"
+                    android:minHeight="48dp"
+                    android:text="@string/sign_up_button"
+                    android:textAllCaps="false"
+                    android:textColor="#FFF" />
+
                 <Button
                     android:id="@+id/btn_signup_cancel"
-                    android:text="@string/cancel"
-                    android:textAllCaps="false"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:backgroundTint="#EEE"
-                    android:textColor="#123E5A"
-                    android:minHeight="48dp"/>
+                    android:minHeight="48dp"
+                    android:text="@string/cancel"
+                    android:textAllCaps="false"
+                    android:textColor="#123E5A" />
             </LinearLayout>
 
             <!-- 비밀번호 찾기 패널 -->
             <LinearLayout
                 android:id="@+id/findPwPanel"
-                android:orientation="vertical"
-                android:padding="28dp"
-                android:gravity="center_horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="28dp"
                 android:visibility="gone">
 
                 <!-- X 닫기 버튼 -->
@@ -324,55 +331,56 @@
                         android:layout_height="32dp"
                         android:layout_gravity="end"
                         android:background="?attr/selectableItemBackgroundBorderless"
-                        android:src="@drawable/ic_close"
+                        android:clickable="true"
                         android:contentDescription="닫기"
-                        android:scaleType="center"
-                        android:padding="0dp"
                         android:focusable="true"
-                        android:clickable="true"/>
+                        android:padding="0dp"
+                        android:scaleType="center"
+                        android:src="@drawable/ic_close" />
                 </FrameLayout>
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="18dp"
                     android:text="@string/password_reset_title"
                     android:textColor="#123E5A"
                     android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:layout_marginBottom="18dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/findpw_email"
-                    android:hint="@string/email_hint"
-                    android:inputType="textEmailAddress"
-                    android:background="@drawable/edittext_bg_blur"
-                    android:layout_marginBottom="14dp"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:textColorHint="#999999"
-                    android:textColor="#000000"
+                    android:layout_marginBottom="14dp"
+                    android:autofillHints="emailAddress"
+                    android:background="@drawable/edittext_bg_blur"
+                    android:hint="@string/email_hint"
                     android:importantForAutofill="yes"
-                    android:autofillHints="emailAddress"/>
+                    android:inputType="textEmailAddress"
+                    android:textColor="#000000"
+                    android:textColorHint="#999999" />
 
                 <Button
                     android:id="@+id/btn_findpw"
-                    android:text="@string/send_reset_email"
-                    android:textAllCaps="false"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:backgroundTint="#123E5A"
-                    android:textColor="#FFF"
                     android:layout_marginBottom="6dp"
-                    android:minHeight="48dp"/>
+                    android:backgroundTint="#123E5A"
+                    android:minHeight="48dp"
+                    android:text="@string/send_reset_email"
+                    android:textAllCaps="false"
+                    android:textColor="#FFF" />
+
                 <Button
                     android:id="@+id/btn_findpw_cancel"
-                    android:text="@string/cancel"
-                    android:textAllCaps="false"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:backgroundTint="#EEE"
-                    android:textColor="#123E5A"
-                    android:minHeight="48dp"/>
+                    android:minHeight="48dp"
+                    android:text="@string/cancel"
+                    android:textAllCaps="false"
+                    android:textColor="#123E5A" />
             </LinearLayout>
         </FrameLayout>
     </androidx.cardview.widget.CardView>
@@ -382,7 +390,7 @@
         android:id="@+id/privacy_and_version"
         android:text="@string/privacy_and_version"
         android:textSize="11sp"
-        android:textColor="#040404"
+        android:textColor="#FFFFFF"
         android:gravity="center"
         android:background="@android:color/transparent"
         android:layout_width="match_parent"

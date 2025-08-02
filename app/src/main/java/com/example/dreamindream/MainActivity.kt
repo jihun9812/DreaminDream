@@ -15,10 +15,18 @@ import com.google.android.gms.ads.MobileAds
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.android.gms.ads.RequestConfiguration
+
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val testDeviceIds = listOf("ABCDEF012345")
+        val configuration = RequestConfiguration.Builder()
+            .setTestDeviceIds(testDeviceIds)
+            .build()
+        MobileAds.setRequestConfiguration(configuration)
 
         // ✅ 로그인 안 되어 있으면 LoginActivity로 이동
         val user = FirebaseAuth.getInstance().currentUser
@@ -28,12 +36,10 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // 🔔 Android 13 이상 알림 권한 요청 및 토픽 구독
+        // 🔔 Android 13 이상 알림 권한 요청
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
             ) {
                 ActivityCompat.requestPermissions(
                     this,
@@ -47,7 +53,7 @@ class MainActivity : AppCompatActivity() {
             subscribeToDailyDream()
         }
 
-        // 🔔 FCM 토큰 Firestore에 저장
+        // 🔔 FCM 토큰 저장
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val token = task.result
@@ -63,8 +69,6 @@ class MainActivity : AppCompatActivity() {
                         .addOnFailureListener {
                             Log.e("FCM", "토큰 저장 실패", it)
                         }
-                } else {
-                    Log.d("FCM", "사용자 없음 - 토큰 저장 생략")
                 }
             } else {
                 Log.e("FCM", "토큰 획득 실패", task.exception)
@@ -79,15 +83,14 @@ class MainActivity : AppCompatActivity() {
         window.statusBarColor = ContextCompat.getColor(this, R.color.dark_background)
         window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_background)
 
-        // ✅ 최초 실행 시 데이터 초기화
+        // ✅ 최초 실행 시 초기화
         val prefs = getSharedPreferences("first_run_check", Context.MODE_PRIVATE)
-        val isFirstRun = prefs.getBoolean("isFirstRun", true)
-        if (isFirstRun) {
+        if (prefs.getBoolean("isFirstRun", true)) {
             try {
-                val prefsList = listOf(
-                    "user_info", "user_prefs", "dream_history", "fortune", "fortune_result"
-                )
-                prefsList.forEach { name ->
+                listOf(
+                    "user_info", "user_prefs", "dream_history",
+                    "fortune", "fortune_result"
+                ).forEach { name ->
                     getSharedPreferences(name, Context.MODE_PRIVATE).edit().clear().apply()
                 }
                 filesDir?.listFiles()?.forEach { it.delete() }
@@ -97,10 +100,11 @@ class MainActivity : AppCompatActivity() {
             prefs.edit().putBoolean("isFirstRun", false).apply()
         }
 
-        // ✅ 홈 프래그먼트 로딩
+        // ✅ 홈 프래그먼트 중복 생성 방지
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, HomeFragment())
+                .disallowAddToBackStack() // 홈은 쌓지 않음
                 .commit()
         }
 
@@ -117,7 +121,6 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    // 🔔 알림 권한 허용 후 토픽 구독 처리
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -126,24 +129,19 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 1001) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d("알림권한", "사용자가 알림 권한을 허용함")
                 subscribeToDailyDream()
-            } else {
-                Log.d("알림권한", "사용자가 알림 권한을 거부함")
             }
         }
     }
 
     private fun subscribeToDailyDream() {
         val prefs = getSharedPreferences("fcm_topic_check", Context.MODE_PRIVATE)
-        val alreadySubscribed = prefs.getBoolean("dailyDreamSubscribed", false)
-
-        if (!alreadySubscribed) {
+        if (!prefs.getBoolean("dailyDreamSubscribed", false)) {
             FirebaseMessaging.getInstance().subscribeToTopic("dailyDream")
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d("FCM", "✅ dailyDream 토픽 구독 완료")
                         prefs.edit().putBoolean("dailyDreamSubscribed", true).apply()
+                        Log.d("FCM", "✅ dailyDream 토픽 구독 완료")
                     } else {
                         Log.e("FCM", "❌ 토픽 구독 실패", task.exception)
                     }

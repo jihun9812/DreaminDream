@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    app:cardCornerRadius="56dp"
+    android:background="#F4F3EF"
+    android:padding="20dp">
+
+    <!-- 타이틀 -->
+    <TextView
+        android:id="@+id/textDreamListTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="이 날의 꿈들"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="#333333"
+        android:layout_marginBottom="12dp" />
+
+    <!-- 꿈 목록 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerDreamList"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:clipToPadding="false"
+        android:overScrollMode="ifContentScrolls"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+</LinearLayout>

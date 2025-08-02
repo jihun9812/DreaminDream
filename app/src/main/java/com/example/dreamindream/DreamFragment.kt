@@ -1,6 +1,7 @@
 package com.example.dreamindream
 
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -29,6 +30,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.Executors
+import android.view.KeyEvent
 
 class DreamFragment : Fragment() {
 
@@ -120,10 +122,12 @@ class DreamFragment : Fragment() {
                             R.anim.slide_out_left
                         )
                         .replace(R.id.fragment_container, HomeFragment())
-                        .disallowAddToBackStack()
+                        .disallowAddToBackStack() // 핵심: 중첩 방지
                         .commit()
                 }
             })
+
+
     }
 
     private fun startInterpretation(text: String, count: Int) {
@@ -186,18 +190,39 @@ class DreamFragment : Fragment() {
         lottieLoading.cancelAnimation()
         lottieLoading.visibility = View.GONE
         interpretButton.isEnabled = true
-
-        val styled = Html.fromHtml(
-            result.replace("💭 꿈이 전하는 메시지", "<font color='#4B0082'><b>💭 꿈이 전하는 메시지</b></font>")
-                .replace("🧠 꿈속 상징의 의미", "<br><font color='#006400'><b>🧠 꿈속 상징의 의미</b></font>")
-                .replace("📌 예지 포인트 요약", "<br><font color='#8B0000'><b>📌 예지 포인트 요약</b></font>")
-                .replace("☀️ 운세 활용 팁", "<br><font color='#DAA520'><b>☀️ 운세 활용 팁</b></font>")
-                .replace("🎯 오늘의 행동 포인트", "<br><font color='#4682B4'><b>🎯 오늘의 행동 포인트</b></font>"),
-            Html.FROM_HTML_MODE_LEGACY
-        ).toString()
-
-        DreamResultDialog(requireContext(), result).show()
+        showDreamResultDialog(requireContext(), result)
     }
+
+    companion object {
+        fun showDreamResultDialog(context: Context, result: String) {
+            val styled: CharSequence = Html.fromHtml(
+                result.replace("💭 꿈이 전하는 메시지", "<font color='#4B0082'><b>💭 꿈이 전하는 메시지</b></font>")
+                    .replace("🧠 꿈속 상징의 의미", "<br><font color='#006400'><b>🧠 꿈속 상징의 의미</b></font>")
+                    .replace("📌 예지 포인트 요약", "<br><font color='#8B0000'><b>📌 예지 포인트 요약</b></font>")
+                    .replace("☀️ 운세 활용 팁", "<br><font color='#DAA520'><b>☀️ 운세 활용 팁</b></font>")
+                    .replace("🎯 오늘의 행동 포인트", "<br><font color='#4682B4'><b>🎯 오늘의 행동 포인트</b></font>"),
+                Html.FROM_HTML_MODE_LEGACY
+            )
+
+            val dialog = Dialog(context)
+            dialog.setContentView(R.layout.dream_result_dialog)
+            dialog.setCancelable(false)
+            dialog.setOnKeyListener { _, keyCode, _ -> keyCode == KeyEvent.KEYCODE_BACK }
+
+            // ✅ 여기가 핵심: 다이얼로그 폭 꽉 채우고 배경 투명하게
+            dialog.window?.setLayout(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            dialog.window?.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT))
+
+            dialog.findViewById<TextView>(R.id.resultTextView).text = styled
+            dialog.findViewById<View>(R.id.btn_close).setOnClickListener { dialog.dismiss() }
+
+            dialog.show()
+        }
+    }
+
 
     private fun validateInputSmart(input: String): Boolean {
         val bannedStarters = listOf("안녕", "gpt", "hello", "how are you", "what is", "tell me", "chatgpt",
@@ -232,19 +257,30 @@ class DreamFragment : Fragment() {
                 JSONObject().apply {
                     put("role", "user")
                     put("content", """
-                        너는 지금부터 꿈을 예지몽처럼 분석하는 전문가야. 아래 꿈은 예지몽이라고 가정했고 다음과 같이 분석해.
+                        너는 지금부터 '예지몽 분석 전문가'야. 사용자가 제공한 꿈은 단순한 상상이 아닌 미래를 암시하는 **예지몽**이라고 가정하고 분석해.
 
-                        [분석 항목]
+                        반드시 아래 5가지 항목을 구분해서 자세하고 현실적으로 작성해줘.  
+                        각 항목 앞의 이모지는 그대로 사용하고, 실제로 일어날 수 있는 사건에 기반하여 **현실성 있는 해몽**을 제공해야 해.  
+                        표현은 신뢰감 있고 조리 있게, 마치 전문 상담사처럼 작성해.
+
+                        ---
                         💭 꿈이 전하는 메시지  
+                        (꿈이 전달하는 전반적 메시지를 요약. 심리 상태나 삶의 방향성 등 내면적 의미 중심)
+
                         🧠 꿈속 상징의 의미  
+                        (꿈에 나온 주요 인물, 사물, 상황 등 각각의 상징이 지닌 의미를 설명)
+
                         📌 예지 포인트 요약  
+                        (가장 핵심적인 예지 포인트를 2~3줄로 요약. 미래에 일어날 수 있는 사건을 구체적으로 제시)
+
                         ☀️ 운세 활용 팁  
+                        (이 꿈을 어떻게 활용하면 좋은지 운세 관점에서 조언. 피해야 할 일/추천 행동 등)
+
                         🎯 오늘의 행동 포인트  
+                        (오늘 바로 실천 가능한 조언이나 주의점. 현실적인 액션 위주로 작성)
 
-                        각 항목은 정확하고 간결하게 작성하고, 이모티콘은 그대로 사용해줘.  
-                        꼭 현실적으로 일어날 수 있는 사건을 기반으로 분석해.
-
-                        [꿈 내용]
+                        ---
+                        [꿈 내용]  
                         "$prompt"
                     """.trimIndent())
                 }

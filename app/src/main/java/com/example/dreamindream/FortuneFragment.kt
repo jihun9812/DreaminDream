@@ -77,20 +77,22 @@ class FortuneFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                parentFragmentManager.beginTransaction()
-                    .setCustomAnimations(
-                        R.anim.slide_in_left,
-                        R.anim.slide_out_right,
-                        R.anim.slide_in_right,
-                        R.anim.slide_out_left
-                    )
-                    .replace(R.id.fragment_container, HomeFragment())
-                    .disallowAddToBackStack()
-                    .commit()
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    parentFragmentManager.beginTransaction()
+                        .setCustomAnimations(
+                            R.anim.slide_in_left,
+                            R.anim.slide_out_right,
+                            R.anim.slide_in_right,
+                            R.anim.slide_out_left
+                        )
+                        .replace(R.id.fragment_container, HomeFragment())
+                        .disallowAddToBackStack() // 핵심: 중첩 방지
+                        .commit()
+                }
+            })
+
     }
 
     private fun getToday(): String {
@@ -259,6 +261,10 @@ class FortuneFragment : Fragment() {
 총운 50점  오늘은 가벼운 산책을 하는게 좋아요
 재물은 80점  소소한 투자를 해보는게 좋아요
 (내용은 가독성좋게 )
+
+각 항목에 반드시 숫자로 된 점수 (예: 80점)를 포함하고, 이유를 간결하게 서술하세요.
+절대 점수만 쓰지 말고 반드시 설명을 붙이세요.
+
 
 [점수별 작성 기준]
 - 60점 이하: 주의사항 또는 피해야 할 행동

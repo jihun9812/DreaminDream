@@ -41,7 +41,7 @@
 
 
     <string name="dream_star_text">어떤 꿈을 꾸었나요?</string>
-    <string name="hint_input">여기에 꿈을 입력해주세요! </string>
+    <string name="hint_input">여기에 꿈을 자세하게 입력해주세요!\n ex) 오늘꿈에서 엄청 큰 나무에서 떨어졌는데 기분이 너무 안좋았어.</string>
     <string name="button_interpret">해몽하기</string>
     <string name="result_default">해몽 결과가 여기에 표시됩니다.</string>
 
@@ -67,7 +67,6 @@
 
     <!-- login.xml 부분 string -->
     <string name="login_slogan">꿈에서 해답을찾다</string>
-    <string name="login_guide">아직 회원이 아니라면, 회원가입 후 이용해보세요!\n구글 로그인/체험 모드로도 바로 사용 가능!</string>
     <string name="dreamin_slogan1"> </string>
     <string name="login_password_confirm_hint">비밀번호 확인</string>
     <string name="login_findpw">비밀번호 찾기</string>

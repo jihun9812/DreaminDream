@@ -2,20 +2,20 @@ package com.example.dreamindream
 
 import android.graphics.Color
 import android.os.Bundle
+import android.content.Context
 import android.view.*
 import android.widget.TextView
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.AdView
+import com.google.android.gms.ads.MobileAds
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.dreamindream.databinding.FragmentCalendarBinding
-import com.google.android.gms.ads.AdRequest
-import com.google.firebase.auth.FirebaseAuth
 import com.kizitonwose.calendar.core.*
 import com.kizitonwose.calendar.view.*
+import com.example.dreamindream.databinding.FragmentCalendarBinding
+import com.google.firebase.auth.FirebaseAuth
 import org.json.JSONArray
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.YearMonth
+import java.time.*
 import java.time.format.DateTimeFormatter
 
 class CalendarFragment : Fragment() {
@@ -32,7 +32,11 @@ class CalendarFragment : Fragment() {
     private val colorBlack = Color.parseColor("#000000")
     private val colorOrange = Color.parseColor("#FF9800")
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentCalendarBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -40,26 +44,28 @@ class CalendarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 뒤로가기 시 홈으로 슬라이드 전환
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    val current = parentFragmentManager.findFragmentById(R.id.fragment_container)
-                    if (current !is HomeFragment) {
-                        parentFragmentManager.beginTransaction()
-                            .setCustomAnimations(
-                                R.anim.slide_in_left,
-                                R.anim.slide_out_right,
-                                R.anim.slide_in_right,
-                                R.anim.slide_out_left
-                            )
-                            .replace(R.id.fragment_container, HomeFragment())
-                            .disallowAddToBackStack()
-                            .commit()
-                    }
+                    parentFragmentManager.beginTransaction()
+                        .setCustomAnimations(
+                            R.anim.slide_in_left,
+                            R.anim.slide_out_right,
+                            R.anim.slide_in_right,
+                            R.anim.slide_out_left
+                        )
+                        .replace(R.id.fragment_container, HomeFragment())
+                        .disallowAddToBackStack()
+                        .commit()
                 }
             })
 
+        binding.calendarView.monthScrollListener = { month ->
+            updateMonthText(month.yearMonth)
+            binding.textViewMonthYear.alpha = 0f
+            binding.textViewMonthYear.animate().alpha(1f).setDuration(200).start()
+        }
 
         val currentMonth = YearMonth.now()
         val daysOfWeek = daysOfWeek(DayOfWeek.SUNDAY)
@@ -69,9 +75,7 @@ class CalendarFragment : Fragment() {
         setupEventListeners()
         loadHolidays()
         updateMonthText(currentMonth)
-        loadDreamsForDate(selectedDate!!)
-        setupRecyclerView()
-        setupAds()
+        setupAds(view)
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
@@ -98,26 +102,31 @@ class CalendarFragment : Fragment() {
 
         binding.calendarView.monthHeaderBinder = object : MonthHeaderFooterBinder<MonthHeaderViewContainer> {
             override fun create(view: View): MonthHeaderViewContainer = MonthHeaderViewContainer(view)
-            override fun bind(container: MonthHeaderViewContainer, month: CalendarMonth) {
-                // 요일 헤더는 레이아웃에서 처리
-            }
+            override fun bind(container: MonthHeaderViewContainer, month: CalendarMonth) {}
         }
     }
 
     private fun bindDayView(container: DayViewContainer, day: CalendarDay) {
         container.textView.text = day.date.dayOfMonth.toString()
-
         val isSelected = selectedDate == day.date
         val isToday = day.date == LocalDate.now()
         val holiday = holidays.find { it.date == day.date }
-
         val hasDreams = checkHasDreams(day.date)
+
         container.dreamIndicator.visibility = if (hasDreams) View.VISIBLE else View.GONE
+
+        container.view.setOnClickListener {
+            handleDayClick(day.date, holiday)
+        }
 
         when {
             isSelected -> {
                 container.textView.setBackgroundResource(R.drawable.day_selected_background)
                 container.textView.setTextColor(Color.WHITE)
+            }
+            day.position != DayPosition.MonthDate -> {
+                container.textView.setBackgroundResource(android.R.color.transparent)
+                container.textView.setTextColor(Color.parseColor("#A0A0A0"))
             }
             isToday -> {
                 container.textView.setBackgroundResource(R.drawable.day_today_background)
@@ -135,14 +144,10 @@ class CalendarFragment : Fragment() {
                 )
             }
         }
-
-        container.view.setOnClickListener {
-            handleDayClick(day.date, holiday)
-        }
     }
 
     private fun checkHasDreams(date: LocalDate): Boolean {
-        val prefs = requireContext().getSharedPreferences("dream_history", 0)
+        val prefs = requireContext().getSharedPreferences("dream_history", Context.MODE_PRIVATE)
         val dreamArray = JSONArray(prefs.getString(date.toString(), "[]") ?: "[]")
         return dreamArray.length() > 0
     }
@@ -150,13 +155,22 @@ class CalendarFragment : Fragment() {
     private fun handleDayClick(date: LocalDate, holiday: Holiday?) {
         val oldDate = selectedDate
         selectedDate = date
-
         oldDate?.let { binding.calendarView.notifyDateChanged(it) }
         binding.calendarView.notifyDateChanged(date)
-
         updateMonthText(date.yearMonth)
-        loadDreamsForDate(date)
-        binding.holidayTextView.text = holiday?.name ?: ""
+
+        if (holiday != null) {
+            binding.holidayTextView.text = holiday.name
+            binding.holidayTextView.visibility = View.VISIBLE
+        } else {
+            binding.holidayTextView.text = ""
+            binding.holidayTextView.visibility = View.GONE
+        }
+
+        if (checkHasDreams(date)) {
+            DreamListDialog.newInstance(date)
+                .show(parentFragmentManager, "DreamListDialog")
+        }
     }
 
     private fun setupEventListeners() {
@@ -167,7 +181,6 @@ class CalendarFragment : Fragment() {
                     updateMonthText(targetMonth)
                 }
         }
-
         binding.buttonNextMonth.setOnClickListener {
             binding.calendarView.findFirstVisibleMonth()?.yearMonth?.plusMonths(1)
                 ?.let { targetMonth ->
@@ -180,48 +193,22 @@ class CalendarFragment : Fragment() {
     private fun loadHolidays() {
         try {
             HolidayApi.fetchHolidays(2025,
-                onSuccess = { result ->
+                onSuccess = {
                     holidays.clear()
-                    holidays.addAll(result)
+                    holidays.addAll(it)
                     binding.calendarView.notifyCalendarChanged()
                 },
-                onError = {
-                    it.printStackTrace()
-                }
-            )
+                onError = { it.printStackTrace() })
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    private fun loadDreamsForDate(date: LocalDate) {
+    private fun setupAds(view: View) {
         try {
-            val prefs = requireContext().getSharedPreferences("dream_history", 0)
-            val dreamArray = JSONArray(prefs.getString(date.toString(), "[]") ?: "[]")
-            val dreamList = mutableListOf<DreamEntry>()
-
-            for (i in 0 until dreamArray.length()) {
-                val obj = dreamArray.getJSONObject(i)
-                dreamList.add(DreamEntry(
-                    obj.getString("dream"),
-                    obj.getString("result")
-                ))
-            }
-
-            binding.recyclerViewDreams.adapter = DreamAdapter(dreamList)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            binding.recyclerViewDreams.adapter = DreamAdapter(emptyList())
-        }
-    }
-
-    private fun setupRecyclerView() {
-        binding.recyclerViewDreams.layoutManager = LinearLayoutManager(requireContext())
-    }
-
-    private fun setupAds() {
-        try {
-            binding.adViewCalendar.loadAd(AdRequest.Builder().build())
+            MobileAds.initialize(requireContext())
+            val adView = view.findViewById<AdView>(R.id.adViewCalendar)
+            adView.loadAd(AdRequest.Builder().build())
         } catch (e: Exception) {
             e.printStackTrace()
         }

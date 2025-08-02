@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#A3FFFFFF" /> <!-- 반투명 흰색 (원하면 다른 색으로 변경 가능) -->
+    <corners android:radius="16dp" />
+</shape>

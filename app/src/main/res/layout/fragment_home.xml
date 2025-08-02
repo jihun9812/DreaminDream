@@ -25,21 +25,22 @@
         android:padding="32dp">
 
         <!-- 타이틀 -->
+
+        <!-- AI 꿈 리포트 카드뷰 -->
         <TextView
             android:id="@+id/home_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="18dp"
             android:fontFamily="@font/jalnan"
-            android:text="Dream In Dream"
-            android:textColor= "#C32986DC"
-            android:shadowColor="#C3ADE6FF"
-            android:textSize="35sp"
+            android:shadowColor="#C3FFFCFC"
             android:shadowDx="2"
             android:shadowDy="2"
-            android:shadowRadius="2"/>
+            android:shadowRadius="2"
+            android:text="Dream In Dream"
+            android:textColor="#FFFFFF"
+            android:textSize="35sp" />
 
-        <!-- AI 꿈 리포트 카드뷰 -->
         <androidx.cardview.widget.CardView
             android:id="@+id/ai_report_card"
             android:layout_width="match_parent"
@@ -74,7 +75,7 @@
 
                     <TextView
                         android:id="@+id/ai_report_title"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/pretendard_medium"
                         android:text="이번 주 꿈 분석 요약"

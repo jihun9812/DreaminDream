@@ -5,7 +5,7 @@
     android:orientation="horizontal"
     android:paddingVertical="6dp"
     android:paddingHorizontal="4dp"
-    android:background="#7B3C4A6A">
+    android:background="#3AADADAD">
 
     <TextView
         android:layout_width="0dp"
@@ -16,7 +16,7 @@
         android:textColor="#FF3E00"
         android:textSize="12sp"
         android:textStyle="bold"
-        android:fontFamily="sans-serif-medium" />
+        android:fontFamily="@font/pretendard_bold" />
 
     <TextView
         android:layout_width="0dp"
@@ -27,7 +27,7 @@
         android:textColor="#404040"
         android:textSize="12sp"
         android:textStyle="bold"
-        android:fontFamily="sans-serif-medium" />
+        android:fontFamily="@font/pretendard_bold" />
 
     <TextView
         android:layout_width="0dp"
@@ -38,7 +38,7 @@
         android:textColor="#404040"
         android:textSize="12sp"
         android:textStyle="bold"
-        android:fontFamily="sans-serif-medium" />
+        android:fontFamily="@font/pretendard_bold" />
 
     <TextView
         android:layout_width="0dp"
@@ -49,7 +49,7 @@
         android:textColor="#404040"
         android:textSize="12sp"
         android:textStyle="bold"
-        android:fontFamily="sans-serif-medium" />
+        android:fontFamily="@font/pretendard_bold" />
 
     <TextView
         android:layout_width="0dp"
@@ -60,7 +60,7 @@
         android:textColor="#404040"
         android:textSize="12sp"
         android:textStyle="bold"
-        android:fontFamily="sans-serif-medium" />
+        android:fontFamily="@font/pretendard_bold" />
 
     <TextView
         android:layout_width="0dp"
@@ -71,7 +71,7 @@
         android:textColor="#404040"
         android:textSize="12sp"
         android:textStyle="bold"
-        android:fontFamily="sans-serif-medium" />
+        android:fontFamily="@font/pretendard_bold" />
     <TextView
         android:layout_width="0dp"
         android:layout_height="28dp"
@@ -81,6 +81,6 @@
         android:textColor="#2196F3"
         android:textSize="12sp"
         android:textStyle="bold"
-        android:fontFamily="sans-serif-medium" />
+        android:fontFamily="@font/pretendard_bold" />
 
 </LinearLayout>

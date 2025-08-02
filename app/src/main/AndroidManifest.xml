@@ -51,6 +51,7 @@
         <!-- 홈 화면을 포함한 실제 앱 화면 -->
         <activity
             android:name=".MainActivity"
+            android:launchMode="singleTop"
             android:exported="true" />
 
         <activity

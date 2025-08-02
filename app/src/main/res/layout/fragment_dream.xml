@@ -2,7 +2,6 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -17,8 +16,8 @@
         <!-- 아이콘을 상단 중앙으로 고정 -->
         <ImageView
             android:id="@+id/dreamIcon"
-            android:layout_width="32dp"
-            android:layout_height="36dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_marginTop="12dp"
             android:contentDescription="@string/app_name"
             android:src="@drawable/ic_dream"
@@ -43,9 +42,9 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="350dp"
                 android:orientation="vertical"
-                android:padding="10dp">
+                android:padding="15dp">
 
                 <TextView
                     android:id="@+id/editLabel"

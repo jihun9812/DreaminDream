@@ -136,21 +136,19 @@ class SettingsFragment : Fragment() {
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    val current = parentFragmentManager.findFragmentById(R.id.fragment_container)
-                    if (current !is HomeFragment) {
-                        parentFragmentManager.beginTransaction()
-                            .setCustomAnimations(
-                                R.anim.slide_in_left,
-                                R.anim.slide_out_right,
-                                R.anim.slide_in_right,
-                                R.anim.slide_out_left
-                            )
-                            .replace(R.id.fragment_container, HomeFragment())
-                            .disallowAddToBackStack()
-                            .commit()
-                    }
+                    parentFragmentManager.beginTransaction()
+                        .setCustomAnimations(
+                            R.anim.slide_in_left,
+                            R.anim.slide_out_right,
+                            R.anim.slide_in_right,
+                            R.anim.slide_out_left
+                        )
+                        .replace(R.id.fragment_container, HomeFragment())
+                        .disallowAddToBackStack() // 핵심: 중첩 방지
+                        .commit()
                 }
             })
+
     }
 
     private fun showDatePicker() {

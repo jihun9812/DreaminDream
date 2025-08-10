@@ -10,7 +10,6 @@ import android.util.Log
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
-import androidx.activity.OnBackPressedCallback
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
@@ -92,23 +91,6 @@ class DreamFragment : Fragment() {
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    parentFragmentManager.beginTransaction()
-                        .setCustomAnimations(
-                            R.anim.slide_in_left, R.anim.slide_out_right,
-                            R.anim.slide_in_right, R.anim.slide_out_left
-                        )
-                        .replace(R.id.fragment_container, HomeFragment())
-                        .disallowAddToBackStack()
-                        .commit()
-                }
-            })
-    }
-
     // ── AdView 수명주기
     override fun onResume() {
         super.onResume()
@@ -183,7 +165,7 @@ class DreamFragment : Fragment() {
     // ── Ad BottomSheet
     private fun showAdPrompt(onAccept: () -> Unit) {
         val dialogView = layoutInflater.inflate(R.layout.dialog_ad_prompt, null)
-        val dialog = BottomSheetDialog(requireContext())
+        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(requireContext())
         dialog.setContentView(dialogView)
         dialog.window?.setDimAmount(0.5f)
 

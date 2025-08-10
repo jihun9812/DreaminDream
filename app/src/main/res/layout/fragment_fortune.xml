@@ -12,75 +12,120 @@
     android:paddingTop="16dp"
     android:paddingBottom="16dp">
 
-    <ImageView
-        android:id="@+id/fortune_icon"
-        android:layout_width="52dp"
-        android:layout_height="52dp"
-        android:layout_marginTop="4dp"
-        android:contentDescription="@string/app_name"
-        android:src="@drawable/ic_fortune"
+    <!-- 컴팩트 헤더 -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/heroCard"
+        android:layout_width="0dp"
+        android:layout_height="84dp"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="2dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_glass_card"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/fortune_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/ic_fortune" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingStart="10dp">
+
+                <TextView
+                    android:id="@+id/heroTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="오늘의 맞춤 운세"
+                    android:textColor="#FFFFFF"
+                    android:textSize="17sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/heroSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="프로필 기반 · AI 해석 · 간결한 조언"
+                    android:textColor="#B3FFFFFF"
+                    android:textSize="12sp"
+                    android:layout_marginTop="2dp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 큰 사각 CTA (아이콘 제거) -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/fortuneButton"
         style="@style/Widget.Material3.Button"
         android:layout_width="0dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginTop="16dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="14dp"
         android:text="@string/btn_fortune"
         android:textAllCaps="false"
         android:textSize="16sp"
-        android:textColor="@color/white"
+        android:fontFamily="@font/pretendard_medium"
+        android:textColor="#FFFFFF"
         android:insetTop="0dp"
         android:insetBottom="0dp"
-        app:icon="@drawable/ic_fortune"
-        app:iconGravity="textStart"
-        app:iconPadding="10dp"
-        app:iconSize="20dp"
-        app:cornerRadius="28dp"
-        android:backgroundTint="#21455E"
-        app:elevation="2dp"
-        app:layout_constraintTop_toBottomOf="@id/fortune_icon"
+        app:cornerRadius="16dp"
+        android:background="@drawable/btn_primary_fortune_rect"
+        app:elevation="4dp"
+        app:layout_constraintTop_toBottomOf="@id/heroCard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- 로딩 -->
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/fortune_loading"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="20dp"
         android:visibility="gone"
         android:elevation="12dp"
-        app:lottie_rawRes="@raw/just_flow_teal"
+        app:lottie_rawRes="@raw/generator"
         app:lottie_loop="true"
         app:layout_constraintTop_toBottomOf="@id/fortuneButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- 결과 카드 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/fortuneCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="8dp"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="14dp"
         android:animateLayoutChanges="true"
         android:visibility="gone"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="10dp"
+        app:cardCornerRadius="18dp"
+        app:cardElevation="8dp"
         app:cardUseCompatPadding="true"
         app:cardPreventCornerOverlap="true"
-        app:strokeColor="#33FFFFFF"
+        app:strokeColor="#26FFFFFF"
         app:strokeWidth="1dp"
-        app:cardBackgroundColor="#16212C"
+        app:cardBackgroundColor="#15202A"
         app:layout_constraintTop_toBottomOf="@id/fortuneButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- maxHeight 제거! 스크롤 막힘 원인 -->
         <ScrollView
             android:id="@+id/resultScrollView"
             android:layout_width="match_parent"
@@ -88,8 +133,8 @@
             android:fillViewport="true"
             android:overScrollMode="ifContentScrolls"
             android:clipToPadding="false"
-            android:paddingTop="6dp"
-            android:paddingBottom="10dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="12dp"
             android:minHeight="160dp"
             android:fadeScrollbars="true"
             android:scrollbars="vertical">
@@ -99,34 +144,34 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
+                android:paddingStart="18dp"
+                android:paddingEnd="18dp"
                 android:paddingBottom="12dp">
 
-                <!-- 1) 키워드 칩 -->
+                <!-- 키워드 칩 -->
                 <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:scrollbars="none"
                     android:overScrollMode="never"
                     android:fillViewport="true">
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chipsFortune"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    app:singleLine="true"
-                    app:singleSelection="false"
-                    app:chipSpacingHorizontal="6dp" />
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipsFortune"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp"
+                        app:singleLine="true"
+                        app:singleSelection="false"
+                        app:chipSpacingHorizontal="6dp" />
                 </HorizontalScrollView>
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginVertical="8dp"
-                    android:background="#1FFFFFFF" />
+                    android:background="#12FFFFFF" />
 
-                <!-- 2) 행운 지표 -->
+                <!-- 행운 지표 -->
                 <LinearLayout
                     android:id="@+id/fortuneKpis"
                     android:layout_width="match_parent"
@@ -166,7 +211,7 @@
                             android:id="@+id/tvLuckyNumber"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="7"
+                            android:text="42"
                             android:textSize="18sp"
                             android:textColor="#FFFFFF"/>
                         <TextView
@@ -187,7 +232,7 @@
                             android:id="@+id/tvLuckyTime"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="오후 3시"
+                            android:text="오전 10시"
                             android:textSize="16sp"
                             android:textColor="#FFFFFF"/>
                         <TextView
@@ -199,7 +244,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- 3) 감정 분포 (굵은 막대 + 라벨 + 범례) -->
+                <!-- 감정 분포 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -215,7 +260,6 @@
                         android:textSize="12sp"
                         android:layout_marginBottom="6dp"/>
 
-                    <!-- 긍정 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -229,18 +273,17 @@
                             android:layout_weight="1"
                             app:trackThickness="12dp"
                             app:indicatorColor="#76FF03"
-                            app:trackColor="#22FFFFFF" />
+                            app:trackColor="#1FFFFFFF" />
                         <TextView
                             android:id="@+id/tvPos"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0%"
+                            android:text="80%"
                             android:textColor="#CFEAD1"
                             android:textSize="12sp"
                             android:layout_marginStart="8dp"/>
                     </LinearLayout>
 
-                    <!-- 중립 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -254,18 +297,17 @@
                             android:layout_weight="1"
                             app:trackThickness="12dp"
                             app:indicatorColor="#29B6F6"
-                            app:trackColor="#22FFFFFF" />
+                            app:trackColor="#1FFFFFFF" />
                         <TextView
                             android:id="@+id/tvNeu"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0%"
+                            android:text="15%"
                             android:textColor="#C6D4DF"
                             android:textSize="12sp"
                             android:layout_marginStart="8dp"/>
                     </LinearLayout>
 
-                    <!-- 부정 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -278,33 +320,51 @@
                             android:layout_weight="1"
                             app:trackThickness="12dp"
                             app:indicatorColor="#EF5350"
-                            app:trackColor="#22FFFFFF" />
+                            app:trackColor="#1FFFFFFF" />
                         <TextView
                             android:id="@+id/tvNeg"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="0%"
+                            android:text="5%"
                             android:textColor="#F2B8B5"
                             android:textSize="12sp"
                             android:layout_marginStart="8dp"/>
                     </LinearLayout>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="초록: 긍정  |  파랑: 중립  |  빨강: 부정"
-                        android:textColor="#82A1B3"
-                        android:textSize="11sp"
-                        android:layout_marginTop="2dp"/>
                 </LinearLayout>
 
-                <!-- 4) 오늘의 체크 -->
+                <!-- ▼ 세부 해석 토글 + 컨테이너(동적 렌더링) -->
+                <TextView
+                    android:id="@+id/btnDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="세부 해석 보기 ▾"
+                    android:textColor="#C6D4DF"
+                    android:textSize="13sp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp"/>
+
+                <LinearLayout
+                    android:id="@+id/sectionsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:paddingTop="2dp"
+                    android:paddingBottom="6dp"/>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="6dp"
+                    android:background="#12FFFFFF" />
+
+                <!-- 체크리스트 -->
                 <LinearLayout
                     android:id="@+id/layoutChecklist"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="6dp"
                     android:layout_marginBottom="8dp">
                     <TextView
                         android:layout_width="wrap_content"
@@ -337,9 +397,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="6dp"
-                    android:background="#1FFFFFFF" />
+                    android:background="#12FFFFFF" />
 
-                <!-- 5) 빠른 액션 -->
+                <!-- 복사/공유 -->
                 <LinearLayout
                     android:id="@+id/layoutQuickActions"
                     android:layout_width="match_parent"
@@ -379,6 +439,7 @@
         </ScrollView>
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- 하단 배너 광고 -->
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView_fortune"
         android:layout_width="match_parent"
@@ -389,6 +450,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- 광고 위 여백 (원하면 제거 가능) -->
     <Space
         android:id="@+id/adSpacer"
         android:layout_width="0dp"

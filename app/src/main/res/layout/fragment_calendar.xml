@@ -6,7 +6,25 @@
     android:background="@drawable/main_ground"
     android:fitsSystemWindows="true">
 
-    <!-- 상단 타이틀 바 -->
+    <!--  좌상단 공휴일 라벨 (오버레이, 공간 차지 X) -->
+    <TextView
+        android:id="@+id/holidayTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/titleBar"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="3dp"
+        android:textColor="#EB5D56"
+        android:textSize="12sp"
+        android:fontFamily="@font/pretendard_bold"
+        android:includeFontPadding="false"
+        android:visibility="gone"
+        android:clickable="false"
+        android:focusable="false"
+        android:translationZ="8dp"/>
+
+    <!-- 상단 타이틀 바 (아이콘만, 월 바는 이 아래로) -->
     <LinearLayout
         android:id="@+id/titleBar"
         android:layout_width="match_parent"
@@ -22,32 +40,15 @@
             android:layout_height="38dp"
             android:src="@drawable/ic_calendar_moon"
             android:contentDescription="캘린더 아이콘" />
-
-        <TextView
-            android:id="@+id/holidayTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
-            android:textColor="@android:color/white"
-            android:textSize="17sp"
-            android:fontFamily="@font/pretendard_bold"
-            android:background="@drawable/bg_holiday_label"
-            android:shadowColor="#80000000"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="1"
-            android:visibility="gone" />
     </LinearLayout>
 
-    <!-- 월 선택 바 -->
+    <!-- 월 선택 바 (캘린더 위치 고정) -->
     <LinearLayout
         android:id="@+id/monthSelector"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/titleBar"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -83,7 +84,7 @@
             app:tint="@color/white" />
     </LinearLayout>
 
-    <!-- 달력 카드 (elevation 효과 포함) -->
+    <!-- 달력 카드 -->
     <FrameLayout
         android:id="@+id/calendarWrapper"
         android:layout_width="match_parent"
@@ -102,7 +103,7 @@
             app:cv_monthHeaderResource="@layout/example_month_header" />
     </FrameLayout>
 
-    <!--  선택한 날짜 요약 카드 (캘린더 아래, 광고 위) -->
+    <!-- 선택한 날짜 요약 카드 -->
     <androidx.cardview.widget.CardView
         android:id="@+id/selectedDayCard"
         android:layout_width="match_parent"
@@ -159,7 +160,6 @@
                 android:textColor="@android:color/white"
                 app:cornerRadius="18dp"
                 app:backgroundTint="#3D6C89"/>
-
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

@@ -12,7 +12,6 @@ import android.transition.Slide
 import android.transition.TransitionManager
 import android.transition.TransitionSet
 import android.widget.*
-import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
@@ -154,19 +153,6 @@ class FortuneFragment : Fragment() {
         bindChecklist(today)
 
         return view
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                parentFragmentManager.beginTransaction()
-                    .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right, R.anim.slide_in_right, R.anim.slide_out_left)
-                    .replace(R.id.fragment_container, HomeFragment())
-                    .disallowAddToBackStack()
-                    .commit()
-            }
-        })
     }
 
     // --- 모델용 사용자 정보 ---
@@ -418,7 +404,7 @@ date: "$today"
     "number": 1-99,             // 1~99 정수
     "time": "자연스러운 한국어 시간대"  // 예: "오전 9시", "오후 3시"
   },
-  "message": "오늘의 운세를 보여드릴게요, ${u.nickname} 님!\\n[총운] 점수 + 평가 + 조언\\n[연애운] ... (총 7줄)",
+  "message": "오늘의 운세를 보여드릴게요, ${u.nickname} 님!\\n[총운] 점수 + 평가 + 조언\\n[연애운] ... (총 7줄)(자세하게)",
   "sections": {
     "overall": { "score": 0-100, "text": "짧은 평가", "advice": "조언" },
     "love":    { "score": 0-100, "text": "짧은 평가", "advice": "조언" },
@@ -439,14 +425,11 @@ date: "$today"
 - sections의 score/text/advice는 message 내용과 일치.
 - keywords는 1~4개.
 - emotions는 균형 있게(합 100일 필요 없음).
+- lotto 칸에 실제 번호 6개 마지막에 추가하기. 
 - checklist는 오늘 운세에서 파생된 구체적이고 실행 가능한 행동 3개.
 - 예시/샘플/고정값 금지.
 """.trimIndent()
     }
-
-
-
-
 
     // --- 파서: 항상 JSON 리턴 ---
     private fun parsePayloadAlways(content: String): JSONObject {

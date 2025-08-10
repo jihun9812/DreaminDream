@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.*
 import android.view.animation.AnimationUtils
 import android.widget.*
-import androidx.activity.OnBackPressedCallback
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import com.google.android.gms.ads.AdRequest
@@ -75,7 +74,7 @@ class SettingsFragment : Fragment() {
         val textColor = Color.parseColor("#E8F1F8")
         val adapter = object : ArrayAdapter<String>(
             requireContext(),
-            R.layout.spinner_item,              // 접힘
+            R.layout.spinner_item,
             android.R.id.text1,
             birthTimes
         ) {
@@ -111,23 +110,6 @@ class SettingsFragment : Fragment() {
         }
         // 닉네임/생년월일 에러 클리어
         nicknameEdit.doAfterTextChanged { tilNickname.error = null }
-
-        // 뒤로가기 → 홈 (슬라이드 유지)
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    parentFragmentManager.beginTransaction()
-                        .setCustomAnimations(
-                            R.anim.slide_in_left,
-                            R.anim.slide_out_right,
-                            R.anim.slide_in_right,
-                            R.anim.slide_out_left
-                        )
-                        .replace(R.id.fragment_container, HomeFragment())
-                        .disallowAddToBackStack()
-                        .commit()
-                }
-            })
 
         // 원격 → 로컬 캐시 → UI
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""

@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -19,6 +20,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 
 class MainActivity : AppCompatActivity() {
+
+    // ▼ 홈에서 '두 번' 뒤로가기 종료를 위한 상태
+    private var lastBackPressedAt = 0L
+    private val backIntervalMs = 1800L // 두 번 누르기 허용 간격(1.8초)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -29,7 +35,7 @@ class MainActivity : AppCompatActivity() {
                     .setTestDeviceIds(
                         listOf(
                             AdRequest.DEVICE_ID_EMULATOR,
-                            "38F4242F488E9C927543337A4DCCD32C" // ← 네 실기기 해시
+                            "38F4242F488E9C927543337A4DCCD32C" // ← 네 실기기 해시(있으면 그대로 유지)
                         )
                     ).build()
             )
@@ -95,10 +101,30 @@ class MainActivity : AppCompatActivity() {
                 .commit()
         }
 
+        // ▼ 뒤로가기 정책: 홈이면 '두 번 눌러 종료', 아니면 홈으로 이동
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val fm = supportFragmentManager
-                if (fm.backStackEntryCount > 0) fm.popBackStack() else finish()
+                val current = fm.findFragmentById(R.id.fragment_container)
+
+                if (current is HomeFragment) {
+                    val now = System.currentTimeMillis()
+                    if (now - lastBackPressedAt <= backIntervalMs) {
+                        finish()
+                    } else {
+                        lastBackPressedAt = now
+                        Toast.makeText(this@MainActivity, "한 번 더 누르면 종료됩니다", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    // 홈이 아닌 경우 → 언제나 홈으로 (백스택 사용 안 함)
+                    fm.beginTransaction()
+                        .setCustomAnimations(
+                            R.anim.slide_in_left, R.anim.slide_out_right,
+                            R.anim.slide_in_right, R.anim.slide_out_left
+                        )
+                        .replace(R.id.fragment_container, HomeFragment())
+                        .commit()
+                }
             }
         })
     }

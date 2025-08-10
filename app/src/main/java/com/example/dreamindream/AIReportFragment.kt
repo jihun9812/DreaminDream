@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.animation.ChartAnimator
@@ -89,19 +88,6 @@ class AIReportFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    parentFragmentManager.beginTransaction()
-                        .setCustomAnimations(
-                            R.anim.slide_in_left, R.anim.slide_out_right,
-                            R.anim.slide_in_right, R.anim.slide_out_left
-                        )
-                        .replace(R.id.fragment_container, HomeFragment())
-                        .disallowAddToBackStack()
-                        .commit()
-                }
-            })
 
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         FirestoreManager.loadWeeklyReport(uid, getPreviousWeekKey()) { f, k, a ->
@@ -137,7 +123,6 @@ class AIReportFragment : Fragment() {
 
         setupEnterpriseBarChart(barChart, feeling)
     }
-
 
     private fun showEmpty() = showReport(false)
 

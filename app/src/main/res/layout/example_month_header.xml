@@ -1,86 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:paddingVertical="6dp"
-    android:paddingHorizontal="4dp"
-    android:background="#3AADADAD">
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="horizontal" android:paddingVertical="6dp" android:paddingHorizontal="4dp">
 
-    <TextView
-        android:layout_width="0dp"
-        android:layout_height="28dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="Sun"
-        android:textColor="#FF3E00"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/pretendard_bold" />
+    <TextView android:layout_width="0dp" android:layout_height="28dp" android:layout_weight="1"
+        android:gravity="center" android:text="일" android:textColor="#FF6B6B"
+        android:textSize="12sp" android:textStyle="bold" android:includeFontPadding="false"
+        android:fontFamily="@font/pretendard_bold"/>
 
-    <TextView
-        android:layout_width="0dp"
-        android:layout_height="28dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="Mon"
-        android:textColor="#404040"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/pretendard_bold" />
+    <TextView android:layout_width="0dp" android:layout_height="28dp" android:layout_weight="1"
+        android:gravity="center" android:text="월" android:textColor="#C6D4DF"
+        android:textSize="12sp" android:textStyle="bold" android:includeFontPadding="false"
+        android:fontFamily="@font/pretendard_bold"/>
 
-    <TextView
-        android:layout_width="0dp"
-        android:layout_height="28dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="Tues"
-        android:textColor="#404040"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/pretendard_bold" />
+    <TextView android:layout_width="0dp" android:layout_height="28dp" android:layout_weight="1"
+        android:gravity="center" android:text="화" android:textColor="#C6D4DF"
+        android:textSize="12sp" android:textStyle="bold" android:includeFontPadding="false"
+        android:fontFamily="@font/pretendard_bold"/>
 
-    <TextView
-        android:layout_width="0dp"
-        android:layout_height="28dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="Wed"
-        android:textColor="#404040"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/pretendard_bold" />
+    <TextView android:layout_width="0dp" android:layout_height="28dp" android:layout_weight="1"
+        android:gravity="center" android:text="수" android:textColor="#C6D4DF"
+        android:textSize="12sp" android:textStyle="bold" android:includeFontPadding="false"
+        android:fontFamily="@font/pretendard_bold"/>
 
-    <TextView
-        android:layout_width="0dp"
-        android:layout_height="28dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="Thur"
-        android:textColor="#404040"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/pretendard_bold" />
+    <TextView android:layout_width="0dp" android:layout_height="28dp" android:layout_weight="1"
+        android:gravity="center" android:text="목" android:textColor="#C6D4DF"
+        android:textSize="12sp" android:textStyle="bold" android:includeFontPadding="false"
+        android:fontFamily="@font/pretendard_bold"/>
 
-    <TextView
-        android:layout_width="0dp"
-        android:layout_height="28dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="Fri"
-        android:textColor="#404040"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/pretendard_bold" />
-    <TextView
-        android:layout_width="0dp"
-        android:layout_height="28dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="Sat"
-        android:textColor="#2196F3"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/pretendard_bold" />
+    <TextView android:layout_width="0dp" android:layout_height="28dp" android:layout_weight="1"
+        android:gravity="center" android:text="금" android:textColor="#C6D4DF"
+        android:textSize="12sp" android:textStyle="bold" android:includeFontPadding="false"
+        android:fontFamily="@font/pretendard_bold"/>
 
+    <TextView android:layout_width="0dp" android:layout_height="28dp" android:layout_weight="1"
+        android:gravity="center" android:text="토" android:textColor="#6FA8FF"
+        android:textSize="12sp" android:textStyle="bold" android:includeFontPadding="false"
+        android:fontFamily="@font/pretendard_bold"/>
 </LinearLayout>

@@ -1,7 +1,6 @@
 package com.example.dreamindream
 
 import android.content.Context
-import android.content.SharedPreferences
 import org.json.JSONArray
 import org.json.JSONObject
 import android.util.Log
@@ -38,7 +37,7 @@ object FirestoreManager {
     }
 
     fun getAllDreamDates(context: Context, userId: String, onResult: (Set<LocalDate>) -> Unit) {
-        val prefs = context.getSharedPreferences("dream_history", Context.MODE_PRIVATE)
+        val prefs = context.getSharedPreferences("dream_history_$userId", Context.MODE_PRIVATE)
         val editor = prefs.edit()
 
         db.collection("users")
@@ -47,31 +46,47 @@ object FirestoreManager {
             .get()
             .addOnSuccessListener { snapshot ->
                 val dateSet = mutableSetOf<LocalDate>()
-                for (doc in snapshot.documents) {
-                    val dateStr = doc.id
-                    try {
-                        val parsedDate = LocalDate.parse(dateStr)
-                        dateSet.add(parsedDate)
+                val documents = snapshot.documents
+                var completed = 0
 
-                        doc.reference.collection("entries").get()
-                            .addOnSuccessListener { entries ->
-                                val jsonArray = JSONArray()
-                                for (entry in entries) {
-                                    val dream = entry.getString("dream") ?: ""
-                                    val result = entry.getString("result") ?: ""
-                                    val obj = JSONObject().apply {
-                                        put("dream", dream)
-                                        put("result", result)
-                                    }
-                                    jsonArray.put(obj)
+                if (documents.isEmpty()) {
+                    onResult(emptySet())
+                    return@addOnSuccessListener
+                }
+
+                for (doc in documents) {
+                    val dateStr = doc.id
+                    val parsedDate = try { LocalDate.parse(dateStr) } catch (_: Exception) { null }
+                    if (parsedDate != null) dateSet.add(parsedDate)
+
+                    doc.reference.collection("entries").get()
+                        .addOnSuccessListener { entries ->
+                            val jsonArray = JSONArray()
+                            for (entry in entries) {
+                                val dream = entry.getString("dream") ?: ""
+                                val result = entry.getString("result") ?: ""
+                                val obj = JSONObject().apply {
+                                    put("dream", dream)
+                                    put("result", result)
                                 }
-                                editor.putString(dateStr, jsonArray.toString())
-                                editor.apply()
+                                jsonArray.put(obj)
                             }
 
-                    } catch (_: Exception) {}
+                            editor.putString(dateStr, jsonArray.toString())
+                            editor.apply()
+
+                            completed++
+                            if (completed == documents.size) {
+                                onResult(dateSet)
+                            }
+                        }
+                        .addOnFailureListener {
+                            completed++
+                            if (completed == documents.size) {
+                                onResult(dateSet)
+                            }
+                        }
                 }
-                onResult(dateSet)
             }
             .addOnFailureListener {
                 onResult(emptySet())
@@ -127,6 +142,10 @@ object FirestoreManager {
     fun loadWeeklyReport(userId: String, onResult: (String, List<String>, String) -> Unit) {
         val sdf = SimpleDateFormat("yyyy-'W'ww", Locale.KOREA)
         val weekKey = sdf.format(Date())
+        loadWeeklyReport(userId, weekKey, onResult)
+    }
+
+    fun loadWeeklyReport(userId: String, weekKey: String, onResult: (String, List<String>, String) -> Unit) {
         db.collection("users")
             .document(userId)
             .collection("weekly_reports")
@@ -145,5 +164,74 @@ object FirestoreManager {
             .addOnFailureListener {
                 onResult("", emptyList(), "")
             }
+    }
+
+    fun deleteWeeklyReport(userId: String, weekKey: String, onComplete: (() -> Unit)? = null) {
+        db.collection("users")
+            .document(userId)
+            .collection("weekly_reports")
+            .document(weekKey)
+            .delete()
+            .addOnSuccessListener {
+                Log.d("Firestore", "리포트 삭제 성공")
+                onComplete?.invoke()
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "리포트 삭제 실패", e)
+                onComplete?.invoke()
+            }
+    }
+
+    // ✅ 레거시 로컬 데이터 마이그레이션 (+옵션 Firestore 업로드)
+    fun migrateLocalDreams(context: Context, userId: String, alsoUploadToFirestore: Boolean = true, onComplete: ((Int) -> Unit)? = null) {
+        val legacyPrefs = context.getSharedPreferences("dream_history", Context.MODE_PRIVATE)
+        val newPrefs = context.getSharedPreferences("dream_history_$userId", Context.MODE_PRIVATE)
+
+        if (newPrefs.getBoolean("migrated_from_legacy", false)) {
+            onComplete?.invoke(0)
+            return
+        }
+
+        val all = legacyPrefs.all
+        var migratedCount = 0
+        val editor = newPrefs.edit()
+
+        all.forEach { (key, value) ->
+            val isDateKey = Regex("""\d{4}-\d{2}-\d{2}""").matches(key)
+            if (isDateKey && value is String) {
+                if (!newPrefs.contains(key)) {
+                    editor.putString(key, value)
+                    migratedCount++
+
+                    if (alsoUploadToFirestore) {
+                        try {
+                            val jsonArr = JSONArray(value)
+                            for (i in 0 until jsonArr.length()) {
+                                val obj = jsonArr.optJSONObject(i) ?: continue
+                                val dream = obj.optString("dream", "")
+                                val result = obj.optString("result", "")
+                                if (dream.isNotBlank() || result.isNotBlank()) {
+                                    db.collection("users")
+                                        .document(userId)
+                                        .collection("dreams")
+                                        .document(key)
+                                        .collection("entries")
+                                        .add(
+                                            mapOf(
+                                                "dream" to dream,
+                                                "result" to result,
+                                                "timestamp" to System.currentTimeMillis()
+                                            )
+                                        )
+                                }
+                            }
+                        } catch (_: Exception) { }
+                    }
+                }
+            }
+        }
+
+        editor.putBoolean("migrated_from_legacy", true).apply()
+        onComplete?.invoke(migratedCount)
     }
 }

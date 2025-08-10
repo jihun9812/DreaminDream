@@ -3,18 +3,21 @@ package com.example.dreamindream
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 
 class DreamPreviewAdapter(
-    private val dreamList: List<DreamEntry>,
-    private val onItemClick: (DreamEntry) -> Unit
+    private val dreamList: MutableList<DreamEntry>,
+    private val onItemClick: (DreamEntry) -> Unit,
+    private val onDreamDelete: (Int) -> Unit
 ) : RecyclerView.Adapter<DreamPreviewAdapter.DreamViewHolder>() {
 
     inner class DreamViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val card: CardView = view.findViewById(R.id.cardDream)
         val previewText: TextView = view.findViewById(R.id.textDreamPreview)
+        val btnDelete: ImageButton = view.findViewById(R.id.btnDelete)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DreamViewHolder {
@@ -30,6 +33,10 @@ class DreamPreviewAdapter(
 
         holder.card.setOnClickListener {
             onItemClick(dreamEntry)
+        }
+
+        holder.btnDelete.setOnClickListener {
+            onDreamDelete(holder.adapterPosition)
         }
     }
 

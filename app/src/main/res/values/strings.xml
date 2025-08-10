@@ -32,6 +32,7 @@
     <string name="report_keywords_placeholder">감정: ...\n키워드: ...</string>
     <string name="report_ai_comment_placeholder">AI 분석 : ...</string>
 
+    <string name="btn_ai_report">AI 리포트</string>
 
 
     <!-- 해몽/꿈/운세 -->
@@ -44,6 +45,7 @@
     <string name="hint_input">여기에 꿈을 자세하게 입력해주세요!\n ex) 오늘꿈에서 엄청 큰 나무에서 떨어졌는데 기분이 너무 안좋았어.</string>
     <string name="button_interpret">해몽하기</string>
     <string name="result_default">해몽 결과가 여기에 표시됩니다.</string>
+    <string name="dream_list_title">%1$s의 꿈들</string>
 
     <!-- 설정/프로필/정보 -->
     <string name="settings_button">설정</string>

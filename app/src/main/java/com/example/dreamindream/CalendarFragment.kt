@@ -1,22 +1,34 @@
 package com.example.dreamindream
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.content.Context
-import android.view.*
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
+import com.example.dreamindream.databinding.FragmentCalendarBinding
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
-import androidx.activity.OnBackPressedCallback
-import androidx.fragment.app.Fragment
-import com.kizitonwose.calendar.core.*
-import com.kizitonwose.calendar.view.*
-import com.example.dreamindream.databinding.FragmentCalendarBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.kizitonwose.calendar.core.CalendarDay
+import com.kizitonwose.calendar.core.CalendarMonth
+import com.kizitonwose.calendar.core.DayPosition
+import com.kizitonwose.calendar.core.daysOfWeek
+import com.kizitonwose.calendar.view.MonthDayBinder
+import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
+import com.kizitonwose.calendar.view.ViewContainer
+import com.kizitonwose.calendar.core.yearMonth
 import org.json.JSONArray
-import java.time.*
+import org.json.JSONObject
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.YearMonth
 import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
+import java.util.Locale
 
 class CalendarFragment : Fragment() {
 
@@ -27,13 +39,15 @@ class CalendarFragment : Fragment() {
     private val holidays = mutableListOf<Holiday>()
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy년 M월")
 
-    private val colorRed = Color.parseColor("#F44336")
-    private val colorBlue = Color.parseColor("#2196F3")
-    private val colorBlack = Color.parseColor("#000000")
-    private val colorOrange = Color.parseColor("#FF9800")
+    // ---- Palette(대기업 톤) ----
+    private val colSun = Color.parseColor("#FF6B6B")
+    private val colSat = Color.parseColor("#6FA8FF")
+    private val colText = Color.parseColor("#E8F1F8")
+    private val colDim = Color.parseColor("#A0A0A0")
+    private val colAccent = Color.parseColor("#37C2D0")
 
     override fun onCreateView(
-        inflater: LayoutInflater,
+        inflater: android.view.LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
@@ -44,6 +58,7 @@ class CalendarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // 뒤로가기 → 홈
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
@@ -61,11 +76,14 @@ class CalendarFragment : Fragment() {
                 }
             })
 
+        // 월 스크롤 시 타이틀 페이드
         binding.calendarView.monthScrollListener = { month ->
             updateMonthText(month.yearMonth)
             binding.textViewMonthYear.alpha = 0f
             binding.textViewMonthYear.animate().alpha(1f).setDuration(200).start()
         }
+        // 오버스크롤 글로우 제거(영상 느낌, 안정감)
+        binding.calendarView.overScrollMode = View.OVER_SCROLL_NEVER
 
         val currentMonth = YearMonth.now()
         val daysOfWeek = daysOfWeek(DayOfWeek.SUNDAY)
@@ -77,11 +95,16 @@ class CalendarFragment : Fragment() {
         updateMonthText(currentMonth)
         setupAds(view)
 
+        // 로컬 캐시 갱신(Firestore→SharedPreferences) 후 캘린더 리프레시
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
             FirestoreManager.getAllDreamDates(requireContext(), userId) {
                 binding.calendarView.notifyCalendarChanged()
+                // 선택일 요약도 최신으로
+                selectedDate?.let { updateSelectedDayCard(it) }
             }
+        } else {
+            selectedDate?.let { updateSelectedDayCard(it) }
         }
     }
 
@@ -100,10 +123,15 @@ class CalendarFragment : Fragment() {
             }
         }
 
-        binding.calendarView.monthHeaderBinder = object : MonthHeaderFooterBinder<MonthHeaderViewContainer> {
-            override fun create(view: View): MonthHeaderViewContainer = MonthHeaderViewContainer(view)
-            override fun bind(container: MonthHeaderViewContainer, month: CalendarMonth) {}
-        }
+        binding.calendarView.monthHeaderBinder =
+            object : MonthHeaderFooterBinder<MonthHeaderViewContainer> {
+                override fun create(view: View): MonthHeaderViewContainer =
+                    MonthHeaderViewContainer(view)
+
+                override fun bind(container: MonthHeaderViewContainer, month: CalendarMonth) {
+                    // header는 example_month_header.xml에서 요일만 표현하므로 별도 bind 불필요
+                }
+            }
     }
 
     private fun bindDayView(container: DayViewContainer, day: CalendarDay) {
@@ -111,9 +139,27 @@ class CalendarFragment : Fragment() {
         val isSelected = selectedDate == day.date
         val isToday = day.date == LocalDate.now()
         val holiday = holidays.find { it.date == day.date }
-        val hasDreams = checkHasDreams(day.date)
 
-        container.dreamIndicator.visibility = if (hasDreams) View.VISIBLE else View.GONE
+        // 기록 도트(강도) 반영
+        val count = getDreamCount(day.date)
+        container.dreamIndicator.apply {
+            visibility = if (count > 0) View.VISIBLE else View.GONE
+            if (count > 0) {
+                val size = when {
+                    count >= 5 -> 10.dp()
+                    count >= 3 -> 8.dp()
+                    else -> 6.dp()
+                }
+                layoutParams = (layoutParams as ViewGroup.LayoutParams).apply {
+                    width = size; height = size
+                }
+                alpha = when {
+                    count >= 5 -> 1f
+                    count >= 3 -> 0.85f
+                    else -> 0.7f
+                }
+            }
+        }
 
         container.view.setOnClickListener {
             handleDayClick(day.date, holiday)
@@ -126,30 +172,24 @@ class CalendarFragment : Fragment() {
             }
             day.position != DayPosition.MonthDate -> {
                 container.textView.setBackgroundResource(android.R.color.transparent)
-                container.textView.setTextColor(Color.parseColor("#A0A0A0"))
+                container.textView.setTextColor(colDim)
             }
             isToday -> {
                 container.textView.setBackgroundResource(R.drawable.day_today_background)
-                container.textView.setTextColor(colorOrange)
+                container.textView.setTextColor(colAccent)
             }
             else -> {
                 container.textView.setBackgroundResource(android.R.color.transparent)
                 container.textView.setTextColor(
                     when {
-                        holiday != null -> colorRed
-                        day.date.dayOfWeek == DayOfWeek.SUNDAY -> colorRed
-                        day.date.dayOfWeek == DayOfWeek.SATURDAY -> colorBlue
-                        else -> colorBlack
+                        holiday != null -> colSun
+                        day.date.dayOfWeek == DayOfWeek.SUNDAY -> colSun
+                        day.date.dayOfWeek == DayOfWeek.SATURDAY -> colSat
+                        else -> colText
                     }
                 )
             }
         }
-    }
-
-    private fun checkHasDreams(date: LocalDate): Boolean {
-        val prefs = requireContext().getSharedPreferences("dream_history", Context.MODE_PRIVATE)
-        val dreamArray = JSONArray(prefs.getString(date.toString(), "[]") ?: "[]")
-        return dreamArray.length() > 0
     }
 
     private fun handleDayClick(date: LocalDate, holiday: Holiday?) {
@@ -157,8 +197,11 @@ class CalendarFragment : Fragment() {
         selectedDate = date
         oldDate?.let { binding.calendarView.notifyDateChanged(it) }
         binding.calendarView.notifyDateChanged(date)
-        updateMonthText(date.yearMonth)
 
+        // 월 텍스트 갱신
+        updateMonthText(YearMonth.from(date))
+
+        // 공휴일 라벨 토글
         if (holiday != null) {
             binding.holidayTextView.text = holiday.name
             binding.holidayTextView.visibility = View.VISIBLE
@@ -167,10 +210,9 @@ class CalendarFragment : Fragment() {
             binding.holidayTextView.visibility = View.GONE
         }
 
-        if (checkHasDreams(date)) {
-            DreamListDialog.newInstance(date)
-                .show(parentFragmentManager, "DreamListDialog")
-        }
+        // 하단 요약 카드만 갱신 (상세는 버튼으로만 열기)
+        updateSelectedDayCard(date)
+
     }
 
     private fun setupEventListeners() {
@@ -192,7 +234,8 @@ class CalendarFragment : Fragment() {
 
     private fun loadHolidays() {
         try {
-            HolidayApi.fetchHolidays(2025,
+            HolidayApi.fetchHolidays(
+                2025,
                 onSuccess = {
                     holidays.clear()
                     holidays.addAll(it)
@@ -218,12 +261,62 @@ class CalendarFragment : Fragment() {
         binding.textViewMonthYear.text = dateFormatter.format(month)
     }
 
+    // --- 요약 카드 & 데이터 유틸 ---
+
+    private fun Int.dp(): Int = (this * resources.displayMetrics.density).toInt()
+
+    private fun getDreamArray(date: LocalDate): JSONArray {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        val prefs = if (userId != null) {
+            requireContext().getSharedPreferences("dream_history_$userId", Context.MODE_PRIVATE)
+        } else {
+            requireContext().getSharedPreferences("dream_history", Context.MODE_PRIVATE)
+        }
+        return JSONArray(prefs.getString(date.toString(), "[]") ?: "[]")
+    }
+
+    private fun getDreamCount(date: LocalDate): Int = getDreamArray(date).length()
+
+    private fun checkHasDreams(date: LocalDate): Boolean = getDreamCount(date) > 0
+
+    private fun previewOf(obj: JSONObject): String {
+        val first = obj.optString("dream").replace("\n", " ").trim()
+        return if (first.length > 50) first.substring(0, 50) + "…" else first
+    }
+
+    private fun updateSelectedDayCard(date: LocalDate) {
+        val arr = getDreamArray(date)
+        if (arr.length() == 0) {
+            binding.selectedDayCard.visibility = View.GONE
+            return
+        }
+
+        val dow = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.KOREA) // 월/화/...
+        binding.selectedDateTitle.text = "$date ($dow)"
+
+        val limit = minOf(2, arr.length())
+        val previews = buildString {
+            for (i in 0 until limit) {
+                append("• ").append(previewOf(arr.getJSONObject(i)))
+                if (i < limit - 1) append("\n")
+            }
+            if (arr.length() > limit) append("\n외 ${arr.length() - limit}개 더 있음")
+        }
+        binding.selectedDreamPreview.text = previews
+        binding.selectedDayCard.visibility = View.VISIBLE
+
+        binding.btnOpenDreamList.setOnClickListener {
+            DreamListDialog.newInstance(date).show(parentFragmentManager, "DreamListDialog")
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 }
 
+// ---- Day/Month View Containers ----
 class DayViewContainer(view: View) : ViewContainer(view) {
     val textView: TextView = view.findViewById(R.id.calendarDayText)
     val dreamIndicator: View = view.findViewById(R.id.dreamIndicator)

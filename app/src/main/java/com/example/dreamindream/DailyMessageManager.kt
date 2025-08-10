@@ -1,74 +1,169 @@
 package com.example.dreamindream
 
 import android.content.Context
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
-import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import com.google.firebase.firestore.SetOptions
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
+import java.util.concurrent.TimeUnit
 
 object DailyMessageManager {
 
-    private val db = FirebaseFirestore.getInstance()
+    private const val TAG = "DailyMessageManager"
+    private val db by lazy { FirebaseFirestore.getInstance() }
 
+    // 단일 OkHttpClient (타임아웃 지정)
+    private val http by lazy {
+        OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(12, TimeUnit.SECONDS)
+            .writeTimeout(12, TimeUnit.SECONDS)
+            .build()
+    }
+
+    private fun todayKey(): String = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
+    private fun prefs(ctx: Context) = ctx.getSharedPreferences("daily_msg_cache", Context.MODE_PRIVATE)
+    private fun localKey(date: String) = "dm_$date"
+
+    // 완전 실패 시 마지막 안전망
+    private val fallbackBank = listOf(
+        "오늘은 마음의 속도를 잠시 늦춰 보세요.",
+        "완벽함보다 한 걸음이 더 중요해요.",
+        "걱정은 내려놓고 할 수 있는 일부터 시작해요.",
+        "오늘의 선택이 내일의 나를 만듭니다.",
+        "당신의 리듬을 믿고 천천히 가도 괜찮아요."
+    )
+
+    /**
+     * 로직:
+     * 1) 로컬 캐시(오늘자) 있으면 즉시 보여주기
+     * 2) Firestore에서 오늘자 조회 → 있으면 로컬 갱신 후 표시
+     * 3) 없으면 GPT 생성 → 성공 시 FS/로컬 저장 후 표시
+     * 4) 모두 실패 시 마지막 캐시 또는 fallbackBank 중 하나 표시
+     */
     fun getMessage(context: Context, onResult: (String) -> Unit) {
-        val today = SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(Date())
+        val today = todayKey()
+        Log.d(TAG, "todayKey=$today tz=${TimeZone.getDefault().id}")
 
-        // Firestore에서 오늘 날짜 메시지 확인
+        val p = prefs(context)
+
+        // 1) 로컬 즉시
+        p.getString(localKey(today), null)?.let { onResult(it) }
+
+        // 2) Firestore 조회
         db.collection("daily_messages").document(today).get()
             .addOnSuccessListener { doc ->
-                val cached = doc.getString("message")
-                if (!cached.isNullOrEmpty()) {
-                    onResult(cached) // ✅ 있으면 그걸 보여줌 (모든 사용자 공통)
+                val fromFs = doc.getString("message")
+                if (!fromFs.isNullOrBlank()) {
+                    Log.d(TAG, "FS hit")
+                    p.edit().putString(localKey(today), fromFs).putString("dm_last", fromFs).apply()
+                    onResult(fromFs)
                 } else {
-                    // ✅ 없으면 GPT 호출 후 Firestore에 저장
-                    fetchFromGPT { message ->
-                        db.collection("daily_messages").document(today)
-                            .set(mapOf("message" to message))
-                        onResult(message)
+                    // 3) GPT 생성
+                    fetchFromGPT { gpt ->
+                        if (!gpt.isNullOrBlank()) {
+                            Log.d(TAG, "GPT ok (no FS doc)")
+                            db.collection("daily_messages").document(today)
+                                .set(mapOf("message" to gpt), SetOptions.merge())
+                                .addOnSuccessListener { Log.d(TAG, "FS save ok: $today") }
+                                .addOnFailureListener { e -> Log.e(TAG, "FS save fail: ${e.message}") }
+
+                            p.edit().putString(localKey(today), gpt).putString("dm_last", gpt).apply()
+                            onResult(gpt)
+                        } else {
+                            Log.w(TAG, "GPT failed, fallback")
+                            val last = p.getString("dm_last", null)
+                            onResult(last ?: fallbackBank.random())
+                        }
                     }
                 }
             }
-            .addOnFailureListener {
-                onResult("오늘의 메시지를 불러올 수 없어요...")
+            .addOnFailureListener { e ->
+                Log.w(TAG, "FS fail: ${e.message}")
+                // FS 실패 → GPT 시도
+                fetchFromGPT { gpt ->
+                    if (!gpt.isNullOrBlank()) {
+                        Log.d(TAG, "GPT ok (FS fail)")
+                        db.collection("daily_messages").document(today)
+                            .set(mapOf("message" to gpt), SetOptions.merge())
+                            .addOnSuccessListener { Log.d(TAG, "FS save ok: $today") }
+                            .addOnFailureListener { ex -> Log.e(TAG, "FS save fail: ${ex.message}") }
+
+                        p.edit().putString(localKey(today), gpt).putString("dm_last", gpt).apply()
+                        onResult(gpt)
+                    } else {
+                        Log.w(TAG, "GPT failed, fallback (FS fail)")
+                        val last = p.getString("dm_last", null)
+                        onResult(last ?: fallbackBank.random())
+                    }
+                }
             }
     }
 
-    private fun fetchFromGPT(onResult: (String) -> Unit) {
-        val prompt = "설명과 서사없이 전문 꿈해몽가답게 오늘의 조언멘트를 짧게 적어줘 한문장 존댓말로.."
-        val json = """
-            {
-              "model": "gpt-3.5-turbo",
-              "messages": [{"role": "user", "content": "$prompt"}],
-              "max_tokens": 85
-            }
-        """
-            .trimIndent()
+        private fun fetchFromGPT(onResult: (String?) -> Unit) {
+            val apiKey = BuildConfig.OPENAI_API_KEY
+            Log.d(TAG, "OPENAI len=${apiKey.length}") // 0이면 키 주입 문제
 
-        val body = json.toRequestBody("application/json".toMediaTypeOrNull())
+            if (apiKey.isBlank()) { onResult(null); return }
 
-        val request = Request.Builder()
-            .url("https://api.openai.com/v1/chat/completions")
-            .addHeader("Authorization", "Bearer ${BuildConfig.OPENAI_API_KEY}")
-            .post(body)
-            .build()
+            val prompt = "설명과 서사 없이, 전문 꿈해몽가의 톤으로 오늘(${SimpleDateFormat("yyyy년 M월 d일").format(Date())})의 조언을 한 문장 존댓말로만 작성해주세요."
+            val body = JSONObject().apply {
+                put("model", "gpt-3.5-turbo")
+                put("max_tokens", 50)
+                put("temperature", 0.65)
+                put("messages", JSONArray().put(
+                    JSONObject().put("role", "user").put("content", prompt)
+                ))
+            }.toString().toRequestBody("application/json".toMediaType())
 
-        OkHttpClient().newCall(request).enqueue(object : Callback {
+            val req = Request.Builder()
+                .url("https://api.openai.com/v1/chat/completions")
+                .addHeader("Authorization", "Bearer $apiKey")
+                .addHeader("Content-Type", "application/json")
+                .post(body)
+                .build()
+
+        http.newCall(req).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                onResult("GPT 호출 실패... 메시지를 가져올 수 없어요.")
+                Log.w(TAG, "GPT onFailure: ${e.message}")
+                onResult(null)
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val res = JSONObject(response.body?.string() ?: "")
-                    .getJSONArray("choices")
-                    .getJSONObject(0)
-                    .getJSONObject("message")
-                    .getString("content")
-
-                onResult(res)
+                response.use { resp ->
+                    if (!resp.isSuccessful) {
+                        Log.w(TAG, "GPT HTTP ${resp.code}")
+                        onResult(null); return
+                    }
+                    val text = try {
+                        val raw = resp.body?.string().orEmpty()
+                        val content = JSONObject(raw)
+                            .getJSONArray("choices")
+                            .getJSONObject(0)
+                            .getJSONObject("message")
+                            .getString("content")
+                            .trim()
+                        // 따옴표/공백 제거
+                        content.replace(Regex("""^[`"'“”\s]+|[`"'“”\s]+$"""), "")
+                    } catch (ex: Exception) {
+                        Log.e(TAG, "GPT parse err: ${ex.message}")
+                        null
+                    }
+                    onResult(text)
+                }
             }
         })
     }

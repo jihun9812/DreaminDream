@@ -80,7 +80,7 @@ exports.sendDailyPush = onSchedule(
   }
 );
 
-// ✅ 가입 시 이메일 인증 메일 발송
+//  가입 시 이메일 인증 메일 발송
 exports.sendWelcomeEmail = functionsV1.auth.user().onCreate(async (user) => {
   const verifyLink = await admin.auth().generateEmailVerificationLink(user.email);
   const html = `
@@ -97,7 +97,7 @@ exports.sendWelcomeEmail = functionsV1.auth.user().onCreate(async (user) => {
   await sendMail(user.email, "DreamInDream - 이메일 인증 안내", html);
 });
 
-// ✅ 해몽 결과 저장 시 이메일 전송
+//  해몽 결과 저장 시 이메일 전송
 exports.sendDreamResult = functionsV1.firestore
   .document("users/{userId}/dreams/{date}/entries/{entryId}")
   .onCreate(async (snap, context) => {

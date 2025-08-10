@@ -25,8 +25,6 @@
         android:padding="32dp">
 
         <!-- 타이틀 -->
-
-        <!-- AI 꿈 리포트 카드뷰 -->
         <TextView
             android:id="@+id/home_title"
             android:layout_width="wrap_content"
@@ -41,12 +39,15 @@
             android:textColor="#FFFFFF"
             android:textSize="35sp" />
 
+        <!-- AI 꿈 리포트 카드뷰 -->
         <androidx.cardview.widget.CardView
             android:id="@+id/ai_report_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="28dp"
-            app:cardBackgroundColor= "#FF0C2C44"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardBackgroundColor="#FF0C2C44"
             app:cardCornerRadius="20dp"
             app:cardElevation="13dp"
             app:cardUseCompatPadding="true">
@@ -56,7 +57,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="16dp">
+                android:padding="16dp"
+                android:foreground="?attr/selectableItemBackground">
 
                 <!-- 리포트 아이콘 -->
                 <ImageView
@@ -80,7 +82,16 @@
                         android:fontFamily="@font/pretendard_medium"
                         android:text="이번 주 꿈 분석 요약"
                         android:textColor="#E4E2E2"
-                        android:textSize="15sp" />
+                        android:textSize="15sp"
+                        android:maxLines="1"
+                        android:ellipsize="end"
+                        android:includeFontPadding="false"
+                        android:hyphenationFrequency="none"
+                        android:breakStrategy="balanced"
+                        app:autoSizeTextType="uniform"
+                        app:autoSizeMinTextSize="12sp"
+                        app:autoSizeMaxTextSize="15sp"
+                        app:autoSizeStepGranularity="1sp" />
 
                     <TextView
                         android:id="@+id/ai_report_summary"
@@ -88,21 +99,33 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
                         android:fontFamily="@font/pretendard_medium"
-                        android:text="  "
-                        android:textColor="#666"
-                        android:textSize="13sp" />
+                        android:text=" "
+                        android:textColor="#C6D4DF"
+                        android:textSize="13sp"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:includeFontPadding="false" />
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_ai_report"
                     android:layout_width="wrap_content"
                     android:layout_height="38dp"
-                    android:layout_marginStart="12dp"
+                    android:minWidth="0dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="0dp"
+                    android:paddingBottom="0dp"
+                    android:layout_marginStart="13dp"
                     android:elevation="0dp"
+                    android:gravity="center"
+                    android:includeFontPadding="false"
                     android:text="AI 리포트"
                     android:textColor="#fff"
+                    android:textSize="14sp"
                     app:backgroundTint="#3D6C89"
                     app:cornerRadius="18dp" />
+
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -128,13 +151,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
-                android:textColor="@color/white"
                 android:layout_weight="1"
                 android:text="오늘의 행운 메시지를 불러오는 중이에요..."
+                android:textColor="@color/white"
                 android:translationZ="1dp" />
         </LinearLayout>
 
-        <!-- 버튼 그룹 -->
+        <!-- 버튼 그룹 (원본 그대로) -->
         <LinearLayout
             android:id="@+id/button_group"
             android:layout_width="wrap_content"
@@ -162,9 +185,7 @@
                 app:icon="@drawable/ic_dream"
                 app:iconGravity="textStart"
                 app:iconPadding="6dp"
-                app:iconTint="@color/white"
-
-                />
+                app:iconTint="@color/white" />
 
             <Space
                 android:layout_width="12dp"
@@ -212,7 +233,6 @@
                 app:iconPadding="6dp"
                 app:iconTint="@color/white" />
         </LinearLayout>
-
 
     </LinearLayout>
 </RelativeLayout>

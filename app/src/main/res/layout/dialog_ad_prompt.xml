@@ -1,58 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:background="#C1C1C1"
-    android:padding="24dp"
-
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
-    <TextView
-        android:id="@+id/dialogTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="📺 광고 보고 해몽 더보기"
-        android:textSize="18sp"
-
-        android:textStyle="bold"
-        android:gravity="center"
-        android:textColor="@color/black"
-        android:paddingBottom="12dp" />
-
-    <TextView
-        android:id="@+id/dialogMessage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="광고를 시청하시면 해몽 기회를 1회 더 받아 보세요!"
-        android:textColor="@color/black"
-        android:gravity="center"
-        android:textSize="15sp"
-        android:paddingBottom="20dp" />
+    android:layout_height="wrap_content"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginBottom="12dp"
+    android:backgroundTint="#142A3B"
+    android:clipToPadding="false"
+    android:clipToOutline="false"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="8dp"
+    app:cardUseCompatPadding="true"
+    app:cardPreventCornerOverlap="true"
+    app:contentPaddingTop="20dp"
+    app:contentPaddingBottom="20dp"
+    app:contentPaddingLeft="20dp"
+    app:contentPaddingRight="20dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btnWatchAd"
-            android:backgroundTint="#123E5A"
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/textTitle"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="광고 보기"
-            android:layout_weight="1"
-            android:textColor="@color/white"
-            android:layout_marginEnd="8dp" />
+            android:text="AI 해몽을 보시려면 광고를 시청해주세요"
+            android:textColor="#E8F1F8"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:includeFontPadding="true"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:breakStrategy="balanced"/>
 
-        <Button
-            android:id="@+id/btnCancel"
-            android:layout_width="0dp"
-            android:backgroundTint="#123E5A"
+        <TextView
+            android:id="@+id/textStatus"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="취소"
-            android:textColor="@color/white"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp" />
+            android:text="광고 준비 중…"
+            android:textColor="#BFD0DC"
+            android:textSize="13sp"
+            android:layout_marginTop="6dp"
+            android:includeFontPadding="true"
+            android:lineSpacingExtra="2dp"/>
+
+        <ProgressBar
+            android:id="@+id/progressAd"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center_horizontal"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="44dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="10dp"
+                android:text="취소"
+                android:textColor="#FFFFFF"
+                android:includeFontPadding="true"
+                android:background="@android:color/transparent"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnWatchAd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="44dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="10dp"
+                android:includeFontPadding="true"
+                android:gravity="center"
+                android:text="광고 보기"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                app:cornerRadius="18dp"
+                app:backgroundTint="#3D6C89"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</com.google.android.material.card.MaterialCardView>

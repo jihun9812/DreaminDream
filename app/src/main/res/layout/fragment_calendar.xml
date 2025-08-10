@@ -68,7 +68,10 @@
             android:textSize="18sp"
             android:textColor="@color/white"
             android:textStyle="bold"
-            android:layout_marginHorizontal="12dp" />
+            android:layout_marginHorizontal="12dp"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:includeFontPadding="false"/>
 
         <ImageButton
             android:id="@+id/buttonNextMonth"
@@ -98,6 +101,67 @@
             app:cv_dayViewResource="@layout/example_day_view"
             app:cv_monthHeaderResource="@layout/example_month_header" />
     </FrameLayout>
+
+    <!--  선택한 날짜 요약 카드 (캘린더 아래, 광고 위) -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/selectedDayCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/calendarWrapper"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="0dp"
+        app:cardBackgroundColor="#1AFFFFFF"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/selectedDateTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:fontFamily="@font/pretendard_bold"
+                android:includeFontPadding="false"/>
+
+            <TextView
+                android:id="@+id/selectedDreamPreview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="#CFE3F0"
+                android:textSize="13sp"
+                android:fontFamily="@font/pretendard_medium"
+                android:includeFontPadding="false"
+                android:maxLines="3"
+                android:ellipsize="end"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOpenDreamList"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:minWidth="0dp"
+                android:minHeight="36dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:includeFontPadding="false"
+                android:gravity="center"
+                android:text="기록 보기"
+                android:textColor="@android:color/white"
+                app:cornerRadius="18dp"
+                app:backgroundTint="#3D6C89"/>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
     <!-- 광고 배너 -->
     <com.google.android.gms.ads.AdView

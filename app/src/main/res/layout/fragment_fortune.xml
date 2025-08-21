@@ -69,7 +69,7 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- 큰 사각 CTA (아이콘 제거) -->
+    <!-- 큰 사각 CTA -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/fortuneButton"
         style="@style/Widget.Material3.Button"
@@ -358,7 +358,7 @@
                     android:layout_marginTop="6dp"
                     android:background="#12FFFFFF" />
 
-                <!-- 체크리스트 -->
+                <!-- 오늘의 체크리스트 -->
                 <LinearLayout
                     android:id="@+id/layoutChecklist"
                     android:layout_width="match_parent"
@@ -398,6 +398,23 @@
                     android:layout_height="1dp"
                     android:layout_marginTop="6dp"
                     android:background="#12FFFFFF" />
+
+                <!-- ✅ 심화 분석 버튼 -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDeep"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="10dp"
+                    android:text="심화 분석 보기"
+                    android:textSize="15sp"
+                    android:textColor="@android:color/white"
+                    android:textAllCaps="false"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/ic_fortune"
+                    app:iconGravity="textStart"
+                    app:iconPadding="8dp"
+                    app:backgroundTint="#7A6CF1"
+                    app:rippleColor="#33FFFFFF" />
 
                 <!-- 복사/공유 -->
                 <LinearLayout
@@ -450,7 +467,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 광고 위 여백 (원하면 제거 가능) -->
     <Space
         android:id="@+id/adSpacer"
         android:layout_width="0dp"

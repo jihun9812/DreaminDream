@@ -1,97 +1,78 @@
-<?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="12dp"
-    android:layout_marginEnd="12dp"
-    android:layout_marginBottom="12dp"
-    android:backgroundTint="#142A3B"
-    android:clipToPadding="false"
-    android:clipToOutline="false"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="8dp"
-    app:cardUseCompatPadding="true"
-    app:cardPreventCornerOverlap="true"
-    app:contentPaddingTop="20dp"
-    app:contentPaddingBottom="20dp"
-    app:contentPaddingLeft="20dp"
-    app:contentPaddingRight="20dp">
+    android:layout_margin="16dp"
+    app:cardCornerRadius="22dp"
+    app:cardElevation="10dp"
+    android:backgroundTint="#142A3B">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="20dp">
 
+        <!-- 제목 -->
         <TextView
             android:id="@+id/textTitle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="AI 해몽을 보시려면 광고를 시청해주세요"
+            android:text="AI 해몽 준비 중..."
             android:textColor="#E8F1F8"
-            android:textSize="16sp"
+            android:textSize="17sp"
             android:textStyle="bold"
-            android:includeFontPadding="true"
-            android:maxLines="2"
-            android:ellipsize="end"
-            android:breakStrategy="balanced"/>
+            android:gravity="center"/>
 
+        <!-- 설명 -->
         <TextView
             android:id="@+id/textStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="광고 준비 중…"
+            android:text="잠시 후 광고가 로드되면 맞춤 해몽을 보실 수 있습니다."
             android:textColor="#BFD0DC"
-            android:textSize="13sp"
-            android:layout_marginTop="6dp"
-            android:includeFontPadding="true"
-            android:lineSpacingExtra="2dp"/>
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_marginTop="8dp"/>
 
+        <!-- 애니메이션/Progress -->
         <ProgressBar
             android:id="@+id/progressAd"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginTop="10dp"
-            android:layout_gravity="center_horizontal"/>
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="12dp"
+            android:indeterminate="true"
+            android:layout_gravity="center"/>
 
+        <!-- 버튼 영역 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="end"
-            android:layout_marginTop="16dp">
+            android:gravity="end">
 
             <Button
                 android:id="@+id/btnCancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="44dp"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="10dp"
                 android:text="취소"
                 android:textColor="#FFFFFF"
-                android:includeFontPadding="true"
-                android:background="@android:color/transparent"/>
+                app:backgroundTint="#9575CD"
+              />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnWatchAd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minHeight="44dp"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="10dp"
-                android:includeFontPadding="true"
-                android:gravity="center"
                 android:text="광고 보기"
                 android:textColor="@android:color/white"
-                android:textSize="14sp"
-                app:cornerRadius="18dp"
-                app:backgroundTint="#3D6C89"
-                android:layout_marginStart="8dp"/>
+                android:textSize="15sp"
+                app:cornerRadius="22dp"
+                app:backgroundTint="#9575CD"
+                android:layout_marginStart="12dp"/>
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

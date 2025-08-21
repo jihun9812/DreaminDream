@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="20dp"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="12dp"
+    android:backgroundTint="#142737">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="오늘의 심화 분석"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#EAF2F8"
+            android:includeFontPadding="false" />
+
+        <TextView
+            android:id="@+id/highlights"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:textColor="#C9D7E1"
+            android:textSize="15sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="14dp"
+            android:background="#244456" />
+
+        <TextView
+            android:id="@+id/tomorrowTip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#9FD5FF"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/btnClose"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="18dp"
+            android:text="확인"
+            android:textAllCaps="false" />
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

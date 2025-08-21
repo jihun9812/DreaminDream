@@ -1,23 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="32dp"
-    app:cardCornerRadius="36dp"
+    android:layout_margin="24dp"
+    app:cardCornerRadius="28dp"
     app:cardElevation="22dp"
     android:backgroundTint="#424141">
 
+    <!-- 스크롤 높이는 코드에서 화면 비율로 제어하므로 maxHeight 제거 -->
     <ScrollView
+        android:id="@+id/scrollDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:maxHeight="500dp"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:overScrollMode="ifContentScrolls">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="28dp">   <!--  끝부분 안 잘리도록 여유 -->
 
             <ImageButton
                 android:id="@+id/btn_close"
@@ -32,12 +39,11 @@
                 android:id="@+id/resultTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="해몽 결과가 여기에 표시됩니다"
                 android:textColor="#F4F4F4"
-                android:textSize="13sp"
+                android:textSize="16sp"
                 android:lineSpacingExtra="6dp"
-                android:paddingTop="8dp"
-                android:fontFamily="@font/pretendard_medium"/>
+                android:paddingTop="6dp"
+                android:fontFamily="@font/pretendard_medium" />
         </LinearLayout>
     </ScrollView>
 </androidx.cardview.widget.CardView>

@@ -134,16 +134,30 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
+            <!-- ✅ 결과 표시(TextView) : DreamFragment가 필수로 요구 -->
+            <TextView
+                android:id="@+id/resultTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:padding="14dp"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:lineSpacingExtra="6dp"
+                android:background="@drawable/bg_glass_card"
+                app:layout_constraintTop_toBottomOf="@id/lottieLoading"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-    <!-- ✅ 배너: 화면 바닥 고정 / XML에서만 adUnitId·adSize 세팅 -->
+    <!-- 배너: 화면 바닥 고정 -->
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

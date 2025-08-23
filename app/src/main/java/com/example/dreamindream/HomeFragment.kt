@@ -28,15 +28,16 @@ class HomeFragment : Fragment() {
     private var lastFeeling: String? = null
     private var lastKeywords: List<String>? = null
     private var lastAnalysis: String? = null
+    private var lastScore: Int? = null
 
-    // 샘플 (디버그에서만 카드에 보여줄 수 있게)
+    // 샘플 (디버그에서만)
     private val SAMPLE_FEELING = "긍정↑"
     private val SAMPLE_KEYWORDS = listOf("성장", "기회", "안정")
     private val SAMPLE_ANALYSIS = "이번 주 전반 에너지는 상승세입니다. 소통이 잘 풀리고 작은 실험에서 성과가 납니다. 계획을 밀고 가세요."
+    private val SAMPLE_SCORE = 82
     private val SHOW_SAMPLE_IN_REPORT = BuildConfig.DEBUG
     private var showingSampleOnCard = false
 
-    // 오늘의 메시지 안전망(홈에서 최종 보정)
     private val dailyMsgFallbacks = listOf(
         "오늘은 마음의 속도를 잠시 늦춰 보세요.",
         "완벽함보다 한 걸음이 더 중요해요.",
@@ -45,13 +46,9 @@ class HomeFragment : Fragment() {
         "당신의 리듬을 믿고 천천히 가도 괜찮아요."
     )
 
-    // 네트워크 콜 취소용
     private var weeklyAnalysisCall: Call? = null
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
 
         val userId = uid ?: ""
@@ -75,11 +72,11 @@ class HomeFragment : Fragment() {
 
         val weekDreams = getThisWeekDreamList()
 
-        // 파베에 주간 리포트 있으면 먼저 보여주고, 없으면 해석 요청
+        // 파이어스토어에 있으면 우선 사용, 없으면 해석 요청
         uid?.let {
             FirestoreManager.loadWeeklyReport(it) { feeling, keywords, analysis ->
                 if (feeling.isNotBlank() && keywords.isNotEmpty() && analysis.isNotBlank()) {
-                    applyHomeSummary(aiReportTitle, aiReportSummary, btnAiReport, feeling, keywords, analysis)
+                    applyHomeSummary(aiReportTitle, aiReportSummary, btnAiReport, feeling, keywords, analysis, null)
                 } else {
                     analyzeWeeklyDreams(view, weekDreams, aiReportTitle, aiReportSummary, btnAiReport)
                 }
@@ -100,7 +97,6 @@ class HomeFragment : Fragment() {
                 action()
             }
         }
-
         view.findViewById<Button>(R.id.btn_dream).applyScaleClick { navigateTo(DreamFragment()) }
         view.findViewById<Button>(R.id.btn_calendar).applyScaleClick { navigateTo(CalendarFragment()) }
         view.findViewById<Button>(R.id.btn_fortune).applyScaleClick { navigateTo(FortuneFragment()) }
@@ -121,6 +117,7 @@ class HomeFragment : Fragment() {
                 putString("feeling", SAMPLE_FEELING)
                 putStringArrayList("keywords", ArrayList(SAMPLE_KEYWORDS))
                 putString("analysis", SAMPLE_ANALYSIS)
+                putInt("score", SAMPLE_SCORE)
                 putBoolean("is_sample", true)
             }
             navigateTo(AIReportFragment().apply { arguments = bundle })
@@ -135,6 +132,7 @@ class HomeFragment : Fragment() {
                 putString("feeling", lastFeeling ?: "")
                 putStringArrayList("keywords", ArrayList(lastKeywords ?: emptyList()))
                 putString("analysis", lastAnalysis ?: "")
+                lastScore?.let { putInt("score", it) }
                 putBoolean("is_sample", false)
             }
             navigateTo(AIReportFragment().apply { arguments = bundle })
@@ -149,10 +147,8 @@ class HomeFragment : Fragment() {
 
         parentFragmentManager.beginTransaction()
             .setCustomAnimations(
-                R.anim.slide_in_right,
-                R.anim.slide_out_left,
-                R.anim.slide_in_left,
-                R.anim.slide_out_right
+                R.anim.slide_in_right, R.anim.slide_out_left,
+                R.anim.slide_in_left,  R.anim.slide_out_right
             )
             .replace(R.id.fragment_container, fragment)
             .disallowAddToBackStack()
@@ -167,46 +163,32 @@ class HomeFragment : Fragment() {
         btnAiReport: MaterialButton
     ) {
         when {
-            weekDreams.isEmpty() -> {
+            weekDreams.isEmpty() || weekDreams.size < 2 -> {
                 if (BuildConfig.DEBUG) {
                     applyHomeSample(aiReportTitle, aiReportSummary, btnAiReport)
                 } else {
-                    aiReportTitle.text = getString(R.string.ai_no_dream)
+                    aiReportTitle.text = getString(R.string.ai_report_summary)
                     aiReportSummary.text = getString(R.string.ai_report_guide)
-                    btnAiReport.isEnabled = true
-                    btnAiReport.alpha = 1f
-                    showingSampleOnCard = false
-                }
-            }
-            weekDreams.size < 2 -> {
-                if (BuildConfig.DEBUG) {
-                    applyHomeSample(aiReportTitle, aiReportSummary, btnAiReport)
-                } else {
-                    aiReportTitle.text = getString(R.string.ai_not_enough_data)
-                    aiReportSummary.text = getString(R.string.ai_need_more)
-                    btnAiReport.isEnabled = true
-                    btnAiReport.alpha = 1f
+                    btnAiReport.isEnabled = true; btnAiReport.alpha = 1f
                     showingSampleOnCard = false
                 }
             }
             else -> {
                 aiReportTitle.text = getString(R.string.ai_loading)
                 aiReportSummary.text = getString(R.string.ai_loading2)
-                btnAiReport.isEnabled = true
-                btnAiReport.alpha = 1f
+                btnAiReport.isEnabled = true; btnAiReport.alpha = 1f
                 showingSampleOnCard = false
 
                 requestWeeklyDreamAnalysisFromGPT(
                     weekDreams,
-                    onResult = { feeling, keywords, analysis ->
-                        applyHomeSummary(aiReportTitle, aiReportSummary, btnAiReport, feeling, keywords, analysis)
-                        uid?.let { FirestoreManager.saveWeeklyReport(it, feeling, keywords, analysis) }
+                    onResult = { feeling, keywords, analysis, score ->
+                        applyHomeSummary(aiReportTitle, aiReportSummary, btnAiReport, feeling, keywords, analysis, score)
+                        uid?.let { FirestoreManager.saveWeeklyReport(it, feeling, keywords, analysis) } // 점수는 저장 스킵(스키마 영향)
                     },
                     onError = {
                         aiReportTitle.text = getString(R.string.ai_report_fail)
                         aiReportSummary.text = getString(R.string.ai_retry)
-                        btnAiReport.isEnabled = true
-                        btnAiReport.alpha = 1f
+                        btnAiReport.isEnabled = true; btnAiReport.alpha = 1f
                     }
                 )
             }
@@ -219,7 +201,8 @@ class HomeFragment : Fragment() {
         btnAiReport: MaterialButton,
         feeling: String,
         keywords: List<String>,
-        analysis: String
+        analysis: String,
+        score: Int?
     ) {
         val top3 = keywords.take(3)
         aiReportTitle.text = getString(R.string.ai_report_summary)
@@ -227,16 +210,13 @@ class HomeFragment : Fragment() {
         lastFeeling = feeling
         lastKeywords = top3
         lastAnalysis = analysis
+        lastScore = score
         btnAiReport.isEnabled = true
         btnAiReport.alpha = 1f
         showingSampleOnCard = false
     }
 
-    private fun applyHomeSample(
-        aiReportTitle: TextView,
-        aiReportSummary: TextView,
-        btnAiReport: MaterialButton
-    ) {
+    private fun applyHomeSample(aiReportTitle: TextView, aiReportSummary: TextView, btnAiReport: MaterialButton) {
         aiReportTitle.text = getString(R.string.ai_report_summary)
         aiReportSummary.text = "감정: $SAMPLE_FEELING\n키워드: ${SAMPLE_KEYWORDS.joinToString(", ")}"
         btnAiReport.isEnabled = true
@@ -265,10 +245,10 @@ class HomeFragment : Fragment() {
         return dreams
     }
 
-    // 안전한 OkHttp 콜백 패턴
+    /** GPT 콜: 점수(0~100)까지 받아온다 */
     private fun requestWeeklyDreamAnalysisFromGPT(
         dreamList: List<String>,
-        onResult: (feeling: String, keywords: List<String>, analysis: String) -> Unit,
+        onResult: (feeling: String, keywords: List<String>, analysis: String, score: Int?) -> Unit,
         onError: ((Exception) -> Unit)? = null
     ) {
         val prompt = buildString {
@@ -276,22 +256,20 @@ class HomeFragment : Fragment() {
             dreamList.forEachIndexed { idx, dream -> appendLine("[꿈 기록 ${idx + 1}] $dream") }
             appendLine(
                 """
-                1. 이 꿈들의 전반적인 감정을 한 단어로 요약해줘.
-                2. 반복 키워드(명사) 2~3개 추출.
-                3. 전체 꿈을 기반으로 전문가처럼 간단 심리 분석.
-                출력 예시:
-                감정: 행복
-                키워드: 여행, 강아지, 바다
-                AI 분석: 당신의 꿈은 밝은 에너지와 여유를 반영합니다.
-            """.trimIndent()
+                아래 형식 **그대로** 한국어로만 출력해. 다른 말 절대 금지.
+                감정: <한 단어 또는 '긍정/중립/부정' + ↑/↓ 가능>
+                키워드: <명사 2~3개, 쉼표로 구분>
+                점수: <0~100 사이 정수 한 개>   # 전반 긍정성/에너지/안정감 종합 점수
+                AI 분석: <2~4문장 요약 분석>
+                """.trimIndent()
             )
         }
 
         val requestBody = JSONObject().apply {
             put("model", "gpt-4o-mini")
-            put("temperature", 0.7)
+            put("temperature", 0.6)
             put("messages", JSONArray().put(JSONObject().put("role", "user").put("content", prompt)))
-            put("max_tokens", 300)
+            put("max_tokens", 320)
         }.toString().toRequestBody("application/json".toMediaType())
 
         val request = Request.Builder()
@@ -306,38 +284,29 @@ class HomeFragment : Fragment() {
 
         weeklyAnalysisCall!!.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                val act = activity ?: return
-                if (!isAdded) return
-                act.runOnUiThread {
-                    if (!isAdded) return@runOnUiThread
-                    onError?.invoke(e)
-                }
+                activity?.runOnUiThread { if (isAdded) onError?.invoke(e) }
             }
-
             override fun onResponse(call: Call, response: Response) {
                 response.use { resp ->
-                    val responseText = if (resp.isSuccessful) {
+                    val content = if (resp.isSuccessful) {
                         try {
                             JSONObject(resp.body?.string() ?: "")
-                                .getJSONArray("choices")
-                                .getJSONObject(0)
-                                .getJSONObject("message")
-                                .getString("content")
-                                .trim()
+                                .getJSONArray("choices").getJSONObject(0)
+                                .getJSONObject("message").getString("content").trim()
                         } catch (_: Exception) { "" }
                     } else ""
 
-                    val feeling = Regex("""감정:\s*([^\n]+)""").find(responseText)?.groupValues?.get(1)?.trim() ?: "불명"
-                    val keywords = Regex("""키워드:\s*([^\n]+)""").find(responseText)
+                    val feeling = Regex("""감정:\s*([^\n]+)""").find(content)?.groupValues?.get(1)?.trim()
+                    val keywords = Regex("""키워드:\s*([^\n]+)""").find(content)
                         ?.groupValues?.get(1)?.split(",")?.map { it.trim() } ?: emptyList()
-                    val analysis = Regex("""AI ?분석:\s*([^\n]+)""").find(responseText)?.groupValues?.get(1)?.trim() ?: ""
+                    val score = Regex("""점수:\s*(\d{1,3})""").find(content)?.groupValues?.get(1)?.toIntOrNull()
+                    val analysis = Regex("""AI ?분석:\s*(.*)""", RegexOption.DOT_MATCHES_ALL)
+                        .find(content)?.groupValues?.get(1)?.trim().orEmpty()
 
-                    val act = activity ?: return
-                    if (!isAdded) return
-                    act.runOnUiThread {
+                    activity?.runOnUiThread {
                         if (!isAdded) return@runOnUiThread
-                        if (feeling != "불명" && keywords.isNotEmpty() && analysis.isNotBlank()) {
-                            onResult(feeling, keywords, analysis)
+                        if (!feeling.isNullOrBlank() && keywords.isNotEmpty() && analysis.isNotBlank()) {
+                            onResult(feeling, keywords, analysis, score)
                         } else onError?.invoke(Exception("AI 분석 파싱 실패"))
                     }
                 }

@@ -42,7 +42,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:backgroundTint="#0C2C44"
+                android:backgroundTint="@color/dd_surface_card"
                 app:cardCornerRadius="26dp"
                 app:cardElevation="10dp"
                 app:cardUseCompatPadding="true"
@@ -134,7 +134,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- ✅ 결과 표시(TextView) : DreamFragment가 필수로 요구 -->
+            <!-- 결과 영역은 기존 유리 카드 유지 -->
             <TextView
                 android:id="@+id/resultTextView"
                 android:layout_width="0dp"

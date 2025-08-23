@@ -1,55 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="20dp"
-    app:cardCornerRadius="24dp"
-    app:cardElevation="12dp"
-    android:backgroundTint="#142737">
+    android:clipToPadding="false"
+    app:cardCornerRadius="22dp"
+    app:cardUseCompatPadding="true"
+    app:strokeWidth="1dp"
+    app:strokeColor="#2A4B5D"
+    android:backgroundTint="@android:color/transparent">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:fillViewport="false"
+        android:clipToPadding="false"
+        android:overScrollMode="ifContentScrolls"
+        android:paddingBottom="12dp">
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="오늘의 심화 분석"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#EAF2F8"
-            android:includeFontPadding="false" />
-
-        <TextView
-            android:id="@+id/highlights"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textColor="#C9D7E1"
-            android:textSize="15sp" />
+            android:orientation="vertical"
+            android:background="@drawable/bg_deep_dialog"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginVertical="14dp"
-            android:background="#244456" />
+            <!-- 타이틀 -->
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="오늘의 심화 분석"
+                android:textColor="#EAF2F8"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
 
-        <TextView
-            android:id="@+id/tomorrowTip"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#9FD5FF"
-            android:textSize="15sp" />
+            <!-- Lucky 칩 (컴팩트) -->
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipsLucky"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:singleLine="true"
+                app:chipSpacingHorizontal="6dp">
 
-        <Button
-            android:id="@+id/btnClose"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="18dp"
-            android:text="확인"
-            android:textAllCaps="false" />
-    </LinearLayout>
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipLuckyTime"
+                    style="@style/Widget.Material3.Chip.Assist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="행운 시간"
+                    android:textSize="12sp"
+                    app:chipBackgroundColor="#143244"
+                    app:chipStrokeColor="#335C76"
+                    app:chipStrokeWidth="1dp"
+                    android:textColor="#BFE6FF" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipLuckyNumber"
+                    style="@style/Widget.Material3.Chip.Assist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="행운 숫자"
+                    android:textSize="12sp"
+                    app:chipBackgroundColor="#143244"
+                    app:chipStrokeColor="#335C76"
+                    app:chipStrokeWidth="1dp"
+                    android:textColor="#BFE6FF" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipLuckyColor"
+                    style="@style/Widget.Material3.Chip.Assist"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="행운색"
+                    android:textSize="12sp"
+                    app:chipBackgroundColor="#143244"
+                    app:chipStrokeColor="#335C76"
+                    app:chipStrokeWidth="1dp"
+                    android:textColor="#BFE6FF" />
+            </com.google.android.material.chip.ChipGroup>
+
+            <!-- 하이라이트 -->
+            <TextView
+                android:id="@+id/highlights"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="#C9D7E1"
+                android:textSize="14sp"
+                android:lineSpacingExtra="4dp"/>
+
+            <!-- 내일 대비 영역 -->
+            <TextView
+                android:id="@+id/tomorrowTip"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textColor="#E0ECF7"
+                android:textSize="13sp"
+                android:lineSpacingExtra="4dp"/>
+
+            <!-- 닫기 버튼 (컴팩트) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClose"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:layout_marginTop="12dp"
+                android:text="확인"
+                android:textAllCaps="false"
+                android:textSize="14sp"
+                android:textColor="@android:color/white"
+                app:cornerRadius="14dp"
+                app:backgroundTint="#6F66F4"
+                app:rippleColor="#33FFFFFF" />
+        </LinearLayout>
+    </ScrollView>
 </com.google.android.material.card.MaterialCardView>

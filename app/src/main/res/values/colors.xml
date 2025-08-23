@@ -12,6 +12,8 @@
 
     <color name="purpleHighlight">#CA6EF6</color>
 
+    <color name="dd_surface_card">#15202A</color>   <!-- 포춘 카드와 동일 -->
+    <color name="dd_stroke_card">#26FFFFFF</color>  <!-- 얇은 유리 느낌 스트로크 -->
 
     <color name="colorPrimaryDark">#1A1333</color> <!-- Deep navy -->
     <color name="colorAccent">#5D5FBD</color> <!-- Input background -->

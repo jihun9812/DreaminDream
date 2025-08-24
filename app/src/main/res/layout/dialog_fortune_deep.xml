@@ -4,120 +4,77 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:clipToPadding="false"
-    app:cardCornerRadius="22dp"
+    app:cardCornerRadius="20dp"
     app:cardUseCompatPadding="true"
-    app:strokeWidth="1dp"
-    app:strokeColor="#2A4B5D"
-    android:backgroundTint="@android:color/transparent">
+    app:cardBackgroundColor="#1A2433"
+    android:padding="12dp">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:fillViewport="false"
-        android:clipToPadding="false"
-        android:overScrollMode="ifContentScrolls"
-        android:paddingBottom="12dp">
+        android:fillViewport="true"
+        android:overScrollMode="always">
 
         <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_deep_dialog"
-            android:paddingStart="14dp"
-            android:paddingEnd="14dp"
-            android:paddingTop="14dp"
-            android:paddingBottom="14dp">
+            android:padding="6dp">
 
-            <!-- 타이틀 -->
             <TextView
-                android:id="@+id/title"
+                android:id="@+id/tvDeepTitle"
+                android:text="심화 분석"
+                android:textSize="20sp"
+                android:textColor="#FFFFFF"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="오늘의 심화 분석"
-                android:textColor="#EAF2F8"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:layout_height="wrap_content"/>
 
-            <!-- Lucky 칩 (컴팩트) -->
-            <com.google.android.material.chip.ChipGroup
-                android:id="@+id/chipsLucky"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                app:singleLine="true"
-                app:chipSpacingHorizontal="6dp">
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipLuckyTime"
-                    style="@style/Widget.Material3.Chip.Assist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="행운 시간"
-                    android:textSize="12sp"
-                    app:chipBackgroundColor="#143244"
-                    app:chipStrokeColor="#335C76"
-                    app:chipStrokeWidth="1dp"
-                    android:textColor="#BFE6FF" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipLuckyNumber"
-                    style="@style/Widget.Material3.Chip.Assist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="행운 숫자"
-                    android:textSize="12sp"
-                    app:chipBackgroundColor="#143244"
-                    app:chipStrokeColor="#335C76"
-                    app:chipStrokeWidth="1dp"
-                    android:textColor="#BFE6FF" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chipLuckyColor"
-                    style="@style/Widget.Material3.Chip.Assist"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="행운색"
-                    android:textSize="12sp"
-                    app:chipBackgroundColor="#143244"
-                    app:chipStrokeColor="#335C76"
-                    app:chipStrokeWidth="1dp"
-                    android:textColor="#BFE6FF" />
-            </com.google.android.material.chip.ChipGroup>
-
-            <!-- 하이라이트 -->
             <TextView
-                android:id="@+id/highlights"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textColor="#C9D7E1"
-                android:textSize="14sp"
-                android:lineSpacingExtra="4dp"/>
-
-            <!-- 내일 대비 영역 -->
-            <TextView
-                android:id="@+id/tomorrowTip"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:textColor="#E0ECF7"
+                android:id="@+id/tvDeepKpis"
+                android:layout_marginTop="6dp"
+                android:textColor="#B9C7D6"
                 android:textSize="13sp"
-                android:lineSpacingExtra="4dp"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
-            <!-- 닫기 버튼 (컴팩트) -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnClose"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:layout_marginTop="12dp"
-                android:text="확인"
-                android:textAllCaps="false"
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:layout_marginVertical="12dp" android:background="#2B3B4D"/>
+
+            <TextView
+                android:id="@+id/tvDeepHighlights"
+                android:textColor="#EAF2FA"
                 android:textSize="14sp"
-                android:textColor="@android:color/white"
-                app:cornerRadius="14dp"
-                app:backgroundTint="#6F66F4"
-                app:rippleColor="#33FFFFFF" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:layout_marginVertical="12dp" android:background="#2B3B4D"/>
+
+            <TextView
+                android:id="@+id/tvDeepPlan"
+                android:textColor="#EAF2FA"
+                android:textSize="14sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <View android:layout_width="match_parent" android:layout_height="1dp"
+                android:layout_marginVertical="12dp" android:background="#2B3B4D"/>
+
+            <TextView
+                android:id="@+id/tvDeepTomorrow"
+                android:textColor="#EAF2FA"
+                android:textSize="14sp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDeepClose"
+                style="@style/Widget.Material3.Button.TonalButton"
+                android:text="닫기"
+                app:backgroundTint="#7A6CF1"
+                android:layout_marginTop="16dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 </com.google.android.material.card.MaterialCardView>

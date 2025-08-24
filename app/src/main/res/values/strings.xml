@@ -38,8 +38,8 @@
     <!-- 해몽/꿈/운세 -->
     <string name="btn_dream">꿈해몽</string>
     <string name="btn_calendar">꿈달력 </string>
-    <string name="btn_fortune">행운보기</string>
-
+    <string name="btn_fortune">"행운보기</string>
+    <string name="btn_fortune2">"운세\n보기</string>
 
     <string name="dream_star_text">어떤 꿈을 꾸었나요?</string>
     <string name="hint_input">여기에 꿈을 자세하게 입력해주세요!\n ex) 오늘꿈에서 엄청 큰 나무에서 떨어졌는데 기분이 너무 안좋았어.</string>

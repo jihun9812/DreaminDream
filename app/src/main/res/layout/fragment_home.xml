@@ -36,7 +36,7 @@
             android:shadowDy="2"
             android:shadowRadius="2"
             android:text="Dream In Dream"
-            android:textColor="#9A74DE"
+            android:textColor="#755BA2"
             android:textSize="35sp" />
 
         <!-- AI 꿈 리포트 카드뷰 -->
@@ -225,6 +225,7 @@
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
                 android:text="@string/btn_fortune"
+
                 android:textColor="@color/white"
                 android:textSize="15sp"
                 android:translationZ="4dp"

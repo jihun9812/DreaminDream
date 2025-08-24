@@ -9,6 +9,20 @@
 
     </style>
 
+
+    <style name="Dialog_GlassM3" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowAnimationStyle">@style/GlassDialogAnimation</item>
+    </style>
+
+    <style name="GlassDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/fade_in_scale_95</item>
+        <item name="android:windowExitAnimation">@anim/fade_out_120</item>
+    </style>
+
+
     <!-- 스플래시/온보딩용 -->
     <style name="Theme.DreaminDream.TransparentFullScreen" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>

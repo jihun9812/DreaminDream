@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginTop="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvPos"
+            android:text="88%"
+            android:textColor="#A7F3D0"
+            android:textSize="12sp"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"/>
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/barPos"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            app:trackThickness="8dp"
+            android:layout_weight="1"
+            app:indicatorColor="#17D499"
+            app:trackColor="#2B3B4D"
+            style="@style/Widget.Material3.LinearProgressIndicator"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginTop="6dp">
+
+        <TextView
+            android:id="@+id/tvNeu"
+            android:text="10%"
+            android:textColor="#FFE08A"
+            android:textSize="12sp"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"/>
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/barNeu"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            app:trackThickness="8dp"
+            android:layout_weight="1"
+            app:indicatorColor="#FFC75F"
+            app:trackColor="#2B3B4D"
+            style="@style/Widget.Material3.LinearProgressIndicator"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginTop="6dp">
+
+        <TextView
+            android:id="@+id/tvNeg"
+            android:text="5%"
+            android:textColor="#FF9CA3"
+            android:textSize="12sp"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"/>
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/barNeg"
+            android:layout_width="0dp"
+            android:layout_height="8dp"
+            app:trackThickness="8dp"
+            android:layout_weight="1"
+            app:indicatorColor="#FF6B7B"
+            app:trackColor="#2B3B4D"
+            style="@style/Widget.Material3.LinearProgressIndicator"/>
+
+    </LinearLayout>
+</LinearLayout>

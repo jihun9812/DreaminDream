@@ -1,8 +1,8 @@
+// file: app/src/main/java/com/example/dreamindream/SettingsFragment.kt
 package com.example.dreamindream
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.Color
 import android.os.Bundle
 import android.view.*
 import android.view.animation.AnimationUtils
@@ -17,6 +17,11 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
+import android.transition.TransitionManager
+import android.transition.TransitionSet
+import android.transition.Fade
+import android.transition.Slide
+import android.view.Gravity
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,6 +31,12 @@ class SettingsFragment : Fragment() {
     private var isEditMode = true
     private var isSaving = false
 
+    // Views
+    private lateinit var editGroup: View
+    private lateinit var summaryCard: View
+    private lateinit var saveButton: com.google.android.material.button.MaterialButton
+    private lateinit var loadingSpinner: ProgressBar
+
     private lateinit var genderGroup: RadioGroup
     private lateinit var tilNickname: TextInputLayout
     private lateinit var tilBirthdate: TextInputLayout
@@ -33,11 +44,9 @@ class SettingsFragment : Fragment() {
     private lateinit var birthEdit: TextInputEditText
     private lateinit var nicknameEdit: TextInputEditText
     private lateinit var mbtiEdit: TextInputEditText
-    private lateinit var saveButton: com.google.android.material.button.MaterialButton
+    private lateinit var birthTimeSpinner: Spinner
     private lateinit var infoSummary: TextView
     private lateinit var infoDetails: TextView
-    private lateinit var loadingSpinner: ProgressBar
-    private lateinit var birthTimeSpinner: Spinner
 
     private val birthTimes = listOf(
         "선택안함",
@@ -47,11 +56,19 @@ class SettingsFragment : Fragment() {
         "유시 (17:00~19:00)", "술시 (19:00~21:00)", "해시 (21:00~23:00)"
     )
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
 
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-        prefs = requireContext().getSharedPreferences("user_info_$userId", Context.MODE_PRIVATE)
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+        prefs = requireContext().getSharedPreferences("user_info_$uid", Context.MODE_PRIVATE)
+
+        // Find views
+        editGroup       = view.findViewById(R.id.edit_group)
+        summaryCard     = view.findViewById(R.id.card_user_info)
+        saveButton      = view.findViewById(R.id.btn_save)
+        loadingSpinner  = view.findViewById(R.id.progress_saving)
 
         genderGroup     = view.findViewById(R.id.radioGroup_gender)
         tilNickname     = view.findViewById(R.id.tilNickname)
@@ -60,18 +77,16 @@ class SettingsFragment : Fragment() {
         birthEdit       = view.findViewById(R.id.edit_birthdate)
         nicknameEdit    = view.findViewById(R.id.edit_nickname)
         mbtiEdit        = view.findViewById(R.id.edit_MBTI)
-        saveButton      = view.findViewById(R.id.btn_save)
+        birthTimeSpinner= view.findViewById(R.id.spinner_birthtime)
         infoSummary     = view.findViewById(R.id.text_info_summary)
         infoDetails     = view.findViewById(R.id.text_user_info)
-        loadingSpinner  = view.findViewById(R.id.progress_saving)
-        birthTimeSpinner= view.findViewById(R.id.spinner_birthtime)
 
-        // 광고
+        // Ad
         view.findViewById<AdView>(R.id.adView_settings).loadAd(AdRequest.Builder().build())
 
-        // 스피너 톤
-        val hintColor = Color.parseColor("#86A1B3")
-        val textColor = Color.parseColor("#E8F1F8")
+        // Spinner adapter (프리미엄 톤 유지)
+        val hintColor = 0xFF86A1B3.toInt()
+        val textColor = 0xFFE8F1F8.toInt()
         val adapter = object : ArrayAdapter<String>(
             requireContext(),
             R.layout.spinner_item,
@@ -84,22 +99,27 @@ class SettingsFragment : Fragment() {
                 return v
             }
             override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-                val v = layoutInflater.inflate(R.layout.spinner_dropdown_item, parent, false) as TextView
-                v.text = getItem(position)
-                v.setTextColor(if (position == 0) hintColor else textColor)
-                return v
+                val tv = layoutInflater.inflate(R.layout.spinner_item, parent, false) as TextView
+                tv.text = getItem(position)
+                tv.setTextColor(if (position == 0) hintColor else textColor)
+                return tv
             }
         }
         birthTimeSpinner.adapter = adapter
-        birthTimeSpinner.setSelection(birthTimes.indexOf(prefs.getString("birth_time", "선택안함")).coerceAtLeast(0), false)
+        birthTimeSpinner.setSelection(
+            birthTimes.indexOf(prefs.getString("birth_time", "선택안함")).coerceAtLeast(0), false
+        )
 
-        // 생년월일: 아이콘/필드 클릭 모두 달력
+        // 🔹 로컬 캐시로 즉시 UI 모드/필드 세팅 → 깜빡임 제거
+        loadUserInfo()
+
+        // 생년월일 피커
         fun openBirthPicker() = showDatePicker()
         tilBirthdate.setEndIconOnClickListener { openBirthPicker() }
         birthEdit.setOnClickListener { openBirthPicker() }
         view.findViewById<View>(R.id.label_birthdate).setOnClickListener { openBirthPicker() }
 
-        // MBTI 대문자 + 에러 클리어
+        // MBTI 대문자화(옵션 필드)
         mbtiEdit.doAfterTextChanged {
             val up = it.toString().uppercase(Locale.ROOT)
             if (mbtiEdit.text.toString() != up) {
@@ -108,18 +128,20 @@ class SettingsFragment : Fragment() {
             }
             tilMBTI.error = null
         }
-        // 닉네임/생년월일 에러 클리어
         nicknameEdit.doAfterTextChanged { tilNickname.error = null }
 
-        // 원격 → 로컬 캐시 → UI
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+        // 원격 → 로컬 → UI 최신화 (조용히 갱신)
         FirestoreManager.getUserProfile(uid) { map ->
             if (map != null) {
-                prefs.edit().apply { map.forEach { (k, v) -> putString(k, v.toString()) }; apply() }
+                prefs.edit().apply {
+                    map.forEach { (k, v) -> putString(k, v.toString()) }
+                    apply()
+                }
             }
-            loadUserInfo()
+            loadUserInfo() // 최신값 반영 (무음 업데이트)
         }
 
+        // 저장/수정 버튼
         saveButton.setOnClickListener {
             it.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.scale_up))
             if (isEditMode) {
@@ -130,6 +152,7 @@ class SettingsFragment : Fragment() {
             }
         }
 
+        // 로그아웃
         view.findViewById<View>(R.id.btn_logout).setOnClickListener {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("로그아웃")
@@ -137,7 +160,8 @@ class SettingsFragment : Fragment() {
                 .setPositiveButton("확인") { _, _ ->
                     FirebaseAuth.getInstance().signOut()
                     val intent = android.content.Intent(requireContext(), LoginActivity::class.java)
-                    intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or
+                            android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                 }
                 .setNegativeButton("취소", null)
@@ -163,7 +187,10 @@ class SettingsFragment : Fragment() {
             val cal = Calendar.getInstance()
             android.app.DatePickerDialog(
                 requireContext(),
-                { _, y, m, d -> birthEdit.setText("${y}년 ${m + 1}월 ${d}일"); tilBirthdate.error = null },
+                { _, y, m, d ->
+                    birthEdit.setText("${y}년 ${m + 1}월 ${d}일")
+                    tilBirthdate.error = null
+                },
                 cal.get(Calendar.YEAR),
                 cal.get(Calendar.MONTH),
                 cal.get(Calendar.DAY_OF_MONTH)
@@ -171,12 +198,13 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    /** 로컬 캐시 기반으로 즉시 화면 구성 */
     private fun loadUserInfo() {
-        val gender   = prefs.getString("gender", "") ?: ""
-        val birth    = prefs.getString("birthdate", "") ?: ""
-        val nickname = prefs.getString("nickname", "") ?: ""
-        val mbti     = prefs.getString("mbti", "") ?: ""
-        val birthTime= prefs.getString("birth_time", "선택안함") ?: "선택안함"
+        val gender    = prefs.getString("gender", "") ?: ""
+        val birth     = prefs.getString("birthdate", "") ?: ""
+        val nickname  = prefs.getString("nickname", "") ?: ""
+        val mbti      = prefs.getString("mbti", "") ?: ""
+        val birthTime = prefs.getString("birth_time", "선택안함") ?: "선택안함"
 
         birthEdit.setText(birth)
         nicknameEdit.setText(nickname)
@@ -186,54 +214,56 @@ class SettingsFragment : Fragment() {
         when (gender) {
             "남성" -> view?.findViewById<RadioButton>(R.id.radio_male)?.isChecked = true
             "여성" -> view?.findViewById<RadioButton>(R.id.radio_female)?.isChecked = true
-            else -> genderGroup.clearCheck()
+            else   -> genderGroup.clearCheck()
         }
 
-        val hasAll = gender.isNotBlank() && birth.isNotBlank() && nickname.isNotBlank() &&
-                mbti.length == 4 && birthTime != "선택안함"
-        toggleEditMode(!hasAll)
-        if (hasAll) updateInfoDisplay(gender, birth, birthTime, nickname, mbti)
+        // ✅ 필수값만 확인 (닉네임/생년월일/성별). MBTI, 출생시간은 옵션.
+        val hasRequired = nickname.isNotBlank() && birth.isNotBlank() && gender.isNotBlank()
+        toggleEditMode(!hasRequired)
+        if (hasRequired) updateInfoDisplay(gender, birth, birthTime, nickname, mbti)
     }
 
-    private fun updateInfoDisplay(gender: String, birth: String, birthTime: String, nickname: String, mbti: String) {
+    private fun updateInfoDisplay(
+        gender: String, birth: String, birthTime: String, nickname: String, mbti: String
+    ) {
         infoSummary.text = "$nickname 님의 프로필"
-        val mbtiMeaning = getMbtiMeaning(mbti)
-        val text = buildString {
-            append("🧑 닉네임: ").append(nickname).append("\n")
-            append("🎂 생일: ").append(birth).append("\n")
-            append("🕰️ 태어난 시간: ").append(birthTime).append("\n")
-            append("⚧️ 성별: ").append(gender).append("\n")
-            append("🔮 MBTI: ").append(mbti).append("\n")
-            append("💬 ").append(mbtiMeaning)
+        val sb = StringBuilder()
+            .append("🧑 닉네임: ").append(nickname).append("\n")
+            .append("🎂 생일: ").append(birth).append("\n")
+            .append("🕰️ 태어난 시간: ").append(birthTime).append("\n")
+            .append("⚧️ 성별: ").append(gender)
+
+        if (mbti.isNotBlank()) {
+            sb.append("\n").append("🔮 MBTI: ").append(mbti)
+            val meaning = getMbtiMeaning(mbti)
+            if (meaning.isNotBlank()) sb.append("\n").append("💬 ").append(meaning)
         }
-        infoDetails.text = text
-        view?.findViewById<View>(R.id.card_user_info)?.visibility = View.VISIBLE
+
+        infoDetails.text = sb.toString()
+        summaryCard.visibility = View.VISIBLE
     }
 
+    /** 부드러운 전환으로 ‘대기업 느낌’ */
     private fun toggleEditMode(enableEdit: Boolean) {
         isEditMode = enableEdit
-        val v = view ?: return
-        val editors = listOf<View>(
-            v.findViewById(R.id.label_nickname),
-            v.findViewById(R.id.label_birthdate),
-            v.findViewById(R.id.label_birthtime),
-            v.findViewById(R.id.label_gender),
-            v.findViewById(R.id.label_mbti),
-            v.findViewById(R.id.tilNickname),
-            v.findViewById(R.id.tilBirthdate),
-            v.findViewById(R.id.spinner_birthtime),
-            v.findViewById(R.id.radioGroup_gender),
-            v.findViewById(R.id.tilMBTI)
-        )
-        val summaryCard = v.findViewById<View>(R.id.card_user_info)
+        val root = view ?: return
+
+        val transition = TransitionSet().apply {
+            ordering = TransitionSet.ORDERING_TOGETHER
+            addTransition(Fade(Fade.OUT))
+            addTransition(Slide(Gravity.TOP))
+            addTransition(Fade(Fade.IN))
+            duration = 180
+        }
+        TransitionManager.beginDelayedTransition(root as ViewGroup, transition)
 
         if (enableEdit) {
-            editors.forEach { it.visibility = View.VISIBLE }
+            editGroup.visibility = View.VISIBLE
             summaryCard.visibility = View.GONE
             saveButton.text = "저장"
             saveButton.isEnabled = true
         } else {
-            editors.forEach { it.visibility = View.GONE }
+            editGroup.visibility = View.GONE
             summaryCard.visibility = View.VISIBLE
             saveButton.text = "수정"
             saveButton.isEnabled = true
@@ -257,86 +287,83 @@ class SettingsFragment : Fragment() {
         saveButton.text = "저장 중…"
         loadingSpinner.visibility = View.VISIBLE
 
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
         val gender = when (genderGroup.checkedRadioButtonId) {
             R.id.radio_male -> "남성"
             R.id.radio_female -> "여성"
             else -> ""
         }
-        val birth    = birthEdit.text?.toString()?.trim().orEmpty()
-        val nickname = nicknameEdit.text?.toString()?.trim().orEmpty()
-        val mbti     = mbtiEdit.text?.toString()?.trim()?.uppercase(Locale.ROOT).orEmpty()
-        val birthTime= birthTimeSpinner.selectedItem as String
-        val mbtiMeaning = getMbtiMeaning(mbti)
+        val birth     = birthEdit.text?.toString()?.trim().orEmpty()
+        val nickname  = nicknameEdit.text?.toString()?.trim().orEmpty()
+        val mbti      = mbtiEdit.text?.toString()?.trim()?.uppercase(Locale.ROOT).orEmpty()
+        val birthTime = birthTimeSpinner.selectedItem as String
 
         val profile = mapOf(
             "gender" to gender,
             "birthdate" to birth,
             "nickname" to nickname,
-            "mbti" to mbti,
-            "birth_time" to birthTime,
-            "mbti_meaning" to mbtiMeaning
+            "mbti" to mbti,                     // 옵션
+            "birth_time" to birthTime           // 옵션
         )
 
-        // 로컬 먼저
+        // 로컬 선저장 → 즉시 반영
         prefs.edit().apply { profile.forEach { (k, v) -> putString(k, v) }; apply() }
 
-        // 원격 저장
-        FirestoreManager.saveUserProfile(userId, profile) {
+        // 원격 저장 후 UI 업데이트
+        FirestoreManager.saveUserProfile(uid, profile) {
             loadingSpinner.visibility = View.GONE
             Snackbar.make(requireView(), "저장되었습니다!", Snackbar.LENGTH_SHORT).show()
             updateInfoDisplay(gender, birth, birthTime, nickname, mbti)
-            toggleEditMode(false)
+            toggleEditMode(false)   // 저장 후 즉시 요약 모드
             isSaving = false
         }
     }
 
-    private fun getMbtiMeaning(mbti: String): String = when (mbti) {
-        "INFP" -> "이상주의적이며 감성적인 사람. 몽환적이고 의미 있는 꿈을 많이 꿉니다."
-        "INFJ" -> "통찰력 있고 조용한 성격. 상징적인 꿈과 연결됨."
-        "ENFP" -> "열정과 상상력이 풍부. 감성적이고 자유로운 꿈을 꿉니다."
-        "ENFJ" -> "타인을 이해하고 돕고자 하는 성향. 관계 중심의 꿈을 자주 꿉니다."
-        "INTP" -> "논리적이고 탐구적인 성향. 퍼즐 구조나 원리 기반의 꿈을 자주 꿉니다."
-        "INTJ" -> "전략적이고 계획적인 성향. 미래 예측형 꿈을 자주 꿉니다."
-        "ENTP" -> "아이디어가 넘치고 토론을 즐김. 창의적이고 스토리 있는 꿈 유형."
-        "ENTJ" -> "리더십이 강하고 목표지향적. 도전과 통제 관련 꿈을 자주 꿉니다."
-        "ISFP" -> "감성적이고 섬세한 예술가형. 풍경이나 감각 중심의 꿈이 많습니다."
-        "ISTP" -> "탐험적이고 현실적인 성향. 행동 중심의 꿈을 자주 꿉니다."
-        "ESFP" -> "즉흥적이고 즐거움을 추구. 화려하고 생생한 꿈을 잘 꿉니다."
-        "ESTP" -> "스릴과 모험을 즐김. 액션이나 위기 상황의 꿈이 많습니다."
-        "ISFJ" -> "헌신적이고 배려심 많은 성향. 가족이나 보호에 관련된 꿈이 많습니다."
-        "ISTJ" -> "책임감 있고 실용적인 성격. 정돈되고 사실적인 꿈을 잘 꿉니다."
-        "ESFJ" -> "친절하고 협동적인 성향. 사람들과 조화로운 상황의 꿈이 많습니다."
-        "ESTJ" -> "조직적이고 실용적인 리더형. 목표 달성이나 구조화된 꿈이 많습니다."
-        else -> "MBTI 유형 기반 해석 정보가 없습니다."
+    private fun getMbtiMeaning(mbti: String): String = when (mbti.uppercase(Locale.ROOT)) {
+        "INFP" -> "이상주의적이며 감성적인 경향. 상징과 감정이 풍부한 꿈을 꾸는 편."
+        "INFJ" -> "통찰이 깊고 조용한 성향. 상징적 메시지가 담긴 꿈과 연결되는 경우가 많음."
+        "ENFP" -> "상상력이 풍부하고 에너지가 높음. 스토리텔링이 강한 꿈을 자주 경험."
+        "ENFJ" -> "관계 중심적이고 배려심 많음. 사람 간 상호작용이 두드러진 꿈을 꾸기 쉬움."
+        "INTP" -> "논리·탐구형. 구조와 규칙성이 드러나는 꿈을 선호하는 경향."
+        "INTJ" -> "전략적·계획적. 미래 지향적 시나리오의 꿈을 경험하기도 함."
+        "ENTP" -> "아이디어가 넘치고 변주를 즐김. 창의적 반전이 있는 꿈을 자주 경험."
+        "ENTJ" -> "목표지향 리더형. 도전·조직화 관련 테마의 꿈을 볼 수 있음."
+        "ISFP" -> "섬세한 감수성. 감각·풍경 묘사가 선명한 꿈이 특징."
+        "ISTP" -> "현실적·탐험가형. 행동 중심·문제 해결형 꿈 경향."
+        "ESFP" -> "즉흥적·경험추구. 생생하고 화려한 장면의 꿈 빈도 높음."
+        "ESTP" -> "스릴 선호. 액션과 긴장감 있는 꿈이 잦을 수 있음."
+        "ISFJ" -> "헌신적·보호지향. 가족·케어 테마가 자주 등장."
+        "ISTJ" -> "책임감·실용성. 사실적·정돈된 꿈 경향."
+        "ESFJ" -> "협동적·친화형. 조화로운 관계가 핵심인 꿈."
+        "ESTJ" -> "조직·규범 중시. 목표 달성과 절차 중심 꿈."
+        else -> ""
     }
 
+    /** 필수: 닉네임/생년월일/성별만 검사 (MBTI/출생시간은 옵션) */
     private fun validateInput(): Boolean {
-        // 에러 초기화
         tilNickname.error = null
         tilBirthdate.error = null
         tilMBTI.error = null
 
+        val nickname = nicknameEdit.text?.toString()?.trim().orEmpty()
+        val birth    = birthEdit.text?.toString()?.trim().orEmpty()
         val gender = when (genderGroup.checkedRadioButtonId) {
             R.id.radio_male -> "남성"
             R.id.radio_female -> "여성"
             else -> ""
         }
-        val nickname = nicknameEdit.text?.toString()?.trim().orEmpty()
-        val birth = birthEdit.text?.toString()?.trim().orEmpty()
-        val mbti = mbtiEdit.text?.toString()?.trim()?.uppercase(Locale.ROOT).orEmpty()
-        val birthTime = birthTimeSpinner.selectedItem as String
 
         var ok = true
         if (nickname.isEmpty()) { tilNickname.error = "닉네임을 입력해주세요."; ok = false }
         if (birth.isEmpty())    { tilBirthdate.error = "생년월일을 선택해주세요."; ok = false }
-        if (mbti.length != 4 || !"^(I|E)(N|S)(F|T)(P|J)$".toRegex().matches(mbti)) {
+        if (gender.isEmpty())   { Snackbar.make(requireView(), "성별을 선택해주세요.", Snackbar.LENGTH_SHORT).show(); ok = false }
+
+        // MBTI는 형식 검사만 “입력했을 때” 적용 (옵션)
+        val mbtiRaw = mbtiEdit.text?.toString()?.trim().orEmpty()
+        if (mbtiRaw.isNotEmpty() && !Regex("^(I|E)(N|S)(F|T)(P|J)$").matches(mbtiRaw.uppercase(Locale.ROOT))) {
             tilMBTI.error = "MBTI 형식을 확인해주세요. (예: INFP)"; ok = false
         }
-        if (gender.isEmpty()) { Snackbar.make(requireView(), "성별을 선택해주세요.", Snackbar.LENGTH_SHORT).show(); ok = false }
-        if (birthTime == "선택안함") { Snackbar.make(requireView(), "태어난 시간을 선택해주세요.", Snackbar.LENGTH_SHORT).show(); ok = false }
-
         return ok
     }
 }

@@ -1,3 +1,4 @@
+// file: app/src/main/java/com/example/dreamindream/DreamFragment.kt
 package com.example.dreamindream
 
 import android.content.Context
@@ -294,33 +295,40 @@ class DreamFragment : Fragment() {
         lottieLoading?.apply { cancelAnimation(); visibility = View.GONE }
     }
 
-    // ---- 텍스트 스타일링 (헤더에 색/볼드/사이즈) ----
+    // ---- 텍스트 정리 + 스타일링 (모든 ** 제거 + 헤더 색/볼드/사이즈) ----
     private fun styleResult(raw: String): CharSequence {
-        // ‘### ’ 같은 마크다운 헤더 토큰 제거
-        val clean = raw.replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")
+        // 1) 마크다운 헤더 토큰 제거
+        var clean = raw.replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")
+        // 2) 굵게 표기(** … **) 전부 제거
+        clean = clean.replace("**", "")
+        // 3) 코드블록/인라인 백틱 제거
+        clean = clean.replace(Regex("`{1,3}"), "")
+        // 4) 리스트 기호 통일(-, * -> •)
+        clean = clean.replace(Regex("(?m)^\\s*[-*]\\s+"), "• ")
+
         val sb = SpannableStringBuilder(clean)
 
-        // 헤더 라인 매칭 (이모지 시작)
-        val headerRegex = Regex("(?m)^(💭\\s*꿈이 전하는 메시지|🧠\\s*핵심 상징 해석|📌\\s*예지 포인트|☀️\\s*오늘의 활용 팁|🎯\\s*오늘의 행동\\s*3가지.*?)$")
-        val matches = headerRegex.findAll(clean)
+        // 헤더 라벨과 컬러 매핑 (이모지 유무 모두 대응)
+        data class H(val emoji: String, val label: String, val color: Int)
+        val headers = listOf(
+            H("💭", "꿈이 전하는 메시지", Color.parseColor("#9BE7FF")),
+            H("🧠", "핵심 상징 해석",   Color.parseColor("#FFB3C1")),
+            H("📌", "예지 포인트",     Color.parseColor("#FFD166")),
+            H("☀️", "오늘의 활용 팁",  Color.parseColor("#FFE082")),
+            H("🎯", "오늘의 행동 3가지",Color.parseColor("#A5D6A7"))
+        )
 
-        // 색 팔레트
-        fun colorFor(h: String) = when {
-            h.startsWith("💭") -> Color.parseColor("#9BE7FF") // 하늘
-            h.startsWith("🧠") -> Color.parseColor("#FFB3C1") // 핑크
-            h.startsWith("📌") -> Color.parseColor("#FFD166") // 노랑
-            h.startsWith("☀️") -> Color.parseColor("#FFE082") // 앰버
-            else               -> Color.parseColor("#A5D6A7") // 초록 (🎯)
+        headers.forEach { h ->
+            // 라인 시작에 (이모지 있을 수도/없을 수도) + 라벨 매칭
+            val pattern = Regex("(?m)^(?:${Regex.escape(h.emoji)}\\s*)?${Regex.escape(h.label)}.*$")
+            pattern.findAll(clean).forEach { m ->
+                val s = m.range.first
+                val e = m.range.last + 1
+                sb.setSpan(ForegroundColorSpan(h.color), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                sb.setSpan(StyleSpan(Typeface.BOLD), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                sb.setSpan(RelativeSizeSpan(1.06f), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
         }
-
-        matches.forEach { m ->
-            val start = m.range.first
-            val end   = m.range.last + 1
-            sb.setSpan(ForegroundColorSpan(colorFor(m.value)), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            sb.setSpan(StyleSpan(Typeface.BOLD), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            sb.setSpan(RelativeSizeSpan(1.06f), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        }
-
         return sb
     }
 
@@ -360,22 +368,31 @@ class DreamFragment : Fragment() {
             val v = View.inflate(context, R.layout.dream_result_dialog, null)
             val tv = v.findViewById<TextView>(R.id.resultTextView)
 
-            // 헤더 스타일 동일 적용
-            val clean = result.ifBlank { "해몽 결과가 비어있습니다." }.replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")
+            // 동일한 정리/스타일 적용
+            var clean = result.ifBlank { "해몽 결과가 비어있습니다." }
+                .replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")
+                .replace("**", "")
+                .replace(Regex("`{1,3}"), "")
+                .replace(Regex("(?m)^\\s*[-*]\\s+"), "• ")
+
             val sb = SpannableStringBuilder(clean)
-            val headerRegex = Regex("(?m)^(💭\\s*꿈이 전하는 메시지|🧠\\s*핵심 상징 해석|📌\\s*예지 포인트|☀️\\s*오늘의 활용 팁|🎯\\s*오늘의 행동\\s*3가지.*?)$")
-            fun colorFor(h: String) = when {
-                h.startsWith("💭") -> Color.parseColor("#9BE7FF")
-                h.startsWith("🧠") -> Color.parseColor("#FFB3C1")
-                h.startsWith("📌") -> Color.parseColor("#FFD166")
-                h.startsWith("☀️") -> Color.parseColor("#FFE082")
-                else               -> Color.parseColor("#A5D6A7")
-            }
-            headerRegex.findAll(clean).forEach { m ->
-                val s = m.range.first; val e = m.range.last + 1
-                sb.setSpan(ForegroundColorSpan(colorFor(m.value)), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                sb.setSpan(StyleSpan(Typeface.BOLD), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                sb.setSpan(RelativeSizeSpan(1.06f), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+            data class H(val emoji: String, val label: String, val color: Int)
+            val headers = listOf(
+                H("💭", "꿈이 전하는 메시지", Color.parseColor("#9BE7FF")),
+                H("🧠", "핵심 상징 해석",   Color.parseColor("#FFB3C1")),
+                H("📌", "예지 포인트",     Color.parseColor("#FFD166")),
+                H("☀️", "오늘의 활용 팁",  Color.parseColor("#FFE082")),
+                H("🎯", "오늘의 행동 3가지",Color.parseColor("#A5D6A7"))
+            )
+            headers.forEach { h ->
+                val pattern = Regex("(?m)^(?:${Regex.escape(h.emoji)}\\s*)?${Regex.escape(h.label)}.*$")
+                pattern.findAll(clean).forEach { m ->
+                    val s = m.range.first; val e = m.range.last + 1
+                    sb.setSpan(ForegroundColorSpan(h.color), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    sb.setSpan(StyleSpan(Typeface.BOLD), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    sb.setSpan(RelativeSizeSpan(1.06f), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
             }
             tv.text = sb
 

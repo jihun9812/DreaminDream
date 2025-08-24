@@ -1,3 +1,4 @@
+// file: app/src/main/java/com/example/dreamindream/CalendarFragment.kt
 package com.example.dreamindream
 
 import android.content.Context
@@ -7,10 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.dreamindream.databinding.FragmentCalendarBinding
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
@@ -38,12 +41,15 @@ class CalendarFragment : Fragment() {
     private val holidays = mutableListOf<Holiday>()
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy년 M월")
 
-    // ---- Palette ----
+    // Palette
     private val colSun = Color.parseColor("#FF6B6B")
     private val colSat = Color.parseColor("#6FA8FF")
     private val colText = Color.parseColor("#E8F1F8")
     private val colDim = Color.parseColor("#A0A0A0")
     private val colAccent = Color.parseColor("#37C2D0")
+
+    // Inline list
+    private lateinit var adapter: DreamInlineAdapter
 
     override fun onCreateView(
         inflater: android.view.LayoutInflater,
@@ -57,13 +63,24 @@ class CalendarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 월 스크롤 시 타이틀 페이드
+        // Recycler
+        adapter = DreamInlineAdapter(mutableListOf(),
+            onOpen = { entry ->
+                DreamFragment.showResultDialog(requireContext(), entry.result)
+            },
+            onDelete = { pos, entry ->
+                confirmDelete { deleteEntryAt(pos) }
+            }
+        )
+        binding.recyclerDreams.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerDreams.adapter = adapter
+
+        // Calendar
         binding.calendarView.monthScrollListener = { month ->
             updateMonthText(month.yearMonth)
             binding.textViewMonthYear.alpha = 0f
             binding.textViewMonthYear.animate().alpha(1f).setDuration(200).start()
         }
-        // 오버스크롤 글로우 제거
         binding.calendarView.overScrollMode = View.OVER_SCROLL_NEVER
 
         val currentMonth = YearMonth.now()
@@ -76,15 +93,15 @@ class CalendarFragment : Fragment() {
         updateMonthText(currentMonth)
         setupAds(view)
 
-        // 로컬 캐시 갱신(Firestore→SharedPreferences) 후 캘린더 리프레시
+        // Firestore->로컬 동기화 후 반영
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
             FirestoreManager.getAllDreamDates(requireContext(), userId) {
                 binding.calendarView.notifyCalendarChanged()
-                selectedDate?.let { updateSelectedDayCard(it) }
+                selectedDate?.let { refreshInlineListFor(it) }
             }
         } else {
-            selectedDate?.let { updateSelectedDayCard(it) }
+            selectedDate?.let { refreshInlineListFor(it) }
         }
     }
 
@@ -120,7 +137,7 @@ class CalendarFragment : Fragment() {
         val isToday = day.date == LocalDate.now()
         val holiday = holidays.find { it.date == day.date }
 
-        // 기록 도트(강도) 반영
+        // 기록 도트(강도)
         val count = getDreamCount(day.date)
         container.dreamIndicator.apply {
             visibility = if (count > 0) View.VISIBLE else View.GONE
@@ -178,10 +195,8 @@ class CalendarFragment : Fragment() {
         oldDate?.let { binding.calendarView.notifyDateChanged(it) }
         binding.calendarView.notifyDateChanged(date)
 
-        // 월 텍스트 갱신
         updateMonthText(YearMonth.from(date))
 
-        // 좌상단 공휴일 라벨 토글
         if (holiday != null) {
             binding.holidayTextView.text = holiday.name
             binding.holidayTextView.visibility = View.VISIBLE
@@ -190,8 +205,7 @@ class CalendarFragment : Fragment() {
             binding.holidayTextView.visibility = View.GONE
         }
 
-        // 하단 요약 카드 갱신
-        updateSelectedDayCard(date)
+        refreshInlineListFor(date)
     }
 
     private fun setupEventListeners() {
@@ -240,52 +254,84 @@ class CalendarFragment : Fragment() {
         binding.textViewMonthYear.text = dateFormatter.format(month)
     }
 
-    // --- 요약 카드 & 데이터 유틸 ---
+    // --- Inline list helpers ---
+
+    private fun refreshInlineListFor(date: LocalDate) {
+        // 타이틀
+        val dow = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.KOREA) // 월/화/...
+        binding.dreamListTitle.text = "${date} (${dow})의 꿈들"
+
+        val arr = getDreamArray(date)
+        val list = mutableListOf<DreamEntry>()
+        for (i in 0 until arr.length()) {
+            val obj = arr.getJSONObject(i)
+            val preview = obj.optString("dream").replace("\n", " ").trim()
+            list += DreamEntry(
+                dream = if (preview.length > 60) preview.substring(0, 60) + "…" else preview,
+                result = obj.optString("result")
+            )
+        }
+
+        if (list.isEmpty()) {
+            binding.emptyDreamText.visibility = View.VISIBLE
+            binding.recyclerDreams.visibility = View.GONE
+        } else {
+            binding.emptyDreamText.visibility = View.GONE
+            binding.recyclerDreams.visibility = View.VISIBLE
+        }
+        adapter.replaceAll(list)
+    }
+
+    private fun deleteEntryAt(pos: Int) {
+        val date = selectedDate ?: return
+        val arr = getDreamArray(date)
+        if (pos !in 0 until arr.length()) return
+
+        // 1) 로컬 삭제
+        val newArr = JSONArray()
+        for (i in 0 until arr.length()) if (i != pos) newArr.put(arr.getJSONObject(i))
+        saveDreamArray(date, newArr)
+
+        // 2) UI 반영
+        adapter.removeAt(pos)
+        if (adapter.itemCount == 0) {
+            binding.emptyDreamText.visibility = View.VISIBLE
+            binding.recyclerDreams.visibility = View.GONE
+        }
+        // 3) 달력 도트 갱신
+        binding.calendarView.notifyDateChanged(date)
+    }
+
+    private fun confirmDelete(onConfirm: () -> Unit) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("삭제하시겠습니까?")
+            .setMessage("이 꿈 기록을 삭제하면 되돌릴 수 없습니다.")
+            .setPositiveButton("삭제") { _, _ -> onConfirm() }
+            .setNegativeButton("취소", null)
+            .show()
+    }
 
     private fun Int.dp(): Int = (this * resources.displayMetrics.density).toInt()
 
-    private fun getDreamArray(date: LocalDate): JSONArray {
+    private fun prefsForUser(): android.content.SharedPreferences {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
-        val prefs = if (userId != null) {
+        return if (userId != null)
             requireContext().getSharedPreferences("dream_history_$userId", Context.MODE_PRIVATE)
-        } else {
+        else
             requireContext().getSharedPreferences("dream_history", Context.MODE_PRIVATE)
-        }
+    }
+
+    private fun getDreamArray(date: LocalDate): JSONArray {
+        val prefs = prefsForUser()
         return JSONArray(prefs.getString(date.toString(), "[]") ?: "[]")
     }
 
+    private fun saveDreamArray(date: LocalDate, arr: JSONArray) {
+        val prefs = prefsForUser()
+        prefs.edit().putString(date.toString(), arr.toString()).apply()
+    }
+
     private fun getDreamCount(date: LocalDate): Int = getDreamArray(date).length()
-
-    private fun previewOf(obj: JSONObject): String {
-        val first = obj.optString("dream").replace("\n", " ").trim()
-        return if (first.length > 50) first.substring(0, 50) + "…" else first
-    }
-
-    private fun updateSelectedDayCard(date: LocalDate) {
-        val arr = getDreamArray(date)
-        if (arr.length() == 0) {
-            binding.selectedDayCard.visibility = View.GONE
-            return
-        }
-
-        val dow = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.KOREA) // 월/화/...
-        binding.selectedDateTitle.text = "$date ($dow)"
-
-        val limit = minOf(2, arr.length())
-        val previews = buildString {
-            for (i in 0 until limit) {
-                append("• ").append(previewOf(arr.getJSONObject(i)))
-                if (i < limit - 1) append("\n")
-            }
-            if (arr.length() > limit) append("\n외 ${arr.length() - limit}개 더 있음")
-        }
-        binding.selectedDreamPreview.text = previews
-        binding.selectedDayCard.visibility = View.VISIBLE
-
-        binding.btnOpenDreamList.setOnClickListener {
-            DreamListDialog.newInstance(date).show(parentFragmentManager, "DreamListDialog")
-        }
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

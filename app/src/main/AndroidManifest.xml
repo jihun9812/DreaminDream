@@ -47,10 +47,21 @@
             android:launchMode="singleTop"
             android:exported="true" />
 
-        <!-- 여기 오탈자 있었음: '/> />' → '/>' 로 수정 -->
         <activity
             android:name=".LoginActivity"
             android:exported="true"
-            android:theme="@style/Theme.DreaminDream" />
+            android:theme="@style/Theme.DreaminDream">
+
+            <!-- ✅ 인증 메일 링크 처리 -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="dreamindream.app"
+                    android:pathPrefix="/__/auth/action" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

@@ -45,6 +45,7 @@ import org.json.JSONObject
 import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
+import android.util.Log
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -109,6 +110,7 @@ private fun mapToProfile(map: Map<String, Any?>): FortuneProfile? {
     if (nickname.isBlank() || birthIso.isBlank() || gender.isBlank()) return null
     return FortuneProfile(nickname, birthIso, gender, mbti, birthTime)
 }
+private const val TAG = "FortuneFragment"
 
 class FortuneFragment : Fragment() {
 
@@ -124,6 +126,7 @@ class FortuneFragment : Fragment() {
     private lateinit var resultText: TextView
     private lateinit var loadingView: LottieAnimationView
     private lateinit var fortuneButton: MaterialButton
+
 
     private lateinit var chips: ChipGroup
     private lateinit var viewLuckyColor: View
@@ -379,11 +382,14 @@ class FortuneFragment : Fragment() {
             relayoutCardToTop()
             fortuneCard.visibility = View.VISIBLE
             expandFortuneCard(v)
+
+            // 로딩 중엔 로티만 보이도록 카드 컨텐츠 숨김
+            setCardContentVisible(false)
             showLoading(true)
 
             val u = loadUserInfoStrict(); val seed = seedForToday(u)
-            showPreviewDuringLoading(seed)  // 프리뷰
-            fetchFortune(u, todayKey(), seed, v) // ← 여기서 호출
+            // 바로 호출 (프리뷰 없이)
+            fetchFortune(u, todayKey(), seed, v)
         }
 
         btnDeep.setOnClickListener {
@@ -404,6 +410,7 @@ class FortuneFragment : Fragment() {
                 fortuneButton.visibility = View.GONE
                 relayoutCardToTop()
                 bindFromPayload(last)
+                setCardContentVisible(true)
                 expandFortuneCard(v)
             }
         }
@@ -508,19 +515,27 @@ class FortuneFragment : Fragment() {
         }
     }
 
-    /* ===== 로딩 프리뷰 ===== */
-    private fun showPreviewDuringLoading(seed: Int) {
-        val color = luckyPalette[abs(seed ushr 1) % luckyPalette.size]
-        val number = (Random(seed).nextInt(60) + 20)
-        val hours = (6..22).map { if (it < 12) "오전 ${it}시" else "오후 ${if (it == 12) 12 else it - 12}시" }
-        val time = hours[abs(seed ushr 3) % hours.size]
-        setLucky(color, number, time)
-        val (p, n, ng) = seededEmotions(seed)
-        setEmotionBars(p, n, ng)
-        setChecklist(buildEssentialChecklist(JSONObject().apply {
-            put("lucky", JSONObject().put("time", time))
-            put("sections", JSONObject().put("overall", JSONObject().put("score", 70)))
-        }))
+    /** 로딩 중 카드의 모든 컨텐츠 숨김/표시 */
+    private fun setCardContentVisible(visible: Boolean) {
+        val vis = if (visible) View.VISIBLE else View.INVISIBLE
+        // 상단 KPI
+        chips.visibility = vis
+        viewLuckyColor.visibility = vis
+        tvLuckyNumber.visibility = vis
+        tvLuckyTime.visibility = vis
+
+        barPos.visibility = vis; barNeu.visibility = vis; barNeg.visibility = vis
+        tvPos.visibility = vis;  tvNeu.visibility = vis;  tvNeg.visibility = vis
+
+        // 본문
+        sectionsContainer?.visibility = vis
+        resultText.visibility = vis
+        layoutChecklist.visibility = vis
+
+        // 하단 액션
+        btnCopy.visibility = vis
+        btnShare.visibility = vis
+        btnDeep.visibility = vis
     }
 
     /* ===== Bind ===== */
@@ -694,7 +709,21 @@ class FortuneFragment : Fragment() {
     /* ===== Networking (Daily) ===== */
     private fun fetchFortune(u: UserInfo, today: String, seed: Int, view: View, attempt: Int = 1) {
         if (!isAdded) return
+
+        // ── 요청 페이로드 미리 생성
         val body = buildDailyRequest(u, seed)
+
+        // 로그: 요청 직전(누가/언제/시드/모델/메시지 수)
+        val model = body.optString("model", "unknown")
+        val messagesCount = body.optJSONArray("messages")?.length() ?: -1
+        Log.d(TAG, "🚀 fetchFortune start | today=$today, seed=$seed, user=${u.nickname}, model=$model, messages=$messagesCount, attempt=$attempt")
+
+        // 디버그용으로 JSON 일부만 찍기 (민감정보/키 제외, 800자 제한)
+        runCatching {
+            val safePreview = body.toString().take(800)
+            Log.v(TAG, "🧾 request body preview: ${safePreview}")
+        }
+
         val req = Request.Builder()
             .url("https://api.openai.com/v1/chat/completions")
             .post(body.toString().toRequestBody("application/json".toMediaType()))
@@ -702,76 +731,183 @@ class FortuneFragment : Fragment() {
             .addHeader("Content-Type", "application/json")
             .build()
 
+        val t0 = System.currentTimeMillis()
+
         http.newCall(req).enqueue(object : Callback {
             override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
+                val dt = System.currentTimeMillis() - t0
+                Log.e(TAG, "❌ onFailure ($dt ms) | attempt=$attempt | error=${e.message}", e)
+
                 if (!isAdded) return
-                requireActivity().runOnUiThread { onFetchFailed(u, today, seed, view, attempt, e.message ?: "io") }
-            }
-            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
-                val raw = response.body?.string().orEmpty(); if (!isAdded) return
-                if (!response.isSuccessful) {
-                    requireActivity().runOnUiThread { onFetchFailed(u, today, seed, view, attempt, "http ${response.code}") }; return
-                }
                 requireActivity().runOnUiThread {
-                    showLoading(false)
+                    onFetchFailed(u, today, seed, view, attempt, e.message ?: "io")
+                }
+            }
+
+            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
+                val raw = response.body?.string().orEmpty()
+                val dt = System.currentTimeMillis() - t0
+
+                if (!isAdded) return
+
+                // HTTP 상태 로그
+                Log.d(TAG, "📩 onResponse ($dt ms) | code=${response.code} | len=${raw.length}")
+
+                if (!response.isSuccessful) {
+                    // 본문 일부 미리보기(길이 제한)
+                    Log.e(TAG, "⚠️ HTTP error ${response.code} | bodyPreview=${raw.take(400)}")
+                    requireActivity().runOnUiThread {
+                        onFetchFailed(u, today, seed, view, attempt, "http ${response.code}")
+                    }
+                    return
+                }
+
+                // 응답 JSON 미리보기 (길이 제한)
+                Log.v(TAG, "🧾 response body preview: ${raw.take(800)}")
+
+                requireActivity().runOnUiThread {
                     val payload = try {
                         val root = JSONObject(raw)
-                        val msg = root.getJSONArray("choices").getJSONObject(0).getJSONObject("message")
+                        val msg = root.getJSONArray("choices")
+                            .getJSONObject(0)
+                            .getJSONObject("message")
+
+                        // tool_calls 우선
                         val tc = msg.optJSONArray("tool_calls")
                         if (tc != null && tc.length() > 0) {
-                            val args = tc.getJSONObject(0).getJSONObject("function").getString("arguments")
+                            val args = tc.getJSONObject(0)
+                                .getJSONObject("function")
+                                .getString("arguments")
+                            Log.d(TAG, "🔧 tool_calls detected. args preview=${args.take(400)}")
                             validateAndFill(JSONObject(args), seed)
                         } else {
+                            // function_call (구형) 또는 content JSON
                             val fc = msg.optJSONObject("function_call")
-                            if (fc != null) validateAndFill(JSONObject(fc.optString("arguments", "{}")), seed)
-                            else parsePayloadAlways(msg.optString("content"), seed)
+                            if (fc != null) {
+                                val args = fc.optString("arguments", "{}")
+                                Log.d(TAG, "🧩 function_call detected. args preview=${args.take(400)}")
+                                validateAndFill(JSONObject(args), seed)
+                            } else {
+                                val content = msg.optString("content")
+                                Log.d(TAG, "✉️ content fallback. preview=${content.take(400)}")
+                                parsePayloadAlways(content, seed)
+                            }
                         }
-                    } catch (_: Exception) { parsePayloadAlways(raw, seed) }
+                    } catch (ex: Exception) {
+                        Log.w(TAG, "🟨 parse fallback path due to exception: ${ex.message}")
+                        parsePayloadAlways(raw, seed)
+                    }
 
+                    // 최종 보정 + 체크리스트 정제
                     val adjusted = finalizePayload(payload, seed).apply {
                         val cl = optJSONArray("checklist")
-                        val cleaned = sanitizeChecklist((0 until (cl?.length() ?: 0)).mapNotNull { cl?.optString(it) })
+                        val cleaned = sanitizeChecklist(
+                            (0 until (cl?.length() ?: 0)).mapNotNull { cl?.optString(it) }
+                        )
                         put("checklist", JSONArray().apply { cleaned.forEach { put(it) } })
                     }
 
+                    // 바인딩
                     lastPayload = adjusted
                     bindFromPayload(adjusted)
 
+                    // 캐시 & 오늘 사용 플래그
                     prefs.edit()
                         .putString("fortune_payload_${todayPersonaKey()}", adjusted.toString())
                         .putBoolean("fortune_seen_${todayPersonaKey()}", true)
                         .apply()
 
+                    // 버튼/레이아웃 정리
                     fortuneButton.visibility = View.GONE
                     relayoutCardToTop()
 
+                    // Firestore 저장
                     FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
                         saveDailyFortuneToFirestore(uid, today, adjusted)
                     }
+
+                    // 로딩 종료 → 카드 컨텐츠 표시
+                    showLoading(false)
+                    setCardContentVisible(true)
 
                     view.findViewById<ScrollView>(R.id.resultScrollView)?.post {
                         val sv = view.findViewById<ScrollView>(R.id.resultScrollView)
                         sv?.scrollTo(0, 0); sv?.fullScroll(View.FOCUS_UP)
                     }
                     expandFortuneCard(view)
+
+                    // 최종 로그: 핵심 KPI 요약
+                    val sec = adjusted.optJSONObject("sections")
+                    val overall = sec?.optJSONObject("overall")?.optInt("score", -1)
+                    val lucky = adjusted.optJSONObject("lucky")
+                    Log.i(
+                        TAG,
+                        "✅ bind done | overall=$overall, luckyColor=${lucky?.optString("colorHex")}, " +
+                                "luckyNum=${lucky?.optInt("number")}, luckyTime=${lucky?.optString("time")}"
+                    )
                 }
             }
         })
     }
 
-    private fun onFetchFailed(u: UserInfo, today: String, seed: Int, view: View, attempt: Int, reason: String) {
+
+    private fun onFetchFailed(
+        u: UserInfo,
+        today: String,
+        seed: Int,
+        view: View,
+        attempt: Int,
+        reason: String
+    ) {
         if (!isAdded) return
+
+        // 1) 로그: 왜 실패했는지 남기기
+        Log.w(TAG, "⚠️ onFetchFailed | attempt=$attempt | reason=$reason | today=$today, user=${u.nickname}")
+
         requireActivity().runOnUiThread {
+            // 2) 재시도 1회: 로딩 유지 + 카드 컨텐츠 가림(깜빡임 방지)
+            if (attempt == 1) {
+                // 재시도 직전에 로딩 모드로 전환
+                setCardContentVisible(false)
+                showLoading(true)
+                // 즉시 2차 시도
+                fetchFortune(u, today, seed, view, attempt = 2)
+                return@runOnUiThread
+            }
+
+            // 3) 최종 실패: 로딩 해제 + 컨텐츠 보이기
             showLoading(false)
-            if (attempt == 1) { fetchFortune(u, today, seed, view, attempt = 2); return@runOnUiThread }
-            resultText.text = "네트워크 오류가 발생했어요. ($reason)"
-            val (p, n, ng) = seededEmotions(seed); setEmotionBars(p, n, ng)
+            setCardContentVisible(true)
+
+            // 사용자 친화적 메시지로 매핑
+            val userMsg = when {
+                reason.startsWith("http 401") -> "인증 오류가 발생했어요. 설정의 API 키를 확인해주세요. ($reason)"
+                reason.startsWith("http 403") -> "접근이 거부되었어요. 권한/결제 상태를 확인해주세요. ($reason)"
+                reason.startsWith("http 404") -> "서버 주소를 찾지 못했어요. 잠시 후 다시 시도해주세요. ($reason)"
+                reason.startsWith("http 429") -> "호출 한도가 초과되었어요. 잠시 기다렸다가 다시 시도해주세요. ($reason)"
+                reason.startsWith("http 5")   -> "서버가 혼잡해요. 잠시 후 다시 시도해주세요. ($reason)"
+                reason.contains("timeout", ignoreCase = true) -> "네트워크가 지연되고 있어요. 연결 상태를 확인한 뒤 다시 시도해주세요. ($reason)"
+                else -> "네트워크 오류가 발생했어요. ($reason)"
+            }
+
+            // 결과 영역에 표시
+            resultText.text = userMsg
+
+            // 감정 바는 시드 기반 프리셋으로 채워서 '빈 화면' 느낌 방지
+            val (p, n, ng) = seededEmotions(seed)
+            setEmotionBars(p, n, ng)
+
+            // 버튼 복구(다시 시도할 수 있게 센터로)
             fortuneButton.visibility = View.VISIBLE
             applyPrimaryButtonStyle()
             moveButtonCentered()
             expandFortuneCard(view)
+
+            // 추가로 사용자에게 토스트도 한 번(가볍게)
+            Toast.makeText(requireContext(), userMsg, Toast.LENGTH_SHORT).show()
         }
     }
+
 
     /* ===== Schema & Prompts ===== */
     private fun fortuneSchema(): JSONObject {
@@ -786,7 +922,7 @@ class FortuneFragment : Fragment() {
                 put("required", JSONArray().apply { put("colorHex"); put("number"); put("time") })
                 put("properties", JSONObject().apply {
                     put("colorHex", JSONObject().put("type","string").put("pattern","#[0-9A-Fa-f]{6}"))
-                    put("number", JSONObject().put("type","integer").put("minimum",1).put("maximum",99))
+                    put("number", JSONObject().put("type","integer").put("minimum",10).put("maximum",99))
                     put("time", JSONObject().put("type","string"))
                 })
             })
@@ -822,22 +958,36 @@ class FortuneFragment : Fragment() {
         return obj
     }
 
+    private fun styleTokens(seed: Int): String {
+        val bank = listOf(
+            "차분한","단단한","선명한","기민한","유연한","담백한","리더십","분석적","균형감","민첩함",
+            "집중","꾸준함","정갈함","실용","낙관","침착","절제","명료","차분집중"
+        )
+        val r = Random(seed)
+        return (0 until 3).map { bank[r.nextInt(bank.size)] }.distinct().joinToString(",")
+    }
+
     private fun buildUserPrompt(u: UserInfo, seed: Int): String {
         val today = todayKey(); val weekday = SimpleDateFormat("EEEE", Locale.KOREAN).format(Date())
         val userAge = ageOf(u.birth); val tag = ageTag(userAge)
-        val avoidColors = JSONArray(getRecentLuckyColors()); val avoidTimes = JSONArray(getRecentLuckyTimes()); val palette = JSONArray(luckyPalette)
+        val avoidColors = JSONArray(getRecentLuckyColors()); val avoidTimes = JSONArray(getRecentLuckyTimes())
+        val avoidNumbers = JSONArray(getRecentLuckyNumbers())
+        val palette = JSONArray(luckyPalette)
+        val tone = styleTokens(seed)
         return """
 [사용자]
 nickname:"${u.nickname}", mbti:"${u.mbti}", birthdate:"${u.birth}", birth_time:"${u.birthTime}", gender:"${u.gender}"
-date:"$today ($weekday)", age:$userAge, age_tag:$tag, seed:$seed
+date:"$today ($weekday)", age:$userAge, age_tag:$tag, seed:$seed, tone:"$tone"
 
 [출력 가이드(엄격)]
+- **금지어:** ‘리듬’ 사용 금지.
 - **학생/학교 어휘 금지:** 숙제/과제/수업/강의/시험/퀴즈/레포트/제출 등 금지.
 - **연락 지시 금지:** 전화/메시지/DM/카톡/연락/초대 등 금지.
-- **checklist 규칙:** 개인지칭·특정 인물 금지, **시간/마감 표현 금지(오전/오후/몇 시/까지/전 X)**, 오늘 바로 실행 가능한 3개(12~18자). 예) "핵심 작업 1개 완료", "알림·메모 3분 정리", "가벼운 스트레칭 5분".
-- 모든 섹션 score는 40~100, 최소 1개 ≤55, 최소 1개 ≥85.
-- 각 섹션 text는 2~3문장(80~160자)로 **조금 더 상세히**, 성숙하고 담백한 톤 + 실행 팁 1개.
+- **checklist 규칙:** 개인지칭·특정 인물 금지, **시간/마감 표현 금지(오전/오후/몇 시/까지/전 X)**, 오늘 바로 실행 가능한 3개(12~18자).
+- 모든 섹션 score는 40~100, .
+- 각 섹션 text는 2~3문장(80~160자)로 **조금 더 상세히**, 성숙하고 담백한 톤 + 실행 팁 1개. tone="$tone"를 글결에 살짝 반영.
 - lucky.colorHex는 palette에서 선택, 최근(5일) 중복 회피(avoidColors/avoidTimes).
+- lucky.number는 10~99, 최근(5일) 회피(avoidNumbers).
 - lucky.time은 ‘오전/오후 HH시(~HH시)’ 표기(자시/축시 금지).
 - emotions는 현실적 분포, lottoNumbers는 6개(1~45).
 
@@ -845,7 +995,7 @@ date:"$today ($weekday)", age:$userAge, age_tag:$tag, seed:$seed
 - 내일 대비 계획을 tomorrow.long(400~700자)에 ‘아침/오후/저녁’ 소제목으로.
 - 오늘 최저 점수 영역 보완 액션(정량) 포함.
 
-palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes
+palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes, avoidNumbers:$avoidNumbers
         """.trimIndent()
     }
 
@@ -854,7 +1004,7 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes
         val mood = when {
             score >= 85 -> "상승세가 뚜렷합니다."
             score >= 70 -> "흐름이 안정적입니다."
-            score >= 55 -> "기복이 있으니 리듬을 조절하세요."
+            score >= 55 -> "기복이 있으니 속도를 조절하세요."
             else -> "기대치보다 낮아 기본을 단단히 하는 날입니다."
         }
         val text = when (key) {
@@ -867,8 +1017,8 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes
         }
         val advice = when (key) {
             "love"  -> "자극적인 화제 대신 편안한 대화로 분위기 안정시키기."
-            "study" -> "집중 20분 블록 2회, 핵심 1개만 끝내기."
-            "work"  -> "$luckyTime 전 ‘첫 작업 1개’에만 에너지 쓰기."
+            "study" -> "집중 구간 2회, 핵심 1개만 끝내기."
+            "work"  -> "한가지에 집중하기."
             "money" -> "필요 지출만 남기고 오늘 1건 점검하기."
             "overall"-> "큰 목표보다는 확실한 한 가지에 집중하기."
             else    -> "체크리스트 1개를 지금 실행해보세요."
@@ -890,12 +1040,19 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes
     }
 
     private fun validateAndFill(obj: JSONObject, seed: Int): JSONObject {
-        // Lucky
+        // Lucky (HEX는 팔레트 강제, 숫자·시간 히스토리 회피)
         val lucky = (obj.optJSONObject("lucky") ?: JSONObject()).apply {
-            if (!has("colorHex")) put("colorHex", pickLuckyColorFallback())
-            if (!has("number")) put("number", pickLuckyNumberFallback(seed))
-            if (!has("time")) put("time", pickLuckyTimeFallback())
-            put("time", humanizeLuckyTime(optString("time")))
+            val chosenHex = optString("colorHex").takeIf { it.matches(Regex("#[0-9A-Fa-f]{6}")) && luckyPalette.contains(it.uppercase()) }
+                ?: pickLuckyColorFallback()
+            var num = optInt("number", pickLuckyNumberFallback(seed)).coerceIn(10, 99)
+            if (getRecentLuckyNumbers().contains(num)) {
+                // 최근 숫자와 겹치면 seed기반 변형
+                num = ((num + (abs(seed) % 7) + 11) % 90) + 10
+            }
+            val t = humanizeLuckyTime(optString("time").ifBlank { pickLuckyTimeFallback() })
+            put("colorHex", chosenHex)
+            put("number", num)
+            put("time", t)
         }
         obj.put("lucky", lucky)
 
@@ -967,25 +1124,71 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes
 
     private fun finalizePayload(payload: JSONObject, seed: Int): JSONObject {
         payload.optJSONObject("lucky")?.let {
-            val c = it.optString("colorHex"); val t = it.optString("time")
+            val c = it.optString("colorHex"); val t = it.optString("time"); val n = it.optInt("number", -1)
             if (c.isNotBlank()) pushHistory("lucky_history_colors", c)
             if (t.isNotBlank()) pushHistory("lucky_history_times",  t)
+            if (n in 10..99)      pushHistory("lucky_history_numbers", n.toString())
         }
         return payload
     }
 
     /* ===== Section dialog (상세 강화) ===== */
+    /* ===== Section dialog (상세 강화) ===== */
     private fun buildSectionDetails(title: String, score: Int, text: String?, advice: String?): String {
         val base = text?.trim().orEmpty().ifBlank { "오늘의 흐름을 간결히 정리했어요." }
         val tip  = advice?.trim().orEmpty().let { if (it.isNotBlank()) "• $it" else "" }
-        val extra = when {
-            score >= 85 -> "• 기회: 자신 있는 방식으로 시작을 끊으면 파급력이 큽니다."
-            score >= 70 -> "• 유지: 리듬을 깨지 않도록 범위를 좁혀 꾸준함을 확보하세요."
-            score >= 55 -> "• 주의: 산만함을 줄이고 한 번에 하나만 처리하세요."
-            else        -> "• 복구: 쉬운 단계부터 작은 완성을 만들며 컨디션을 올리세요."
+
+        fun extraBy(title: String, score: Int): String {
+            return when (title) {
+                "총운" -> when {
+                    score >= 85 -> "• 기회: 자신 있는 첫 걸음을 크게 끊으면 하루 전체가 따라옵니다."
+                    score >= 70 -> "• 유지: 목표를 1개로 고정하고, 과감히 나머지는 내일로 미루세요."
+                    score >= 55 -> "• 주의: 선택을 줄여 피로를 낮추고, 가벼운 완료 1개로 리듬을 만드세요."
+                    else        -> "• 복구: 쉬운 일 10분만, 오늘은 감점 요소를 만들지 않는 것이 최우선."
+                }
+                "연애운" -> when {
+                    score >= 85 -> "• 기회: 가벼운 칭찬·공감으로 분위기가 빠르게 따뜻해집니다."
+                    score >= 70 -> "• 유지: 민감한 주제는 피하고, 편안한 대화로 속도를 맞추세요."
+                    score >= 55 -> "• 주의: 과한 해석은 금물. 텍스트 길이를 줄이고 간결하게."
+                    else        -> "• 복구: 기대치 낮추고 안부·감사 한 줄로 따뜻함만 남기기."
+                }
+                "학업운" -> when {
+                    score >= 85 -> "• 기회: 가장 자신 있는 파트로 25분 집중 2회, 성취감 극대화."
+                    score >= 70 -> "• 유지: 분량을 줄이되 핵심 개념 1개를 완전 정복."
+                    score >= 55 -> "• 주의: 노트 5줄 요약만 남기는 ‘가벼운 완성’ 전략."
+                    else        -> "• 복구: 예열용 문제 3개로 감을 되찾고 종료."
+                }
+                "직장운" -> when {
+                    score >= 85 -> "• 기회: 임팩트 높은 태스크 1건을 먼저 끝내면 생산성이 급상승."
+                    score >= 70 -> "• 유지: 범위를 좁혀 진행(서브태스크 2개 이내) → 전진감 확보."
+                    score >= 55 -> "• 주의: 동시에 여러 일 금지. 체크리스트를 반으로 줄이기."
+                    else        -> "• 복구: 난도 낮은 정리·정돈 1건으로 복귀 동력 만들기."
+                }
+                "재물운" -> when {
+                    score >= 85 -> "• 기회: 소액이라도 수익/정산을 확정하면 체감 효과가 큽니다."
+                    score >= 70 -> "• 유지: 오늘은 ‘지출 카테고리 하나’만 정리해 균형을 지키세요."
+                    score >= 55 -> "• 주의: 충동지출 경계. 비필수 구매는 보류하고 ‘비필수 0건’ 원칙."
+                    else        -> "• 복구: 지출 1건 확인·정리로 신뢰 회복부터."
+                }
+                "로또운" -> when {
+                    score >= 85 -> "• 참고: 숫자에 기대기보다 재정 습관을 강화하면 운의 누수가 줄어듭니다."
+                    score >= 70 -> "• 참고: 오락의 범위를 넘기지 않도록 상한선을 미리 정하세요."
+                    score >= 55 -> "• 참고: 기대치를 낮추고 장기적인 저축·투자 습관에 비중."
+                    else        -> "• 참고: 오늘은 휴식. 정보 탐색·분석에 시간을 쓰지 마세요."
+                }
+                else -> when {
+                    score >= 85 -> "• 기회: 자신 있는 방식으로 시작을 끊으면 파급력이 큽니다."
+                    score >= 70 -> "• 유지: 범위를 좁혀 꾸준함을 확보하세요."
+                    score >= 55 -> "• 주의: 산만함을 줄이고 한 번에 하나만 처리하세요."
+                    else        -> "• 복구: 쉬운 단계부터 작은 완성을 만들며 컨디션을 올리세요."
+                }
+            }
         }
+
+        val extra = extraBy(title, score)
         return listOf(base, tip, extra).filter { it.isNotBlank() }.joinToString("\n\n")
     }
+
 
     private fun openSectionDialog(title: String, score: Int, text: String?, advice: String?) {
         val content = layoutInflater.inflate(R.layout.dialog_fortune_section, null)
@@ -1091,7 +1294,7 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes
 
     private fun fetchDeepAnalysis(u: UserInfo, daily: JSONObject, seed: Int, cb: (JSONObject?, String?) -> Unit) {
         val body = JSONObject().apply {
-            put("model","gpt-4o-mini"); put("temperature",0.5)
+            put("model","gpt-4.1-mini"); put("temperature",0.8)
             put("messages", JSONArray().apply {
                 put(JSONObject().put("role","system").put("content","당신은 프리미엄 라이프 코치이자 운세 분석가입니다. 도구만 호출해 JSON을 반환하세요."))
                 put(JSONObject().put("role","user").put("content", buildDeepPrompt(u, daily, seed)))
@@ -1164,13 +1367,33 @@ daily:$daily
 
 [요구]
 - 전문가 톤의 심화 분석 JSON(function: deep_fortune_analysis).
+- **금지어:** ‘리듬’ ,‘블록’ 사용 금지.
 - highlights 3–6개(1문장).
 - plan: 아침(09–12)/오후(13–17)/저녁(19–22) 2–4줄씩, 정량 지시.
 - tips 3–6개 + checklistAdjusted 3개(시간/개인지시 금지).
-- tomorrowPrep 250–400자.
+- tomorrowPrep 250자미만 .
 - luckyTime/Number는 daily 유지, colorName은 이름(헥스 금지).
 - **연락 지시·학생 어휘·특정 시간/마감 금지.**
+-현실적 으로 적기.
         """.trimIndent()
+    }
+
+    /* 이름 정규화 */
+    private fun sanitizeColorName(nameRaw: String, hex: String): String {
+        val m = nameRaw.trim().lowercase(Locale.ROOT)
+        val map = mapOf(
+            "blue" to "블루", "navy" to "인디고", "indigo" to "인디고", "green" to "그린",
+            "orange" to "오렌지", "red" to "레드", "purple" to "퍼플", "violet" to "퍼플",
+            "slate" to "슬레이트", "teal" to "틸", "cyan" to "틸", "yellow" to "옐로",
+            "brown" to "브라운", "amber" to "옐로"
+        )
+        val allowed = setOf("블루","인디고","그린","오렌지","레드","퍼플","슬레이트","틸","옐로","브라운")
+        val fromMap = map[m]
+        return when {
+            allowed.contains(nameRaw) -> nameRaw
+            fromMap != null -> fromMap
+            else -> colorNameForHex(hex)
+        }
     }
 
     private fun showDeepDialog(deep: JSONObject) {
@@ -1183,7 +1406,7 @@ daily:$daily
         val btnClose = dialogView.findViewById<MaterialButton>(R.id.btnDeepClose)
 
         val lucky = lastPayload?.optJSONObject("lucky") ?: JSONObject()
-        val colName = deep.optString("luckyColorName", colorNameForHex(lucky.optString("colorHex")))
+        val colName = sanitizeColorName(deep.optString("luckyColorName"), lucky.optString("colorHex"))
         val time = humanizeLuckyTime(deep.optString("luckyTime", lucky.optString("time")))
         val num  = deep.optInt("luckyNumber", lucky.optInt("number"))
 
@@ -1229,6 +1452,10 @@ daily:$daily
     }
     private fun getRecentLuckyTimes(limit: Int = 5): List<String> {
         val arr = JSONArray(prefs.getString("lucky_history_times", "[]")); return (0 until arr.length()).mapNotNull { arr.optString(it) }.takeLast(limit)
+    }
+    private fun getRecentLuckyNumbers(limit: Int = 5): List<Int> {
+        val arr = JSONArray(prefs.getString("lucky_history_numbers", "[]"))
+        return (0 until arr.length()).mapNotNull { arr.optString(it).toIntOrNull() }.takeLast(limit)
     }
     private fun pushHistory(key: String, value: String) {
         val arr = JSONArray(prefs.getString(key, "[]")); val list = mutableListOf<String>()
@@ -1310,12 +1537,11 @@ daily:$daily
     private fun buildDailyRequest(u: UserInfo, seed: Int): JSONObject {
         return JSONObject().apply {
             put("model", "gpt-4o-mini")
-            put("temperature", 0.6)
+            put("temperature", 0.7) // 변주 조금 더
             put("max_tokens", 2200)
             put("messages", JSONArray().apply {
                 put(JSONObject().put("role", "system").put("content",
-                    "당신은 프리미엄 라이프 코치이자 운세 분석가입니다. " +
-                            "항상 function 호출만으로 JSON을 반환하세요."))
+                    "당신은 프리미엄 라이프 코치이자 운세 분석가입니다. 항상 function 호출만으로 JSON을 반환하세요."))
                 put(JSONObject().put("role", "user").put("content", buildUserPrompt(u, seed)))
             })
             put("tools", JSONArray().put(JSONObject().apply {
@@ -1374,7 +1600,6 @@ daily:$daily
             append(" - 가벼운 스트레칭 5분\n\n")
             append("저녁(19~22)\n")
             append(" - 하루 리뷰 3줄, 내일 첫 작업 1줄 적기\n")
-            append(" - 행운 숫자 ").append(num).append("를 떠올리며 루틴 유지")
         }
     }
 

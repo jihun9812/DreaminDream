@@ -69,13 +69,13 @@ android {
 dependencies {
 
     //  Firebase SDK 추가
-    implementation(platform("com.google.firebase:firebase-bom:32.8.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-firestore-ktx") //유저꿈 저장
     implementation("com.google.firebase:firebase-messaging") // 팝업메세지
     implementation("com.google.firebase:firebase-config-ktx:21.6.0")
     implementation("com.google.firebase:firebase-auth-ktx")
-
+    implementation("com.google.firebase:firebase-functions-ktx")
     // google gradle 추가.
 
     implementation ("com.google.android.gms:play-services-auth:21.1.0")

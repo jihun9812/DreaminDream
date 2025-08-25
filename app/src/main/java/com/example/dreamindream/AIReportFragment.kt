@@ -69,10 +69,10 @@ class AIReportFragment : Fragment() {
 
         weekLabel.text = getCurrentWeekLabel()
 
-        // ✅ 기본은 '빈 상태'로 시작 (깜빡임 방지)
+
         showReport(false)
 
-        // 인자 수신
+
         val feeling  = arguments?.getString("feeling")
         val keywords = arguments?.getStringArrayList("keywords")
         val analysis = arguments?.getString("analysis")

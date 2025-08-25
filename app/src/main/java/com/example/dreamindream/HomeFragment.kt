@@ -266,8 +266,8 @@ class HomeFragment : Fragment() {
         }
 
         val requestBody = JSONObject().apply {
-            put("model", "gpt-4o-mini")
-            put("temperature", 0.6)
+            put("model", "gpt-4.1-mini")
+            put("temperature", 0.8)
             put("messages", JSONArray().put(JSONObject().put("role", "user").put("content", prompt)))
             put("max_tokens", 320)
         }.toString().toRequestBody("application/json".toMediaType())

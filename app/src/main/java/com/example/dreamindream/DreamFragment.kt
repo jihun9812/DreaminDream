@@ -57,6 +57,9 @@ class DreamFragment : Fragment() {
 
     private val http = OkHttpClient()
 
+    // ✅ Firestore 트리거용 사용자 UID
+    private var userId: String = ""
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val v = inflater.inflate(R.layout.fragment_dream, container, false)
 
@@ -74,8 +77,10 @@ class DreamFragment : Fragment() {
         AdManager.initialize(requireContext())
         AdManager.loadRewarded(requireContext())
 
-        val uid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
-        prefs = requireContext().getSharedPreferences("dream_history_$uid", Context.MODE_PRIVATE)
+        // ✅ uid 보관 (로그인/익명 모두 값 존재)
+        userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
+        prefs = requireContext().getSharedPreferences("dream_history_$userId", Context.MODE_PRIVATE)
 
         bindViews(v)
         initUi(v)
@@ -129,7 +134,7 @@ class DreamFragment : Fragment() {
                     increaseTodayCount(used)
                 }
                 used < freeLimit + adLimit -> {
-                    // ✅ 광고 보기/취소 — 시청 완료(보상)되어야만 진행
+                    // ✅ 광고 보기/취소 — 시청 완료(보상)되어야만 진행.
                     showAdPrompt {
                         val latest = dreamEditText.text.toString().trim()
                         if (validateInput(latest)) {
@@ -231,7 +236,7 @@ class DreamFragment : Fragment() {
         )
 
         val body = JSONObject().apply {
-            put("model", "gpt-4o-mini")
+            put("model", "gpt-4.1-mini")
             put("temperature", 0.7)
             put("messages", messages)
             put("max_tokens", 900)
@@ -264,14 +269,20 @@ class DreamFragment : Fragment() {
     }
 
     private fun saveDream(dream: String, result: String) {
+        // 로컬(프리뷰/캘린더 표시용)
         val dayKey = todayKey()
         val arr = JSONArray(prefs.getString(dayKey, "[]") ?: "[]")
         if (arr.length() >= 10) arr.remove(0)
         arr.put(JSONObject().put("dream", dream).put("result", result))
         prefs.edit().putString(dayKey, arr.toString()).apply()
+
+        // ✅ Firestore 저장 → Cloud Function(sendDreamResult) 트리거 → 이메일 발송
+        if (userId.isNotBlank()) {
+            FirestoreManager.saveDream(userId, dream, result, null)
+        }
     }
 
-    // ---- 결과 수신 후 처리 (즉시 표시 + 제목 색 입히기) ----
+    // ---- 결과 수신 후 처리
     private fun onResultArrived(text: String) {
         hideLoading()
         resultTextView.setTextColor(Color.parseColor("#FFFFFF"))
@@ -295,20 +306,15 @@ class DreamFragment : Fragment() {
         lottieLoading?.apply { cancelAnimation(); visibility = View.GONE }
     }
 
-    // ---- 텍스트 정리 + 스타일링 (모든 ** 제거 + 헤더 색/볼드/사이즈) ----
+    // ---- 텍스트 정리 + 스타일링
     private fun styleResult(raw: String): CharSequence {
-        // 1) 마크다운 헤더 토큰 제거
         var clean = raw.replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")
-        // 2) 굵게 표기(** … **) 전부 제거
         clean = clean.replace("**", "")
-        // 3) 코드블록/인라인 백틱 제거
         clean = clean.replace(Regex("`{1,3}"), "")
-        // 4) 리스트 기호 통일(-, * -> •)
         clean = clean.replace(Regex("(?m)^\\s*[-*]\\s+"), "• ")
 
         val sb = SpannableStringBuilder(clean)
 
-        // 헤더 라벨과 컬러 매핑 (이모지 유무 모두 대응)
         data class H(val emoji: String, val label: String, val color: Int)
         val headers = listOf(
             H("💭", "꿈이 전하는 메시지", Color.parseColor("#9BE7FF")),
@@ -319,7 +325,6 @@ class DreamFragment : Fragment() {
         )
 
         headers.forEach { h ->
-            // 라인 시작에 (이모지 있을 수도/없을 수도) + 라벨 매칭
             val pattern = Regex("(?m)^(?:${Regex.escape(h.emoji)}\\s*)?${Regex.escape(h.label)}.*$")
             pattern.findAll(clean).forEach { m ->
                 val s = m.range.first
@@ -332,14 +337,10 @@ class DreamFragment : Fragment() {
         return sb
     }
 
-    // ---- 키보드 내리고 결과 영역 보이게 스크롤 ----
     private fun hideKeyboardAndScrollToResult(root: View) {
-        // 키보드 내리기
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         dreamEditText.clearFocus()
         imm.hideSoftInputFromWindow(root.windowToken, 0)
-
-        // 결과 영역으로 스크롤 (가장 가까운 ScrollView 찾아서 이동)
         resultTextView.post {
             var parentView: View? = resultTextView
             var scroll: ScrollView? = null
@@ -363,12 +364,10 @@ class DreamFragment : Fragment() {
     }
 
     companion object {
-        //  캘린더/리스트 다이얼로그 — 아래 잘리지 않게 높이 80% 제한
         fun showResultDialog(context: Context, result: String) {
             val v = View.inflate(context, R.layout.dream_result_dialog, null)
             val tv = v.findViewById<TextView>(R.id.resultTextView)
 
-            // 동일한 정리/스타일 적용
             var clean = result.ifBlank { "해몽 결과가 비어있습니다." }
                 .replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")
                 .replace("**", "")
@@ -396,7 +395,6 @@ class DreamFragment : Fragment() {
             }
             tv.text = sb
 
-            // 높이 제한 + 스크롤 설정
             val dm = context.resources.displayMetrics
             val maxH = (dm.heightPixels * 0.80f).toInt()
             val scroll = v.findViewById<ScrollView>(R.id.scrollDialog)

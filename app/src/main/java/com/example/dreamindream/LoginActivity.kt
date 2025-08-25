@@ -133,13 +133,13 @@ class LoginActivity : AppCompatActivity() {
             }
             auth.createUserWithEmailAndPassword(email, pw)
                 .addOnSuccessListener {
-                    auth.currentUser?.sendEmailVerification()?.addOnSuccessListener {
-                        Toast.makeText(this, "회원가입 성공! 인증 메일이 발송되었습니다. 인증 후 로그인하세요.", Toast.LENGTH_LONG).show()
-                        signupPanel.visibility = View.GONE
-                        loginPanel.visibility = View.VISIBLE
-                    }?.addOnFailureListener {
-                        Toast.makeText(this, "이메일 인증 발송 실패: ${it.message}", Toast.LENGTH_SHORT).show()
-                    }
+                    Toast.makeText(
+                        this,
+                        "회원가입 성공! 인증 메일이 발송되었습니다. 메일을 확인하고 로그인하세요.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    signupPanel.visibility = View.GONE
+                    loginPanel.visibility = View.VISIBLE
                 }
                 .addOnFailureListener {
                     Toast.makeText(this, "회원가입 실패: ${it.message}", Toast.LENGTH_SHORT).show()

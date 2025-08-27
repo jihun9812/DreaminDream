@@ -109,10 +109,6 @@ class DreamFragment : Fragment() {
         resultTextView.text = "여기에 해몽 결과가 표시됩니다."
         resultTextView.setTextColor(Color.parseColor("#BFD0DC"))
 
-        // 결과 클릭 시 전체보기
-        resultTextView.setOnClickListener {
-            showResultDialog(requireContext(), resultTextView.text.toString())
-        }
     }
 
     private fun initUi(root: View) {
@@ -121,7 +117,7 @@ class DreamFragment : Fragment() {
         interpretButton.setOnClickListener {
             it.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.scale_up))
 
-            // ✅ 키보드 자동 내림 + 결과 영역으로 스크롤 준비
+            //  키보드 자동 내림 + 결과 영역으로 스크롤 준비
             hideKeyboardAndScrollToResult(root)
 
             val input = dreamEditText.text.toString().trim()
@@ -134,7 +130,7 @@ class DreamFragment : Fragment() {
                     increaseTodayCount(used)
                 }
                 used < freeLimit + adLimit -> {
-                    // ✅ 광고 보기/취소 — 시청 완료(보상)되어야만 진행.
+                    // 광고 보기/취소 — 시청 완료(보상)되어야만 진행.
                     showAdPrompt {
                         val latest = dreamEditText.text.toString().trim()
                         if (validateInput(latest)) {
@@ -202,7 +198,7 @@ class DreamFragment : Fragment() {
     }
     private fun updateUsageLabel() {
         val remain = (freeLimit + adLimit - getTodayCount()).coerceAtLeast(0)
-        usageTextView?.text = "오늘 남은 해몽 기회: ${remain}회"
+        usageTextView?.text = "오늘 남은 횟수 : ${remain}회"
     }
 
     // 입력 검증
@@ -217,27 +213,26 @@ class DreamFragment : Fragment() {
         }
     }
 
-    // 해몽 요청
     private fun startInterpret(prompt: String) {
         showLoading()
 
         val messages = JSONArray().put(
             JSONObject().put("role", "user").put("content", """
-                너는 '예지몽 분석 컨설턴트'야.
+                너는 '예지몽 분석 해몽가'야.
                 아래 꿈 내용을 바탕으로 현실적이고 신뢰감 있게 해석해.
                 구조:
                 - 💭 꿈이 전하는 메시지
                 - 🧠 핵심 상징 해석
                 - 📌 예지 포인트
                 - ☀️ 오늘의 활용 팁
-                - 🎯 오늘의 행동 3가지(시간·수치 포함)
+                - 🎯 오늘의 행동 3가지
                 [꿈 내용] "$prompt"
             """.trimIndent())
         )
 
         val body = JSONObject().apply {
             put("model", "gpt-4.1-mini")
-            put("temperature", 0.7)
+            put("temperature", 0.8)
             put("messages", messages)
             put("max_tokens", 900)
         }.toString().toRequestBody("application/json".toMediaType())
@@ -276,7 +271,7 @@ class DreamFragment : Fragment() {
         arr.put(JSONObject().put("dream", dream).put("result", result))
         prefs.edit().putString(dayKey, arr.toString()).apply()
 
-        // ✅ Firestore 저장 → Cloud Function(sendDreamResult) 트리거 → 이메일 발송
+        //  Firestore 저장 → Cloud Function(sendDreamResult) 트리거 → 이메일 발송
         if (userId.isNotBlank()) {
             FirestoreManager.saveDream(userId, dream, result, null)
         }

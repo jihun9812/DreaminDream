@@ -9,6 +9,18 @@
 
     </style>
 
+    <style name="Widget.DreamIn.Chip.Info" parent="Widget.Material3.Chip.Assist.Elevated">
+        <item name="chipBackgroundColor">#1AFFFFFF</item>
+        <item name="chipStrokeColor">#33FFFFFF</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipCornerRadius">14dp</item>
+        <item name="chipMinHeight">36dp</item>
+        <item name="chipStartPadding">10dp</item>
+        <item name="chipEndPadding">10dp</item>
+        <item name="rippleColor">#33FFFFFF</item>
+        <item name="android:textColor">#E6FFFFFF</item>
+        <item name="elevation">0dp</item>
+    </style>
 
     <style name="Dialog_GlassM3" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="android:windowIsTranslucent">true</item>

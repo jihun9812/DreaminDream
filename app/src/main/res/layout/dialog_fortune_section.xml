@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         app:cardCornerRadius="22dp"
         app:cardUseCompatPadding="true"
-        app:strokeColor="#C7FFFFFF"
+        app:strokeColor="#454545"
         app:strokeWidth="1dp"
         app:cardElevation="10dp"
         app:cardBackgroundColor="#F3111728">
@@ -76,6 +76,8 @@
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#212121"
+                android:backgroundTint="#F6AF1E"
                 android:text="확인" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

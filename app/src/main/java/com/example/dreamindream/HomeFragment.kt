@@ -24,19 +24,11 @@ class HomeFragment : Fragment() {
     private val uid by lazy { FirebaseAuth.getInstance().currentUser?.uid }
     private val apiKey by lazy { BuildConfig.OPENAI_API_KEY }
 
-    // 카드 요약 표시용 상태
+    // 홈 카드 요약 캐시(실데이터만 사용)
     private var lastFeeling: String? = null
     private var lastKeywords: List<String>? = null
     private var lastAnalysis: String? = null
     private var lastScore: Int? = null
-
-    // 샘플 (디버그에서만)
-    private val SAMPLE_FEELING = "긍정↑"
-    private val SAMPLE_KEYWORDS = listOf("성장", "기회", "안정")
-    private val SAMPLE_ANALYSIS = "이번 주 전반 에너지는 상승세입니다. 소통이 잘 풀리고 작은 실험에서 성과가 납니다. 계획을 밀고 가세요."
-    private val SAMPLE_SCORE = 82
-    private val SHOW_SAMPLE_IN_REPORT = BuildConfig.DEBUG
-    private var showingSampleOnCard = false
 
     private val dailyMsgFallbacks = listOf(
         "오늘은 마음의 속도를 잠시 늦춰 보세요.",
@@ -64,33 +56,36 @@ class HomeFragment : Fragment() {
             aiMessage.post { aiMessage.text = safeMsg }
         }
 
-        // 홈 카드(주간 요약)
+        // 홈 카드
         val aiReportTitle = view.findViewById<TextView>(R.id.ai_report_title)
         val aiReportSummary = view.findViewById<TextView>(R.id.ai_report_summary)
         val btnAiReport = view.findViewById<MaterialButton>(R.id.btn_ai_report)
         val aiReportCard = view.findViewById<View>(R.id.ai_report_card)
 
         val weekDreams = getThisWeekDreamList()
+        val weekInterps = getThisWeekInterpretationList()
 
-        // 파이어스토어에 있으면 우선 사용, 없으면 해석 요청
+        // 파이어스토어에 이번 주 리포트 있으면 우선 사용, 없으면 즉시 분석
         uid?.let {
             FirestoreManager.loadWeeklyReport(it) { feeling, keywords, analysis ->
                 if (feeling.isNotBlank() && keywords.isNotEmpty() && analysis.isNotBlank()) {
                     applyHomeSummary(aiReportTitle, aiReportSummary, btnAiReport, feeling, keywords, analysis, null)
                 } else {
-                    analyzeWeeklyDreams(view, weekDreams, aiReportTitle, aiReportSummary, btnAiReport)
+                    analyzeWeeklyDreams(view, weekDreams, weekInterps, aiReportTitle, aiReportSummary, btnAiReport)
                 }
             }
         } ?: run {
-            analyzeWeeklyDreams(view, weekDreams, aiReportTitle, aiReportSummary, btnAiReport)
+            analyzeWeeklyDreams(view, weekDreams, weekInterps, aiReportTitle, aiReportSummary, btnAiReport)
         }
 
-        btnAiReport.setOnClickListener { openAIReport(btnAiReport) }
+        // 열기
+        btnAiReport.setOnClickListener { openAIReport() }
         aiReportCard.setOnClickListener {
             it.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.scale_up))
-            openAIReport(btnAiReport)
+            openAIReport()
         }
 
+        // 네비게이션 단축
         fun View.applyScaleClick(action: () -> Unit) {
             setOnClickListener {
                 it.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.scale_up))
@@ -111,40 +106,50 @@ class HomeFragment : Fragment() {
         super.onDestroyView()
     }
 
-    private fun openAIReport(btnAiReport: MaterialButton) {
-        if (showingSampleOnCard && SHOW_SAMPLE_IN_REPORT) {
-            val bundle = Bundle().apply {
-                putString("feeling", SAMPLE_FEELING)
-                putStringArrayList("keywords", ArrayList(SAMPLE_KEYWORDS))
-                putString("analysis", SAMPLE_ANALYSIS)
-                putInt("score", SAMPLE_SCORE)
-                putBoolean("is_sample", true)
+    /** 가장 최근 주 리포트로 화면 이동 (없으면 안내) */
+    private fun openAIReport() {
+        val userId = uid
+        if (userId == null) {
+            if (!lastFeeling.isNullOrBlank()) {
+                navigateTo(AIReportFragment().apply {
+                    arguments = Bundle().apply {
+                        putString("feeling", lastFeeling!!)
+                        putStringArrayList("keywords", ArrayList(lastKeywords ?: emptyList()))
+                        putString("analysis", lastAnalysis ?: "")
+                        lastScore?.let { putInt("score", it) }
+                        putBoolean("is_sample", false)
+                    }
+                })
+            } else {
+                Toast.makeText(requireContext(), "이번 주 꿈을 2개 이상 기록하면 AI 리포트를 볼 수 있어요.", Toast.LENGTH_SHORT).show()
             }
-            navigateTo(AIReportFragment().apply { arguments = bundle })
-            return
-        } else if (showingSampleOnCard && !SHOW_SAMPLE_IN_REPORT) {
-            Toast.makeText(requireContext(), "이번 주 꿈을 2개 이상 기록하면 AI 리포트를 볼 수 있어요.", Toast.LENGTH_SHORT).show()
             return
         }
 
-        if (!lastFeeling.isNullOrBlank()) {
-            val bundle = Bundle().apply {
-                putString("feeling", lastFeeling ?: "")
-                putStringArrayList("keywords", ArrayList(lastKeywords ?: emptyList()))
-                putString("analysis", lastAnalysis ?: "")
-                lastScore?.let { putInt("score", it) }
-                putBoolean("is_sample", false)
+        FirestoreManager.getLatestWeeklyReportKey(userId) { latest ->
+            if (latest != null) {
+                navigateTo(AIReportFragment().apply {
+                    arguments = Bundle().apply { putString("weekKey", latest) }
+                })
+            } else if (!lastFeeling.isNullOrBlank()) {
+                navigateTo(AIReportFragment().apply {
+                    arguments = Bundle().apply {
+                        putString("feeling", lastFeeling!!)
+                        putStringArrayList("keywords", ArrayList(lastKeywords ?: emptyList()))
+                        putString("analysis", lastAnalysis ?: "")
+                        lastScore?.let { putInt("score", it) }
+                        putBoolean("is_sample", false)
+                    }
+                })
+            } else {
+                Toast.makeText(requireContext(), "이번 주 꿈을 2개 이상 기록하면 AI 리포트를 볼 수 있어요.", Toast.LENGTH_SHORT).show()
             }
-            navigateTo(AIReportFragment().apply { arguments = bundle })
-        } else {
-            Toast.makeText(requireContext(), "이번 주 꿈을 2개 이상 기록하면 AI 리포트를 볼 수 있어요.", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun navigateTo(fragment: Fragment) {
         val current = parentFragmentManager.findFragmentById(R.id.fragment_container)
         if (current?.javaClass == fragment.javaClass) return
-
         parentFragmentManager.beginTransaction()
             .setCustomAnimations(
                 R.anim.slide_in_right, R.anim.slide_out_left,
@@ -155,44 +160,42 @@ class HomeFragment : Fragment() {
             .commit()
     }
 
+    // ───────────────── 분석/요약 ─────────────────
     private fun analyzeWeeklyDreams(
         root: View,
         weekDreams: List<String>,
+        weekInterps: List<String>,
         aiReportTitle: TextView,
         aiReportSummary: TextView,
         btnAiReport: MaterialButton
     ) {
-        when {
-            weekDreams.isEmpty() || weekDreams.size < 2 -> {
-                if (BuildConfig.DEBUG) {
-                    applyHomeSample(aiReportTitle, aiReportSummary, btnAiReport)
-                } else {
-                    aiReportTitle.text = getString(R.string.ai_report_summary)
-                    aiReportSummary.text = getString(R.string.ai_report_guide)
-                    btnAiReport.isEnabled = true; btnAiReport.alpha = 1f
-                    showingSampleOnCard = false
-                }
-            }
-            else -> {
-                aiReportTitle.text = getString(R.string.ai_loading)
-                aiReportSummary.text = getString(R.string.ai_loading2)
-                btnAiReport.isEnabled = true; btnAiReport.alpha = 1f
-                showingSampleOnCard = false
-
-                requestWeeklyDreamAnalysisFromGPT(
-                    weekDreams,
-                    onResult = { feeling, keywords, analysis, score ->
-                        applyHomeSummary(aiReportTitle, aiReportSummary, btnAiReport, feeling, keywords, analysis, score)
-                        uid?.let { FirestoreManager.saveWeeklyReport(it, feeling, keywords, analysis) } // 점수는 저장 스킵(스키마 영향)
-                    },
-                    onError = {
-                        aiReportTitle.text = getString(R.string.ai_report_fail)
-                        aiReportSummary.text = getString(R.string.ai_retry)
-                        btnAiReport.isEnabled = true; btnAiReport.alpha = 1f
-                    }
-                )
-            }
+        if (weekDreams.size < 2) {
+            aiReportTitle.text = getString(R.string.ai_report_summary)
+            aiReportSummary.text = getString(R.string.ai_report_guide)
+            btnAiReport.isEnabled = true
+            btnAiReport.alpha = 1f
+            return
         }
+
+        aiReportTitle.text = getString(R.string.ai_loading)
+        aiReportSummary.text = getString(R.string.ai_loading2)
+        btnAiReport.isEnabled = true
+        btnAiReport.alpha = 1f
+
+        requestWeeklyDreamAnalysisFromGPT(
+            dreamList = weekDreams,
+            interpList = weekInterps,
+            onResult = { feeling, keywords, analysis, score ->
+                applyHomeSummary(aiReportTitle, aiReportSummary, btnAiReport, feeling, keywords, analysis, score)
+                uid?.let { FirestoreManager.saveWeeklyReport(it, feeling, keywords, analysis) }
+            },
+            onError = {
+                aiReportTitle.text = getString(R.string.ai_report_fail)
+                aiReportSummary.text = getString(R.string.ai_retry)
+                btnAiReport.isEnabled = true
+                btnAiReport.alpha = 1f
+            }
+        )
     }
 
     private fun applyHomeSummary(
@@ -213,54 +216,88 @@ class HomeFragment : Fragment() {
         lastScore = score
         btnAiReport.isEnabled = true
         btnAiReport.alpha = 1f
-        showingSampleOnCard = false
     }
 
-    private fun applyHomeSample(aiReportTitle: TextView, aiReportSummary: TextView, btnAiReport: MaterialButton) {
-        aiReportTitle.text = getString(R.string.ai_report_summary)
-        aiReportSummary.text = "감정: $SAMPLE_FEELING\n키워드: ${SAMPLE_KEYWORDS.joinToString(", ")}"
-        btnAiReport.isEnabled = true
-        btnAiReport.alpha = 1f
-        showingSampleOnCard = true
-    }
-
+    /** 이번 주 원문 꿈 리스트(길이 제한으로 200자 컷) */
     private fun getThisWeekDreamList(): List<String> {
         val dreams = mutableListOf<String>()
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
         val weekDates = mutableListOf<String>()
-        val calendar = Calendar.getInstance()
-        calendar.firstDayOfWeek = Calendar.MONDAY
-        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val cal = Calendar.getInstance().apply {
+            firstDayOfWeek = Calendar.MONDAY
+            set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        }
         for (i in 0..6) {
-            weekDates.add(sdf.format(calendar.time))
-            calendar.add(Calendar.DAY_OF_MONTH, 1)
+            weekDates.add(sdf.format(cal.time))
+            cal.add(Calendar.DAY_OF_MONTH, 1)
         }
         for (dateKey in weekDates) {
-            val jsonArr = try { JSONArray(prefs.getString(dateKey, "[]")) } catch (_: Exception) { JSONArray() }
-            for (i in 0 until jsonArr.length()) {
-                val dreamObj = jsonArr.optJSONObject(i)
-                dreamObj?.getString("dream")?.let { dreams.add(it) }
+            val arr = try { JSONArray(prefs.getString(dateKey, "[]")) } catch (_: Exception) { JSONArray() }
+            for (i in 0 until arr.length()) {
+                val obj = arr.optJSONObject(i)
+                obj?.optString("dream")?.takeIf { it.isNotBlank() }?.let { dreams += it.take(200) }
             }
         }
         return dreams
     }
 
-    /** GPT 콜: 점수(0~100)까지 받아온다 */
+    /** 이번 주 ‘해몽/분석’ 텍스트 리스트(없으면 빈 리스트, 300자 컷) */
+    private fun getThisWeekInterpretationList(): List<String> {
+        val result = mutableListOf<String>()
+        val keys = listOf(
+            "meaning", "interpretation", "analysis", "aiMeaning", "ai_interpretation",
+            "aiAnalysis", "ai_result", "result", "comment"
+        )
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
+        val weekDates = mutableListOf<String>()
+        val cal = Calendar.getInstance().apply {
+            firstDayOfWeek = Calendar.MONDAY
+            set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        }
+        for (i in 0..6) {
+            weekDates.add(sdf.format(cal.time))
+            cal.add(Calendar.DAY_OF_MONTH, 1)
+        }
+        for (dateKey in weekDates) {
+            val arr = try { JSONArray(prefs.getString(dateKey, "[]")) } catch (_: Exception) { JSONArray() }
+            for (i in 0 until arr.length()) {
+                val obj = arr.optJSONObject(i) ?: continue
+                val interp = keys.firstNotNullOfOrNull { k -> obj.optString(k).takeIf { !it.isNullOrBlank() } }
+                if (!interp.isNullOrBlank()) result += interp.take(300)
+            }
+        }
+        return result
+    }
+
+    /** GPT 콜: 주간 요약 + 점수 (감정 라벨 다양 / 키워드는 해몽에서 ‘명사’만) */
     private fun requestWeeklyDreamAnalysisFromGPT(
         dreamList: List<String>,
+        interpList: List<String>,
         onResult: (feeling: String, keywords: List<String>, analysis: String, score: Int?) -> Unit,
         onError: ((Exception) -> Unit)? = null
     ) {
+        // 해몽이 하나도 없으면 원문에서 폴백(지시문에 명시)
+        val hasInterps = interpList.any { it.isNotBlank() }
+
         val prompt = buildString {
-            appendLine("아래는 한 사용자가 최근 일주일간 기록한 꿈 내용들입니다.")
-            dreamList.forEachIndexed { idx, dream -> appendLine("[꿈 기록 ${idx + 1}] $dream") }
+            appendLine("아래는 사용자의 최근 1주 꿈 기록과, 각 꿈에 대한 해몽/분석 텍스트입니다.")
+            dreamList.forEachIndexed { idx, dream -> appendLine("[꿈 원문 ${idx + 1}] $dream") }
+            if (hasInterps) {
+                interpList.forEachIndexed { idx, t -> appendLine("[해몽 텍스트 ${idx + 1}] $t") }
+            }
             appendLine(
                 """
-                아래 형식 **그대로** 한국어로만 출력해. 다른 말 절대 금지.
-                감정: <한 단어 또는 '긍정/중립/부정' + ↑/↓ 가능>
+                ★ 출력 형식(한국어, 다른 말 금지):
+                감정: <정서 한 단어 + 필요 시 ↑/↓, 예: 기쁨, 설렘, 차분, 평온, 활력, 몰입, 자신감, 안도, 호기심, 피곤, 권태, 무기력, 혼란, 답답함, 불안, 분노, 좌절, 슬픔, 외로움 등>
                 키워드: <명사 2~3개, 쉼표로 구분>
-                점수: <0~100 사이 정수 한 개>   # 전반 긍정성/에너지/안정감 종합 점수
+                점수: <0~100 사이 정수 한 개>
                 AI 분석: <2~4문장 요약 분석>
+
+                ★ 규칙:
+                - **키워드는 반드시 ‘해몽 텍스트들’에서만 추출**하고, **일반명사**로만 제시(동사/형용사/숫자/이모지 금지).
+                - ‘꿈/사람/장소/이야기/상황’과 같은 포괄 명사는 제외하고, 의미가 있는 핵심 개념만.
+                - 해몽 텍스트가 하나도 없을 경우에만 원문 꿈에서 추출.
+                - 감정/점수/분석은 전체 흐름을 종합해 작성.
                 """.trimIndent()
             )
         }
@@ -269,7 +306,7 @@ class HomeFragment : Fragment() {
             put("model", "gpt-4.1-mini")
             put("temperature", 0.8)
             put("messages", JSONArray().put(JSONObject().put("role", "user").put("content", prompt)))
-            put("max_tokens", 320)
+            put("max_tokens", 360)
         }.toString().toRequestBody("application/json".toMediaType())
 
         val request = Request.Builder()

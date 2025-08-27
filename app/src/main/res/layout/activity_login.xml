@@ -10,7 +10,7 @@
         android:id="@+id/bg_lottie"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F5080C23"
+        android:background="#382A5B"
         app:lottie_rawRes="@raw/hwwprmbqc9"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
@@ -99,12 +99,11 @@
                     android:layout_width="140dp"
                     android:layout_height="48dp"
                     android:layout_marginBottom="8dp"
-                    android:backgroundTint="#123E5A"
+                    android:backgroundTint="#FDCA60"
                     android:minHeight="48dp"
                     android:text="@string/login_btn_login"
                     android:textAllCaps="false"
-
-                    android:textColor="#FFF"
+                    android:textColor="@color/black"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -202,10 +201,10 @@
                     android:layout_height="48dp"
                     android:layout_gravity="center"
                     android:layout_marginTop="10dp"
-                    android:backgroundTint="#123E5A"
+                    android:backgroundTint="#FDCA60"
                     android:minHeight="48dp"
                     android:text="체험"
-                    android:textColor="@color/white"
+                    android:textColor="@color/black"
                     android:textStyle="bold" />
 
 

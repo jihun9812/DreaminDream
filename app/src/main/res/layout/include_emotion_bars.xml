@@ -26,7 +26,7 @@
             app:trackThickness="8dp"
             android:layout_weight="1"
             app:indicatorColor="#17D499"
-            app:trackColor="#2B3B4D"
+            app:trackColor="#FBFCFD"
             style="@style/Widget.Material3.LinearProgressIndicator"/>
 
     </LinearLayout>

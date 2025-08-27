@@ -1,13 +1,12 @@
+// file: app/src/main/java/com/example/dreamindream/AIReportFragment.kt
 package com.example.dreamindream
 
-import android.graphics.*
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.text.Html
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.view.animation.AccelerateDecelerateInterpolator
-import android.widget.TextView
+import android.view.*
+import android.widget.*
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.github.mikephil.charting.animation.Easing
@@ -17,274 +16,209 @@ import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
-import com.github.mikephil.charting.renderer.BarChartRenderer
-import com.github.mikephil.charting.utils.Utils
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
-import java.util.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.firebase.auth.FirebaseAuth
 
 class AIReportFragment : Fragment() {
 
-    // palette
-    private val COLOR_TEXT_PRIMARY = Color.parseColor("#F3F8FC")
+    // 색상
     private val COLOR_TEXT_DIMMED  = Color.parseColor("#B6C7D3")
-    private val NEON_POSITIVE      = Color.parseColor("#00F5A0")
-    private val NEON_NEUTRAL       = Color.parseColor("#9CB6C7")
-    private val NEON_NEGATIVE      = Color.parseColor("#FF5A7D")
+    private val GOLD               = Color.parseColor("#FDCA60")
     private val GRID_LIGHT         = Color.parseColor("#22FFFFFF")
-    private val GRID_LIGHTER       = Color.parseColor("#14FFFFFF")
-    private val VALUE_TEXT         = Color.parseColor("#EFF6FB")
 
+    // 뷰
+    private lateinit var emptyIconLayout: View
+    private lateinit var reportCard: View
+    private lateinit var adView: AdView
+    private lateinit var weekLabel: TextView
     private lateinit var keywordsText: TextView
     private lateinit var aiComment: TextView
     private lateinit var analysisScore: TextView
-    private lateinit var emptyIconLayout: View
-    private lateinit var reportCard: View
-    private lateinit var barChart: BarChart
-    private lateinit var adView: AdView
-    private lateinit var weekLabel: TextView
-
+    private lateinit var chartTitle: TextView
+    private lateinit var chartInfoBtn: ImageButton
+    private lateinit var chartCaption: TextView
+    private lateinit var emotionChart: BarChart
+    private lateinit var themeChart: BarChart
     private lateinit var kpiPositive: TextView
     private lateinit var kpiNeutral: TextView
     private lateinit var kpiNegative: TextView
 
+    // 상태
+    private val uid get() = FirebaseAuth.getInstance().currentUser?.uid
+    private lateinit var prevWeekKey: String
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val v = inflater.inflate(R.layout.fragment_ai_report, container, false)
 
+        // Ads
         MobileAds.initialize(requireContext())
         adView = v.findViewById(R.id.adView_ai)
         adView.loadAd(AdRequest.Builder().build())
 
-        keywordsText     = v.findViewById(R.id.text_keywords)
-        aiComment        = v.findViewById(R.id.text_ai_comment)
-        analysisScore    = v.findViewById(R.id.analysis_score)
-        emptyIconLayout  = v.findViewById(R.id.empty_icon_layout)
-        reportCard       = v.findViewById(R.id.report_card)
-        barChart         = v.findViewById(R.id.emotion_bar_chart)
-        weekLabel        = v.findViewById(R.id.week_label)
-        kpiPositive      = v.findViewById(R.id.kpi_positive)
-        kpiNeutral       = v.findViewById(R.id.kpi_neutral)
-        kpiNegative      = v.findViewById(R.id.kpi_negative)
+        // bind
+        emptyIconLayout = v.findViewById(R.id.empty_icon_layout)
+        reportCard      = v.findViewById(R.id.report_card)
+        weekLabel       = v.findViewById(R.id.week_label)
+        keywordsText    = v.findViewById(R.id.text_keywords)
+        aiComment       = v.findViewById(R.id.text_ai_comment)
+        analysisScore   = v.findViewById(R.id.analysis_score)
+        chartTitle      = v.findViewById(R.id.chart_title)
+        chartInfoBtn    = v.findViewById(R.id.btn_chart_info)
+        chartCaption    = v.findViewById(R.id.chart_caption)
+        emotionChart    = v.findViewById(R.id.emotion_bar_chart)
+        themeChart      = v.findViewById(R.id.theme_bar_chart)
+        kpiPositive     = v.findViewById(R.id.kpi_positive)
+        kpiNeutral      = v.findViewById(R.id.kpi_neutral)
+        kpiNegative     = v.findViewById(R.id.kpi_negative)
 
-        weekLabel.text = getCurrentWeekLabel()
+        setPending()
 
+        // ✅ 이번 주 기준 항상 "저번 주" 키로 표시
+        val thisWeek = WeekUtils.weekKey()
+        prevWeekKey = WeekUtils.previousWeekKey(thisWeek, 1)
 
-        showReport(false)
-
-
-        val feeling  = arguments?.getString("feeling")
-        val keywords = arguments?.getStringArrayList("keywords")
-        val analysis = arguments?.getString("analysis")
-        val scoreArg = arguments?.getInt("score", -1) ?: -1
-        val isSample = arguments?.getBoolean("is_sample", false) == true
-
-        if (!feeling.isNullOrBlank() && !keywords.isNullOrEmpty() && !analysis.isNullOrBlank()) {
-            bindUI(
-                feeling + if (isSample) " (샘플)" else "",
-                keywords,
-                analysis,
-                if (scoreArg >= 0) scoreArg else estimateScore(feeling)
-            )
-        } else {
-            // 데이터 없음 → 빈 상태 유지
-            // 필요시 토스트만
-            // Toast.makeText(requireContext(), "이번 주 꿈을 2개 이상 기록해보세요.", Toast.LENGTH_SHORT).show()
+        // 상단 라벨/캡션 세팅
+        weekLabel.text = "저번 주 분석 리포트  ▼"
+        chartTitle.text = "감정 밸런스 (세분화)"
+        chartInfoBtn.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("감정/테마 분석")
+                .setMessage("저번 주에 기록된 모든 꿈을 종합하여 감정 8축, 테마 4축으로 세분화해 표시합니다.")
+                .setPositiveButton("확인", null).show()
         }
+        // 캡션: 상대라벨 + 절대 주차
+        val abs = WeekUtils.weekChipLabel(prevWeekKey)     // ex) WEEK 35 · 2025
+        val rel = WeekUtils.relativeLabel(prevWeekKey, thisWeek) // "저번 주"
+        chartCaption.text = "$rel · $abs"
+
+        // 데이터 로드
+        val userId = uid
+        if (userId != null) {
+            // 1) 먼저 저번 주 리포트 로드 시도
+            FirestoreManager.loadWeeklyReport(userId, prevWeekKey) { feeling, keywords, analysis,
+                                                                     emoLabels, emoDist, themeLabels, themeDist ->
+                if (feeling.isBlank() || keywords.isEmpty() || analysis.isBlank()) {
+                    // 2) 없으면 저번 주를 즉시 집계 → 성공 시 다시 로드
+                    FirestoreManager.aggregateDreamsForWeek(userId, prevWeekKey) { ok ->
+                        if (ok) {
+                            FirestoreManager.loadWeeklyReport(userId, prevWeekKey) { f2, k2, a2, el2, ed2, tl2, td2 ->
+                                if (f2.isNotBlank()) bindUI(prevWeekKey, f2, k2, a2, el2, ed2, tl2, td2)
+                                else showReport(false)
+                            }
+                        } else {
+                            showReport(false)
+                        }
+                    }
+                } else {
+                    bindUI(prevWeekKey, feeling, keywords, analysis, emoLabels, emoDist, themeLabels, themeDist)
+                }
+            }
+        } else showReport(false)
 
         return v
     }
 
-    private fun bindUI(feeling: String, keywords: List<String>, analysis: String, score: Int) {
+    private fun setPending() { emptyIconLayout.isVisible = false; reportCard.isVisible = false }
+    private fun showReport(has: Boolean) { emptyIconLayout.isVisible = !has; reportCard.isVisible = has }
+
+    private fun bindUI(
+        weekKey: String,
+        feeling: String,
+        keywords: List<String>,
+        analysis: String,
+        emoLabels: List<String>,
+        emoDist: List<Float>,
+        themeLabels: List<String>,
+        themeDist: List<Float>
+    ) {
         showReport(true)
 
-        // KPI %
-        val (pos, neu, neg) = toEmotionDistribution(feeling)
-        kpiPositive.text = "${(pos * 100).toInt()}%"
-        kpiNeutral.text  = "${(neu * 100).toInt()}%"
-        kpiNegative.text = "${(neg * 100).toInt()}%"
+        // 헤더 설명
+        weekLabel.text = "저번 주 분석 리포트  ▼"
+        keywordsText.text = "감정: $feeling • 키워드: ${keywords.joinToString(", ")}"
+        analysisScore.text = "-" // (원하면 종합 점수 계산해 넣을 수 있음)
+        aiComment.text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+            Html.fromHtml(analysis, Html.FROM_HTML_MODE_LEGACY)
+        else Html.fromHtml(analysis)
 
-        // 키워드/감정
-        keywordsText.setTextColor(COLOR_TEXT_DIMMED)
-        keywordsText.text = "감정: $feeling   |   키워드: ${keywords.joinToString(" · ")}"
+        // KPI (긍/중/부) 계산: 감정 8축에서 그룹핑
+        val (pos, neu, neg) = computeKpis(emoLabels, emoDist)
+        kpiPositive.text = String.format("%.1f%%", pos)
+        kpiNeutral.text  = String.format("%.1f%%", neu)
+        kpiNegative.text = String.format("%.1f%%", neg)
 
-        // 분석 섹션
-        analysisScore.text = "${score}점"
-        aiComment.setTextColor(COLOR_TEXT_PRIMARY)
-        aiComment.text = Html.fromHtml(analysis, Html.FROM_HTML_MODE_LEGACY)
+        // 차트 렌더
+        setupBarChart(emotionChart, emoDist, emoLabels)
+        setupBarChart(themeChart, themeDist, themeLabels)
 
-        // 차트 (라벨/100% 안 잘리게)
-        setupBarChart(barChart, pos * 100f, neu * 100f, neg * 100f)
-
-        // ✅ 데이터 있을 때만 카드 등장 애니메이션
-        reportCard.alpha = 0f
-        reportCard.translationY = 20f
-        reportCard.animate()
-            .alpha(1f)
-            .translationY(0f)
-            .setDuration(420)
-            .setInterpolator(AccelerateDecelerateInterpolator())
-            .start()
+        // 캡션 업데이트 (안전)
+        val rel = WeekUtils.relativeLabel(weekKey, WeekUtils.weekKey())
+        val abs = WeekUtils.weekChipLabel(weekKey)
+        chartCaption.text = "$rel · $abs"
     }
 
-    private fun showReport(hasData: Boolean) {
-        emptyIconLayout.isVisible = !hasData
-        reportCard.isVisible      = hasData
+    private fun computeKpis(labels: List<String>, dist: List<Float>): Triple<Float, Float, Float> {
+        // 긍정군: 긍정/평온/활력/몰입
+        val pos = sumOf(labels, dist, listOf("긍정","평온","활력","몰입"))
+        // 중립
+        val neu = sumOf(labels, dist, listOf("중립"))
+        // 부정군: 혼란/불안/우울/피로 (우울/피로 라벨은 변형 가능)
+        val neg = sumOf(labels, dist, listOf("혼란","불안","우울/피로","우울","피로"))
+        return Triple(pos, neu, neg)
     }
 
-    /** 감정 텍스트로 대략 분포 추정 (퍼센트 API 미제공 시 보완) */
-    private fun toEmotionDistribution(feeling: String): Triple<Float, Float, Float> {
-        val posList = setOf("행복","희망","설렘","긍정","기쁨","평온","사랑","감사","안정","자신감")
-        val negList = setOf("불안","슬픔","공포","우울","외로움","지침","분노","짜증","피로")
-        val hasUp = feeling.contains("↑")
-        val hasDown = feeling.contains("↓")
-        val clean = feeling.replace("↑", "").replace("↓", "").replace("(샘플)", "").trim()
-        return when {
-            hasUp || clean in posList -> Triple(0.70f, 0.20f, 0.10f)
-            hasDown || clean in negList -> Triple(0.10f, 0.20f, 0.70f)
-            else -> Triple(0.25f, 0.50f, 0.25f)
+    private fun sumOf(labels: List<String>, dist: List<Float>, targets: List<String>): Float {
+        var s = 0f
+        targets.forEach { t ->
+            val idx = labels.indexOf(t)
+            if (idx in labels.indices && idx in dist.indices) s += dist[idx]
         }
+        return s
     }
 
-    /** 점수 추정 (score 인자 없을 때만 사용) */
-    private fun estimateScore(feeling: String): Int {
-        val (p, n, ne) = toEmotionDistribution(feeling)
-        return (p * 100 * 0.9 + ne * 100 * 0.6 + (1 - n) * 100 * 0.2).toInt().coerceIn(0, 100)
-    }
-
-    /** 차트: 바폭 축소 + 오프셋 확대 (라벨/0~100% 안 잘림) */
-    private fun setupBarChart(chart: BarChart, pos: Float, neu: Float, neg: Float) {
-        val labels = listOf("긍정", "중립", "부정")
-        val set = BarDataSet(
-            listOf(BarEntry(0f, pos), BarEntry(1f, neu), BarEntry(2f, neg)), ""
-        ).apply {
-            colors = listOf(NEON_POSITIVE, NEON_NEUTRAL, NEON_NEGATIVE)
-            valueTextSize = 12f
-            valueTextColor = VALUE_TEXT
-            highLightAlpha = 0
-            valueFormatter = object : ValueFormatter() {
-                override fun getBarLabel(e: BarEntry?): String {
-                    val v = e?.y ?: 0f; return if (v < 1f) "" else "${v.toInt()}%"
-                }
-            }
-        }
-
-        chart.apply {
-            description.isEnabled = false
-            legend.isEnabled = false
-            setScaleEnabled(false)
-            setPinchZoom(false)
-            setDrawBarShadow(false)
-            setDrawGridBackground(false)
-            setViewPortOffsets(64f, 48f, 44f, 64f)
-            setExtraOffsets(0f, 6f, 0f, 0f)
-            setFitBars(true)
-            setLayerType(View.LAYER_TYPE_SOFTWARE, null)
-        }
-
-        chart.xAxis.apply {
-            valueFormatter = IndexAxisValueFormatter(labels)
-            position = XAxis.XAxisPosition.BOTTOM
-            setDrawAxisLine(false)
-            setDrawGridLines(true)
-            enableGridDashedLine(6f, 6f, 0f)
-            gridColor = GRID_LIGHT
-            textColor = COLOR_TEXT_DIMMED
-            textSize = 12f
-            granularity = 1f
-            labelCount = labels.size
-            yOffset = 6f
-        }
-
-        chart.axisLeft.apply {
-            axisMinimum = 0f
-            axisMaximum = 100f
-            granularity = 25f
-            setDrawAxisLine(false)
-            setDrawGridLines(true)
-            gridColor = GRID_LIGHTER
-            textColor = COLOR_TEXT_DIMMED
-            textSize = 11f
-            valueFormatter = object : ValueFormatter() {
-                override fun getFormattedValue(value: Float): String = "${value.toInt()}%"
-            }
-        }
+    private fun setupBarChart(chart: BarChart, values: List<Float>, labels: List<String>) {
+        chart.clear()
+        chart.setScaleEnabled(false)
+        chart.description.isEnabled = false
+        chart.legend.isEnabled = false
         chart.axisRight.isEnabled = false
+        chart.axisLeft.apply {
+            textColor = COLOR_TEXT_DIMMED
+            axisMinimum = 0f; axisMaximum = 100f
+            granularity = 5f
+            setDrawGridLines(true); gridColor = GRID_LIGHT
+        }
+        chart.xAxis.apply {
+            position = XAxis.XAxisPosition.BOTTOM
+            valueFormatter = IndexAxisValueFormatter(labels)
+            textColor = COLOR_TEXT_DIMMED
+            granularity = 1f
+        }
 
-        chart.data = BarData(set).apply { barWidth = 0.32f }
-        chart.renderer = RoundedBarChartRenderer(chart, Utils.convertDpToPixel(14f))
-        chart.animateY(900, Easing.EaseOutCubic)
+        val entries = values.mapIndexed { i, v -> BarEntry(i.toFloat(), v) }
+        val set = BarDataSet(entries, "").apply {
+            setDrawValues(true)
+            valueTextSize = 11f
+            valueTextColor = GOLD
+            valueFormatter = object : ValueFormatter() {
+                override fun getBarLabel(e: BarEntry): String = String.format("%.1f%%", e.y)
+            }
+        }
+
+        // 파스텔-네온 팔레트 반복
+        val palette = listOf(
+            Color.parseColor("#17D499"), Color.parseColor("#7CD1FF"),
+            Color.parseColor("#96E6B3"), Color.parseColor("#BDA7FF"),
+            Color.parseColor("#CFE0EA"), Color.parseColor("#FFC95C"),
+            Color.parseColor("#FF8A80"), Color.parseColor("#E57373")
+        )
+        set.colors = List(values.size) { idx -> palette[idx % palette.size] }
+
+        chart.data = BarData(set as IBarDataSet).apply { barWidth = 0.45f }
+        chart.animateY(700, Easing.EaseInOutCubic)
         chart.invalidate()
-    }
-
-    // 라운드 + 네온 글로우 렌더러
-    private class RoundedBarChartRenderer(
-        private val chart: BarChart,
-        private val radius: Float
-    ) : BarChartRenderer(chart, chart.animator, chart.viewPortHandler) {
-
-        private val r = RectF()
-        private val clip = Path()
-        private val radii = floatArrayOf(radius, radius, radius, radius, 0f, 0f, 0f, 0f)
-        private val glow = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.FILL
-            color = Color.WHITE
-            maskFilter = BlurMaskFilter(22f, BlurMaskFilter.Blur.NORMAL)
-            alpha = 42
-        }
-
-        override fun drawDataSet(c: Canvas, dataSet: IBarDataSet, index: Int) {
-            val trans = chart.getTransformer(dataSet.axisDependency)
-            val buffer = mBarBuffers[index].apply {
-                setPhases(mAnimator.phaseX, mAnimator.phaseY)
-                setDataSet(index)
-                setInverted(chart.isInverted(dataSet.axisDependency))
-                setBarWidth(chart.barData.barWidth)
-                feed(dataSet)
-            }
-            trans.pointValuesToPixel(buffer.buffer)
-
-            val single = dataSet.colors.size == 1
-            val p = mRenderPaint.apply { style = Paint.Style.FILL }
-
-            var j = 0
-            while (j < buffer.size()) {
-                if (!mViewPortHandler.isInBoundsLeft(buffer.buffer[j + 2])) { j += 4; continue }
-                if (!mViewPortHandler.isInBoundsRight(buffer.buffer[j])) break
-
-                r.set(buffer.buffer[j], buffer.buffer[j + 1], buffer.buffer[j + 2], buffer.buffer[j + 3])
-                clip.reset(); clip.addRoundRect(r, radii, Path.Direction.CW)
-                c.save(); c.clipPath(clip)
-
-                val base = if (single) dataSet.color else dataSet.getColor(j / 4)
-                val shader = LinearGradient(0f, r.top, 0f, r.bottom,
-                    lighten(base, 1.12f), darken(base, 0.66f), Shader.TileMode.CLAMP)
-                p.shader = shader
-
-                c.drawRect(r.left, r.top - 8f, r.right, r.bottom, glow)
-                c.drawRect(r, p)
-                c.restore()
-                p.shader = null
-                j += 4
-            }
-        }
-
-        private fun darken(color: Int, factor: Float) =
-            Color.argb(Color.alpha(color),
-                (Color.red(color) * factor).toInt().coerceIn(0,255),
-                (Color.green(color) * factor).toInt().coerceIn(0,255),
-                (Color.blue(color) * factor).toInt().coerceIn(0,255))
-
-        private fun lighten(color: Int, factor: Float) =
-            Color.argb(Color.alpha(color),
-                (Color.red(color) * factor).toInt().coerceAtMost(255),
-                (Color.green(color) * factor).toInt().coerceAtMost(255),
-                (Color.blue(color) * factor).toInt().coerceAtMost(255))
-    }
-
-    private fun getCurrentWeekLabel(): String {
-        val c = Calendar.getInstance()
-        c.firstDayOfWeek = Calendar.MONDAY
-        return "WEEK ${c.get(Calendar.WEEK_OF_YEAR)} · ${c.get(Calendar.YEAR)}"
     }
 }

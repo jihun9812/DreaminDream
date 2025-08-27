@@ -4,77 +4,268 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="20dp"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginTop="8dp"
     app:cardUseCompatPadding="true"
-    app:cardBackgroundColor="#1A2433"
-    android:padding="12dp">
+    app:cardCornerRadius="22dp"
+    app:cardBackgroundColor="#FF352D49"
+    app:strokeWidth="2dp"
+    app:strokeColor="#000000"
+    android:padding="16dp">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fillViewport="true"
-        android:overScrollMode="always">
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="18dp"
+        android:paddingBottom="28dp">
 
         <LinearLayout
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="6dp">
+            android:orientation="vertical">
 
+            <!-- Title -->
             <TextView
                 android:id="@+id/tvDeepTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="심화 분석"
-                android:textSize="20sp"
                 android:textColor="#FFFFFF"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:textSize="18sp"
+                android:letterSpacing="0.02"/>
 
+            <!-- KPI chips -->
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:overScrollMode="never"
+                android:scrollbars="none">
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipKpis"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:chipSpacingHorizontal="8dp"
+                    app:singleLine="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipLuckyTime"
+                        style="@style/Widget.Material3.Chip.Assist.Elevated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="오후 3시~4시"
+                        app:chipBackgroundColor="#FDCA60"
+                        app:chipStrokeColor="#33FFFFFF"
+                        app:chipStrokeWidth="1dp"
+                        android:textColor="#212121"/>
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipLuckyNumber"
+                        style="@style/Widget.Material3.Chip.Assist.Elevated" android:text="숫자 56"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:chipBackgroundColor="#FDCA60"
+                        app:chipStrokeColor="#33FFFFFF"
+                        app:chipStrokeWidth="1dp"
+                        android:textColor="#212121"/>
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipLuckyColor"
+                        style="@style/Widget.Material3.Chip.Assist.Elevated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="색상 블루"
+                        app:chipBackgroundColor="#1AFFFFFF"
+                        app:chipStrokeColor="#33FFFFFF"
+                        app:chipStrokeWidth="1dp"
+                        android:textColor="#212121"/>
+                </com.google.android.material.chip.ChipGroup>
+            </HorizontalScrollView>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="12dp"
+                android:background="#FFC855"/>
+
+            <!-- Highlights -->
             <TextView
-                android:id="@+id/tvDeepKpis"
-                android:layout_marginTop="6dp"
-                android:textColor="#B9C7D6"
-                android:textSize="13sp"
+                android:id="@+id/labelHighlights"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <View android:layout_width="match_parent" android:layout_height="1dp"
-                android:layout_marginVertical="12dp" android:background="#2B3B4D"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="오늘의 하이라이트"
+                android:textSize="12sp"
+                android:textColor="#FDCA60"
+                android:letterSpacing="0.05"
+                android:textAllCaps="true"/>
 
             <TextView
                 android:id="@+id/tvDeepHighlights"
-                android:textColor="#EAF2FA"
-                android:textSize="14sp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="#EAF2FA"
+                android:textSize="15sp"
+                android:lineHeight="22sp"/>
 
-            <View android:layout_width="match_parent" android:layout_height="1dp"
-                android:layout_marginVertical="12dp" android:background="#2B3B4D"/>
-
+            <!-- Plan (3 small cards) -->
             <TextView
-                android:id="@+id/tvDeepPlan"
-                android:textColor="#EAF2FA"
-                android:textSize="14sp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:id="@+id/labelPlan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="실행 계획"
+                android:textSize="12sp"
+                android:textColor="#FDCA60"
+                android:letterSpacing="0.05"
+                android:textAllCaps="true"/>
 
-            <View android:layout_width="match_parent" android:layout_height="1dp"
-                android:layout_marginVertical="12dp" android:background="#2B3B4D"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp">
+
+                <!-- Morning -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#D4281C3C"
+                    app:strokeColor="#FDCA60"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="309dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.05"
+                            android:text="아침 09~12시"
+                            android:textAllCaps="true"
+                            android:textColor="#FDCA60"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/tvPlanMorning"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:lineHeight="22sp"
+                            android:textColor="#FFFFFF"
+                            android:textSize="15sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Afternoon -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#D4281C3C"
+                    app:strokeColor="#FDCA60"
+                    app:strokeWidth="1dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:letterSpacing="0.05"
+                            android:text="오후 13~17시"
+                            android:textAllCaps="true"
+                            android:textColor="#FDCA60"
+                            android:textSize="12sp" />
+                        <TextView
+                            android:id="@+id/tvPlanAfternoon"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="#FFFFFF"
+                            android:textSize="15sp"
+                            android:lineHeight="22sp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Evening -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#D4281C3C"
+                    app:strokeColor="#FDCA60"
+                    app:strokeWidth="1dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="저녁 19~22시"
+                            android:textColor="#FDCA60"
+                            android:textSize="12sp"
+                            android:textAllCaps="true"
+                            android:letterSpacing="0.05"/>
+                        <TextView
+                            android:id="@+id/tvPlanEvening"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="#FFFFFF"
+                            android:textSize="15sp"
+                            android:lineHeight="22sp"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- Tomorrow -->
+            <TextView
+                android:id="@+id/labelTomorrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="내일 준비"
+                android:textSize="12sp"
+                android:textColor="#FDCA60"
+                android:letterSpacing="0.05"
+                android:textAllCaps="true"/>
 
             <TextView
                 android:id="@+id/tvDeepTomorrow"
-                android:textColor="#EAF2FA"
-                android:textSize="14sp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:lineHeight="22sp"/>
 
+            <!-- Close -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDeepClose"
                 style="@style/Widget.Material3.Button.TonalButton"
-                android:text="닫기"
-                app:backgroundTint="#7A6CF1"
-                android:layout_marginTop="16dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="닫기"
+                app:backgroundTint="#FDCA60"
+                android:textColor="#212121"/>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </com.google.android.material.card.MaterialCardView>

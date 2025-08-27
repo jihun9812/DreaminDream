@@ -6,9 +6,8 @@
     android:layout_margin="24dp"
     app:cardCornerRadius="28dp"
     app:cardElevation="22dp"
-    android:backgroundTint="#424141">
+    android:backgroundTint="#A25C4781">
 
-    <!-- 스크롤 높이는 코드에서 화면 비율로 제어하므로 maxHeight 제거 -->
     <ScrollView
         android:id="@+id/scrollDialog"
         android:layout_width="match_parent"

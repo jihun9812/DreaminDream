@@ -1,5 +1,0 @@
-<!-- res/drawable/bg_calendar_card.xml -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#10263D" /> <!-- 남청 반투명 -->
-    <corners android:radius="14dp" />
-</shape>

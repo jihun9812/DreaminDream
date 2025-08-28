@@ -92,7 +92,7 @@ class FortuneApi(
         cb: (JSONObject?) -> Unit
     ) {
         val body = JSONObject().apply {
-            put("model","gpt-4.1-mini"); put("temperature",0.8)
+            put("model","gpt-4.1-mini"); put("temperature",0.7)
             put("messages", JSONArray().apply {
                 put(JSONObject().put("role","system").put("content","당신은 프리미엄 라이프 코치이자 운세 분석가입니다. 도구만 호출해 JSON을 반환하세요."))
                 put(JSONObject().put("role","user").put("content", buildDeepPrompt(u, daily, seed)))

@@ -1,4 +1,4 @@
-// file: app/src/main/java/com/example/dreamindream/DreamFragment.kt
+// app/src/main/java/com/example/dreamindream/DreamFragment.kt
 package com.example.dreamindream
 
 import android.content.Context
@@ -108,7 +108,6 @@ class DreamFragment : Fragment() {
         // ▼ 안내 문구
         resultTextView.text = "여기에 해몽 결과가 표시됩니다."
         resultTextView.setTextColor(Color.parseColor("#BFD0DC"))
-
     }
 
     private fun initUi(root: View) {
@@ -116,8 +115,6 @@ class DreamFragment : Fragment() {
 
         interpretButton.setOnClickListener {
             it.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.scale_up))
-
-            //  키보드 자동 내림 + 결과 영역으로 스크롤 준비
             hideKeyboardAndScrollToResult(root)
 
             val input = dreamEditText.text.toString().trim()
@@ -130,7 +127,6 @@ class DreamFragment : Fragment() {
                     increaseTodayCount(used)
                 }
                 used < freeLimit + adLimit -> {
-                    // 광고 보기/취소 — 시청 완료(보상)되어야만 진행.
                     showAdPrompt {
                         val latest = dreamEditText.text.toString().trim()
                         if (validateInput(latest)) {
@@ -158,13 +154,12 @@ class DreamFragment : Fragment() {
             btnWatch.isEnabled = false
             progress.visibility = View.VISIBLE
             textStatus.text = "광고 준비 중…"
-            // ▶ 실제 보상형 광고 표시. 보상 Earned 시에만 진행.
             AdManager.showRewarded(
                 activity = requireActivity(),
                 onRewardEarned = {
                     bs.dismiss()
                     onRewardEarnedProceed()
-                    AdManager.loadRewarded(requireContext()) // 다음을 위해 다시 로드
+                    AdManager.loadRewarded(requireContext())
                 },
                 onClosed = {
                     btnWatch.isEnabled = true
@@ -232,7 +227,7 @@ class DreamFragment : Fragment() {
 
         val body = JSONObject().apply {
             put("model", "gpt-4.1-mini")
-            put("temperature", 0.8)
+            put("temperature", 0.6)
             put("messages", messages)
             put("max_tokens", 900)
         }.toString().toRequestBody("application/json".toMediaType())
@@ -244,7 +239,7 @@ class DreamFragment : Fragment() {
             .addHeader("Content-Type", "application/json")
             .build()
 
-        http.newCall(req).enqueue(object : Callback {
+        OkHttpClient().newCall(req).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e(logTag, "GPT 요청 실패", e)
                 ui { onResultArrived("해몽 결과를 받아올 수 없습니다. 네트워크를 확인하고 다시 시도해 주세요.") }
@@ -273,7 +268,8 @@ class DreamFragment : Fragment() {
 
         //  Firestore 저장 → Cloud Function(sendDreamResult) 트리거 → 이메일 발송
         if (userId.isNotBlank()) {
-            FirestoreManager.saveDream(userId, dream, result, null)
+            // ❗️dateKey에 null 전달 금지 (Non-null)
+            FirestoreManager.saveDream(userId, dream, result) // ← 오늘 날짜 자동
         }
     }
 
@@ -284,7 +280,8 @@ class DreamFragment : Fragment() {
         resultTextView.text = styleResult(text.ifBlank { "해몽 결과가 비어있습니다." })
     }
 
-    // 로딩 표시/해제
+    // (스타일링/로딩/유틸 메서드는 기존 그대로 …)
+    // ─────────────────────────────────────────────
     private fun showLoading() {
         interpretButton.isEnabled = false
         lottieLoading?.apply {
@@ -301,7 +298,6 @@ class DreamFragment : Fragment() {
         lottieLoading?.apply { cancelAnimation(); visibility = View.GONE }
     }
 
-    // ---- 텍스트 정리 + 스타일링
     private fun styleResult(raw: String): CharSequence {
         var clean = raw.replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")
         clean = clean.replace("**", "")

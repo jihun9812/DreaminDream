@@ -108,7 +108,7 @@ fun richEmotionColor(label: String): Int = when (label) {
     else -> paletteFallback(label)
 }
 
-/** 테마 라벨별 풍부한 팔레트 */
+
 fun richThemeColor(label: String): Int = when (label) {
     "관계"     -> 0xFF4FC3F7.toInt()
     "성취"     -> 0xFFA5D6A7.toInt()
@@ -128,7 +128,7 @@ fun richThemeColor(label: String): Int = when (label) {
     else -> paletteFallback(label)
 }
 
-/** 라벨이 위에 없을 때 순환 팔레트에서 선택 (충돌 최소화) */
+
 private fun paletteFallback(key: String): Int {
     val palette = intArrayOf(
         0xFF7C9AFF.toInt(), 0xFF6EE7F2.toInt(), 0xFFFFB74D.toInt(), 0xFF4DD0E1.toInt(),
@@ -138,10 +138,6 @@ private fun paletteFallback(key: String): Int {
     val idx = (key.hashCode() and 0x7fffffff) % palette.size
     return palette[idx]
 }
-
-/* ─────────────────────────────────────────────────────────────
- * 데이터 바인딩 헬퍼
- * ──────────────────────────────────────────────────────────── */
 
 private fun makeSet(values: List<Float>, labels: List<String>, colorFor: (String) -> Int): BarDataSet {
     val entries = values.mapIndexed { i, v -> BarEntry(i.toFloat(), v.coerceIn(0f, 100f)) }

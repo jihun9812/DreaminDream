@@ -9,6 +9,7 @@
     android:padding="16dp"
     android:forceDarkAllowed="false">
 
+    <!-- 상단 아이콘 (통일 아이콘 포지션) -->
     <ImageView
         android:id="@+id/settings_icon"
         android:layout_width="48dp"
@@ -37,194 +38,238 @@
             android:orientation="vertical"
             android:background="@android:color/transparent">
 
-            <LinearLayout
+            <!-- 편집 카드 (보임/숨김 전환 대상) -->
+            <com.google.android.material.card.MaterialCardView
                 android:id="@+id/edit_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="gone"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="10dp"
+                app:strokeColor="#454545"
+                app:strokeWidth="1dp"
+                app:cardBackgroundColor="#6E5C9B">
 
-                <TextView
-                    android:id="@+id/label_nickname"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="이름"
-                    android:textColor="#FABE41"
-                    android:includeFontPadding="false"/>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilNickname"
+                <LinearLayout
+                    android:id="@+id/edit_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="14dp"
-                    app:boxBackgroundMode="outline"
-                    app:boxBackgroundColor="@android:color/transparent"
-                    app:boxStrokeColor="#FDCA60"
-                    app:boxStrokeWidth="1dp"
-                    app:boxStrokeWidthFocused="2dp"
-                    app:boxCornerRadiusTopStart="10dp"
-                    app:boxCornerRadiusTopEnd="10dp"
-                    app:boxCornerRadiusBottomStart="10dp"
-                    app:boxCornerRadiusBottomEnd="10dp">
+                    android:orientation="vertical"
+                    android:padding="18dp">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edit_nickname"
+                    <!-- 헤더 -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="예: 홍길동"
-                        android:padding="12dp"
-                        android:textColor="#E8F1F8"
-                        android:textColorHint="#80C6D4DF"
-                        android:includeFontPadding="false"/>
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="10dp">
 
-                <TextView
-                    android:id="@+id/label_birthdate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="생년월일"
-                    android:textColor="#FABE41"
-                    android:includeFontPadding="false"/>
+                        <ImageView
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@drawable/ic_edit"/>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilBirthdate"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="14dp"
-                    app:boxBackgroundMode="outline"
-                    app:boxBackgroundColor="@android:color/transparent"
-                    app:boxStrokeColor="#FDCA60"
-                    app:boxStrokeWidth="1dp"
-                    app:boxStrokeWidthFocused="2dp"
-                    app:endIconMode="custom"
-                    app:endIconTint="#C6D4DF"
-                    app:boxCornerRadiusTopStart="10dp"
-                    app:boxCornerRadiusTopEnd="10dp"
-                    app:boxCornerRadiusBottomStart="10dp"
-                    app:boxCornerRadiusBottomEnd="10dp">
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:text="프로필 편집"
+                            android:textColor="#E6F2FA"
+                            android:textStyle="bold"
+                            android:textSize="16sp"/>
+                    </LinearLayout>
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edit_birthdate"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="예: 1998년 7월 6일 (월)"
-                        android:focusable="false"
-                        android:clickable="true"
-                        android:inputType="none"
-                        android:padding="12dp"
-                        android:textColor="#E8F1F8"
-                        android:textColorHint="#80C6D4DF"
-                        android:includeFontPadding="false"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <TextView
-                    android:id="@+id/label_birthtime"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="태어난 시간"
-                    android:textColor="#FABE41"
-                    android:includeFontPadding="false"/>
-
-                <Spinner
-                    android:id="@+id/spinner_birthtime"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:minHeight="48dp"
-                    android:spinnerMode="dropdown"
-                    android:background="@drawable/bg_spinner_outline"
-                    android:popupBackground="@drawable/bg_spinner_popup"
-                    android:paddingStart="0dp"
-                    android:paddingEnd="0dp"
-                    android:layout_marginBottom="14dp"/>
-
-                <TextView
-                    android:id="@+id/label_gender"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="성별"
-                    android:textColor="#FABE41"
-                    android:includeFontPadding="false"/>
-
-                <RadioGroup
-                    android:id="@+id/radioGroup_gender"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="14dp">
-
-                    <RadioButton
-                        android:id="@+id/radio_male"
+                    <!-- 이름 -->
+                    <TextView
+                        android:id="@+id/label_nickname"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="남성"
+                        android:text="이름"
                         android:textColor="#FABE41"
-                        android:buttonTint="#37C2D0"
-                        android:layout_marginEnd="24dp"/>
+                        android:includeFontPadding="false"/>
 
-                    <RadioButton
-                        android:id="@+id/radio_female"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="여성"
-                        android:textColor="#FABE41"
-                        android:buttonTint="#37C2D0"/>
-                </RadioGroup>
-
-                <TextView
-                    android:id="@+id/label_mbti"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="MBTI"
-                    android:textColor="#FABE41"
-                    android:includeFontPadding="false"/>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilMBTI"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="22dp"
-                    app:boxBackgroundMode="outline"
-                    app:boxBackgroundColor="@android:color/transparent"
-                    app:boxStrokeColor="#3D6C89"
-                    app:boxStrokeWidth="1dp"
-                    app:boxStrokeWidthFocused="2dp"
-                    app:boxCornerRadiusTopStart="10dp"
-                    app:boxCornerRadiusTopEnd="10dp"
-                    app:boxCornerRadiusBottomStart="10dp"
-                    app:boxCornerRadiusBottomEnd="10dp">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edit_MBTI"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilNickname"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="예: INFP"
-                        android:padding="12dp"
-                        android:textColor="#E8F1F8"
-                        android:textColorHint="#80C6D4DF"
-                        android:inputType="textCapCharacters"
-                        android:maxLength="4"
+                        android:layout_marginBottom="14dp"
+                        app:boxBackgroundMode="outline"
+                        app:boxBackgroundColor="@android:color/transparent"
+                        app:boxStrokeColor="#FDCA60"
+                        app:boxStrokeWidth="1dp"
+                        app:boxStrokeWidthFocused="2dp"
+                        app:boxCornerRadiusTopStart="10dp"
+                        app:boxCornerRadiusTopEnd="10dp"
+                        app:boxCornerRadiusBottomStart="10dp"
+                        app:boxCornerRadiusBottomEnd="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edit_nickname"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="예: 홍길동"
+                            android:padding="12dp"
+                            android:textColor="#E8F1F8"
+                            android:textColorHint="#80C6D4DF"
+                            android:includeFontPadding="false"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- 생년월일 -->
+                    <TextView
+                        android:id="@+id/label_birthdate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="생년월일"
+                        android:textColor="#FABE41"
                         android:includeFontPadding="false"/>
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_save"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="저장"
-                android:textColor="#212121"
-                android:textStyle="bold"
-                android:includeFontPadding="false"
-                android:gravity="center"
-                app:cornerRadius="14dp"
-                app:backgroundTint="#EBBB57"
-                />
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilBirthdate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="14dp"
+                        app:boxBackgroundMode="outline"
+                        app:boxBackgroundColor="@android:color/transparent"
+                        app:boxStrokeColor="#FDCA60"
+                        app:boxStrokeWidth="1dp"
+                        app:boxStrokeWidthFocused="2dp"
+                        app:endIconMode="custom"
+                        app:endIconTint="#C6D4DF"
+                        app:boxCornerRadiusTopStart="10dp"
+                        app:boxCornerRadiusTopEnd="10dp"
+                        app:boxCornerRadiusBottomStart="10dp"
+                        app:boxCornerRadiusBottomEnd="10dp">
 
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edit_birthdate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="예: 1998-07-06"
+                            android:focusable="false"
+                            android:clickable="true"
+                            android:inputType="none"
+                            android:padding="12dp"
+                            android:textColor="#E8F1F8"
+                            android:textColorHint="#80C6D4DF"
+                            android:includeFontPadding="false"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- 태어난 시간 -->
+                    <TextView
+                        android:id="@+id/label_birthtime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="태어난 시간"
+                        android:textColor="#FABE41"
+                        android:includeFontPadding="false"/>
+
+                    <Spinner
+                        android:id="@+id/spinner_birthtime"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:minHeight="48dp"
+                        android:spinnerMode="dropdown"
+                        android:background="@drawable/bg_spinner_outline"
+                        android:popupBackground="@drawable/bg_spinner_popup"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="0dp"
+                        android:layout_marginBottom="14dp"/>
+
+                    <!-- 성별 -->
+                    <TextView
+                        android:id="@+id/label_gender"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="성별"
+                        android:textColor="#FABE41"
+                        android:includeFontPadding="false"/>
+
+                    <RadioGroup
+                        android:id="@+id/radioGroup_gender"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="14dp">
+
+                        <RadioButton
+                            android:id="@+id/radio_male"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="남성"
+                            android:textColor="#FABE41"
+                            android:buttonTint="#37C2D0"
+                            android:layout_marginEnd="24dp"/>
+
+                        <RadioButton
+                            android:id="@+id/radio_female"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="여성"
+                            android:textColor="#FABE41"
+                            android:buttonTint="#37C2D0"/>
+                    </RadioGroup>
+
+                    <!-- MBTI -->
+                    <TextView
+                        android:id="@+id/label_mbti"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="MBTI"
+                        android:textColor="#FABE41"
+                        android:includeFontPadding="false"/>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilMBTI"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="14dp"
+                        app:boxBackgroundMode="outline"
+                        app:boxBackgroundColor="@android:color/transparent"
+                        app:boxStrokeColor="#FDCA60"
+                        app:boxStrokeWidth="1dp"
+                        app:boxStrokeWidthFocused="2dp"
+                        app:boxCornerRadiusTopStart="10dp"
+                        app:boxCornerRadiusTopEnd="10dp"
+                        app:boxCornerRadiusBottomStart="10dp"
+                        app:boxCornerRadiusBottomEnd="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edit_MBTI"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="예: INFP"
+                            android:padding="12dp"
+                            android:textColor="#E8F1F8"
+                            android:textColorHint="#80C6D4DF"
+                            android:inputType="textCapCharacters"
+                            android:maxLength="4"
+                            android:includeFontPadding="false"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- 저장 버튼(편집 카드 내부) -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_save"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="저장"
+                        android:textColor="#212121"
+                        android:textStyle="bold"
+                        android:includeFontPadding="false"
+                        android:gravity="center"
+                        app:cornerRadius="14dp"
+                        app:backgroundTint="#EBBB57"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- 프로필 요약 카드 -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/card_user_info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="4dp"
                 android:visibility="gone"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="10dp"
@@ -246,7 +291,18 @@
                         android:textSize="18sp"
                         android:textStyle="bold"
                         android:includeFontPadding="false"
-                        android:layout_marginBottom="12dp"/>
+                        android:layout_marginBottom="6dp"/>
+
+                    <!-- 🔐 로그인 방식 표시 -->
+                    <TextView
+                        android:id="@+id/text_login_provider"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FFD54F"
+                        android:textSize="13sp"
+                        android:includeFontPadding="false"
+                        android:layout_marginBottom="8dp"
+                        android:text=" "/>
 
                     <TextView
                         android:id="@+id/text_user_info"
@@ -264,9 +320,23 @@
                         android:layout_marginTop="16dp"
                         android:visibility="gone"
                         style="?android:attr/progressBarStyleLarge" />
+
+                    <!-- 보기 모드에서 '수정' 역할 버튼 -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_edit_mode"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="16dp"
+                        android:text="수정"
+                        android:textAllCaps="false"
+                        android:textColor="#212121"
+                        android:textStyle="bold"
+                        app:cornerRadius="14dp"
+                        app:backgroundTint="#FDCA60"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <!-- 로그아웃 -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_logout"
                 android:layout_width="wrap_content"
@@ -284,6 +354,7 @@
         </LinearLayout>
     </ScrollView>
 
+    <!-- 하단 배너 (다른 화면들과 동일 유닛) -->
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView_settings"
         android:layout_width="match_parent"

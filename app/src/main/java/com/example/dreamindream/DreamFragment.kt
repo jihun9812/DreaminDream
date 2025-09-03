@@ -268,7 +268,6 @@ class DreamFragment : Fragment() {
 
         //  Firestore 저장 → Cloud Function(sendDreamResult) 트리거 → 이메일 발송
         if (userId.isNotBlank()) {
-            // ❗️dateKey에 null 전달 금지 (Non-null)
             FirestoreManager.saveDream(userId, dream, result) // ← 오늘 날짜 자동
         }
     }
@@ -298,33 +297,53 @@ class DreamFragment : Fragment() {
         lottieLoading?.apply { cancelAnimation(); visibility = View.GONE }
     }
 
+    /**
+     * 해몽 결과 텍스트에서 섹션 헤더를 자동 감지해
+     * (색상 + Bold + 살짝 크게) 적용.
+     */
     private fun styleResult(raw: String): CharSequence {
+        // 마크다운 잔재/코드 블럭/리스트 기호 정리
         var clean = raw.replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")
-        clean = clean.replace("**", "")
-        clean = clean.replace(Regex("`{1,3}"), "")
-        clean = clean.replace(Regex("(?m)^\\s*[-*]\\s+"), "• ")
+            .replace("**", "")
+            .replace(Regex("`{1,3}"), "")
+            .replace(Regex("(?m)^\\s*[-*]\\s+"), "• ")
 
         val sb = SpannableStringBuilder(clean)
 
+        // 섹션 헤더 정의 (색은 프리미엄 톤)
         data class H(val emoji: String, val label: String, val color: Int)
         val headers = listOf(
-            H("💭", "꿈이 전하는 메시지", Color.parseColor("#9BE7FF")),
-            H("🧠", "핵심 상징 해석",   Color.parseColor("#FFB3C1")),
-            H("📌", "예지 포인트",     Color.parseColor("#FFD166")),
-            H("☀️", "오늘의 활용 팁",  Color.parseColor("#FFE082")),
-            H("🎯", "오늘의 행동 3가지",Color.parseColor("#A5D6A7"))
+            H("💭", "꿈이 전하는 메시지", Color.parseColor("#9BE7FF")), // 하늘빛
+            H("🧠", "핵심 상징 해석",   Color.parseColor("#FFB3C1")), // 핑크
+            H("📌", "예지 포인트",     Color.parseColor("#FFD166")), // 옐로우
+            H("☀️", "오늘의 활용 팁",  Color.parseColor("#FFE082")), // 크림
+            H("🎯", "오늘의 행동 3가지",Color.parseColor("#A5D6A7"))  // 민트
         )
 
+        // 이모지 유무/앞공백 허용, 라인 전체를 헤더로 처리
         headers.forEach { h ->
-            val pattern = Regex("(?m)^(?:${Regex.escape(h.emoji)}\\s*)?${Regex.escape(h.label)}.*$")
+            val pattern = Regex("(?m)^(?:${Regex.escape(h.emoji)}\\s*)?${Regex.escape(h.label)}\\s*$")
             pattern.findAll(clean).forEach { m ->
                 val s = m.range.first
                 val e = m.range.last + 1
                 sb.setSpan(ForegroundColorSpan(h.color), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 sb.setSpan(StyleSpan(Typeface.BOLD), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                sb.setSpan(RelativeSizeSpan(1.06f), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                sb.setSpan(RelativeSizeSpan(1.08f), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
+
+        // 소제목이 콜론으로 끝나는 경우도 색상 적용 (예: "핵심 상징 해석:")
+        headers.forEach { h ->
+            val alt = Regex("(?m)^(?:${Regex.escape(h.emoji)}\\s*)?${Regex.escape(h.label)}\\s*:\\s*$")
+            alt.findAll(clean).forEach { m ->
+                val s = m.range.first
+                val e = m.range.last + 1
+                sb.setSpan(ForegroundColorSpan(h.color), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                sb.setSpan(StyleSpan(Typeface.BOLD), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                sb.setSpan(RelativeSizeSpan(1.08f), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+
         return sb
     }
 
@@ -375,13 +394,15 @@ class DreamFragment : Fragment() {
                 H("☀️", "오늘의 활용 팁",  Color.parseColor("#FFE082")),
                 H("🎯", "오늘의 행동 3가지",Color.parseColor("#A5D6A7"))
             )
+            // 라인 끝/콜론 변형까지 처리
             headers.forEach { h ->
-                val pattern = Regex("(?m)^(?:${Regex.escape(h.emoji)}\\s*)?${Regex.escape(h.label)}.*$")
-                pattern.findAll(clean).forEach { m ->
+                val p1 = Regex("(?m)^(?:${Regex.escape(h.emoji)}\\s*)?${Regex.escape(h.label)}\\s*$")
+                val p2 = Regex("(?m)^(?:${Regex.escape(h.emoji)}\\s*)?${Regex.escape(h.label)}\\s*:\\s*$")
+                (p1.findAll(clean) + p2.findAll(clean)).forEach { m ->
                     val s = m.range.first; val e = m.range.last + 1
                     sb.setSpan(ForegroundColorSpan(h.color), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                     sb.setSpan(StyleSpan(Typeface.BOLD), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    sb.setSpan(RelativeSizeSpan(1.06f), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    sb.setSpan(RelativeSizeSpan(1.08f), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 }
             }
             tv.text = sb
@@ -397,6 +418,7 @@ class DreamFragment : Fragment() {
                 .setView(v)
                 .create()
 
+            //  XML에 btn_close 추가했으니 크래시 없음
             v.findViewById<View>(R.id.btn_close).setOnClickListener { dialog.dismiss() }
             dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
             dialog.show()

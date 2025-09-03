@@ -1,22 +1,20 @@
-// file: app/src/main/java/com/example/dreamindream/AIReportFragment.kt
+// app/src/main/java/com/example/dreamindream/AIReportFragment.kt
 package com.example.dreamindream
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.*
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
 import android.widget.*
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import com.airbnb.lottie.LottieAnimationView           // ✅ 추가
 import com.example.dreamindream.ads.AdManager
-import com.example.dreamindream.chart.setupBarChart
 import com.example.dreamindream.chart.renderPercentBars
 import com.example.dreamindream.chart.richEmotionColor
 import com.example.dreamindream.chart.richThemeColor
+import com.example.dreamindream.chart.setupBarChart
 import com.github.mikephil.charting.charts.BarChart
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
@@ -24,6 +22,7 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import okhttp3.*
@@ -31,6 +30,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 class AIReportFragment : Fragment() {
@@ -51,39 +51,48 @@ class AIReportFragment : Fragment() {
     private lateinit var kpiNeutral: TextView
     private lateinit var kpiNegative: TextView
     private lateinit var btnPro: MaterialButton
-
-    // ✅ PRO 로더
-    private lateinit var proLoader: LottieAnimationView
+    private lateinit var proSpinner: CircularProgressIndicator
 
     // State
-    private var proInFlight = false
-    private var proCompleted = false
-    private var proNeedRefresh = false
+    private lateinit var prefs: SharedPreferences
+    private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+    private val TAG = "AIReport"
+
+    private var targetWeekKey: String = WeekUtils.weekKey()
     private var lastDreamCount = 0
     private var lastProClickAt = 0L
 
-    private var targetWeekKey: String = WeekUtils.weekKey()
-    private lateinit var prefs: SharedPreferences
-
     private var lastFeeling: String = ""
     private var lastKeywords: List<String> = emptyList()
-
     private var lastEmoLabels: List<String> = emptyList()
     private var lastEmoDist: List<Float> = emptyList()
     private var lastThemeLabels: List<String> = emptyList()
     private var lastThemeDist: List<Float> = emptyList()
 
-    private val apiKey by lazy { BuildConfig.OPENAI_API_KEY }
+    // 진행 상태
+    private var adGateInProgress = false
+    private var adEarned = false
+    private var proInFlight = false
+    private var proCompleted = false
+    private var proNeedRefresh = false
 
-    // 성능/중복방지
-    private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+    // 호출 핸들
+    private var prefetchCall: Call? = null
+    private var prefetchResult: String? = null
+    private var prefetchWatchdog: Runnable? = null
+
+    // Configs
+    private val apiKey by lazy { BuildConfig.OPENAI_API_KEY }
+    private val OKHTTP_TIMEOUT = 20L
+    private val PRO_WATCHDOG_MS = 30_000L
+    private val RELOAD_DEBOUNCE_MS = 350L
+    private val PRO_PENDING_TTL_MS = 3_000L
+
+    // Debounce
     private var reloadScheduled = false
     private var isReloading = false
 
-    private val PRO_PENDING_TTL_MS = 3_000L
-    private val RELOAD_DEBOUNCE_MS = 350L
-    private val OKHTTP_TIMEOUT = 20L
-
+    // Network
     private val httpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .connectTimeout(OKHTTP_TIMEOUT, TimeUnit.SECONDS)
@@ -93,66 +102,97 @@ class AIReportFragment : Fragment() {
             .build()
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
+    // ------ 섹션 컬러 팔레트 & 틴팅 ------
+    private val sectionColorMap = linkedMapOf(
+        "주간 꿈 심화 분석" to "#FDCA60",
+        "요약"           to "#90CAF9",
+        "수치 요약"      to "#A7FFEB",
+        "감정 패턴 해석"  to "#FFAB91",
+        "상징·장면 해석"  to "#F48FB1",
+        "명리 관점"      to "#B39DDB", // (가볍게) 등 꼬리표 포함 매칭
+        "1~2주 전망"     to "#81C784",
+        "체크리스트"      to "#FFE082",
+        "오늘의 체크"     to "#80DEEA"
+    )
+
+    private fun tintSectionTitles(html: String): String {
+        var s = html
+        sectionColorMap.forEach { (key, color) ->
+            val pattern = Regex("(<p>\\s*<b>)(${Regex.escape(key)}[^<]*)(</b>)", RegexOption.IGNORE_CASE)
+            s = pattern.replace(s) { m ->
+                "${m.groupValues[1]}<font color=\"$color\">${m.groupValues[2]}</font>${m.groupValues[3]}"
+            }
+        }
+        return s
+    }
+
+    private fun ensureTinted(html: String): String {
+        return if (html.contains("<font color=", ignoreCase = true)) html else tintSectionTitles(html)
+    }
+
+    private fun sanitizeModelHtml(raw: String): String {
+        var s = raw.trim()
+        s = s.replace(Regex("^\\s*```(?:\\w+)?\\s*"), "")
+        s = s.replace(Regex("\\s*```\\s*$"), "")
+        s = s.replace(Regex("^#+\\s*", RegexOption.MULTILINE), "")
+        return s
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val v = inflater.inflate(R.layout.fragment_ai_report, container, false)
 
         emptyIconLayout = v.findViewById(R.id.empty_icon_layout)
-        reportCard = v.findViewById(R.id.report_card)
-        weekLabel = v.findViewById(R.id.week_label)
-        btnHistory = v.findViewById(R.id.btn_history)
-        keywordsText = v.findViewById(R.id.text_keywords)
-        aiComment = v.findViewById(R.id.text_ai_comment)
-        analysisTitle = v.findViewById(R.id.analysis_title)
-        chartInfoBtn = v.findViewById(R.id.btn_chart_info)
-        emotionChart = v.findViewById(R.id.emotion_bar_chart)
-        themeChart = v.findViewById(R.id.theme_bar_chart)
-        kpiPositive = v.findViewById(R.id.kpi_positive)
-        kpiNeutral  = v.findViewById(R.id.kpi_neutral)
-        kpiNegative = v.findViewById(R.id.kpi_negative)
-        btnPro = v.findViewById(R.id.btn_pro_upgrade)
-        adView = v.findViewById(R.id.adView_ai)
-
-        // ✅ Lottie 로더 바인딩
-        proLoader = v.findViewById(R.id.pro_loader)
-
-        val uidPart = FirebaseAuth.getInstance().currentUser?.uid ?: "guest"
-        prefs = requireContext().getSharedPreferences("weekly_report_cache_$uidPart", Context.MODE_PRIVATE)
+        reportCard      = v.findViewById(R.id.report_card)
+        weekLabel       = v.findViewById(R.id.week_label)
+        btnHistory      = v.findViewById(R.id.btn_history)
+        keywordsText    = v.findViewById(R.id.text_keywords)
+        aiComment       = v.findViewById(R.id.text_ai_comment)
+        analysisTitle   = v.findViewById(R.id.analysis_title)
+        chartInfoBtn    = v.findViewById(R.id.btn_chart_info)
+        emotionChart    = v.findViewById(R.id.emotion_bar_chart)
+        themeChart      = v.findViewById(R.id.theme_bar_chart)
+        kpiPositive     = v.findViewById(R.id.kpi_positive)
+        kpiNeutral      = v.findViewById(R.id.kpi_neutral)
+        kpiNegative     = v.findViewById(R.id.kpi_negative)
+        btnPro          = v.findViewById(R.id.btn_pro_upgrade)
+        adView          = v.findViewById(R.id.adView_ai)
+        proSpinner      = v.findViewById(R.id.pro_spinner)
+        proSpinner.isIndeterminate = true
 
         MobileAds.initialize(requireContext())
         adView.loadAd(AdRequest.Builder().build())
         AdManager.initialize(requireContext())
         AdManager.loadRewarded(requireContext())
 
-        reportCard.visibility = View.VISIBLE
-        reportCard.scaleX = 0.96f; reportCard.scaleY = 0.96f; reportCard.alpha = 0f
-        reportCard.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(160L).start()
+        reportCard.apply {
+            visibility = View.VISIBLE
+            scaleX = 0.96f; scaleY = 0.96f; alpha = 0f
+            animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(160L).start()
+        }
 
         targetWeekKey = arguments?.getString("weekKey") ?: WeekUtils.weekKey()
-
         setupBarChart(emotionChart)
         setupBarChart(themeChart)
 
-        // 캐시 즉시 표시 (체감 속도↑)
+        val uidPart = FirebaseAuth.getInstance().currentUser?.uid ?: "guest"
+        prefs = requireContext().getSharedPreferences("weekly_report_cache_$uidPart", Context.MODE_PRIVATE)
         prefillFromCache(targetWeekKey)
 
-        if (prefs.getBoolean("pro_done_${targetWeekKey}", false)) {
-            proCompleted = true
-        }
+        if (prefs.getBoolean("pro_done_${targetWeekKey}", false)) proCompleted = true
         applyProButtonState()
 
         chartInfoBtn.setOnClickListener {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("차트 안내")
-                .setMessage("• 꿈 기록 → 감정 8가지·테마 4가지\n• 2개 이상 기록 시 리포트\n• 명리 심화 분석으로 깊이 있는 해석")
+                .setMessage("• 꿈 기록 → 감정 8가지·테마 4가지\n• 2개 이상 기록 시 리포트\n• 심화 분석으로 깊이 있는 해석")
                 .setPositiveButton("확인", null).show()
         }
-
         btnHistory.setOnClickListener {
             WeeklyHistoryBottomSheet.showOnce(
-                childFragmentManager, currentWeekKey = targetWeekKey,
-                onPick = { scheduleReload(it) }, maxItems = 26
+                childFragmentManager,
+                currentWeekKey = targetWeekKey,
+                onPick = { scheduleReload(it) },
+                maxItems = 26
             )
         }
         btnPro.setOnClickListener { onProCtaClicked() }
@@ -162,40 +202,47 @@ class AIReportFragment : Fragment() {
         return v
     }
 
-    // ----- 로더 제어 -----
-    private fun showProLoader(show: Boolean) {
-        if (!this::proLoader.isInitialized) return
-        proLoader.visibility = if (show) View.VISIBLE else View.GONE
-        if (show) proLoader.playAnimation() else proLoader.cancelAnimation()
-        reportCard.alpha = if (show) 0.6f else 1f
-        btnPro.isEnabled = !show
+    override fun onDestroyView() {
+        cancelPrefetch("destroy")
+        super.onDestroyView()
     }
 
-    // ----- Prefill / Header / Loading -----
+    // -------- Spinner --------
+    private fun showProSpinner(show: Boolean, textOverride: String? = null) {
+        if (!this::proSpinner.isInitialized) return
+        proSpinner.isVisible = show
+        reportCard.alpha = if (show) 0.92f else 1f
+        if (show) btnPro.isEnabled = false
+        textOverride?.let { btnPro.text = it }
+    }
+
+    // -------- Cache/Header --------
     private fun prefillFromCache(weekKey: String) {
         prefs.getString("last_feeling_${weekKey}", null)?.let { cf ->
-            val ck = prefs.getString("last_keywords_${weekKey}", null)
-                ?.split("|")?.filter { it.isNotBlank() }
+            val ck = prefs.getString("last_keywords_${weekKey}", null)?.split("|")?.filter { it.isNotBlank() }
             val ca = prefs.getString("last_analysis_${weekKey}", null)
 
             val el = prefs.getString("last_emo_labels_${weekKey}", null)?.split("|") ?: emptyList()
             val ed = prefs.getString("last_emo_dist_${weekKey}", null)?.split(",")?.mapNotNull { it.toFloatOrNull() } ?: emptyList()
             val tl = prefs.getString("last_theme_labels_${weekKey}", null)?.split("|") ?: emptyList()
             val td = prefs.getString("last_theme_dist_${weekKey}", null)?.split(",")?.mapNotNull { it.toFloatOrNull() } ?: emptyList()
+
+            lastFeeling = cf
+            lastKeywords = ck ?: emptyList()
             lastEmoLabels = el; lastEmoDist = ed
             lastThemeLabels = tl; lastThemeDist = td
 
-            if (!ck.isNullOrEmpty() && !ca.isNullOrBlank()) {
+            if (!lastKeywords.isNullOrEmpty() && !ca.isNullOrBlank()) {
                 showReport(true)
-                keywordsText.text = "감정: $cf • 키워드: ${ck.joinToString(", ")}"
-                aiComment.text = HtmlCompat.fromHtml(ca, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                keywordsText.text = "감정: $cf • 키워드: ${lastKeywords.joinToString(", ")}"
+                val caColored = ensureTinted(ca!!)
+                aiComment.text = HtmlCompat.fromHtml(caColored, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
                 if (el.isNotEmpty() && ed.isNotEmpty() && tl.isNotEmpty() && td.isNotEmpty()) {
-                    val (pos, neu, neg) = computeKpis(el, ed)
-                    kpiPositive.text = String.format("%.1f%%", pos)
-                    kpiNeutral.text  = String.format("%.1f%%", neu)
-                    kpiNegative.text = String.format("%.1f%%", neg)
-
+                    val (p, n, m) = computeKpis(el, ed)
+                    kpiPositive.text = String.format("%.1f%%", p)
+                    kpiNeutral.text  = String.format("%.1f%%", n)
+                    kpiNegative.text = String.format("%.1f%%", m)
                     renderPercentBars(emotionChart, el, ed, ::richEmotionColor)
                     renderPercentBars(themeChart,   tl, td, ::richThemeColor)
                 }
@@ -208,13 +255,9 @@ class AIReportFragment : Fragment() {
         reportCard.isVisible = has
     }
 
-    private fun updateHeader(
-        sourceCount: Int? = null, rebuiltAt: Long? = null,
-        tier: String? = null, proAt: Long? = null, stale: Boolean? = null
-    ) {
+    private fun updateHeader(sourceCount: Int? = null, rebuiltAt: Long? = null, tier: String? = null, proAt: Long? = null, stale: Boolean? = null) {
         val titleLine = "이번 주 분석 리포트"
-        val metaLine = if (sourceCount != null && rebuiltAt != null && rebuiltAt > 0L)
-            "${sourceCount}건 · ${formatAgo(rebuiltAt)}" else ""
+        val metaLine = if (sourceCount != null && rebuiltAt != null && rebuiltAt > 0L) "${sourceCount}건 · ${formatAgo(rebuiltAt)}" else ""
         weekLabel.text = if (metaLine.isNotBlank()) "$titleLine\n$metaLine" else titleLine
 
         val needRefresh = (stale == true) || (tier == "pro" && (proAt ?: 0L) < (rebuiltAt ?: 0L))
@@ -223,10 +266,10 @@ class AIReportFragment : Fragment() {
         applyProButtonState()
     }
 
-    private fun beginLoading() { reportCard.alpha = 0.6f }
+    private fun beginLoading() { reportCard.alpha = 0.92f }
     private fun endLoading() { reportCard.alpha = 1f; applyProButtonState() }
 
-    // ----- CTA State -----
+    // -------- CTA State --------
     private fun isProPending(): Boolean {
         val until = prefs.getLong("pro_pending_until_${targetWeekKey}", 0L)
         return SystemClock.elapsedRealtime() < until
@@ -236,7 +279,7 @@ class AIReportFragment : Fragment() {
         prefs.edit().putLong("pro_pending_until_${targetWeekKey}", until).apply()
     }
     private fun applyProButtonState() {
-        val enabledBase = apiKey.isNotBlank() && !proInFlight && lastDreamCount >= 2 && !isProPending()
+        val enabledBase = apiKey.isNotBlank() && !proInFlight && lastDreamCount >= 2 && !isProPending() && !adGateInProgress
         when {
             proCompleted && !proNeedRefresh -> {
                 btnPro.text = "심화 분석 완료"
@@ -259,7 +302,7 @@ class AIReportFragment : Fragment() {
         }
     }
 
-    // ----- Debounced reload -----
+    // -------- Debounced Reload --------
     private fun scheduleReload(weekKey: String) {
         targetWeekKey = weekKey
         if (reloadScheduled) return
@@ -270,15 +313,13 @@ class AIReportFragment : Fragment() {
         }, RELOAD_DEBOUNCE_MS)
     }
 
-    // ----- Load / Bind -----
+    // -------- Load / Bind --------
     private fun reloadForWeekInternal(weekKey: String) {
         if (isReloading) return
         isReloading = true
         beginLoading()
 
-        if (prefs.getBoolean("pro_done_$weekKey", false)) {
-            proCompleted = true
-        }
+        if (prefs.getBoolean("pro_done_$weekKey", false)) proCompleted = true
 
         val userId = uid ?: run {
             fallbackFromArgsOrEmpty(); endLoading(); isReloading = false; return
@@ -376,7 +417,7 @@ class AIReportFragment : Fragment() {
     ) {
         showReport(true)
         keywordsText.text = "감정: $feeling • 키워드: ${keywords.joinToString(", ")}"
-        aiComment.text = HtmlCompat.fromHtml(analysis, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        aiComment.text = HtmlCompat.fromHtml(ensureTinted(analysis), HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         val (pos, neu, neg) = computeKpis(emoLabels, emoDist)
         kpiPositive.text = String.format("%.1f%%", pos)
@@ -389,7 +430,7 @@ class AIReportFragment : Fragment() {
         prefs.edit()
             .putString("last_feeling_$weekKey", feeling)
             .putString("last_keywords_$weekKey", keywords.joinToString("|"))
-            .putString("last_analysis_$weekKey", analysis.take(2000))
+            .putString("last_analysis_$weekKey", analysis.take(5000))
             .putString("last_emo_labels_$weekKey", emoLabels.joinToString("|"))
             .putString("last_emo_dist_$weekKey", emoDist.joinToString(","))
             .putString("last_theme_labels_$weekKey", themeLabels.joinToString("|"))
@@ -398,7 +439,7 @@ class AIReportFragment : Fragment() {
         applyProButtonState()
     }
 
-    // ----- Pro -----
+    // -------- Pro CTA --------
     private fun onProCtaClicked() {
         val userId = uid ?: run {
             Snackbar.make(reportCard, "로그인이 필요해요.", Snackbar.LENGTH_SHORT).show(); return
@@ -411,12 +452,13 @@ class AIReportFragment : Fragment() {
             Snackbar.make(reportCard, "심화 분석은 이번 주 꿈 2개 이상일 때 제공됩니다.", Snackbar.LENGTH_SHORT).show()
             applyProButtonState(); return
         }
-        // 리프레시 케이스: 광고 없이 바로
+
+        // 새로고침이면 바로 선호출
         if (proCompleted && proNeedRefresh) {
-            showProLoader(true)                 // ✅ 바로 로더 ON
-            proceedProUpgrade(userId)
+            startPrefetchPro(userId)
             return
         }
+
         openProWithGate(userId)
     }
 
@@ -424,7 +466,7 @@ class AIReportFragment : Fragment() {
         val now = SystemClock.elapsedRealtime()
         if (now - lastProClickAt < 800) return
         lastProClickAt = now
-        if (proInFlight || isProPending()) return
+        if (adGateInProgress || isProPending()) return
 
         val bs = BottomSheetDialog(requireContext())
         val v = layoutInflater.inflate(R.layout.dialog_ad_prompt, null)
@@ -435,31 +477,39 @@ class AIReportFragment : Fragment() {
 
         btnCancel.setOnClickListener { bs.dismiss() }
         btnWatch.setOnClickListener {
-            proInFlight = true; setProPending(PRO_PENDING_TTL_MS); applyProButtonState()
-            btnWatch.isEnabled = false; progress.visibility = View.VISIBLE
+            adGateInProgress = true
+            adEarned = false
+            setProPending(PRO_PENDING_TTL_MS)
+            applyProButtonState()
+
+            // 즉시 로딩 표시 + 선호출
+            showProSpinner(true, "분석 준비 중…")
+            btnWatch.isEnabled = false
+            progress.visibility = View.VISIBLE
             textStatus.text = "광고 준비 중…"
+
+            startPrefetchPro(userId)
 
             AdManager.showRewarded(
                 requireActivity(),
                 onRewardEarned = {
-                    progress.visibility = View.GONE
+                    adEarned = true
                     textStatus.text = "보상 확인됨"
                     bs.dismiss()
-
-                    // ✅ 즉시 로더 ON + 버튼 상태
-                    showProLoader(true)
-                    btnPro.isEnabled = false; btnPro.text = "심화 분석 중..."
-
-                    proceedProUpgrade(userId)
+                    prefetchResult?.let { applyProResult(userId, it) } // 이미 완료면 즉시 표시
                     AdManager.loadRewarded(requireContext())
                 },
                 onClosed = {
-                    proInFlight = false; applyProButtonState()
-                    btnWatch.isEnabled = true; progress.visibility = View.GONE
+                    adGateInProgress = false
+                    cancelPrefetch("ad-closed")
+                    applyProButtonState()
+                    btnWatch.isEnabled = true
+                    progress.visibility = View.GONE
                     textStatus.text = "광고가 닫혔어요. 보상이 확인되지 않았습니다."
                 },
                 onFailed = { reason ->
-                    proInFlight = false
+                    adGateInProgress = false
+                    cancelPrefetch("ad-failed:$reason")
                     Snackbar.make(reportCard, "광고 오류($reason) - 잠시 후 다시 시도해주세요.", Snackbar.LENGTH_SHORT).show()
                     applyProButtonState()
                 }
@@ -468,75 +518,35 @@ class AIReportFragment : Fragment() {
         bs.setContentView(v); bs.show()
     }
 
-    private fun proceedProUpgrade(userId: String) {
-        if (proInFlight) return
-        proInFlight = true; applyProButtonState()
-        btnPro.isEnabled = false; btnPro.text = "심화 분석 중..."
+    // -------- 선호출/적용 --------
+    private fun startPrefetchPro(userId: String) {
+        if (prefetchCall != null || proInFlight) return
+        proInFlight = true
+        applyProButtonState()
+        btnPro.isEnabled = false
+        btnPro.text = "심화 분석 중..."
+        showProSpinner(true)
 
-        // ✅ 안전망: 로더가 꺼져 있으면 켠다
-        showProLoader(true)
-
+        // 1) 주간 엔트리 4개 수집 후 프롬프트 구성
         FirestoreManager.collectWeekEntriesLimited(userId, targetWeekKey, limit = 4) { entries, totalCount ->
+            if (!isAdded) return@collectWeekEntriesLimited
+
             if (totalCount < 2) {
-                proInFlight = false; applyProButtonState()
-                showProLoader(false) // ✅ OFF
+                cancelPrefetch("not-enough-entries")
                 Snackbar.make(reportCard, "심화 분석은 이번 주 꿈 2개 이상일 때 제공됩니다.", Snackbar.LENGTH_SHORT).show()
                 return@collectWeekEntriesLimited
             }
 
             val dreams = entries.map { it.dream }.filter { it.isNotBlank() }
             val interps = entries.map { it.interp }.filter { it.isNotBlank() }
+            val prompt = buildProPrompt(dreams, interps)
 
-            val (pos, neu, neg) = computeKpis(lastEmoLabels, lastEmoDist)
-            val themePairs = lastThemeLabels.zip(lastThemeDist)
-            fun fmt(v: Float) = String.format("%.1f", v)
-
-            val numericBlock = buildString {
-                appendLine("• 감정 분포(%) — 긍정 ${fmt(pos)} / 중립 ${fmt(neu)} / 부정 ${fmt(neg)}")
-                if (themePairs.isNotEmpty()) {
-                    append("• 테마 비중(%) — ")
-                    append(themePairs.joinToString(" / ") { (lab, v) -> "$lab ${fmt(v)}" })
-                }
-            }.trim()
-
-            val prompt = buildString {
-                appendLine("다음은 사용자의 한 주 꿈 원문과 각 꿈에 대한 해몽 텍스트입니다. (최대 4개, 최신순)")
-                dreams.forEachIndexed { i, s -> appendLine("[꿈 ${i+1}] $s") }
-                interps.forEachIndexed { i, s -> appendLine("[해몽 ${i+1}] $s") }
-                appendLine()
-                appendLine("아래는 이번 주 분석에서 산출된 수치입니다. 반드시 그대로 인용하세요.")
-                appendLine(numericBlock)
-                appendLine()
-                appendLine(
-                    """
-                    당신은 한국어만 사용하는 ‘명리·상징 기반 꿈해몽가’이자 스토리텔러입니다.
-                    톤&스타일: 간결, 신뢰감, 대기업 리포트 느낌(섹션 헤더 명확, 불릿 최소).
-                    지침:
-                    - 위의 수치(%)를 <b>수치 요약</b> 섹션에서 명확히 제시하고 첫 단락 근처에서도 자연스럽게 1회 언급
-                    - 감정/테마 이름은 그대로 사용(값은 위 수치 활용)
-                    - 과장 금지, 현실적인 1~2주 전망/주의
-                    - HTML로 출력, 문단 간 여백 유지(모바일 가독성)
-                    출력(HTML):
-                    <p><b>요약</b> — 한 문단으로 핵심 정리</p>
-                    <p><b>수치 요약</b><br/>감정(긍정/중립/부정): ${fmt(pos)}% / ${fmt(neu)}% / ${fmt(neg)}%<br/>테마: ${
-                        if (themePairs.isNotEmpty())
-                            themePairs.joinToString(" / ") { (lab, v) -> "$lab ${fmt(v)}%" }
-                        else "—"
-                    }</p>
-                    <p><b>명리 관점</b> — 사주적 상징 연결과 흐름</p>
-                    <p><b>상징 해석</b> — 반복 상징을 하나의 이야기로</p>
-                    <p><b>미래 전망(1~2주)</b> — 기대/주의 포인트</p>
-                    <ul><li>가이드 1</li><li>가이드 2</li><li>가이드 3</li></ul>
-                    <p><b>결론</b> — 한 문단 마무리</p>
-                    """.trimIndent()
-                )
-            }
-
+            // 2) OpenAI 호출
             val body = JSONObject().apply {
                 put("model", "gpt-4o-mini")
                 put("temperature", 0.6)
                 put("messages", JSONArray().put(JSONObject().put("role", "user").put("content", prompt)))
-                put("max_tokens", 700)
+                put("max_tokens", 900)
             }.toString().toRequestBody("application/json".toMediaType())
 
             val req = Request.Builder()
@@ -546,56 +556,161 @@ class AIReportFragment : Fragment() {
                 .addHeader("Content-Type", "application/json")
                 .build()
 
-            httpClient.newCall(req).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: java.io.IOException) {
-                    proInFlight = false; applyProButtonState()
-                    view?.post {
-                        showProLoader(false) // ✅ OFF
+            val watchdog = Runnable {
+                if (proInFlight) {
+                    cancelPrefetch("timeout")
+                    Snackbar.make(reportCard, "심화 분석이 시간 초과됐어요. 네트워크 확인 후 다시 시도해주세요.", Snackbar.LENGTH_LONG).show()
+                }
+            }
+            prefetchWatchdog = watchdog
+            mainHandler.postDelayed(watchdog, PRO_WATCHDOG_MS)
+
+            val call = httpClient.newCall(req)
+            prefetchCall = call
+
+            call.enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    if (prefetchCall !== call) return
+                    cancelPrefetch("network-fail")
+                    mainHandler.post {
                         Snackbar.make(reportCard, "네트워크 오류로 심화 분석에 실패했어요.", Snackbar.LENGTH_SHORT).show()
                     }
                 }
                 override fun onResponse(call: Call, response: Response) {
-                    response.use {
-                        val content = try {
-                            JSONObject(it.body?.string() ?: "")
-                                .getJSONArray("choices").getJSONObject(0)
-                                .getJSONObject("message").getString("content").trim()
+                    if (prefetchCall !== call) { response.close(); return }
+                    val bodyText = response.body?.string().orEmpty()
+                    val isOk = response.isSuccessful
+                    response.close()
+
+                    if (!isOk) {
+                        val errMsg = try {
+                            JSONObject(bodyText).optJSONObject("error")?.optString("message").orEmpty()
                         } catch (_: Exception) { "" }
-
-                        view?.post {
-                            if (content.isNotBlank()) {
-                                aiComment.text = HtmlCompat.fromHtml(content, HtmlCompat.FROM_HTML_MODE_LEGACY)
-                                prefs.edit().putBoolean("pro_done_${targetWeekKey}", true).apply()
-                                analysisTitle.text = "AI 심화분석"
-                                proCompleted = true; proNeedRefresh = false
-                                btnPro.text = "심화 분석 완료"; btnPro.isEnabled = false; btnPro.alpha = 0.65f
-                                applyProButtonState()
-
-                                FirestoreManager.saveProUpgrade(
-                                    uid = userId,
-                                    weekKey = targetWeekKey,
-                                    feeling = lastFeeling,
-                                    keywords = lastKeywords,
-                                    analysis = content,
-                                    model = "gpt-4o-mini"
-                                ) {
-                                    Snackbar.make(reportCard, "심화 분석이 적용되었어요.", Snackbar.LENGTH_SHORT).show()
-                                }
-                                proInFlight = false
-                                showProLoader(false) // ✅ 성공 후 OFF
-                            } else {
-                                proInFlight = false; applyProButtonState()
-                                showProLoader(false) // ✅ OFF
-                                Snackbar.make(reportCard, "심화 분석 결과를 이해하지 못했어요.", Snackbar.LENGTH_SHORT).show()
-                            }
+                        cancelPrefetch("http-${response.code}")
+                        mainHandler.post {
+                            Snackbar.make(reportCard, "서버 응답 오류(${response.code}): ${errMsg.ifBlank { "잠시 후 다시 시도" }}", Snackbar.LENGTH_LONG).show()
                         }
+                        return
+                    }
+
+                    val raw = try {
+                        JSONObject(bodyText)
+                            .getJSONArray("choices").getJSONObject(0)
+                            .getJSONObject("message").getString("content").trim()
+                    } catch (_: Exception) { "" }
+
+                    val content = tintSectionTitles(sanitizeModelHtml(raw))
+
+                    prefetchCall = null
+                    prefetchWatchdog?.let { mainHandler.removeCallbacks(it) }
+                    prefetchWatchdog = null
+                    prefetchResult = content
+
+                    if (adEarned || !adGateInProgress) {
+                        applyProResult(userId, content)
                     }
                 }
             })
         }
     }
 
-    // ----- Charts / KPIs -----
+    private fun applyProResult(userId: String, content: String) {
+        proInFlight = false
+        adGateInProgress = false
+        prefetchResult = null
+
+        mainHandler.post {
+            showProSpinner(false)
+            if (content.isNotBlank()) {
+                aiComment.text = HtmlCompat.fromHtml(content, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                prefs.edit().putBoolean("pro_done_${targetWeekKey}", true).apply()
+                analysisTitle.text = "AI 심화분석"
+                proCompleted = true
+                proNeedRefresh = false
+                btnPro.text = "심화 분석 완료"
+                btnPro.isEnabled = false
+                btnPro.alpha = 0.65f
+                applyProButtonState()
+
+                try {
+                    FirestoreManager.saveProUpgrade(
+                        uid = userId,
+                        weekKey = targetWeekKey,
+                        feeling = lastFeeling,
+                        keywords = lastKeywords,
+                        analysis = content,
+                        model = "gpt-4o-mini"
+                    ) { Snackbar.make(reportCard, "심화 분석이 적용되었어요.", Snackbar.LENGTH_SHORT).show() }
+                } catch (_: Throwable) { /* optional */ }
+            } else {
+                btnPro.isEnabled = true
+                btnPro.text = "다시 시도"
+                Snackbar.make(reportCard, "심화 분석 결과를 이해하지 못했어요.", Snackbar.LENGTH_SHORT).show()
+                applyProButtonState()
+            }
+        }
+    }
+
+    private fun cancelPrefetch(reason: String) {
+        Log.d(TAG, "cancelPrefetch: $reason")
+        prefetchCall?.cancel()
+        prefetchCall = null
+        prefetchResult = null
+        prefetchWatchdog?.let { mainHandler.removeCallbacks(it) }
+        prefetchWatchdog = null
+        proInFlight = false
+        adGateInProgress = false
+        showProSpinner(false)
+        btnPro.isEnabled = true
+        btnPro.text = "심화 분석"
+    }
+
+    // -------- Prompt Utils --------
+    private fun buildProPrompt(dreams: List<String>, interps: List<String>): String {
+        val (pos, neu, neg) = computeKpis(lastEmoLabels, lastEmoDist)
+        val themePairs = lastThemeLabels.zip(lastThemeDist)
+        fun fmt(v: Float) = String.format("%.1f", v)
+
+        val numericBlock = buildString {
+            appendLine("• 감정 분포(%) — 긍정 ${fmt(pos)} / 중립 ${fmt(neu)} / 부정 ${fmt(neg)}")
+            if (themePairs.isNotEmpty()) {
+                append("• 테마 비중(%) — ")
+                append(themePairs.joinToString(" / ") { (lab, v) -> "$lab ${fmt(v)}" })
+            }
+        }.trim()
+
+        return buildString {
+            appendLine("아래는 사용자의 이번 주 꿈 요약 데이터다. 숫자는 반드시 그대로 반영해라.")
+            appendLine(numericBlock)
+            appendLine()
+            dreams.forEachIndexed { i, s -> appendLine("[꿈 ${i+1}] $s") }
+            interps.forEachIndexed { i, s -> appendLine("[해몽 ${i+1}] $s") }
+            appendLine()
+            appendLine(
+                """
+                역할: 한국어만 사용하는 ‘주간 꿈 심화 분석가’.
+                톤: 담백·정확하되 스토리텔링으로 부드럽게 연결.
+                출력 형식: 순수 HTML fragment. 코드블록/백틱/마크다운 금지(```html, ``` 절대 X).
+                각 섹션은 <p>/<ul>만 사용, 굵은 제목(<b>)으로 표기.
+
+                섹션(이 순서):
+                1) <p><b>주간 꿈 심화 분석</b></p>
+                2) <p><b>요약</b> — 3문장</p>
+                3) <p><b>수치 요약</b><br/>감정(긍정/중립/부정): ${fmt(pos)}% / ${fmt(neu)}% / ${fmt(neg)}%<br/>테마: ${
+                    if (themePairs.isNotEmpty()) themePairs.joinToString(" / ") { (lab, v) -> "$lab ${fmt(v)}%" } else "—"
+                }</p>
+                4) <p><b>감정 패턴 해석</b></p>
+                5) <p><b>상징·장면 해석</b></p>
+                6) <p><b>명리 관점(가볍게)</b></p>
+                7) <p><b>1~2주 전망</b></p>
+                8) <ul><li>체크리스트 1</li><li>체크리스트 2</li><li>체크리스트 3</li></ul>
+                9) <p><b>오늘의 체크</b> — 한 줄</p>
+                """.trimIndent()
+            )
+        }
+    }
+
+    // -------- Charts / Utils --------
     private fun computeKpis(labels: List<String>, dist: List<Float>): Triple<Float, Float, Float> {
         val pos = sumOf(labels, dist, listOf("긍정","평온","활력","몰입"))
         val neu = sumOf(labels, dist, listOf("중립"))
@@ -610,7 +725,6 @@ class AIReportFragment : Fragment() {
         }
         return s
     }
-
     private fun formatAgo(ts: Long): String {
         if (ts <= 0) return ""
         val d = (System.currentTimeMillis() - ts) / 1000

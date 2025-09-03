@@ -24,6 +24,7 @@ import java.util.*
 
 class SettingsFragment : Fragment() {
 
+    /** ==== Prefs (계정별로 분리) ==== */
     private fun currentUserKey(ctx: Context): String {
         val uid = FirebaseAuth.getInstance().currentUser?.uid
         return uid ?: "guest-" + (Settings.Secure.getString(ctx.contentResolver, Settings.Secure.ANDROID_ID) ?: "device")
@@ -32,6 +33,7 @@ class SettingsFragment : Fragment() {
     private fun resolvePrefs(): SharedPreferences =
         requireContext().getSharedPreferences(profilePrefName(requireContext()), Context.MODE_PRIVATE)
 
+    /** ==== Util ==== */
     private val ISO_FMT = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private fun normalizeDate(src: String?): String {
         if (src.isNullOrBlank()) return ""
@@ -51,13 +53,14 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    /** ==== State / Views ==== */
     private lateinit var prefs: SharedPreferences
-    private var isEditMode = true
     private var isSaving = false
 
-    private lateinit var editGroup: View
-    private lateinit var summaryCard: View
+    private lateinit var editCard: View            // 편집 카드 (edit_group)
+    private lateinit var summaryCard: View         // 요약 카드 (card_user_info)
     private lateinit var saveButton: com.google.android.material.button.MaterialButton
+    private lateinit var editModeButton: com.google.android.material.button.MaterialButton
     private lateinit var loadingSpinner: ProgressBar
 
     private lateinit var genderGroup: RadioGroup
@@ -70,6 +73,7 @@ class SettingsFragment : Fragment() {
     private lateinit var birthTimeSpinner: Spinner
     private lateinit var infoSummary: TextView
     private lateinit var infoDetails: TextView
+    private lateinit var loginProviderText: TextView
 
     private val birthTimes = listOf(
         "선택안함",
@@ -84,9 +88,10 @@ class SettingsFragment : Fragment() {
 
         prefs = resolvePrefs()
 
-        editGroup        = view.findViewById(R.id.edit_group)
+        editCard         = view.findViewById(R.id.edit_group)
         summaryCard      = view.findViewById(R.id.card_user_info)
         saveButton       = view.findViewById(R.id.btn_save)
+        editModeButton   = view.findViewById(R.id.btn_edit_mode)
         loadingSpinner   = view.findViewById(R.id.progress_saving)
         genderGroup      = view.findViewById(R.id.radioGroup_gender)
         tilNickname      = view.findViewById(R.id.tilNickname)
@@ -98,10 +103,11 @@ class SettingsFragment : Fragment() {
         birthTimeSpinner = view.findViewById(R.id.spinner_birthtime)
         infoSummary      = view.findViewById(R.id.text_info_summary)
         infoDetails      = view.findViewById(R.id.text_user_info)
+        loginProviderText= view.findViewById(R.id.text_login_provider)
 
         view.findViewById<AdView>(R.id.adView_settings)?.loadAd(AdRequest.Builder().build())
 
-        // Spinner: 왼쪽 정렬 커스텀 + 팝업 위치/폭 지정
+        // Spinner 어댑터 (아이템 좌측정렬+힌트색)
         val hintColor = 0xFF86A1B3.toInt()
         val textColor = 0xFFE8F1F8.toInt()
         val adapter = object : ArrayAdapter<String>(
@@ -126,19 +132,23 @@ class SettingsFragment : Fragment() {
         birthTimeSpinner.setSelection(
             birthTimes.indexOf(prefs.getString("birth_time", "선택안함")).coerceAtLeast(0), false
         )
-        // ★ 드롭다운을 입력칸 '아래'로 띄우고 폭을 칸과 맞춤
+        // 드롭다운 옵셋/폭
         val density = resources.displayMetrics.density
         birthTimeSpinner.dropDownVerticalOffset = (8 * density).toInt()
         birthTimeSpinner.dropDownHorizontalOffset = 0
         birthTimeSpinner.dropDownWidth = ViewGroup.LayoutParams.MATCH_PARENT
 
+        // 초기 로드 & 로그인 표시
         loadUserInfo()
+        updateLoginProviderUI()
 
+        // 생일 선택
         fun openBirthPicker() = showDatePicker()
         tilBirthdate.setEndIconOnClickListener { openBirthPicker() }
         birthEdit.setOnClickListener { openBirthPicker() }
         view.findViewById<View>(R.id.label_birthdate)?.setOnClickListener { openBirthPicker() }
 
+        // MBTI 대문자 강제 / 에러 제거
         mbtiEdit.doAfterTextChanged {
             val up = it.toString().uppercase(Locale.ROOT)
             if (mbtiEdit.text.toString() != up) {
@@ -148,6 +158,7 @@ class SettingsFragment : Fragment() {
         }
         nicknameEdit.doAfterTextChanged { tilNickname.error = null }
 
+        // 서버 → 로컬 동기화 (있는 값만 반영)
         FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
             FirestoreManager.getUserProfile(uid) { map ->
                 if (map != null) {
@@ -162,22 +173,22 @@ class SettingsFragment : Fragment() {
                         if (gd.isNotBlank()) putString("gender", gd)
                         if (mb.isNotBlank()) putString("mbti", mb)
                         putString("birth_time", bt)
-                        apply()
-                    }
+                    }.apply()
                     loadUserInfo()
                 }
             }
         }
 
+        // 저장
         saveButton.setOnClickListener {
-            if (isEditMode) {
-                if (!validateInput()) return@setOnClickListener
-                confirmAndSave()
-            } else {
-                toggleEditMode(true)
-            }
+            if (!validateInput()) return@setOnClickListener
+            confirmAndSave()
         }
 
+        // 보기 → 편집 토글 버튼(요약 카드 내부)
+        editModeButton.setOnClickListener { toggleEditMode(true) }
+
+        // 로그아웃
         view.findViewById<View>(R.id.btn_logout)?.setOnClickListener {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("로그아웃")
@@ -196,6 +207,28 @@ class SettingsFragment : Fragment() {
         return view
     }
 
+    /** 로그인 방식 표기 (Google / 이메일 / 휴대폰 / 게스트) */
+    private fun updateLoginProviderUI() {
+        val auth = FirebaseAuth.getInstance()
+        val user = auth.currentUser
+        val label = when {
+            user == null -> "로그인: 없음"
+            user.isAnonymous -> "로그인: 게스트(익명)"
+            else -> {
+                val providers = user.providerData.mapNotNull { it.providerId }.toSet()
+                when {
+                    providers.contains("google.com") -> "로그인: Google"
+                    providers.contains("password") -> "로그인: 이메일"
+                    providers.contains("phone") -> "로그인: 휴대폰"
+                    else -> "로그인: 기타"
+                }
+            }
+        }
+        val email = user?.email
+        loginProviderText.text = if (!email.isNullOrBlank()) "🔐 $label · $email" else "🔐 $label"
+    }
+
+    /** 날짜 선택기 */
     private fun showDatePicker() {
         try {
             val picker = MaterialDatePicker.Builder.datePicker()
@@ -224,6 +257,7 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    /** 로컬 상태를 입력칸/요약에 반영 */
     private fun loadUserInfo() {
         val gender    = prefs.getString("gender", "") ?: ""
         val birth     = (prefs.getString("birthdate_iso", null)
@@ -244,12 +278,18 @@ class SettingsFragment : Fragment() {
         }
 
         val hasRequired = nickname.isNotBlank() && birth.isNotBlank() && gender.isNotBlank()
-        toggleEditMode(!hasRequired)
-        if (hasRequired) updateInfoDisplay(gender, birth, birthTime, nickname, mbti)
+        if (hasRequired) {
+            updateInfoDisplay(gender, birth, birthTime, nickname, mbti)
+            toggleEditMode(false)
+        } else {
+            toggleEditMode(true)
+        }
     }
 
+    /** 요약 카드 텍스트 구성 */
     private fun updateInfoDisplay(gender: String, birth: String, birthTime: String, nickname: String, mbti: String) {
         infoSummary.text = "$nickname 님의 프로필"
+
         val sb = StringBuilder()
             .append("🧑 닉네임: ").append(nickname).append("\n")
             .append("🎂 생일: ").append(birth).append("\n")
@@ -264,29 +304,22 @@ class SettingsFragment : Fragment() {
 
         infoDetails.text = sb.toString()
         summaryCard.visibility = View.VISIBLE
+        updateLoginProviderUI()
     }
 
-    /** 부드러운 전환: Fade만 사용 (튀는 효과 제거) */
+    /** 부드럽고 가벼운 전환 (Fade만) */
     private fun toggleEditMode(enableEdit: Boolean) {
-        isEditMode = enableEdit
         (view as? ViewGroup)?.let { vg ->
             TransitionManager.beginDelayedTransition(vg, Fade().apply { duration = 150 })
         }
-        if (enableEdit) {
-            editGroup.visibility = View.VISIBLE
-            summaryCard.visibility = View.GONE
-            saveButton.text = "저장"
-            saveButton.isEnabled = true
-        } else {
-            editGroup.visibility = View.GONE
-            summaryCard.visibility = View.VISIBLE
-            saveButton.text = "수정"
-            saveButton.isEnabled = true
-        }
+        editCard.visibility = if (enableEdit) View.VISIBLE else View.GONE
+        summaryCard.visibility = if (enableEdit) View.GONE else View.VISIBLE
     }
 
+    /** 저장 확인 → 저장 */
     private fun confirmAndSave() {
         if (isSaving) return
+        if (!validateInput()) return
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("저장하시겠어요?")
             .setMessage("입력하신 정보로 프로필을 저장합니다.")
@@ -295,6 +328,7 @@ class SettingsFragment : Fragment() {
             .show()
     }
 
+    /** 저장 로직 (로컬 → 서버) */
     private fun saveUserInfo() {
         if (isSaving) return
         isSaving = true
@@ -347,9 +381,10 @@ class SettingsFragment : Fragment() {
         toggleEditMode(false)
         isSaving = false
         saveButton.isEnabled = true
-        saveButton.text = "수정"
+        saveButton.text = "저장"
     }
 
+    /** MBTI 요약 */
     private fun getMbtiMeaning(mbti: String): String = when (mbti.uppercase(Locale.ROOT)) {
         "INFP" -> "이상주의적이며 감성적인 경향. 상징과 감정이 풍부한 꿈을 꾸는 편."
         "INFJ" -> "통찰이 깊고 조용한 성향. 상징적 메시지가 담긴 꿈과 연결되는 경우가 많음."
@@ -370,6 +405,7 @@ class SettingsFragment : Fragment() {
         else -> ""
     }
 
+    /** 입력 검증 (필수 3개: 닉네임, 생일, 성별) */
     private fun validateInput(): Boolean {
         tilNickname.error = null
         tilBirthdate.error = null

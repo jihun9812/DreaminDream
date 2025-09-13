@@ -26,7 +26,6 @@
             android:paddingTop="12dp"
             android:paddingBottom="24dp">
 
-            <!-- 🔹 아이콘 제거, 텍스트 타이틀로 교체 -->
             <TextView
                 android:id="@+id/titleText"
                 android:layout_width="wrap_content"
@@ -48,7 +47,7 @@
                 android:layout_marginTop="12dp"
                 app:cardCornerRadius="26dp"
                 app:cardElevation="10dp"
-                app:cardBackgroundColor="#FF352D49"
+                app:cardBackgroundColor="#FE352D49"
                 app:cardPreventCornerOverlap="true"
                 app:cardUseCompatPadding="true"
                 app:contentPaddingBottom="20dp"

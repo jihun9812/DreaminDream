@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 베이스: 은은한 골드 그라데이션 -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp"/>
+            <gradient
+                android:startColor="#FFE6C25A"
+                android:endColor="#C79E56"
+                android:angle="90"/>
+
+
+            <!-- 외곽선: 과하지 않게 아주 옅은 하이라이트 -->
+            <stroke android:width="1dp" android:color="#12FFFFFF"/>
+        </shape>
+    </item>
+
+    <!-- 상단 반사광: 거의 안 보이게(살짝만) -->
+    <item android:insetTop="1dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp"/>
+            <gradient
+                android:startColor="#09FFFFFF"
+                android:endColor="#00FFFFFF"
+                android:angle="90"/>
+        </shape>
+    </item>
+
+    <!-- 하단 내음영: 최소화 -->
+    <item android:insetBottom="1dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp"/>
+            <gradient
+                android:startColor="#00000000"
+                android:endColor="#12000000"
+                android:angle="90"/>
+        </shape>
+    </item>
+</layer-list>

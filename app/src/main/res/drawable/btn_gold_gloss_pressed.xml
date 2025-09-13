@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp"/>
+            <gradient
+                android:startColor="#FFD8B24F"
+                android:endColor="#FFB97E2A"
+                android:angle="90"/>
+            <stroke android:width="1dp" android:color="#26FFFFFF"/>
+        </shape>
+    </item>
+
+    <!-- 반사광 더 약하게 -->
+    <item android:insetTop="1dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp"/>
+            <gradient
+                android:startColor="#0EFFFFFF"
+                android:endColor="#00FFFFFF"
+                android:angle="90"/>
+        </shape>
+    </item>
+
+    <!-- 내음영 살짝 강화(눌린 느낌) -->
+    <item android:insetBottom="0dp">
+        <shape android:shape="rectangle">
+            <corners android:radius="16dp"/>
+            <gradient
+                android:startColor="#00000000"
+                android:endColor="#1E000000"
+                android:angle="90"/>
+        </shape>
+    </item>
+</layer-list>

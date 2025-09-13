@@ -21,10 +21,11 @@ import android.transition.TransitionManager
 import android.transition.Fade
 import java.text.SimpleDateFormat
 import java.util.*
+import android.graphics.Color
+import androidx.core.view.doOnLayout
 
 class SettingsFragment : Fragment() {
 
-    /** ==== Prefs (계정별로 분리) ==== */
     private fun currentUserKey(ctx: Context): String {
         val uid = FirebaseAuth.getInstance().currentUser?.uid
         return uid ?: "guest-" + (Settings.Secure.getString(ctx.contentResolver, Settings.Secure.ANDROID_ID) ?: "device")
@@ -33,7 +34,6 @@ class SettingsFragment : Fragment() {
     private fun resolvePrefs(): SharedPreferences =
         requireContext().getSharedPreferences(profilePrefName(requireContext()), Context.MODE_PRIVATE)
 
-    /** ==== Util ==== */
     private val ISO_FMT = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     private fun normalizeDate(src: String?): String {
         if (src.isNullOrBlank()) return ""
@@ -53,12 +53,11 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    /** ==== State / Views ==== */
     private lateinit var prefs: SharedPreferences
     private var isSaving = false
 
-    private lateinit var editCard: View            // 편집 카드 (edit_group)
-    private lateinit var summaryCard: View         // 요약 카드 (card_user_info)
+    private lateinit var editCard: View
+    private lateinit var summaryCard: View
     private lateinit var saveButton: com.google.android.material.button.MaterialButton
     private lateinit var editModeButton: com.google.android.material.button.MaterialButton
     private lateinit var loadingSpinner: ProgressBar
@@ -105,11 +104,17 @@ class SettingsFragment : Fragment() {
         infoDetails      = view.findViewById(R.id.text_user_info)
         loginProviderText= view.findViewById(R.id.text_login_provider)
 
+        // 광고
         view.findViewById<AdView>(R.id.adView_settings)?.loadAd(AdRequest.Builder().build())
 
-        // Spinner 어댑터 (아이템 좌측정렬+힌트색)
-        val hintColor = 0xFF86A1B3.toInt()
-        val textColor = 0xFFE8F1F8.toInt()
+        // === 색상 통일 ===
+        val hintGray = Color.parseColor("#B0B0B0")   // 회색 힌트
+        val white    = Color.WHITE
+
+        // TextInput 힌트 -> 회색
+        listOf(nicknameEdit, birthEdit, mbtiEdit).forEach { it.setHintTextColor(hintGray) }
+
+        // Spinner 어댑터: "선택안함"(index 0)은 회색, 선택값은 화이트
         val adapter = object : ArrayAdapter<String>(
             requireContext(),
             R.layout.spinner_item,
@@ -118,27 +123,38 @@ class SettingsFragment : Fragment() {
         ) {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val v = super.getView(position, convertView, parent) as TextView
-                v.setTextColor(if (position == 0) hintColor else textColor)
+                val isHint = (birthTimeSpinner.selectedItemPosition == 0)
+                v.setTextColor(if (isHint) hintGray else white)
                 return v
             }
             override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val tv = layoutInflater.inflate(R.layout.spinner_dropdown_item, parent, false) as TextView
                 tv.text = getItem(position)
-                tv.setTextColor(if (position == 0) hintColor else textColor)
+                // 드롭다운에서도 0번은 회색, 나머지는 화이트
+                tv.setTextColor(if (position == 0) hintGray else white)
                 return tv
             }
         }
         birthTimeSpinner.adapter = adapter
-        birthTimeSpinner.setSelection(
-            birthTimes.indexOf(prefs.getString("birth_time", "선택안함")).coerceAtLeast(0), false
-        )
-        // 드롭다운 옵셋/폭
-        val density = resources.displayMetrics.density
-        birthTimeSpinner.dropDownVerticalOffset = (8 * density).toInt()
-        birthTimeSpinner.dropDownHorizontalOffset = 0
-        birthTimeSpinner.dropDownWidth = ViewGroup.LayoutParams.MATCH_PARENT
 
-        // 초기 로드 & 로그인 표시
+        // 저장된 값 반영
+        birthTimeSpinner.setSelection(
+            birthTimes.indexOf(prefs.getString("birth_time", "선택안함")).coerceAtLeast(0),
+            false
+        )
+
+        // 드롭다운 위치: 스피너 아래로 2dp 내려서 가림 없음
+        birthTimeSpinner.doOnLayout {
+            birthTimeSpinner.dropDownWidth = birthTimeSpinner.width
+            birthTimeSpinner.dropDownHorizontalOffset = 0
+            val offset2dp = (resources.displayMetrics.density * 2f).toInt()
+            birthTimeSpinner.dropDownVerticalOffset = offset2dp
+            // 선택 상태에 따라 메인 뷰 텍스트 색 재적용
+            (birthTimeSpinner.selectedView as? TextView)?.setTextColor(
+                if (birthTimeSpinner.selectedItemPosition == 0) hintGray else white
+            )
+        }
+
         loadUserInfo()
         updateLoginProviderUI()
 
@@ -148,7 +164,7 @@ class SettingsFragment : Fragment() {
         birthEdit.setOnClickListener { openBirthPicker() }
         view.findViewById<View>(R.id.label_birthdate)?.setOnClickListener { openBirthPicker() }
 
-        // MBTI 대문자 강제 / 에러 제거
+        // MBTI 대문자 강제
         mbtiEdit.doAfterTextChanged {
             val up = it.toString().uppercase(Locale.ROOT)
             if (mbtiEdit.text.toString() != up) {
@@ -158,7 +174,7 @@ class SettingsFragment : Fragment() {
         }
         nicknameEdit.doAfterTextChanged { tilNickname.error = null }
 
-        // 서버 → 로컬 동기화 (있는 값만 반영)
+        // 서버 -> 로컬 동기화
         FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
             FirestoreManager.getUserProfile(uid) { map ->
                 if (map != null) {
@@ -185,7 +201,7 @@ class SettingsFragment : Fragment() {
             confirmAndSave()
         }
 
-        // 보기 → 편집 토글 버튼(요약 카드 내부)
+        // 보기 → 편집
         editModeButton.setOnClickListener { toggleEditMode(true) }
 
         // 로그아웃
@@ -207,7 +223,6 @@ class SettingsFragment : Fragment() {
         return view
     }
 
-    /** 로그인 방식 표기 (Google / 이메일 / 휴대폰 / 게스트) */
     private fun updateLoginProviderUI() {
         val auth = FirebaseAuth.getInstance()
         val user = auth.currentUser
@@ -228,7 +243,6 @@ class SettingsFragment : Fragment() {
         loginProviderText.text = if (!email.isNullOrBlank()) "🔐 $label · $email" else "🔐 $label"
     }
 
-    /** 날짜 선택기 */
     private fun showDatePicker() {
         try {
             val picker = MaterialDatePicker.Builder.datePicker()
@@ -257,7 +271,6 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    /** 로컬 상태를 입력칸/요약에 반영 */
     private fun loadUserInfo() {
         val gender    = prefs.getString("gender", "") ?: ""
         val birth     = (prefs.getString("birthdate_iso", null)
@@ -286,7 +299,6 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    /** 요약 카드 텍스트 구성 */
     private fun updateInfoDisplay(gender: String, birth: String, birthTime: String, nickname: String, mbti: String) {
         infoSummary.text = "$nickname 님의 프로필"
 
@@ -307,7 +319,6 @@ class SettingsFragment : Fragment() {
         updateLoginProviderUI()
     }
 
-    /** 부드럽고 가벼운 전환 (Fade만) */
     private fun toggleEditMode(enableEdit: Boolean) {
         (view as? ViewGroup)?.let { vg ->
             TransitionManager.beginDelayedTransition(vg, Fade().apply { duration = 150 })
@@ -316,7 +327,6 @@ class SettingsFragment : Fragment() {
         summaryCard.visibility = if (enableEdit) View.GONE else View.VISIBLE
     }
 
-    /** 저장 확인 → 저장 */
     private fun confirmAndSave() {
         if (isSaving) return
         if (!validateInput()) return
@@ -328,7 +338,6 @@ class SettingsFragment : Fragment() {
             .show()
     }
 
-    /** 저장 로직 (로컬 → 서버) */
     private fun saveUserInfo() {
         if (isSaving) return
         isSaving = true
@@ -384,7 +393,6 @@ class SettingsFragment : Fragment() {
         saveButton.text = "저장"
     }
 
-    /** MBTI 요약 */
     private fun getMbtiMeaning(mbti: String): String = when (mbti.uppercase(Locale.ROOT)) {
         "INFP" -> "이상주의적이며 감성적인 경향. 상징과 감정이 풍부한 꿈을 꾸는 편."
         "INFJ" -> "통찰이 깊고 조용한 성향. 상징적 메시지가 담긴 꿈과 연결되는 경우가 많음."
@@ -405,7 +413,6 @@ class SettingsFragment : Fragment() {
         else -> ""
     }
 
-    /** 입력 검증 (필수 3개: 닉네임, 생일, 성별) */
     private fun validateInput(): Boolean {
         tilNickname.error = null
         tilBirthdate.error = null

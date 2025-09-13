@@ -91,16 +91,16 @@
                 <TextView
                     android:id="@+id/btn_history"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="분석 기록 ▼"
-                    android:textColor="#E6F2FA"
-                    android:textStyle="bold"
-                    android:textSize="12sp"
+                    android:layout_height="10dp"
                     android:background="@drawable/bg_chip_glass"
                     android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
                     android:paddingTop="6dp"
-                    android:paddingBottom="6dp"/>
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="6dp"
+                    android:text="분석 기록 ▼"
+                    android:textColor="#E6F2FA"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <View
@@ -317,7 +317,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="40dp"
                         android:layout_marginTop="6dp"
-                        android:text="심화 분석"
+                        android:text="심화 분석하기"
                         android:textAllCaps="false"
                         android:textSize="13sp"
                         android:textStyle="bold"

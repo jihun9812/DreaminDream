@@ -10,7 +10,7 @@
         android:id="@+id/bg_lottie"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#382A5B"
+        android:background="#E12A1E49"
         app:lottie_rawRes="@raw/hwwprmbqc9"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
@@ -51,7 +51,7 @@
                     android:fontFamily="@font/jalnan"
                     android:gravity="center"
                     android:text="@string/home_title"
-                    android:textColor="#123E5A"
+                    android:textColor="#FABE41"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
@@ -61,7 +61,8 @@
                     android:layout_marginBottom="20dp"
                     android:gravity="center"
                     android:text="@string/login_slogan"
-                    android:textColor="#888"
+                    android:fontFamily="@font/pretendard_bold"
+                    android:textColor="#431D56"
                     android:textSize="14sp" />
 
                 <!-- 이메일/비밀번호 -->
@@ -244,7 +245,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="18dp"
                     android:text="@string/sign_up_title"
-                    android:textColor="#123E5A"
+                    android:textColor="#FABE41"
                     android:textSize="22sp"
                     android:textStyle="bold" />
 
@@ -292,7 +293,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:layout_marginBottom="6dp"
-                    android:backgroundTint="#123E5A"
+                    android:backgroundTint="#FABE41"
                     android:minHeight="48dp"
                     android:text="@string/sign_up_button"
                     android:textAllCaps="false"
@@ -306,7 +307,7 @@
                     android:minHeight="48dp"
                     android:text="@string/cancel"
                     android:textAllCaps="false"
-                    android:textColor="#123E5A" />
+                    android:textColor="#431D56" />
             </LinearLayout>
 
             <!-- 비밀번호 찾기 패널 -->
@@ -343,7 +344,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="18dp"
                     android:text="@string/password_reset_title"
-                    android:textColor="#123E5A"
+                    android:textColor="#FABE41"
                     android:textSize="22sp"
                     android:textStyle="bold" />
 
@@ -365,7 +366,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:layout_marginBottom="6dp"
-                    android:backgroundTint="#123E5A"
+                    android:backgroundTint="#FABE41"
                     android:minHeight="48dp"
                     android:text="@string/send_reset_email"
                     android:textAllCaps="false"
@@ -379,7 +380,7 @@
                     android:minHeight="48dp"
                     android:text="@string/cancel"
                     android:textAllCaps="false"
-                    android:textColor="#123E5A" />
+                    android:textColor="#431D56"  />
             </LinearLayout>
         </FrameLayout>
     </androidx.cardview.widget.CardView>

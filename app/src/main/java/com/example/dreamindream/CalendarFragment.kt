@@ -19,12 +19,10 @@ import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
 import com.kizitonwose.calendar.core.daysOfWeek
-import com.kizitonwose.calendar.core.yearMonth
 import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
 import com.kizitonwose.calendar.view.ViewContainer
 import org.json.JSONArray
-import org.json.JSONObject
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
@@ -40,6 +38,10 @@ class CalendarFragment : Fragment() {
     private var selectedDate: LocalDate? = null
     private val holidays = mutableListOf<Holiday>()
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy년 M월")
+
+    // ✅ 캘린더 표시 범위: 2024.01 ~ 2030.12
+    private val CAL_START_YEAR = 2024
+    private val CAL_END_YEAR = 2030
 
     // Palette
     private val colSun = Color.parseColor("#FF6B6B")
@@ -64,13 +66,10 @@ class CalendarFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Recycler
-        adapter = DreamInlineAdapter(mutableListOf(),
-            onOpen = { entry ->
-                DreamFragment.showResultDialog(requireContext(), entry.result)
-            },
-            onDelete = { pos, entry ->
-                confirmDelete { deleteEntryAt(pos) }
-            }
+        adapter = DreamInlineAdapter(
+            mutableListOf(),
+            onOpen = { entry -> DreamFragment.showResultDialog(requireContext(), entry.result) },
+            onDelete = { pos, _ -> confirmDelete { deleteEntryAt(pos) } }
         )
         binding.recyclerDreams.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerDreams.adapter = adapter
@@ -78,6 +77,7 @@ class CalendarFragment : Fragment() {
         // Calendar
         binding.calendarView.monthScrollListener = { month ->
             updateMonthText(month.yearMonth)
+            clearHolidayBanner() // 🔴 달 바뀌면 휴일 라벨 숨김
             binding.textViewMonthYear.alpha = 0f
             binding.textViewMonthYear.animate().alpha(1f).setDuration(200).start()
         }
@@ -89,7 +89,7 @@ class CalendarFragment : Fragment() {
 
         setupCalendar(currentMonth, daysOfWeek)
         setupEventListeners()
-        loadHolidays()
+        loadHolidays2030() // ✅ 2024~2030 캐시+프리패치
         updateMonthText(currentMonth)
         setupAds(view)
 
@@ -106,11 +106,9 @@ class CalendarFragment : Fragment() {
     }
 
     private fun setupCalendar(currentMonth: YearMonth, daysOfWeek: List<DayOfWeek>) {
-        binding.calendarView.setup(
-            currentMonth.minusMonths(12),
-            currentMonth.plusMonths(12),
-            daysOfWeek.first()
-        )
+        val start = YearMonth.of(CAL_START_YEAR, 1)
+        val end = YearMonth.of(CAL_END_YEAR, 12)
+        binding.calendarView.setup(start, end, daysOfWeek.first())
         binding.calendarView.scrollToMonth(currentMonth)
 
         binding.calendarView.dayBinder = object : MonthDayBinder<DayViewContainer> {
@@ -124,9 +122,8 @@ class CalendarFragment : Fragment() {
             object : MonthHeaderFooterBinder<MonthHeaderViewContainer> {
                 override fun create(view: View): MonthHeaderViewContainer =
                     MonthHeaderViewContainer(view)
-
                 override fun bind(container: MonthHeaderViewContainer, month: CalendarMonth) {
-                    // header는 example_month_header.xml에서 요일만 표현
+                    // 요일 헤더 필요 시 여기에서 처리
                 }
             }
     }
@@ -158,9 +155,7 @@ class CalendarFragment : Fragment() {
             }
         }
 
-        container.view.setOnClickListener {
-            handleDayClick(day.date, holiday)
-        }
+        container.view.setOnClickListener { handleDayClick(day.date, holiday) }
 
         when {
             isSelected -> {
@@ -210,31 +205,69 @@ class CalendarFragment : Fragment() {
 
     private fun setupEventListeners() {
         binding.buttonPreviousMonth.setOnClickListener {
-            binding.calendarView.findFirstVisibleMonth()?.yearMonth?.minusMonths(1)
-                ?.let { targetMonth ->
-                    binding.calendarView.smoothScrollToMonth(targetMonth)
-                    updateMonthText(targetMonth)
-                }
+            clearHolidayBanner() // 🔴 버튼으로 이전 달 이동 전 숨김
+            binding.calendarView.findFirstVisibleMonth()?.yearMonth?.minusMonths(1)?.let {
+                binding.calendarView.smoothScrollToMonth(it)
+                updateMonthText(it)
+            }
         }
         binding.buttonNextMonth.setOnClickListener {
-            binding.calendarView.findFirstVisibleMonth()?.yearMonth?.plusMonths(1)
-                ?.let { targetMonth ->
-                    binding.calendarView.smoothScrollToMonth(targetMonth)
-                    updateMonthText(targetMonth)
-                }
+            clearHolidayBanner() // 🔴 버튼으로 다음 달 이동 전 숨김
+            binding.calendarView.findFirstVisibleMonth()?.yearMonth?.plusMonths(1)?.let {
+                binding.calendarView.smoothScrollToMonth(it)
+                updateMonthText(it)
+            }
         }
     }
 
-    private fun loadHolidays() {
+    /** 🔴 상단 휴일 라벨 즉시 숨김 */
+    private fun clearHolidayBanner() {
+        binding.holidayTextView.text = ""
+        binding.holidayTextView.visibility = View.GONE
+    }
+
+    /**
+     * ✅ 2024~2030 전체 휴일을 캐시에서 즉시 로드 후,
+     *    비어있는 연도만 네트워크로 가져와 저장/반영.
+     */
+    private fun loadHolidays2030() {
         try {
-            HolidayApi.fetchHolidays(
-                2025,
-                onSuccess = {
-                    holidays.clear()
-                    holidays.addAll(it)
-                    binding.calendarView.notifyCalendarChanged()
-                },
-                onError = { it.printStackTrace() })
+            holidays.clear()
+
+            // 1) 캐시 우선 로드
+            val cached = HolidayStorage.loadHolidaysRange(requireContext(), CAL_START_YEAR, CAL_END_YEAR)
+            holidays.addAll(cached)
+            holidays.sortBy { it.date }
+            binding.calendarView.notifyCalendarChanged()
+
+            // 2) 빈 연도만 API 호출해서 채우기
+            val missingYears = (CAL_START_YEAR..CAL_END_YEAR).filter { year ->
+                HolidayStorage.loadHolidays(requireContext(), year).isEmpty()
+            }
+            if (missingYears.isEmpty()) return
+
+            // 순차 프리패치
+            fun fetchNext(idx: Int) {
+                if (idx >= missingYears.size) return
+                val y = missingYears[idx]
+                HolidayApi.fetchHolidays(
+                    y,
+                    onSuccess = { list ->
+                        HolidayStorage.saveHolidays(requireContext(), y, list)
+                        // 중복 방지 후 합치기
+                        val existing = holidays.map { it.date }.toHashSet()
+                        holidays += list.filter { it.date !in existing }
+                        holidays.sortBy { it.date }
+                        binding.calendarView.notifyCalendarChanged()
+                        fetchNext(idx + 1)
+                    },
+                    onError = {
+                        it.printStackTrace()
+                        fetchNext(idx + 1)
+                    }
+                )
+            }
+            fetchNext(0)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -257,8 +290,7 @@ class CalendarFragment : Fragment() {
     // --- Inline list helpers ---
 
     private fun refreshInlineListFor(date: LocalDate) {
-        // 타이틀
-        val dow = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.KOREA) // 월/화/...
+        val dow = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.KOREA)
         binding.dreamListTitle.text = "${date} (${dow})의 꿈들"
 
         val arr = getDreamArray(date)
@@ -339,7 +371,7 @@ class CalendarFragment : Fragment() {
     }
 }
 
-// ---- Day/Month View Containers ----
+
 class DayViewContainer(view: View) : ViewContainer(view) {
     val textView: TextView = view.findViewById(R.id.calendarDayText)
     val dreamIndicator: View = view.findViewById(R.id.dreamIndicator)

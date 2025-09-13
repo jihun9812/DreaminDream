@@ -49,7 +49,7 @@ class FortuneFragment : Fragment() {
     private lateinit var loadingView: LottieAnimationView
     private lateinit var resultText: TextView
 
-    private lateinit var chips: ChipGroup           // 키워드 칩 컨테이너
+    private lateinit var chips: ChipGroup
     private lateinit var viewLuckyColor: View
     private lateinit var tvLuckyNumber: TextView
     private lateinit var tvLuckyTime: TextView
@@ -132,7 +132,7 @@ class FortuneFragment : Fragment() {
         // 초기 프레임 깜빡임 방지
         setPendingFortune()
 
-        // 화면에 있는 Trait 칩(창의성·소통·적응력·결단력)을 자동으로 골드 톤으로 틴트
+        // 화면에 있는 Trait 칩을 자동으로 골드 틴트
         applyGoldToTraitChips(rootLayout)
 
         // Firestore → Prefs 동기화 후 초기 UI 결정
@@ -293,16 +293,15 @@ class FortuneFragment : Fragment() {
         setChecklist(items)
     }
 
-    // 초기 깜빡임 제거: 화면 진입 시 버튼/카드 모두 숨기고 결정 후 보여주기
+    // 초기 깜빡임 제거
     private fun setPendingFortune() {
         fortuneButton.visibility = View.INVISIBLE
         fortuneCard.visibility = View.GONE
         loadingView.visibility = View.GONE
     }
 
-    // ------- Chip Gold Tint (자동 적용) -------
+    // ------- Chip Gold Tint -------
     private fun applyGoldToTraitChips(root: ViewGroup) {
-        // View트리를 돌면서 '창의성/소통/적응력/결단력' 텍스트를 가진 Chip을 찾아 색을 적용
         fun dfs(v: View) {
             when (v) {
                 is ChipGroup -> tintChipsGoldInGroup(v)
@@ -334,12 +333,12 @@ class FortuneFragment : Fragment() {
         for (i in 0 until group.childCount) {
             val chip = group.getChildAt(i) as? Chip ?: continue
             if (!TRAIT_TITLES.contains(chip.text?.toString()?.trim())) continue
-            chip.isCheckable = true               // 토글형이면 유지, 아니면 true여도 UI에 문제 없음
+            chip.isCheckable = true
             chip.chipBackgroundColor = bg
             chip.chipStrokeWidth = resources.displayMetrics.density * 1f
             chip.chipStrokeColor = stroke
             chip.rippleColor = ColorStateList.valueOf(adjustAlpha(base, 0.25f))
-            chip.setTextColor(Color.parseColor("#0C1830")) // 골드 배경에 어두운 텍스트
+            chip.setTextColor(Color.parseColor("#0C1830"))
         }
     }
 
@@ -350,17 +349,20 @@ class FortuneFragment : Fragment() {
     // ------- UI small helpers -------
     private fun applyPrimaryButtonStyle() {
         if (suppressButtonState) return
-        if (!suppressButtonState) fortuneButton.visibility = View.VISIBLE
-        fortuneButton.isEnabled = true
-        fortuneButton.background = gradientBg(Color.parseColor("#9B8CFF"), Color.parseColor("#6F86FF"))
-        fortuneButton.setTextColor(Color.WHITE)
-        fortuneButton.text = "운세\n보기"
+        with(fortuneButton) {
+            visibility = View.VISIBLE
+            isEnabled = true
+            setBackgroundResource(R.drawable.fortune_button_bg) // ★ ContextCompat 불필요
+            backgroundTintList = null                           // 틴트 제거
+            setTextColor(Color.WHITE)
+            text = "운세\n보기"
+        }
         moveButtonCentered()
     }
 
     private fun lockFortuneButtonForToday() {
         if (suppressButtonState) return
-        if (!suppressButtonState) fortuneButton.visibility = View.VISIBLE
+        fortuneButton.visibility = View.VISIBLE
         fortuneButton.isEnabled = false
         fortuneButton.background = GradientDrawable().apply {
             cornerRadius = dp(16).toFloat()
@@ -392,7 +394,9 @@ class FortuneFragment : Fragment() {
 
     private fun setEmotionBars(pos: Int, neu: Int, neg: Int) {
         fun v(x: Int) = x.coerceIn(0,100)
-        barPos.setProgressCompat(v(pos), true); barNeu.setProgressCompat(v(neu), true); barNeg.setProgressCompat(v(neg), true)
+        barPos.setProgressCompat(v(pos), true)
+        barNeu.setProgressCompat(v(neu), true)
+        barNeg.setProgressCompat(v(neg), true)
         tvPos.text = "${v(pos)}%"; tvNeu.text = "${v(neu)}%"; tvNeg.text = "${v(neg)}%"
     }
 
@@ -400,9 +404,10 @@ class FortuneFragment : Fragment() {
         chips.removeAllViews()
         list.take(4).forEach { label ->
             val chip = Chip(requireContext()).apply {
-                text = label; isCheckable = false; isClickable = false
+                text = label
+                isCheckable = false
+                isClickable = false
                 setTextColor(Color.WHITE)
-                // 키워드 칩은 기존 톤 유지 (원하면 여기도 GOLD로 바꿀 수 있음)
                 chipBackgroundColor = ColorStateList.valueOf(Color.parseColor("#334E68"))
             }
             chips.addView(chip)
@@ -453,7 +458,6 @@ class FortuneFragment : Fragment() {
                 background = GradientDrawable().apply { cornerRadius = dp(999).toFloat(); setColor(color) }
                 visibility = if (key == "lotto") View.GONE else View.VISIBLE
             }
-
 
             val prog = card.findViewById<LinearProgressIndicator>(R.id.sectionIndicator)
             prog.apply {

@@ -39,19 +39,17 @@
             android:textColor="#FABE41"
             android:textSize="35sp" />
 
-        <!-- AI 꿈 리포트 카드뷰 -->
+        <!-- AI 꿈 리포트 카드뷰 (카드 자체 클릭/포커스 비활성) -->
         <androidx.cardview.widget.CardView
             android:id="@+id/ai_report_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="38dp"
-            android:clickable="true"
-            android:focusable="true"
+            android:clickable="false"
+            android:focusable="false"
             app:cardBackgroundColor="#FF352D49"
             app:cardCornerRadius="20dp"
-
-            app:cardElevation="7dp"
-            >
+            app:cardElevation="7dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -69,12 +67,14 @@
                     android:contentDescription="AI Report Icon"
                     android:src="@drawable/ic_ai_report" />
 
-                <!-- 요약 내용 -->
+                <!-- 요약 내용(안전하게 클릭 불가 지정) -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:clickable="false"
+                    android:focusable="false">
 
                     <TextView
                         android:id="@+id/ai_report_title"
@@ -92,7 +92,9 @@
                         app:autoSizeTextType="uniform"
                         app:autoSizeMinTextSize="12sp"
                         app:autoSizeMaxTextSize="15sp"
-                        app:autoSizeStepGranularity="1sp" />
+                        app:autoSizeStepGranularity="1sp"
+                        android:clickable="false"
+                        android:focusable="false" />
 
                     <TextView
                         android:id="@+id/ai_report_summary"
@@ -105,29 +107,34 @@
                         android:textSize="13sp"
                         android:maxLines="2"
                         android:ellipsize="end"
-                        android:includeFontPadding="false" />
+                        android:includeFontPadding="false"
+                        android:clickable="false"
+                        android:focusable="false" />
                 </LinearLayout>
 
-                <!-- AI 리포트 버튼: 골드 -->
+                <!-- AI 리포트 버튼(이것만 동작) -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_ai_report"
                     android:layout_width="wrap_content"
-                    android:layout_height="38dp"
+                    android:layout_height="32dp"
                     android:minWidth="0dp"
+                    android:minHeight="0dp"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
                     android:paddingTop="0dp"
                     android:paddingBottom="0dp"
-                    android:layout_marginStart="13dp"
-                    android:elevation="0dp"
+                    android:layout_marginStart="12dp"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:text="AI 리포트"
-                    android:textColor="#212121"
+                    android:textColor="#17212B"
                     android:textSize="12sp"
-                    app:backgroundTint="#FDCA60"
-                    app:rippleColor="#33FFC54D"
-                    app:cornerRadius="18dp" />
+                    app:backgroundTint="@null"
+                    android:background="@drawable/btn_gold_gloss_selector"
+                    app:rippleColor="#33FFFFFF"
+                    app:cornerRadius="16dp"
+                    android:elevation="6dp"
+                    android:translationZ="2dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -136,9 +143,11 @@
             android:id="@+id/character_bubble"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="48dp"
             android:gravity="start"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingTop="2dp"
+            android:paddingBottom="2dp">
 
             <ImageView
                 android:id="@+id/ai_avatar"
@@ -150,93 +159,119 @@
 
             <TextView
                 android:id="@+id/ai_message"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
                 android:layout_weight="1"
+                android:layout_marginBottom="10dp"
                 android:text="오늘의 행운 메시지를 불러오는 중이에요..."
                 android:textColor="@color/white"
+                android:textSize="13sp"
+                android:includeFontPadding="true"
+                android:lineSpacingExtra="2dp"
+                android:breakStrategy="balanced"
+                android:hyphenationFrequency="full"
+                android:ellipsize="none"
+                android:singleLine="false"
+                android:maxLines="5"
                 android:translationZ="1dp" />
         </LinearLayout>
 
-        <!-- 버튼 그룹 (원본 구조 유지, 색만 변경) -->
+        <!-- 버튼 그룹 -->
         <LinearLayout
             android:id="@+id/button_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="28dp"
             android:layout_marginBottom="20dp"
             android:gravity="center"
             android:orientation="horizontal">
 
-            <!-- 해몽 버튼: 골드 -->
+            <!-- 해몽 -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_dream"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#FDCA60"
-                android:elevation="16dp"
+                android:layout_height="36dp"
                 android:minWidth="0dp"
+                android:minHeight="0dp"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
                 android:text="@string/btn_dream"
-                android:textColor="#212121"
-                android:textSize="15sp"
-                android:translationZ="4dp"
-                app:rippleColor="#33FFC54D"
+                android:textColor="#17212B"
+                android:textSize="14sp"
+                app:backgroundTint="@null"
+                android:background="@drawable/btn_gold_gloss_selector"
+                app:cornerRadius="16dp"
+                app:rippleColor="#33FFFFFF"
                 app:icon="@drawable/ic_dream"
                 app:iconGravity="textStart"
-                app:iconPadding="6dp"
-                app:iconTint="#212121" />
+                app:iconPadding="4dp"
+                app:iconSize="18dp"
+                app:iconTint="#17212B"
+                android:elevation="8dp"
+                android:translationZ="2dp"/>
 
             <Space
-                android:layout_width="12dp"
-                android:layout_height="wrap_content" />
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"/>
 
-            <!-- 캘린더 버튼: 골드 -->
+            <!-- 꿈달력 -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_calendar"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#FDCA60"
-                android:elevation="16dp"
+                android:layout_height="36dp"
                 android:minWidth="0dp"
+                android:minHeight="0dp"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
                 android:text="@string/btn_calendar"
-                android:textColor="#212121"
-                android:textSize="15sp"
-                android:translationZ="4dp"
-                app:rippleColor="#33FFC54D"
+                android:textColor="#17212B"
+                android:textSize="14sp"
+                app:backgroundTint="@null"
+                android:background="@drawable/btn_gold_gloss_selector"
+                app:cornerRadius="16dp"
+                app:rippleColor="#33FFFFFF"
                 app:icon="@drawable/ic_calendar_moon"
                 app:iconGravity="textStart"
-                app:iconPadding="6dp"
-                app:iconTint="#212121" />
+                app:iconPadding="4dp"
+                app:iconSize="18dp"
+                app:iconTint="#17212B"
+                android:elevation="8dp"
+                android:translationZ="2dp"/>
 
             <Space
-                android:layout_width="12dp"
-                android:layout_height="wrap_content" />
+                android:layout_width="24dp"
+                android:layout_height="wrap_content"/>
 
-            <!-- 운세 버튼: 골드 -->
+            <!-- 행운보기 -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_fortune"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="#FDCA60"
-                android:elevation="16dp"
+                android:layout_height="36dp"
                 android:minWidth="0dp"
+                android:minHeight="0dp"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
                 android:text="@string/btn_fortune"
-                android:textColor="#212121"
-                android:textSize="15sp"
-                android:translationZ="4dp"
-                app:rippleColor="#33FFC54D"
+                android:textColor="#17212B"
+                android:textSize="14sp"
+                app:backgroundTint="@null"
+                android:background="@drawable/btn_gold_gloss_selector"
+                app:cornerRadius="16dp"
+                app:rippleColor="#33FFFFFF"
                 app:icon="@drawable/ic_fortune"
                 app:iconGravity="textStart"
-                app:iconPadding="6dp"
-                app:iconTint="#212121" />
+                app:iconPadding="4dp"
+                app:iconSize="18dp"
+                app:iconTint="#17212B"
+                android:elevation="8dp"
+                android:translationZ="2dp"/>
         </LinearLayout>
 
     </LinearLayout>

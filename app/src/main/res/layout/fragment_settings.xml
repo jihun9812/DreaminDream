@@ -38,18 +38,19 @@
             android:orientation="vertical"
             android:background="@android:color/transparent">
 
-            <!-- 편집 카드 (보임/숨김 전환 대상) -->
+            <!-- 편집 카드 -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/edit_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
+                android:layout_marginTop="20dp"
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="10dp"
                 app:strokeColor="#454545"
                 app:strokeWidth="1dp"
-                app:cardBackgroundColor="#6E5C9B">
+                app:cardBackgroundColor="#FF352D49">
 
                 <LinearLayout
                     android:id="@+id/edit_content"
@@ -113,7 +114,7 @@
                             android:hint="예: 홍길동"
                             android:padding="12dp"
                             android:textColor="#E8F1F8"
-                            android:textColorHint="#80C6D4DF"
+                            android:textColorHint="#FFFFFF"
                             android:includeFontPadding="false"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -153,7 +154,7 @@
                             android:inputType="none"
                             android:padding="12dp"
                             android:textColor="#E8F1F8"
-                            android:textColorHint="#80C6D4DF"
+                            android:textColorHint="#FFFFFF"
                             android:includeFontPadding="false"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -212,7 +213,7 @@
                             android:buttonTint="#37C2D0"/>
                     </RadioGroup>
 
-                    <!-- MBTI -->
+
                     <TextView
                         android:id="@+id/label_mbti"
                         android:layout_width="wrap_content"
@@ -243,13 +244,13 @@
                             android:hint="예: INFP"
                             android:padding="12dp"
                             android:textColor="#E8F1F8"
-                            android:textColorHint="#80C6D4DF"
+                            android:textColorHint="#FFFFFF"
                             android:inputType="textCapCharacters"
                             android:maxLength="4"
                             android:includeFontPadding="false"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- 저장 버튼(편집 카드 내부) -->
+                    <!-- 저장 버튼 -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_save"
                         android:layout_width="match_parent"
@@ -321,7 +322,7 @@
                         android:visibility="gone"
                         style="?android:attr/progressBarStyleLarge" />
 
-                    <!-- 보기 모드에서 '수정' 역할 버튼 -->
+                    <!-- 보기 모드에서 '수정' -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_edit_mode"
                         android:layout_width="match_parent"
@@ -354,7 +355,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- 하단 배너 (다른 화면들과 동일 유닛) -->
+    <!-- 하단 배너 -->
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView_settings"
         android:layout_width="match_parent"

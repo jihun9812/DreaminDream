@@ -10,6 +10,6 @@
     android:singleLine="true"
     android:ellipsize="end"
     android:textSize="16sp"
-    android:textColor="@color/black"
+    android:textColor="#E8F1F8"
     android:includeFontPadding="false"
     android:background="@android:color/transparent"/>

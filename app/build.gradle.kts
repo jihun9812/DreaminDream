@@ -69,9 +69,11 @@ android {
 dependencies {
 
     //  Firebase SDK 추가
-    implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-firestore-ktx") //유저꿈 저장
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
     implementation("com.google.firebase:firebase-messaging") // 팝업메세지
     implementation("com.google.firebase:firebase-config-ktx:21.6.0")
     implementation("com.google.firebase:firebase-auth-ktx")
@@ -81,6 +83,7 @@ dependencies {
     implementation ("com.google.android.gms:play-services-auth:21.1.0")
 
 
+    implementation("androidx.activity:activity-ktx:1.9.2")
 
     implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
@@ -88,7 +91,6 @@ dependencies {
     implementation("com.airbnb.android:lottie:6.4.0")
     implementation("com.google.android.gms:play-services-ads:22.6.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
-
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
@@ -97,6 +99,8 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

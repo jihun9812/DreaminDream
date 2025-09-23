@@ -1,4 +1,3 @@
-// file: app/src/main/java/com/example/dreamindream/CalendarFragment.kt
 package com.example.dreamindream
 
 import android.content.Context
@@ -29,6 +28,7 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 
 class CalendarFragment : Fragment() {
 
@@ -36,7 +36,13 @@ class CalendarFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var selectedDate: LocalDate? = null
-    private val holidays = mutableListOf<Holiday>()
+
+    /**
+     * 휴일을 스레드-세이프하게 보관하기 위한 맵.
+     * key: 날짜, value: 휴일명
+     */
+    private val holidayMap = ConcurrentHashMap<LocalDate, String>()
+
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy년 M월")
 
     // ✅ 캘린더 표시 범위: 2024.01 ~ 2030.12
@@ -68,7 +74,10 @@ class CalendarFragment : Fragment() {
         // Recycler
         adapter = DreamInlineAdapter(
             mutableListOf(),
-            onOpen = { entry -> DreamFragment.showResultDialog(requireContext(), entry.result) },
+            onOpen = { entry ->
+                // 폴드 전용 우측 패널이 없다면 기존 다이얼로그 사용
+                DreamFragment.showResultDialog(requireContext(), entry.result)
+            },
             onDelete = { pos, _ -> confirmDelete { deleteEntryAt(pos) } }
         )
         binding.recyclerDreams.layoutManager = LinearLayoutManager(requireContext())
@@ -132,7 +141,7 @@ class CalendarFragment : Fragment() {
         container.textView.text = day.date.dayOfMonth.toString()
         val isSelected = selectedDate == day.date
         val isToday = day.date == LocalDate.now()
-        val holiday = holidays.find { it.date == day.date }
+        val holidayName = holidayMap[day.date] // ✅ O(1) 조회, 동시 접근 안전
 
         // 기록 도트(강도)
         val count = getDreamCount(day.date)
@@ -155,7 +164,7 @@ class CalendarFragment : Fragment() {
             }
         }
 
-        container.view.setOnClickListener { handleDayClick(day.date, holiday) }
+        container.view.setOnClickListener { handleDayClick(day.date, holidayName) }
 
         when {
             isSelected -> {
@@ -174,7 +183,7 @@ class CalendarFragment : Fragment() {
                 container.textView.setBackgroundResource(android.R.color.transparent)
                 container.textView.setTextColor(
                     when {
-                        holiday != null -> colSun
+                        holidayName != null -> colSun
                         day.date.dayOfWeek == DayOfWeek.SUNDAY -> colSun
                         day.date.dayOfWeek == DayOfWeek.SATURDAY -> colSat
                         else -> colText
@@ -184,7 +193,7 @@ class CalendarFragment : Fragment() {
         }
     }
 
-    private fun handleDayClick(date: LocalDate, holiday: Holiday?) {
+    private fun handleDayClick(date: LocalDate, holidayName: String?) {
         val oldDate = selectedDate
         selectedDate = date
         oldDate?.let { binding.calendarView.notifyDateChanged(it) }
@@ -192,12 +201,11 @@ class CalendarFragment : Fragment() {
 
         updateMonthText(YearMonth.from(date))
 
-        if (holiday != null) {
-            binding.holidayTextView.text = holiday.name
+        if (holidayName != null) {
+            binding.holidayTextView.text = holidayName
             binding.holidayTextView.visibility = View.VISIBLE
         } else {
-            binding.holidayTextView.text = ""
-            binding.holidayTextView.visibility = View.GONE
+            clearHolidayBanner()
         }
 
         refreshInlineListFor(date)
@@ -229,15 +237,15 @@ class CalendarFragment : Fragment() {
     /**
      * ✅ 2024~2030 전체 휴일을 캐시에서 즉시 로드 후,
      *    비어있는 연도만 네트워크로 가져와 저장/반영.
+     *    (holidayMap은 ConcurrentHashMap으로 동시 접근 안전)
      */
     private fun loadHolidays2030() {
         try {
-            holidays.clear()
+            holidayMap.clear()
 
             // 1) 캐시 우선 로드
             val cached = HolidayStorage.loadHolidaysRange(requireContext(), CAL_START_YEAR, CAL_END_YEAR)
-            holidays.addAll(cached)
-            holidays.sortBy { it.date }
+            for (h in cached) holidayMap[h.date] = h.name
             binding.calendarView.notifyCalendarChanged()
 
             // 2) 빈 연도만 API 호출해서 채우기
@@ -253,11 +261,8 @@ class CalendarFragment : Fragment() {
                 HolidayApi.fetchHolidays(
                     y,
                     onSuccess = { list ->
-                        HolidayStorage.saveHolidays(requireContext(), y, list)
-                        // 중복 방지 후 합치기
-                        val existing = holidays.map { it.date }.toHashSet()
-                        holidays += list.filter { it.date !in existing }
-                        holidays.sortBy { it.date }
+                        // 맵에 병합 (원자적 대입)
+                        for (h in list) holidayMap[h.date] = h.name
                         binding.calendarView.notifyCalendarChanged()
                         fetchNext(idx + 1)
                     },
@@ -277,7 +282,7 @@ class CalendarFragment : Fragment() {
         try {
             MobileAds.initialize(requireContext())
             val adView = view.findViewById<AdView>(R.id.adViewCalendar)
-            adView.loadAd(AdRequest.Builder().build())
+            adView?.loadAd(AdRequest.Builder().build())
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -370,7 +375,6 @@ class CalendarFragment : Fragment() {
         _binding = null
     }
 }
-
 
 class DayViewContainer(view: View) : ViewContainer(view) {
     val textView: TextView = view.findViewById(R.id.calendarDayText)

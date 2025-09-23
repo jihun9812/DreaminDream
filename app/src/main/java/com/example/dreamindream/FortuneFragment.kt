@@ -1,6 +1,10 @@
-// file: app/src/main/java/com/example/dreamindream/FortuneFragment.kt
 package com.example.dreamindream
 
+
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Context
 import android.content.SharedPreferences
@@ -8,25 +12,33 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
+import android.media.SoundPool
 import android.os.Bundle
 import android.transition.Fade
 import android.transition.Slide
 import android.transition.TransitionManager
 import android.transition.TransitionSet
-import android.view.*
-import android.view.animation.AnimationUtils
+import android.view.Gravity
+import android.view.HapticFeedbackConstants
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
-import android.widget.*
+import android.view.animation.OvershootInterpolator
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.LinearLayout
+import android.widget.ScrollView
+import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.graphics.ColorUtils
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
 import com.example.dreamindream.ads.AdManager
-import com.example.dreamindream.fortune.FortuneApi
-import com.example.dreamindream.fortune.FortuneStorage
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.material.button.MaterialButton
@@ -38,7 +50,10 @@ import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.firebase.auth.FirebaseAuth
 import org.json.JSONArray
 import org.json.JSONObject
+import kotlin.math.cos
 import kotlin.math.max
+import kotlin.math.sin
+import kotlin.random.Random
 
 class FortuneFragment : Fragment() {
 
@@ -74,8 +89,16 @@ class FortuneFragment : Fragment() {
     private var lastPayload: JSONObject? = null
     private var isExpanded = false
 
-    // 클릭/전환 중 임시 상태 업데이트 차단 (0.2s 번쩍 방지)
+    // Anim state
     private var suppressButtonState = false
+    private var breathingAnim: ValueAnimator? = null
+
+    // Sound
+    private var soundPool: SoundPool? = null
+    private var sfxClickId: Int = 0
+    private var sfxChimeId: Int = 0
+
+    companion object { private var fortuneIntroPlayed = false }
 
     // UI helpers
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
@@ -84,8 +107,6 @@ class FortuneFragment : Fragment() {
 
     private val BTN_GRAD = intArrayOf(Color.parseColor("#9B8CFF"), Color.parseColor("#6F86FF"))
     private val BTN_DISABLED = Color.parseColor("#475166")
-
-    // 골드 칩 자동 적용용 상수
     private val TRAIT_TITLES = setOf("창의성", "소통", "적응력", "결단력")
     private val GOLD = Color.parseColor("#FDCA60")
 
@@ -94,6 +115,7 @@ class FortuneFragment : Fragment() {
         storage = FortuneStorage(requireContext())
         prefs = storage.prefs
         api = FortuneApi(requireContext(), storage)
+        initSound()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -132,20 +154,13 @@ class FortuneFragment : Fragment() {
         // 초기 프레임 깜빡임 방지
         setPendingFortune()
 
-        // 화면에 있는 Trait 칩을 자동으로 골드 틴트
+        // 칩 골드 틴트
         applyGoldToTraitChips(rootLayout)
 
-        // Firestore → Prefs 동기화 후 초기 UI 결정
-        storage.syncProfileFromFirestore {
-            decideInitialUi(v)
-        }
+        // FS → Prefs 동기화 후 초기 UI
+        storage.syncProfileFromFirestore { decideInitialUi(v) }
 
-        fun View.scaleClick(run: () -> Unit) = setOnClickListener {
-            startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.scale_up))
-            performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-            run()
-        }
-
+        // 복사/공유
         btnCopy.setOnClickListener {
             val cm = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
             cm.setPrimaryClip(android.content.ClipData.newPlainText("fortune", resultText.text))
@@ -157,23 +172,31 @@ class FortuneFragment : Fragment() {
             }; startActivity(android.content.Intent.createChooser(send, "공유"))
         }
 
-        fortuneButton.scaleClick {
-            suppressButtonState = true
-            fortuneButton.clearAnimation(); fortuneButton.animate().cancel()
-            fortuneButton.isClickable = false
-            fortuneButton.alpha = 0f
-            fortuneButton.visibility = View.INVISIBLE
-            if (!storage.isProfileComplete()) { showProfileRequiredDialog(); return@scaleClick }
+        // 버튼 클릭
+        fortuneButton.setOnClickListener {
+            if (!storage.isProfileComplete()) {
+                showProfileRequiredDialog()
+                return@setOnClickListener
+            }
             if (storage.isFortuneSeenToday()) {
                 Toast.makeText(requireContext(),"오늘은 이미 확인했어요. 내일 다시 이용해주세요.",Toast.LENGTH_SHORT).show()
-                return@scaleClick
+                return@setOnClickListener
             }
+
+            it.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+            playSfx(sfxClickId, 0.8f)
+            popSparkles(it, count = 12)
+            playPressBounce(it)
+            stopBreathing()
+
+            suppressButtonState = true
+            fortuneButton.isClickable = false
             fortuneButton.visibility = View.GONE
+
             relayoutCardToTop()
             fortuneCard.visibility = View.VISIBLE
             expandFortuneCard(v)
 
-            // 로딩 중엔 카드 컨텐츠 숨김
             setCardContentVisible(false)
             showLoading(true)
 
@@ -186,15 +209,18 @@ class FortuneFragment : Fragment() {
                     bindFromPayload(payload)
                     storage.cacheTodayPayload(payload)
                     storage.markSeenToday()
-                    fortuneButton.visibility = View.GONE
-                    relayoutCardToTop()
+
                     showLoading(false)
                     setCardContentVisible(true)
+                    view?.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                    playSfx(sfxChimeId, 0.9f)
+
                     v.findViewById<ScrollView>(R.id.resultScrollView)?.post {
                         val sv = v.findViewById<ScrollView>(R.id.resultScrollView)
                         sv?.scrollTo(0, 0); sv?.fullScroll(View.FOCUS_UP)
                     }
                     expandFortuneCard(v)
+
                     FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
                         FirestoreManager.saveDailyFortune(uid, storage.todayKey(), payload)
                     }
@@ -205,10 +231,8 @@ class FortuneFragment : Fragment() {
                     setCardContentVisible(true)
                     resultText.text = userMsg
                     setEmotionBars(seedPreset.first, seedPreset.second, seedPreset.third)
-                    if (!suppressButtonState) fortuneButton.visibility = View.VISIBLE
+                    fortuneButton.visibility = View.VISIBLE
                     applyPrimaryButtonStyle()
-                    moveButtonCentered()
-                    expandFortuneCard(v)
                 }
             )
         }
@@ -224,9 +248,7 @@ class FortuneFragment : Fragment() {
         return v
     }
 
-    // Firestore 동기화 이후에만 버튼/카드 노출 결정 → "내일 다시" 번쩍 방지
     private fun decideInitialUi(v: View) {
-        // 1) 캐시된 오늘 운세가 있으면 카드만 노출, 버튼 숨김
         storage.getCachedTodayPayload()?.let { last ->
             lastPayload = last
             fortuneButton.visibility = View.GONE
@@ -236,35 +258,164 @@ class FortuneFragment : Fragment() {
             expandFortuneCard(v)
             return
         }
-        // 2) 오늘 이미 본 날이면 버튼도 아예 미노출
         if (storage.isFortuneSeenToday()) {
             fortuneButton.visibility = View.GONE
             return
         }
-        // 3) 그 외에는 '행운 보기' 버튼 노출
         applyPrimaryButtonStyle()
     }
 
-    // ------- Restore & Bind -------
+    // ------- 애니메이션 -------
 
-    private fun restoreCachedPayload(v: View) {
-        storage.getCachedTodayPayload()?.let { last ->
-            lastPayload = last
-            fortuneButton.visibility = View.GONE
-            relayoutCardToTop()
-            bindFromPayload(last)
-            setCardContentVisible(true)
-            expandFortuneCard(v)
+    private fun playFortuneButtonIntro(btn: View) {
+        btn.visibility = View.VISIBLE
+        btn.alpha = 0f
+        btn.scaleX = 0.60f
+        btn.scaleY = 0.60f
+        btn.rotation = 0f
+
+        val grow = AnimatorSet().apply {
+            playTogether(
+                ObjectAnimator.ofFloat(btn, View.SCALE_X, 0.60f, 1.18f),
+                ObjectAnimator.ofFloat(btn, View.SCALE_Y, 0.60f, 1.18f),
+                ObjectAnimator.ofFloat(btn, View.ALPHA,   0f,    1f)
+            )
+            duration = 280
+            interpolator = AccelerateDecelerateInterpolator()
+        }
+
+        val settle1 = AnimatorSet().apply {
+            playTogether(
+                ObjectAnimator.ofFloat(btn, View.SCALE_X, 1.18f, 0.92f),
+                ObjectAnimator.ofFloat(btn, View.SCALE_Y, 1.18f, 0.92f)
+            )
+            duration = 160
+            interpolator = DecelerateInterpolator()
+        }
+
+        val settle2 = AnimatorSet().apply {
+            playTogether(
+                ObjectAnimator.ofFloat(btn, View.SCALE_X, 0.92f, 1.06f, 1.0f),
+                ObjectAnimator.ofFloat(btn, View.SCALE_Y, 0.92f, 1.06f, 1.0f)
+            )
+            duration = 220
+            interpolator = OvershootInterpolator(1.9f)
+        }
+
+        AnimatorSet().apply {
+            playSequentially(grow, settle1, settle2)
+            start()
+        }
+
+        fortuneIntroPlayed = true
+        startBreathing(btn)
+    }
+
+    private fun startBreathing(btn: View) {
+        stopBreathing()
+        breathingAnim = ValueAnimator.ofFloat(1.0f, 0.94f, 1.06f, 1.0f).apply {
+            duration = 2400
+            repeatCount = ValueAnimator.INFINITE
+            addUpdateListener { a ->
+                val s = a.animatedValue as Float
+                btn.scaleX = s
+                btn.scaleY = s
+            }
+            start()
         }
     }
 
+    private fun stopBreathing() { breathingAnim?.cancel(); breathingAnim = null }
+
+    private fun playPressBounce(v: View) {
+        val press = AnimatorSet().apply {
+            playTogether(
+                ObjectAnimator.ofFloat(v, View.SCALE_X, v.scaleX, 0.90f),
+                ObjectAnimator.ofFloat(v, View.SCALE_Y, v.scaleY, 0.90f)
+            )
+            duration = 90
+            interpolator = DecelerateInterpolator()
+        }
+        val release = AnimatorSet().apply {
+            playTogether(
+                ObjectAnimator.ofFloat(v, View.SCALE_X, 0.90f, 1.07f, 1.0f),
+                ObjectAnimator.ofFloat(v, View.SCALE_Y, 0.90f, 1.07f, 1.0f)
+            )
+            duration = 130
+            interpolator = OvershootInterpolator(2.0f)
+        }
+        AnimatorSet().apply { playSequentially(press, release); start() }
+    }
+
+    // ✨ 스파클
+    private fun popSparkles(anchor: View, count: Int = 10) {
+        val root = rootLayout
+        if (!isAdded || root.width == 0 || root.height == 0) return
+
+        val rootLoc = IntArray(2); root.getLocationOnScreen(rootLoc)
+        val btnLoc  = IntArray(2); anchor.getLocationOnScreen(btnLoc)
+        val cx = (btnLoc[0] - rootLoc[0]) + anchor.width / 2f
+        val cy = (btnLoc[1] - rootLoc[1]) + anchor.height / 2f
+
+        val palette = intArrayOf(
+            Color.parseColor("#FFE27A"),
+            Color.parseColor("#FFFFFF"),
+            Color.parseColor("#FFD3A3"),
+            Color.parseColor("#A6C8FF"),
+            Color.parseColor("#FF8AE2")
+        )
+
+        repeat(count) { i ->
+            val size = dp(10 + Random.nextInt(10))
+            val dot = View(requireContext()).apply {
+                layoutParams = ConstraintLayout.LayoutParams(size, size)
+                background = GradientDrawable().apply {
+                    shape = GradientDrawable.OVAL
+                    setColor(palette[i % palette.size])
+                }
+                scaleX = 0f; scaleY = 0f; alpha = 1f
+                x = cx - size / 2f; y = cy - size / 2f
+                elevation = 100f
+            }
+            root.addView(dot)
+
+            val baseAngle = (360f / count) * i
+            val jitter = Random.nextFloat() * 40f - 20f
+            val angle = baseAngle + jitter
+            val rad   = Math.toRadians(angle.toDouble())
+            val radius = dp(36 + Random.nextInt(44))
+
+            val endX = (cx + cos(rad) * radius).toFloat() - size / 2f
+            val endY = (cy + sin(rad) * radius).toFloat() - size / 2f
+
+            AnimatorSet().apply {
+                playTogether(
+                    ObjectAnimator.ofFloat(dot, View.SCALE_X, 0f, 1f, 0f),
+                    ObjectAnimator.ofFloat(dot, View.SCALE_Y, 0f, 1f, 0f),
+                    ObjectAnimator.ofFloat(dot, View.X, dot.x, endX),
+                    ObjectAnimator.ofFloat(dot, View.Y, dot.y, endY),
+                    ObjectAnimator.ofFloat(dot, View.ALPHA, 1f, 1f, 0f)
+                )
+                duration = 650L
+                startDelay = (i * 12L)
+                interpolator = AccelerateDecelerateInterpolator()
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        root.removeView(dot)
+                    }
+                })
+                start()
+            }
+        }
+    }
+
+    // ------- Bind & Helpers -------
+
     private fun bindFromPayload(obj: JSONObject) {
-        // 키워드
         val kwArr = obj.optJSONArray("keywords") ?: JSONArray()
         val kws = (0 until kwArr.length()).mapNotNull { kwArr.optString(it).takeIf { it.isNotBlank() } }
         setKeywords(kws)
 
-        // 행운
         val lucky = obj.optJSONObject("lucky")
         setLucky(
             lucky?.optString("colorHex").orEmpty(),
@@ -272,7 +423,6 @@ class FortuneFragment : Fragment() {
             lucky?.optString("time").orEmpty()
         )
 
-        // 감정
         val emo = obj.optJSONObject("emotions")
         setEmotionBars(
             emo?.optInt("positive", 60) ?: 60,
@@ -280,12 +430,10 @@ class FortuneFragment : Fragment() {
             emo?.optInt("negative", 15) ?: 15
         )
 
-        // 섹션 카드 or 텍스트
         val rendered = renderSectionCards(obj)
         resultText.visibility = if (rendered) View.GONE else View.VISIBLE
         if (!rendered) resultText.text = api.formatSections(obj)
 
-        // 체크리스트
         val items = api.sanitizeChecklist(
             (0 until (obj.optJSONArray("checklist")?.length() ?: 0))
                 .mapNotNull { obj.optJSONArray("checklist")?.optString(it) }
@@ -293,14 +441,12 @@ class FortuneFragment : Fragment() {
         setChecklist(items)
     }
 
-    // 초기 깜빡임 제거
     private fun setPendingFortune() {
         fortuneButton.visibility = View.INVISIBLE
         fortuneCard.visibility = View.GONE
         loadingView.visibility = View.GONE
     }
 
-    // ------- Chip Gold Tint -------
     private fun applyGoldToTraitChips(root: ViewGroup) {
         fun dfs(v: View) {
             when (v) {
@@ -315,9 +461,7 @@ class FortuneFragment : Fragment() {
         var hasTrait = false
         for (i in 0 until group.childCount) {
             val chip = group.getChildAt(i) as? Chip ?: continue
-            if (TRAIT_TITLES.contains(chip.text?.toString()?.trim())) {
-                hasTrait = true
-            }
+            if (TRAIT_TITLES.contains(chip.text?.toString()?.trim())) hasTrait = true
         }
         if (!hasTrait) return
 
@@ -342,35 +486,30 @@ class FortuneFragment : Fragment() {
         }
     }
 
-    private fun adjustAlpha(color: Int, factor: Float): Int {
-        return ColorUtils.setAlphaComponent(color, (Color.alpha(color) * factor).toInt())
-    }
+    private fun adjustAlpha(color: Int, factor: Float): Int =
+        ColorUtils.setAlphaComponent(color, (Color.alpha(color) * factor).toInt())
 
-    // ------- UI small helpers -------
     private fun applyPrimaryButtonStyle() {
         if (suppressButtonState) return
         with(fortuneButton) {
-            visibility = View.VISIBLE
-            isEnabled = true
-            setBackgroundResource(R.drawable.fortune_button_bg) // ★ ContextCompat 불필요
-            backgroundTintList = null                           // 틴트 제거
-            setTextColor(Color.WHITE)
-            text = "운세\n보기"
+            visibility = View.VISIBLE; isEnabled = true
+            setBackgroundResource(R.drawable.fortune_button_bg); backgroundTintList = null
+            setTextColor(Color.WHITE); text = "운세\n보기"
+            alpha = 1f; scaleX = 1f; scaleY = 1f; rotation = 0f
         }
         moveButtonCentered()
+        if (!fortuneIntroPlayed) playFortuneButtonIntro(fortuneButton) else startBreathing(fortuneButton)
     }
 
     private fun lockFortuneButtonForToday() {
         if (suppressButtonState) return
         fortuneButton.visibility = View.VISIBLE
         fortuneButton.isEnabled = false
-        fortuneButton.background = GradientDrawable().apply {
-            cornerRadius = dp(16).toFloat()
-            setColor(BTN_DISABLED)
-        }
+        fortuneButton.background = GradientDrawable().apply { cornerRadius = dp(16).toFloat(); setColor(BTN_DISABLED) }
         fortuneButton.setTextColor(Color.parseColor("#B3C1CC"))
         fortuneButton.text = "내일 다시"
         moveButtonTop()
+        stopBreathing()
     }
 
     private fun showProfileRequiredDialog() {
@@ -404,9 +543,7 @@ class FortuneFragment : Fragment() {
         chips.removeAllViews()
         list.take(4).forEach { label ->
             val chip = Chip(requireContext()).apply {
-                text = label
-                isCheckable = false
-                isClickable = false
+                text = label; isCheckable = false; isClickable = false
                 setTextColor(Color.WHITE)
                 chipBackgroundColor = ColorStateList.valueOf(Color.parseColor("#334E68"))
             }
@@ -421,8 +558,7 @@ class FortuneFragment : Fragment() {
         items.forEachIndexed { idx, text ->
             val cb = CheckBox(requireContext()).apply {
                 this.text = "• $text"
-                setTextColor(Color.parseColor("#F0F4F8"))
-                textSize = 14f
+                setTextColor(Color.parseColor("#F0F4F8")); textSize = 14f
                 isChecked = prefs.getBoolean("fortune_check_${todayKey}_$idx", false)
                 setPadding(8, 10, 8, 10)
                 setOnCheckedChangeListener { _, checked ->
@@ -444,12 +580,8 @@ class FortuneFragment : Fragment() {
             val score = s.optInt("score", -1).coerceIn(40, 100)
             val bodyText = s.optString("text").ifBlank { s.optString("advice") }.trim()
 
-            val card = layoutInflater.inflate(
-                R.layout.item_fortune_section, container, false
-            ) as MaterialCardView
-
-            val tvTitle = card.findViewById<TextView>(R.id.tvSectionTitle)
-            tvTitle.text = title
+            val card = layoutInflater.inflate(R.layout.item_fortune_section, container, false) as MaterialCardView
+            val tvTitle = card.findViewById<TextView>(R.id.tvSectionTitle); tvTitle.text = title
 
             val badge = card.findViewById<TextView>(R.id.tvScoreBadge)
             val color = api.scoreColor(score)
@@ -503,18 +635,14 @@ class FortuneFragment : Fragment() {
 
         tvTitle.text = title
         tvScore.text = "${score}점"
-        tvScore.background = GradientDrawable().apply {
-            cornerRadius = dp(999).toFloat()
-            setColor(api.scoreColor(score))
-        }
+        tvScore.background = GradientDrawable().apply { cornerRadius = dp(999).toFloat(); setColor(api.scoreColor(score)) }
         tvBody.text = api.buildSectionDetails(title, score, text, advice)
 
         val dlg = MaterialAlertDialogBuilder(
             requireContext(),
             com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog
-        ).setView(content).create().apply {
-            window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        }
+        ).setView(content).create().apply { window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT)) }
+
         dlg.setOnShowListener {
             val dm = resources.displayMetrics
             dlg.window?.setLayout((dm.widthPixels * 0.92f).toInt(), ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -533,44 +661,64 @@ class FortuneFragment : Fragment() {
         else TransitionManager.beginDelayedTransition(target)
     }
 
-    // ------- Layout/Loading helpers -------
+    // ------- Layout/Loading -------
+    private fun relayoutCardToTop() {
+        beginTransitionIfAllowed(rootLayout)
+        val lp = fortuneCard.layoutParams as ConstraintLayout.LayoutParams
+        lp.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+        lp.endToEnd     = ConstraintLayout.LayoutParams.PARENT_ID
+        lp.topToTop     = ConstraintLayout.LayoutParams.PARENT_ID
+        lp.topMargin    = dp(10)
+        lp.bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+        lp.bottomToTop    = ConstraintLayout.LayoutParams.UNSET
+        fortuneCard.layoutParams = lp
+        fortuneCard.requestLayout()
+    }
+
     private fun moveButtonCentered() {
-        val set = ConstraintSet().apply { clone(rootLayout) }
-        set.clear(R.id.fortuneButton, ConstraintSet.TOP); set.clear(R.id.fortuneButton, ConstraintSet.BOTTOM)
-        set.connect(R.id.fortuneButton, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        set.connect(R.id.fortuneButton, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-        set.connect(R.id.fortuneButton, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
-        set.connect(R.id.fortuneButton, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM)
-        set.setVerticalBias(R.id.fortuneButton, 0.48f)
-        beginTransitionIfAllowed(rootLayout); set.applyTo(rootLayout)
+        beginTransitionIfAllowed(rootLayout)
+        val lp = fortuneButton.layoutParams as ConstraintLayout.LayoutParams
+        lp.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+        lp.endToEnd     = ConstraintLayout.LayoutParams.PARENT_ID
+        lp.topToTop     = ConstraintLayout.LayoutParams.PARENT_ID
+        lp.bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+        lp.topMargin = 0; lp.bottomMargin = 0
+        lp.verticalBias = 0.48f
+        fortuneButton.layoutParams = lp
+        fortuneButton.requestLayout()
     }
 
     private fun moveButtonTop() {
-        val set = ConstraintSet().apply { clone(rootLayout) }
-        set.clear(R.id.fortuneButton, ConstraintSet.BOTTOM)
-        set.connect(R.id.fortuneButton, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START)
-        set.connect(R.id.fortuneButton, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END)
-        set.connect(R.id.fortuneButton, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, dp(24))
-        beginTransitionIfAllowed(rootLayout); set.applyTo(rootLayout)
+        beginTransitionIfAllowed(rootLayout)
+        val lp = fortuneButton.layoutParams as ConstraintLayout.LayoutParams
+        lp.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+        lp.endToEnd     = ConstraintLayout.LayoutParams.PARENT_ID
+        lp.topToTop     = ConstraintLayout.LayoutParams.PARENT_ID
+        lp.topMargin    = dp(24)
+        lp.bottomToBottom = ConstraintLayout.LayoutParams.UNSET
+        lp.bottomToTop    = ConstraintLayout.LayoutParams.UNSET
+        lp.verticalBias   = 0f
+        fortuneButton.layoutParams = lp
+        fortuneButton.requestLayout()
     }
 
-    private fun relayoutCardToTop() {
-        val set = ConstraintSet().apply { clone(rootLayout) }
-        set.clear(R.id.fortuneCard, ConstraintSet.TOP)
-        set.connect(R.id.fortuneCard, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, dp(10))
-        beginTransitionIfAllowed(rootLayout); set.applyTo(rootLayout)
-    }
-
-    private fun showLoading(show: Boolean) {
+    private fun showLoading(show: Boolean, animRes: Int? = null) {
         if (show) {
+            animRes?.let { loadingView.setAnimation(it) }
             loadingView.alpha=0f; loadingView.visibility=View.VISIBLE
             loadingView.scaleX=0.3f; loadingView.scaleY=0.3f
-            loadingView.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(700).setInterpolator(BounceInterpolator()).start()
-            loadingView.playAnimation()
+            loadingView.animate()
+                .alpha(1f).scaleX(1f).scaleY(1f)
+                .setDuration(450).setInterpolator(BounceInterpolator())
+                .withEndAction { loadingView.playAnimation() }
+                .start()
             resultText.text=""
             fortuneButton.isEnabled=false
+            stopBreathing()
         } else {
-            loadingView.cancelAnimation(); loadingView.visibility=View.GONE; fortuneButton.isEnabled=true
+            loadingView.cancelAnimation()
+            loadingView.visibility=View.GONE
+            fortuneButton.isEnabled=true
         }
     }
 
@@ -584,7 +732,10 @@ class FortuneFragment : Fragment() {
         val curH = max(scroll?.height ?: 160, 160)
         ValueAnimator.ofInt(curH, targetH).apply {
             duration = 700; startDelay=150; interpolator = DecelerateInterpolator()
-            addUpdateListener { a -> scroll?.layoutParams?.height = (a.animatedValue as Int); scroll?.requestLayout() }
+            addUpdateListener { a ->
+                scroll?.layoutParams?.height = (a.animatedValue as Int)
+                scroll?.requestLayout()
+            }
             start()
         }
     }
@@ -600,7 +751,7 @@ class FortuneFragment : Fragment() {
         btnCopy.visibility = vis; btnShare.visibility = vis; btnDeep.visibility = vis
     }
 
-    // ------- Deep (reward gate) -------
+    // ------- Ad gate / Deep -------
     private fun openDeepWithGate() {
         val key = "fortune_deep_unlocked_${storage.todayPersonaKey()}"
         if (prefs.getBoolean(key, false)) { openDeepNow(); return }
@@ -610,7 +761,7 @@ class FortuneFragment : Fragment() {
         val btnCancel = v.findViewById<Button>(R.id.btnCancel)
         val btnWatch = v.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnWatchAd)
         val textStatus = v.findViewById<TextView>(R.id.textStatus)
-        val progress = v.findViewById<ProgressBar>(R.id.progressAd)
+        val progress = v.findViewById<android.widget.ProgressBar>(R.id.progressAd)
 
         btnCancel.setOnClickListener { bs.dismiss() }
         btnWatch.setOnClickListener {
@@ -662,5 +813,36 @@ class FortuneFragment : Fragment() {
             deep?.let { storage.cacheDeep(today, it) }
             api.showDeepDialog(requireContext(), deep ?: JSONObject(), lastPayload)
         }
+    }
+
+    // ------- Sound -------
+    private fun initSound() {
+        soundPool = SoundPool.Builder().setMaxStreams(2).build()
+        sfxClickId = loadSfxFirstFound("sfx_fortune_click_dreamy", "sfx_fortune_click")
+        sfxChimeId = loadSfxFirstFound("sfx_fortune_chime_dreamy", "sfx_fortune_chime")
+    }
+
+    private fun loadSfxFirstFound(vararg names: String): Int {
+        val ctx = requireContext()
+        for (n in names) {
+            val resId = ctx.resources.getIdentifier(n, "raw", ctx.packageName)
+            if (resId != 0) return soundPool?.load(ctx, resId, 1) ?: 0
+        }
+        return 0
+    }
+
+    private fun playSfx(id: Int, volume: Float = 1f) {
+        if (id != 0) soundPool?.play(id, volume, volume, 1, 0, 1f)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        stopBreathing()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        soundPool?.release()
+        soundPool = null
     }
 }

@@ -1,16 +1,17 @@
-// file: app/src/main/java/com/example/dreamindream/fortune/FortuneStorage.kt
-package com.example.dreamindream.fortune
+// FortuneStorage.kt
+package com.example.dreamindream
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.provider.Settings
-import com.example.dreamindream.FirestoreManager
 import com.google.firebase.auth.FirebaseAuth
 import org.json.JSONArray
 import org.json.JSONObject
 import java.security.MessageDigest
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class FortuneStorage(private val ctx: Context) {
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 은은한 유리 배경 그라데이션 -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="18dp" />
+            <gradient
+                android:type="linear"
+                android:angle="270"
+                android:startColor="#2E2545"
+                android:endColor="#58352D49" />
+        </shape>
+    </item>
+
+</layer-list>

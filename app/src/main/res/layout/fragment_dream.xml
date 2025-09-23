@@ -7,12 +7,12 @@
     android:background="@drawable/main_ground"
     android:fitsSystemWindows="true">
 
-    <!-- 스크롤 영역: 배너 위까지 -->
     <ScrollView
         android:id="@+id/contentScroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
+        android:overScrollMode="never"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/adView"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,154 +20,147 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingTop="12dp"
-            android:paddingBottom="24dp">
+            android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/titleText"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/content_wrapper"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:text=""
-                android:textColor="#FFFFFF"
-                android:fontFamily="@font/pretendard_bold"
-                android:textSize="22sp"
-                android:textStyle="bold"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="@dimen/ads_bottom_inset"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/editCard"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                app:cardCornerRadius="26dp"
-                app:cardElevation="10dp"
-                app:cardBackgroundColor="#FE352D49"
-                app:cardPreventCornerOverlap="true"
-                app:cardUseCompatPadding="true"
-                app:contentPaddingBottom="20dp"
-                app:contentPaddingLeft="20dp"
-                app:contentPaddingRight="20dp"
-                app:contentPaddingTop="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/titleText">
+                app:layout_constraintWidth_percent="0.95"
+                app:layout_constraintWidth_max="@dimen/max_phone_width">
 
-                <LinearLayout
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/editCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_marginTop="10dp"
+                    android:minHeight="300dp"
+                    app:cardCornerRadius="16dp"
+                    app:strokeWidth="0dp"
+                    app:cardElevation="0dp"
+                    android:outlineAmbientShadowColor="@android:color/transparent"
+                    android:outlineSpotShadowColor="@android:color/transparent"
+                    app:strokeColor="@android:color/transparent"
+                    app:cardBackgroundColor="#99312943"
+                    app:cardForegroundColor="@android:color/transparent"
+                    app:cardPreventCornerOverlap="true"
+                    app:cardUseCompatPadding="false">
 
-                    <TextView
-                        android:id="@+id/editLabel"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:includeFontPadding="true"
-                        android:lineSpacingExtra="2dp"
-                        android:text="• 꿈 내용 입력"
-                        android:textColor="#FDCA60"
-                        android:textSize="17sp"
-                        android:textStyle="bold" />
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
-                    <!-- 🔹 문구 변경: 오늘의 횟수 (초깃값 0회) -->
-                    <TextView
-                        android:id="@+id/usageTextView"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
-                        android:layout_marginBottom="8dp"
-                        android:includeFontPadding="true"
-                        android:text="오늘의 횟수 : 0회"
-                        android:textColor="#B6C5D0"
-                        android:textSize="13sp" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="6dp">
 
-                    <EditText
-                        android:id="@+id/dreamEditText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:autofillHints="none"
-                        android:background="@android:color/transparent"
-                        android:gravity="top|start"
-                        android:hint="@string/hint_input"
-                        android:includeFontPadding="true"
-                        android:inputType="textCapSentences|textMultiLine|textNoSuggestions"
-                        android:lineSpacingExtra="2dp"
-                        android:maxLines="8"
-                        android:minHeight="160dp"
-                        android:paddingStart="12dp"
-                        android:paddingTop="12dp"
-                        android:paddingEnd="12dp"
-                        android:paddingBottom="12dp"
-                        android:textColor="#FFFFFF"
-                        android:textColorHint="#9FB1BF"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                            <TextView
+                                android:id="@+id/editLabel"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="• 꿈 내용 입력"
+                                android:textColor="#FDCA60"
+                                android:textSize="@dimen/text_md"
+                                android:textStyle="bold" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/interpretButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:includeFontPadding="true"
-                        android:minHeight="48dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"
-                        android:text="@string/button_interpret"
-                        android:fontFamily="@font/pretendard_bold"
-                        android:textColor="#212121"
-                        android:textSize="13sp"
-                        app:backgroundTint="#FDCA60"
-                        app:cornerRadius="16dp"
-                        app:rippleColor="#33FFC54D" />
+                            <TextView
+                                android:id="@+id/usageTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="오늘 남은 횟수 : 0회"
+                                android:textColor="#B6C5D0"
+                                android:textSize="@dimen/text_sm" />
+                        </LinearLayout>
 
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        <EditText
+                            android:id="@+id/dreamEditText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:autofillHints="none"
+                            android:background="@android:color/transparent"
+                            android:gravity="top|start"
+                            android:hint="@string/hint_input"
+                            android:includeFontPadding="false"
+                            android:inputType="textCapSentences|textMultiLine|textNoSuggestions"
+                            android:imeOptions="flagNoFullscreen|actionDone"
+                            android:lineSpacingExtra="2dp"
+                            android:maxLines="8"
+                            android:minHeight="180dp"
+                            android:paddingStart="2dp"
+                            android:paddingTop="12dp"
+                            android:paddingEnd="12dp"
+                            android:paddingBottom="12dp"
+                            android:textColor="#FFFFFF"
+                            android:textColorHint="#9FB1BF"
+                            android:textSize="@dimen/hint_input" />
 
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/lottieLoading"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_marginTop="12dp"
-                android:visibility="gone"
-                app:lottie_rawRes="@raw/just_flow_teal"
-                app:lottie_loop="true"
-                app:layout_constraintTop_toBottomOf="@id/editCard"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- 결과 영역 -->
-            <TextView
-                android:id="@+id/resultTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
-                android:padding="14dp"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:lineSpacingExtra="6dp"
-                android:background="@drawable/bg_glass_card"
-                app:layout_constraintTop_toBottomOf="@id/lottieLoading"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/interpretButton"
+                            android:layout_width="match_parent"
+                            android:layout_height="42dp"
+                            android:layout_marginTop="44dp"
+                            android:text="@string/button_interpret"
+                            android:textAllCaps="false"
+                            android:textColor="#212121"
+                            android:textSize="@dimen/text_md"
+                            android:textStyle="bold"
+                            android:includeFontPadding="false"
+                            app:backgroundTint="#EBBB57"
+                            app:cornerRadius="12dp"
+                            app:rippleColor="#33FFC54D" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lottieLoading"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_gravity="center_horizontal"
+                    android:visibility="gone"
+                    android:scaleType="centerInside"
+                    app:lottie_rawRes="@raw/just_flow_teal"
+                    app:lottie_loop="true" />
+
+                <TextView
+                    android:id="@+id/resultTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/bg_glass_card"
+                    android:lineSpacingExtra="4dp"
+                    android:minHeight="52dp"
+                    android:padding="12dp"
+                    android:text="여기에 해몽 결과가 표시됩니다."
+                    android:textColor="#FFFFFF"
+                    android:textSize="@dimen/text_md" />
+            </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-    <!-- 배너: 화면 바닥 고정 -->
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:adSize="BANNER"
-        app:adUnitId="ca-app-pub-1742201279182732/8682841157" />
+        app:adUnitId="ca-app-pub-1742201279182732/8682841157"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,14 +32,14 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
 import java.util.concurrent.TimeUnit
-
-// ▼ 추가: 텍스트 컬러링용
+import android.graphics.text.LineBreaker
+import android.text.Layout
 import android.graphics.Typeface
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import androidx.annotation.ColorInt
-import androidx.core.text.toSpannable
+import android.annotation.SuppressLint
 
 class AIReportFragment : Fragment() {
 
@@ -49,6 +49,9 @@ class AIReportFragment : Fragment() {
         private const val PRO_WATCHDOG_MS = 30_000L
         private const val RELOAD_DEBOUNCE_MS = 300L
         private const val EMPTY_DIALOG_DELAY_MS = 1_000L
+
+        /** 리포트 생성 최소 기록 개수(“이번 주 꿈 N개 이상” 규칙) */
+        private const val MIN_ENTRIES_FOR_REPORT = 2
     }
 
     // UI
@@ -110,59 +113,64 @@ class AIReportFragment : Fragment() {
     }
     private val uid get() = FirebaseAuth.getInstance().currentUser?.uid
 
-    // ---------- helpers ----------
+    // ---------- small utils ----------
     private fun View.fadeInIfHidden(dur: Long = 140L) {
         if (!isVisible) { alpha = 0f; visibility = View.VISIBLE; animate().alpha(1f).setDuration(dur).start() }
     }
     private fun View.hideGone() { animate().cancel(); visibility = View.GONE; alpha = 0f }
+    private val Float.dp get() = this * resources.displayMetrics.density
 
-    // HTML 파서(간이)
     private fun TextView.setHtml(html: String) {
         text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
 
-    // ▼ 심화 섹션 제목 색상 팔레트 (원하는 톤 자유 변경)
+    // ▼ 심화 섹션 제목 색상 팔레트
     private val SECTION_COLORS: Map<String, Int> by lazy {
         mapOf(
             "주간 꿈 심화 분석" to color("#FDCA60"),
-            "심화 분석"       to color("#FDCA60"),
-            "AI 심화분석"     to color("#FDCA60"),
+            "심화 분석"         to color("#FDCA60"),
+            "AI 심화분석"       to color("#FDCA60"),
 
-            "요약"           to color("#90CAF9"),
-            "수치 요약"       to color("#A7FFEB"),
-            "감정 패턴 해석"   to color("#FFAB91"),
-            "상징·장면 해석"   to color("#F48FB1"),
-            "명리 관점"       to color("#B39DDB"),
-            "1~2주 전망"      to color("#81C784"),
-            "1-2주 전망"      to color("#81C784"),
-            "체크리스트"       to color("#FFE082"),
+            "요약"             to color("#90CAF9"),
+            "수치 요약"         to color("#A7FFEB"),
+            "감정 패턴 해석"     to color("#FFAB91"),
+            "상징·장면 해석"     to color("#F48FB1"),
+            "명리 관점"         to color("#B39DDB"),
+            "1~2주 전망"        to color("#81C784"),
+            "1-2주 전망"        to color("#81C784"),
+            "체크리스트"         to color("#FFE082"),
 
-            // 수치 라벨성 제목
-            "감정 분포(%)"     to color("#FFE082"),
-            "테마 비중(%)"     to color("#FFE082"),
+            "감정 분포(%)"       to color("#FFE082"),
+            "감정 분포"          to color("#FFE082"),
+            "테마 비중(%)"       to color("#FFE082"),
+            "테마 비중"          to color("#FFE082"),
 
-            // 보조
-            "핵심 요약"       to color("#90CAF9"),
-            "인사이트"        to color("#F48FB1")
+            "핵심 요약"         to color("#90CAF9"),
+            "인사이트"          to color("#F48FB1")
         )
     }
 
     @ColorInt private fun color(hex: String): Int = android.graphics.Color.parseColor(hex)
 
-    // 섹션 제목/라벨 컬러링 (HTML 변환 후 Spanned에 직접 스팬 입힘)
-    private fun buildRichAnalysis(htmlOrMd: String): CharSequence {
-        // 1) 기본 HTML 파싱 (모델이 마크다운/플레인 반환해도 안전하게)
-        val sanitized = sanitizeModelHtml(htmlOrMd)
-        val spanned = HtmlCompat.fromHtml(sanitized, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        val sb = SpannableStringBuilder(spanned)
+    private fun compactTypography(raw: String): String = raw
+        .replace(Regex("[ \\t]{2,}"), " ")
+        .replace(Regex("\\n{3,}"), "\n\n")
+        .replace(Regex("^\\s*•\\s+", RegexOption.MULTILINE), "• ")
+        .replace(Regex("\\s*\\n\\s*•\\s*", RegexOption.MULTILINE), "\n• ")
+        .replace(Regex("\\s+([:：])"), "$1")
+        .trim()
 
-        // 2) 라인/불릿/번호/콜론 패턴으로 제목 컬러+볼드
+    private fun buildRichAnalysis(htmlOrMd: String): CharSequence {
+        val sanitized = sanitizeModelHtml(htmlOrMd)
+        val compact = compactTypography(sanitized)
+        val spanned = HtmlCompat.fromHtml(compact, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        val sb = SpannableStringBuilder(spanned)
         val plain = sb.toString()
+
         SECTION_COLORS.forEach { (key, col) ->
             val k = Regex.escape(key)
 
-            // a) 줄 첫머리 | 불릿 "• " | 번호 "1. " 뒤에 오는 제목 (+콜론 허용)
-            val rLine = Regex("(?m)(^|•\\s|\\d+\\.\\s*)($k)(?=\\s*[:：]?\\s*(\\n|\$))")
+            val rLine = Regex("(?m)(^|•\\s|\\d+\\.\\s*)($k)(?=\\s*(?:[:：]|\\n|$))")
             rLine.findAll(plain).forEach { m ->
                 val s = m.groups[2]?.range?.first ?: return@forEach
                 val e = m.groups[2]?.range?.last?.plus(1) ?: return@forEach
@@ -170,8 +178,7 @@ class AIReportFragment : Fragment() {
                 sb.setSpan(StyleSpan(Typeface.BOLD), s, e, 0)
             }
 
-            // b) 문장 중간의 굵은 제목 + 콜론 형태도 보정
-            val rInline = Regex("(?i)(?:^|\\s)($k)(?=\\s*[:：])")
+            val rInline = Regex("(?im)(?:^|\\s)($k)(?=\\s*[:：])")
             rInline.findAll(plain).forEach { m ->
                 val s = m.groups[1]?.range?.first ?: return@forEach
                 val e = m.groups[1]?.range?.last?.plus(1) ?: return@forEach
@@ -179,8 +186,7 @@ class AIReportFragment : Fragment() {
                 sb.setSpan(StyleSpan(Typeface.BOLD), s, e, 0)
             }
 
-            // c) 표기 변형: <h2>/<h3>가 텍스트로 flatten 되었을 때 단독 라인
-            val rSolo = Regex("(?m)^($k)\\s*\$")
+            val rSolo = Regex("(?m)^($k)\\s*$")
             rSolo.findAll(plain).forEach { m ->
                 val s = m.groups[1]?.range?.first ?: return@forEach
                 val e = m.groups[1]?.range?.last?.plus(1) ?: return@forEach
@@ -188,11 +194,9 @@ class AIReportFragment : Fragment() {
                 sb.setSpan(StyleSpan(Typeface.BOLD), s, e, 0)
             }
         }
-
         return sb
     }
 
-    // 모델 출력 전처리(코드펜스/nbsp/Heading샾 제거)
     private fun sanitizeModelHtml(raw: String) =
         raw.trim()
             .replace(Regex("^\\s*```(?:\\w+)?\\s*"), "")
@@ -223,6 +227,28 @@ class AIReportFragment : Fragment() {
         reportCard.visibility = View.GONE
         reportCard.alpha = 0f
 
+        // 텍스트 가독성
+        aiComment.includeFontPadding = false
+        aiComment.setLineSpacing(1f.dp, 1.10f)
+        if (Build.VERSION.SDK_INT >= 26) {
+            if (Build.VERSION.SDK_INT >= 29) {
+                aiComment.justificationMode = LineBreaker.JUSTIFICATION_MODE_INTER_WORD
+            } else {
+                @SuppressLint("WrongConstant")
+                aiComment.justificationMode = 1 // INTER_WORD
+            }
+        }
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (Build.VERSION.SDK_INT >= 29) {
+                aiComment.breakStrategy = LineBreaker.BREAK_STRATEGY_SIMPLE
+            } else {
+                @SuppressLint("WrongConstant")
+                aiComment.breakStrategy = 0 // SIMPLE
+            }
+            @SuppressLint("WrongConstant")
+            aiComment.hyphenationFrequency = 1 // HYPHENATION_FREQUENCY_NORMAL
+        }
+
         // Ads
         MobileAds.initialize(requireContext())
         adView = v.findViewById(R.id.adView_ai)
@@ -236,6 +262,9 @@ class AIReportFragment : Fragment() {
         val uidPart = FirebaseAuth.getInstance().currentUser?.uid ?: "guest"
         prefs = requireContext().getSharedPreferences("weekly_report_cache_$uidPart", android.content.Context.MODE_PRIVATE)
 
+        // [NEW] 로그인 상태면 선집계(워밍업)
+        FirebaseAuth.getInstance().currentUser?.uid?.let { ReportWarmup.warmUpThisWeek(it) }
+
         // cache-first
         prefillFromCache(targetWeekKey)
 
@@ -243,15 +272,24 @@ class AIReportFragment : Fragment() {
         applyProButtonState()
 
         chartInfoBtn.setOnClickListener {
+            val msg = """
+        • 이번 주 꿈이 ${MIN_ENTRIES_FOR_REPORT}개 이상이면 리포트가 즉시 생성됩니다.
+        • 생성 후 광고 1회 시청으로 ‘심화 분석’을 이용할 수 있어요.
+        • 주 중에 꿈이 총 ${MIN_ENTRIES_FOR_REPORT + 1}개 이상이 되면 리포트가 새로고침되고,
+          광고 1회 시청으로 심화 분석을 다시 실행할 수 있어요.
+        • 막대는 감정 8가지·테마 5가지의 주간 비중(%)을 의미합니다.
+        • 주간 기준: 월~일 (지난 주 리포트는 ‘분석 기록’에서 확인)
+    """.trimIndent()
+
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("차트 안내")
-                .setMessage("• 꿈 기록 → 감정 8가지 · 테마 5가지\n• 2개 이상 기록 시 리포트\n• ‘심화 분석’으로 깊이 있는 해석")
-                .setPositiveButton("확인", null).show()
+                .setMessage(msg)
+                .setPositiveButton("확인", null)
+                .show()
         }
 
-        // ▣ 분석 기록: 상태에 따라 분기 (있으면 바텀시트, 없으면 다이얼로그)
         btnHistory.setOnClickListener {
-            val hasReport = reportCard.isShown && lastDreamCount >= 2
+            val hasReport = reportCard.isShown && lastDreamCount >= MIN_ENTRIES_FOR_REPORT
             if (hasReport) {
                 WeeklyHistoryBottomSheet.showOnce(
                     fm = childFragmentManager,
@@ -284,7 +322,6 @@ class AIReportFragment : Fragment() {
         super.onDestroyView()
     }
 
-    // ---------- spinner ----------
     private fun showProSpinner(show: Boolean, textOverride: String? = null) {
         proSpinner.isVisible = show
         if (reportCard.isVisible) reportCard.alpha = if (show) 0.92f else 1f
@@ -292,7 +329,6 @@ class AIReportFragment : Fragment() {
         textOverride?.let { btnPro.text = it }
     }
 
-    // ---------- cache-first ----------
     private fun prefillFromCache(weekKey: String) {
         prefs.getString("last_feeling_${weekKey}", null)?.let { cf ->
             val ck = prefs.getString("last_keywords_${weekKey}", null)?.split("|")?.filter { it.isNotBlank() }
@@ -356,7 +392,12 @@ class AIReportFragment : Fragment() {
         prefs.edit().putLong("pro_pending_until_${targetWeekKey}", until).apply()
     }
     private fun applyProButtonState() {
-        val enabledBase = BuildConfig.OPENAI_API_KEY.isNotBlank() && !proInFlight && lastDreamCount >= 2 && !isProPending() && !adGateInProgress
+        val enabledBase = BuildConfig.OPENAI_API_KEY.isNotBlank() &&
+                !proInFlight &&
+                lastDreamCount >= MIN_ENTRIES_FOR_REPORT &&
+                !isProPending() &&
+                !adGateInProgress
+
         when {
             proCompleted && !proNeedRefresh -> {
                 btnPro.text = "심화 분석 완료"
@@ -404,7 +445,7 @@ class AIReportFragment : Fragment() {
         FirestoreManager.countDreamEntriesForWeek(userId, weekKey) { dreamCount ->
             lastDreamCount = dreamCount; applyProButtonState()
 
-            if (dreamCount < 2) {
+            if (dreamCount < MIN_ENTRIES_FOR_REPORT) {
                 showReport(false)
                 scheduleEmptyDialog()
                 endLoading(); isReloading = false
@@ -499,7 +540,7 @@ class AIReportFragment : Fragment() {
 
         keywordsText.text = "감정: $feeling • 키워드: ${keywords.joinToString(", ")}"
 
-        // ▼ 핵심: 섹션 제목 컬러링 적용
+        // ▼ 간격 압축 + 컬러링 적용
         aiComment.text = buildRichAnalysis(analysis)
 
         val (pos, neu, neg) = computeKpis(emoLabels, emoDist)
@@ -532,8 +573,8 @@ class AIReportFragment : Fragment() {
             Snackbar.make(reportCard, "API 키가 설정되지 않았어요. 관리자에게 문의하세요.", Snackbar.LENGTH_SHORT).show()
             return
         }
-        if (lastDreamCount < 2) {
-            Snackbar.make(reportCard, "심화 분석은 이번 주 꿈 2개 이상일 때 제공됩니다.", Snackbar.LENGTH_SHORT).show()
+        if (lastDreamCount < MIN_ENTRIES_FOR_REPORT) {
+            Snackbar.make(reportCard, "심화 분석은 이번 주 꿈 ${MIN_ENTRIES_FOR_REPORT}개 이상일 때 제공됩니다.", Snackbar.LENGTH_SHORT).show()
             applyProButtonState(); return
         }
         if (proCompleted && proNeedRefresh) { startPrefetchPro(userId); return }
@@ -557,7 +598,6 @@ class AIReportFragment : Fragment() {
             textStatus.text = "광고 준비 중…"
             progress.visibility = View.VISIBLE
 
-            // 이 줄은 단순 로딩 메시지에만 사용 (색상 로직은 buildRichAnalysis에서 처리)
             aiComment.setHtml(aiComment.text.toString() + "<br/><i style='opacity:.7'>업데이트 중…</i>")
             startPrefetchPro(userId)
 
@@ -596,9 +636,9 @@ class AIReportFragment : Fragment() {
 
         FirestoreManager.collectWeekEntriesLimited(userId, targetWeekKey, limit = 4) { entries, totalCount ->
             if (!isAdded) return@collectWeekEntriesLimited
-            if (totalCount < 2) {
+            if (totalCount < MIN_ENTRIES_FOR_REPORT) {
                 cancelPrefetch("not-enough-entries")
-                Snackbar.make(reportCard, "심화 분석은 이번 주 꿈 2개 이상일 때 제공됩니다.", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(reportCard, "심화 분석은 이번 주 꿈 ${MIN_ENTRIES_FOR_REPORT}개 이상일 때 제공됩니다.", Snackbar.LENGTH_SHORT).show()
                 return@collectWeekEntriesLimited
             }
 
@@ -607,7 +647,7 @@ class AIReportFragment : Fragment() {
             val prompt = buildProPrompt(dreams, interps)
 
             val body = JSONObject().apply {
-                put("model", "gpt-4o-mini")
+                put("model", "gpt-4.1-mini")
                 put("temperature", 0.6)
                 put("messages", JSONArray().put(JSONObject().put("role", "user").put("content", prompt)))
                 put("max_tokens", 900)
@@ -680,20 +720,31 @@ class AIReportFragment : Fragment() {
             showProSpinner(false)
             val content = contentRaw.ifBlank { "" }
             if (content.isNotBlank()) {
-                // ▼ 핵심: 컬러링 적용 버전으로 세팅
+                // UI 반영
                 aiComment.text = buildRichAnalysis(content)
 
-                prefs.edit().putBoolean("pro_done_${targetWeekKey}", true).apply()
+                // [핵심] 로컬 캐시까지 즉시 갱신 → 재시작/오프라인에서도 프로 본문 유지
+                prefs.edit()
+                    .putBoolean("pro_done_${targetWeekKey}", true)
+                    .putString("last_analysis_${targetWeekKey}", sanitizeModelHtml(content).take(5000))
+                    .putString("last_feeling_${targetWeekKey}", lastFeeling)
+                    .putString("last_keywords_${targetWeekKey}", lastKeywords.joinToString("|"))
+                    .apply()
+
                 analysisTitle.text = "AI 심화분석"
                 proCompleted = true; proNeedRefresh = false
                 btnPro.text = "심화 분석 완료"; btnPro.isEnabled = false; btnPro.alpha = 0.65f
                 applyProButtonState()
+
+                // Firestore 저장(merge)
                 try {
                     FirestoreManager.saveProUpgrade(
                         uid = userId, weekKey = targetWeekKey,
                         feeling = lastFeeling, keywords = lastKeywords,
-                        analysis = sanitizeModelHtml(content), model = "gpt-4o-mini"
-                    ) { Snackbar.make(reportCard, "심화 분석이 적용되었어요.", Snackbar.LENGTH_SHORT).show() }
+                        analysis = sanitizeModelHtml(content), model = "gpt-4.1-mini"
+                    ) {
+                        Snackbar.make(reportCard, "심화 분석이 적용되었어요.", Snackbar.LENGTH_SHORT).show()
+                    }
                 } catch (_: Throwable) { /* ignore */ }
             } else {
                 btnPro.isEnabled = true; btnPro.text = "다시 시도"
@@ -774,7 +825,6 @@ class AIReportFragment : Fragment() {
         }
     }
 
-    // DreamFragment로 이동 (부모 컨테이너 id 자동 감지)
     private fun openDreamFragment() {
         val containerId = (view?.parent as? ViewGroup)?.id
             ?: resources.getIdentifier("nav_host_fragment", "id", requireContext().packageName)

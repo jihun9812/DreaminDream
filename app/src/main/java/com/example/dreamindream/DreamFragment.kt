@@ -301,51 +301,85 @@ class DreamFragment : Fragment() {
      * 해몽 결과 텍스트에서 섹션 헤더를 자동 감지해
      * (색상 + Bold + 살짝 크게) 적용.
      */
+
+    /**
+     * 해몽 결과를 섹션 단위로 가독성 좋게 스타일링.
+     * - 섹션 헤더는 굵게/컬러/살짝 크게
+     * - 섹션 본문은 은은한 컬러 톤으로 구분
+     * - 섹션 사이에는 한 줄 공백을 자동 삽입
+     */
+// 섹션별 색 적용 + 섹션 사이 한 줄 공백
     private fun styleResult(raw: String): CharSequence {
-        // 마크다운 잔재/코드 블럭/리스트 기호 정리
-        var clean = raw.replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")
-            .replace("**", "")
-            .replace(Regex("`{1,3}"), "")
-            .replace(Regex("(?m)^\\s*[-*]\\s+"), "• ")
+        var text = raw.ifBlank { "해몽 결과가 비어있습니다." }
+            .replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")      // # 헤더 제거
+            .replace("**", "")                              // 볼드 마크 제거
+            .replace(Regex("`{1,3}"), "")                   // 코드 마크 제거
+            .replace(Regex("(?m)^\\s*[-*]\\s+"), "• ")      // 리스트 → 불릿
+            .trimEnd()
 
-        val sb = SpannableStringBuilder(clean)
+        data class Sec(val key: Regex, val headerColor: Int, val bodyColor: Int)
 
-        // 섹션 헤더 정의 (색은 프리미엄 톤)
-        data class H(val emoji: String, val label: String, val color: Int)
-        val headers = listOf(
-            H("💭", "꿈이 전하는 메시지", Color.parseColor("#9BE7FF")), // 하늘빛
-            H("🧠", "핵심 상징 해석",   Color.parseColor("#FFB3C1")), // 핑크
-            H("📌", "예지 포인트",     Color.parseColor("#FFD166")), // 옐로우
-            H("☀️", "오늘의 활용 팁",  Color.parseColor("#FFE082")), // 크림
-            H("🎯", "오늘의 행동 3가지",Color.parseColor("#A5D6A7"))  // 민트
+        // 이모지/기호/공백/콜론 여부와 상관없이 매칭되게: ^(?:\P{L}*)? -> 앞의 이모지/기호 무시
+        val secs = listOf(
+            Sec(Regex("""^(?:\P{L}*)?\s*(꿈이\s*전하는\s*메시지)\s*:?\s*$""", RegexOption.IGNORE_CASE),
+                Color.parseColor("#9BE7FF"), Color.parseColor("#E6F7FF")),
+            Sec(Regex("""^(?:\P{L}*)?\s*(핵심\s*상징(\s*(해석|분석))?|핵심\s*포인트)\s*:?\s*$""", RegexOption.IGNORE_CASE),
+                Color.parseColor("#FFB3C1"), Color.parseColor("#FFE6EC")),
+            Sec(Regex("""^(?:\P{L}*)?\s*(예지\s*포인트)\s*:?\s*$""", RegexOption.IGNORE_CASE),
+                Color.parseColor("#FFD166"), Color.parseColor("#FFF1CC")),
+            Sec(Regex("""^(?:\P{L}*)?\s*(오늘의\s*활용\s*팁)\s*:?\s*$""", RegexOption.IGNORE_CASE),
+                Color.parseColor("#FFE082"), Color.parseColor("#FFF4D6")),
+            Sec(Regex("""^(?:\P{L}*)?\s*(오늘의\s*행동\s*3\s*가지)\s*:?\s*$""", RegexOption.IGNORE_CASE),
+                Color.parseColor("#A5D6A7"), Color.parseColor("#E9F8ED"))
         )
 
-        // 이모지 유무/앞공백 허용, 라인 전체를 헤더로 처리
-        headers.forEach { h ->
-            val pattern = Regex("(?m)^(?:${Regex.escape(h.emoji)}\\s*)?${Regex.escape(h.label)}\\s*$")
-            pattern.findAll(clean).forEach { m ->
-                val s = m.range.first
-                val e = m.range.last + 1
-                sb.setSpan(ForegroundColorSpan(h.color), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                sb.setSpan(StyleSpan(Typeface.BOLD), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                sb.setSpan(RelativeSizeSpan(1.08f), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
+        fun matchHeader(line: String): Sec? = secs.firstOrNull { it.key.matches(line.trim()) }
+
+        // 섹션 간 공백 추가
+        val lines = text.split('\n')
+        val rebuilt = StringBuilder(text.length + 64)
+        var metFirst = false
+        lines.forEach { line ->
+            val sec = matchHeader(line)
+            if (sec != null && metFirst) rebuilt.append('\n')
+            rebuilt.append(line.trimEnd()).append('\n')
+            if (sec != null) metFirst = true
+        }
+        val finalText = rebuilt.toString().trimEnd()
+
+        val sb = SpannableStringBuilder(finalText)
+
+        // 헤더 범위 수집
+        data class Hit(val start: Int, val end: Int, val sec: Sec)
+        val hits = mutableListOf<Hit>()
+        var idx = 0
+        finalText.split('\n').forEach { line ->
+            val st = idx
+            val en = st + line.length
+            matchHeader(line)?.let { sec -> hits += Hit(st, en, sec) }
+            idx = en + 1 // '\n'
+        }
+        if (hits.isEmpty()) return sb
+
+        // 헤더 스타일
+        hits.forEach { h ->
+            sb.setSpan(ForegroundColorSpan(h.sec.headerColor), h.start, h.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sb.setSpan(StyleSpan(Typeface.BOLD),               h.start, h.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            sb.setSpan(RelativeSizeSpan(1.08f),                h.start, h.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
-        // 소제목이 콜론으로 끝나는 경우도 색상 적용 (예: "핵심 상징 해석:")
-        headers.forEach { h ->
-            val alt = Regex("(?m)^(?:${Regex.escape(h.emoji)}\\s*)?${Regex.escape(h.label)}\\s*:\\s*$")
-            alt.findAll(clean).forEach { m ->
-                val s = m.range.first
-                val e = m.range.last + 1
-                sb.setSpan(ForegroundColorSpan(h.color), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                sb.setSpan(StyleSpan(Typeface.BOLD), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                sb.setSpan(RelativeSizeSpan(1.08f), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        // 본문 톤 (연한 색감)
+        for (i in hits.indices) {
+            val bodyStart = hits[i].end + 1
+            val bodyEnd   = if (i + 1 < hits.size) hits[i + 1].start - 1 else finalText.length
+            if (bodyStart < bodyEnd) {
+                sb.setSpan(ForegroundColorSpan(hits[i].sec.bodyColor), bodyStart, bodyEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
-
         return sb
     }
+
+
 
     private fun hideKeyboardAndScrollToResult(root: View) {
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -373,38 +407,72 @@ class DreamFragment : Fragment() {
             .show()
     }
 
+
     companion object {
         fun showResultDialog(context: Context, result: String) {
             val v = View.inflate(context, R.layout.dream_result_dialog, null)
             val tv = v.findViewById<TextView>(R.id.resultTextView)
 
-            var clean = result.ifBlank { "해몽 결과가 비어있습니다." }
+            var text = result.ifBlank { "해몽 결과가 비어있습니다." }
                 .replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")
                 .replace("**", "")
                 .replace(Regex("`{1,3}"), "")
                 .replace(Regex("(?m)^\\s*[-*]\\s+"), "• ")
+                .trimEnd()
 
-            val sb = SpannableStringBuilder(clean)
-
-            data class H(val emoji: String, val label: String, val color: Int)
-            val headers = listOf(
-                H("💭", "꿈이 전하는 메시지", Color.parseColor("#9BE7FF")),
-                H("🧠", "핵심 상징 해석",   Color.parseColor("#FFB3C1")),
-                H("📌", "예지 포인트",     Color.parseColor("#FFD166")),
-                H("☀️", "오늘의 활용 팁",  Color.parseColor("#FFE082")),
-                H("🎯", "오늘의 행동 3가지",Color.parseColor("#A5D6A7"))
+            data class Sec(val emoji: String, val label: String, val headerColor: Int, val bodyColor: Int)
+            val secs = listOf(
+                Sec("💭", "꿈이 전하는 메시지", Color.parseColor("#9BE7FF"), Color.parseColor("#E6F7FF")),
+                Sec("🧠", "핵심 상징 해석",   Color.parseColor("#FFB3C1"), Color.parseColor("#FFE6EC")),
+                Sec("📌", "예지 포인트",     Color.parseColor("#FFD166"), Color.parseColor("#FFF1CC")),
+                Sec("☀️", "오늘의 활용 팁",  Color.parseColor("#FFE082"), Color.parseColor("#FFF4D6")),
+                Sec("🎯", "오늘의 행동 3가지",Color.parseColor("#A5D6A7"), Color.parseColor("#E9F8ED"))
             )
-            // 라인 끝/콜론 변형까지 처리
-            headers.forEach { h ->
-                val p1 = Regex("(?m)^(?:${Regex.escape(h.emoji)}\\s*)?${Regex.escape(h.label)}\\s*$")
-                val p2 = Regex("(?m)^(?:${Regex.escape(h.emoji)}\\s*)?${Regex.escape(h.label)}\\s*:\\s*$")
-                (p1.findAll(clean) + p2.findAll(clean)).forEach { m ->
-                    val s = m.range.first; val e = m.range.last + 1
-                    sb.setSpan(ForegroundColorSpan(h.color), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    sb.setSpan(StyleSpan(Typeface.BOLD), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    sb.setSpan(RelativeSizeSpan(1.08f), s, e, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+            fun matchHeader(line: String): Sec? {
+                val s = line.trim()
+                return secs.firstOrNull { sec ->
+                    s == sec.label || s == "${sec.emoji} ${sec.label}" ||
+                            s == "${sec.label}:" || s == "${sec.emoji} ${sec.label}:"
                 }
             }
+
+            // 섹션 간 한 칸 띄우기
+            val lines = text.split('\n')
+            val rebuilt = StringBuilder(text.length + 64)
+            var metFirst = false
+            lines.forEach { line ->
+                val sec = matchHeader(line)
+                if (sec != null && metFirst) rebuilt.append('\n')
+                rebuilt.append(line.trimEnd()).append('\n')
+                if (sec != null) metFirst = true
+            }
+            val finalText = rebuilt.toString().trimEnd()
+            val sb = SpannableStringBuilder(finalText)
+
+            data class Hit(val start: Int, val end: Int, val sec: Sec)
+            val hits = mutableListOf<Hit>()
+            var idx = 0
+            finalText.split('\n').forEach { line ->
+                val start = idx
+                val end = start + line.length
+                matchHeader(line)?.let { sec -> hits += Hit(start, end, sec) }
+                idx = end + 1
+            }
+
+            hits.forEach { h ->
+                sb.setSpan(ForegroundColorSpan(h.sec.headerColor), h.start, h.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                sb.setSpan(StyleSpan(Typeface.BOLD), h.start, h.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                sb.setSpan(RelativeSizeSpan(1.08f), h.start, h.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            for (i in hits.indices) {
+                val bodyStart = hits[i].end + 1
+                val bodyEnd   = if (i + 1 < hits.size) hits[i + 1].start - 1 else finalText.length
+                if (bodyStart < bodyEnd) {
+                    sb.setSpan(ForegroundColorSpan(hits[i].sec.bodyColor), bodyStart, bodyEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
+            }
+
             tv.text = sb
 
             val dm = context.resources.displayMetrics
@@ -418,10 +486,10 @@ class DreamFragment : Fragment() {
                 .setView(v)
                 .create()
 
-            //  XML에 btn_close 추가했으니 크래시 없음
             v.findViewById<View>(R.id.btn_close).setOnClickListener { dialog.dismiss() }
             dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
             dialog.show()
         }
     }
+
 }

@@ -1,4 +1,3 @@
-// file: app/src/main/java/com/example/dreamindream/HolidayStorage.kt
 package com.example.dreamindream
 
 import android.content.Context

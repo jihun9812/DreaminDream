@@ -10,26 +10,17 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.*
 import android.view.KeyEvent
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.Space
-import android.widget.TextView
+import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
 
-/**
- * 빈 상태 전용 다이얼로그:
- * - 히어로 안내 + 가이드 칩 + "꿈 기록하러 가기" CTA
- * - 히스토리/삭제/리스트 없음 (바텀시트가 담당)
- * - X 버튼으로만 닫힘 (밖 터치/백버튼 금지)
- */
 class WeeklyHistoryDialogFragment(
-    @Suppress("unused") private val currentWeekKey: String? = null, // 호환성 유지용(미사용)
-    @Suppress("unused") private val onPick: (String) -> Unit = {},  // 호환성 유지용(미사용)
-    @Suppress("unused") private val maxItems: Int = 0,              // 호환성 유지용(미사용)
-    private val onEmptyCta: (() -> Unit)? = null                    // 꿈 기록 화면으로 이동
+    @Suppress("unused") private val currentWeekKey: String? = null,
+    @Suppress("unused") private val onPick: (String) -> Unit = {},
+    @Suppress("unused") private val maxItems: Int = 0,
+    private val onEmptyCta: (() -> Unit)? = null
 ) : DialogFragment() {
 
     companion object {
@@ -49,7 +40,6 @@ class WeeklyHistoryDialogFragment(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // 밖 터치/백버튼으로 닫히지 않게 잠금
         isCancelable = false
         setStyle(STYLE_NORMAL, android.R.style.Theme_Material_Light_Dialog_NoActionBar_MinWidth)
     }
@@ -60,16 +50,14 @@ class WeeklyHistoryDialogFragment(
                 window?.apply {
                     setBackgroundDrawable(GradientDrawable().apply {
                         cornerRadius = 22f
-                        setColor(Color.parseColor("#FFF8DC")) // 라이트 골드
+                        setColor(Color.parseColor("#FFF8DC"))
                         setStroke(1, Color.parseColor("#E0B34A"))
                     })
                     val w = (resources.displayMetrics.widthPixels * 0.92f).toInt()
                     setLayout(w, WindowManager.LayoutParams.WRAP_CONTENT)
                     setDimAmount(0.45f)
                 }
-                // 밖 터치 금지
                 setCanceledOnTouchOutside(false)
-                // 백버튼 소비
                 setOnKeyListener { _, keyCode, event ->
                     keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_UP
                 }
@@ -82,6 +70,13 @@ class WeeklyHistoryDialogFragment(
     ): View {
         val ctx = requireContext()
 
+        // ── 스크롤 컨테이너 (하단 패딩으로 잘림 방지)
+        val scroll = ScrollView(ctx).apply {
+            isFillViewport = false
+            clipToPadding = false
+            setPadding(0, 0, 0, 20.dp(ctx))
+        }
+
         // ── Root
         val root = LinearLayout(ctx).apply {
             orientation = LinearLayout.VERTICAL
@@ -89,8 +84,9 @@ class WeeklyHistoryDialogFragment(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
             )
         }
+        scroll.addView(root)
 
-        // ── Header (제목 + 닫기)
+        // ── Header
         val header = LinearLayout(ctx).apply {
             orientation = LinearLayout.HORIZONTAL
             setPadding(18.dp(ctx), 14.dp(ctx), 12.dp(ctx), 6.dp(ctx))
@@ -106,7 +102,8 @@ class WeeklyHistoryDialogFragment(
             setTextColor(Color.parseColor("#1F2234"))
         }
         val meta = MaterialTextView(ctx).apply {
-            text = "이번 주 꿈을 2개 이상 기록하면 주간 요약이 생성돼요."
+            // 변경: ‘일요일 자동 분석’ → ‘이번 주 2개 이상 즉시 생성’ + 주간 기준 명시
+            text = "리포트 생성 기준: 이번 주 꿈이 2개 이상이면 즉시 AI 리포트를 생성합니다. (주간 기준: 월~일)"
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
             setTextColor(Color.parseColor("#5B5F6A"))
             setPadding(0, 4.dp(ctx), 0, 0)
@@ -114,18 +111,17 @@ class WeeklyHistoryDialogFragment(
         titleCol.addView(title); titleCol.addView(meta)
 
         val close = ImageButton(ctx, null, android.R.attr.borderlessButtonStyle).apply {
-            // 프로젝트 리소스 의존 제거: 기본 X 아이콘 사용
             setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
             imageTintList = ColorStateList.valueOf(Color.parseColor("#1F2234"))
             layoutParams = LinearLayout.LayoutParams(36.dp(ctx), 36.dp(ctx))
             background = null
             contentDescription = "닫기"
-            setOnClickListener { dismissAllowingStateLoss() } // X로만 닫힘
+            setOnClickListener { dismissAllowingStateLoss() }
         }
         header.addView(titleCol); header.addView(close)
         root.addView(header)
 
-        // ── Hero 카드 (보라 그라데이션)
+        // ── Hero
         val hero = LinearLayout(ctx).apply {
             orientation = LinearLayout.HORIZONTAL
             layoutParams = LinearLayout.LayoutParams(
@@ -162,7 +158,8 @@ class WeeklyHistoryDialogFragment(
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
         }
         val heroSub = MaterialTextView(ctx).apply {
-            text = "이번 주 꿈을 최소 2개 기록하면 자동으로 주간 요약을 만들어 드려요."
+            // 변경: ‘일요일 12시 자동 생성’ → ‘2개 이상 기록되는 즉시 생성’
+            text = "이번 주는 꿈을 자유롭게 기록해 주세요. 2개 이상 기록되는 즉시 AI 리포트를 만들어 드려요."
             setTextColor(Color.parseColor("#BFE1FF"))
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
             setPadding(0, 4.dp(ctx), 0, 0)
@@ -171,7 +168,7 @@ class WeeklyHistoryDialogFragment(
         hero.addView(icon); hero.addView(heroCol)
         root.addView(hero)
 
-        // ── 가이드 칩 3개
+        // ── Chips (2개 유지)
         fun chip(text: String) = MaterialTextView(ctx).apply {
             setText(text)
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
@@ -189,14 +186,44 @@ class WeeklyHistoryDialogFragment(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
             ).apply { leftMargin = 18.dp(ctx); rightMargin = 18.dp(ctx); topMargin = 8.dp(ctx) }
         }
-        chipRow.addView(chip("이번 주 2개 이상"))
+
+
+        // 변경: 칩 문구 갱신
+        chipRow.addView(chip("이번 주 2개 이상 즉시 생성"))
         chipRow.addView(Space(ctx).apply { layoutParams = LinearLayout.LayoutParams(6.dp(ctx), 1) })
-        chipRow.addView(chip("키워드 적기"))
-        chipRow.addView(Space(ctx).apply { layoutParams = LinearLayout.LayoutParams(6.dp(ctx), 1) })
-        chipRow.addView(chip("감정 선택"))
+        chipRow.addView(chip("주간 기준: 월~일"))
         root.addView(chipRow)
 
-        // ── CTA: 꿈 기록하러 가기
+        // ── Pro 안내(배너형) — 텍스트가 잘리지 않도록 패딩/라인높이 유지
+        val proInfo = LinearLayout(ctx).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply { leftMargin = 18.dp(ctx); rightMargin = 18.dp(ctx); topMargin = 8.dp(ctx) }
+            setPadding(12.dp(ctx), 12.dp(ctx), 12.dp(ctx), 12.dp(ctx))
+            background = GradientDrawable().apply {
+                cornerRadius = 12f
+                setColor(Color.parseColor("#FFF4ECD6"))
+                setStroke(1.dp(ctx), Color.parseColor("#E0B34A"))
+            }
+        }
+        val proIcon = TextView(ctx).apply {
+            text = "🎬"
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
+            setTextColor(Color.parseColor("#1F2234"))
+            setPadding(2.dp(ctx), 0, 10.dp(ctx), 0)
+        }
+        val proText = MaterialTextView(ctx).apply {
+            // 변경: 활성 기간을 고정시각이 아닌 ‘리포트 생성 후 주간 동안’으로 안내
+            text = "AI 심화분석은 리포트가 생성된 주간 동안 광고 시청 후 이용할 수 있어요."
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
+            setLineSpacing(0f, 1.1f)
+            setTextColor(Color.parseColor("#3A3D4A"))
+        }
+        proInfo.addView(proIcon); proInfo.addView(proText)
+        root.addView(proInfo)
+
+        // ── CTA
         val cta = MaterialButton(ctx, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
             text = "꿈 기록하러 가기"
             setTextColor(Color.parseColor("#1F2234"))
@@ -209,19 +236,17 @@ class WeeklyHistoryDialogFragment(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
             ).apply {
                 leftMargin = 16.dp(ctx); rightMargin = 16.dp(ctx)
-                topMargin = 14.dp(ctx); bottomMargin = 14.dp(ctx)
+                topMargin = 14.dp(ctx); bottomMargin = 20.dp(ctx)
             }
         }
         cta.setOnClickListener {
-            // X로만 닫히게 하고 싶다면 여기서 닫지 않고 이동만 하도록 바꿀 수도 있음.
             dismissAllowingStateLoss()
             onEmptyCta?.invoke()
         }
         root.addView(cta)
 
-        return root
+        return scroll
     }
 }
 
-// dp 확장함수
 private fun Int.dp(ctx: Context) = (this * ctx.resources.displayMetrics.density).toInt()

@@ -4,358 +4,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_ground"
     android:fitsSystemWindows="true"
-    android:padding="16dp"
-    android:forceDarkAllowed="false">
+    android:background="@drawable/main_ground">
 
-    <!-- 상단 아이콘 (통일 아이콘 포지션) -->
-    <ImageView
-        android:id="@+id/settings_icon"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginTop="8dp"
-        android:src="@drawable/ic_edit"
-        android:contentDescription="@string/app_name"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <ScrollView
-        android:id="@+id/scrollView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:fillViewport="true"
-        android:background="@android:color/transparent"
-        app:layout_constraintTop_toBottomOf="@id/settings_icon"
-        app:layout_constraintBottom_toTopOf="@id/adView_settings"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@android:color/transparent">
-
-            <!-- 편집 카드 -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/edit_group"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="10dp"
-                app:strokeColor="#454545"
-                app:strokeWidth="1dp"
-                app:cardBackgroundColor="#FF352D49">
-
-                <LinearLayout
-                    android:id="@+id/edit_content"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="18dp">
-
-                    <!-- 헤더 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="10dp">
-
-                        <ImageView
-                            android:layout_width="28dp"
-                            android:layout_height="28dp"
-                            android:src="@drawable/ic_edit"/>
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="8dp"
-                            android:text="프로필 편집"
-                            android:textColor="#E6F2FA"
-                            android:textStyle="bold"
-                            android:textSize="16sp"/>
-                    </LinearLayout>
-
-                    <!-- 이름 -->
-                    <TextView
-                        android:id="@+id/label_nickname"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="이름"
-                        android:textColor="#FABE41"
-                        android:includeFontPadding="false"/>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/tilNickname"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="14dp"
-                        app:boxBackgroundMode="outline"
-                        app:boxBackgroundColor="@android:color/transparent"
-                        app:boxStrokeColor="#FDCA60"
-                        app:boxStrokeWidth="1dp"
-                        app:boxStrokeWidthFocused="2dp"
-                        app:boxCornerRadiusTopStart="10dp"
-                        app:boxCornerRadiusTopEnd="10dp"
-                        app:boxCornerRadiusBottomStart="10dp"
-                        app:boxCornerRadiusBottomEnd="10dp">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edit_nickname"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="예: 홍길동"
-                            android:padding="12dp"
-                            android:textColor="#E8F1F8"
-                            android:textColorHint="#FFFFFF"
-                            android:includeFontPadding="false"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- 생년월일 -->
-                    <TextView
-                        android:id="@+id/label_birthdate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="생년월일"
-                        android:textColor="#FABE41"
-                        android:includeFontPadding="false"/>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/tilBirthdate"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="14dp"
-                        app:boxBackgroundMode="outline"
-                        app:boxBackgroundColor="@android:color/transparent"
-                        app:boxStrokeColor="#FDCA60"
-                        app:boxStrokeWidth="1dp"
-                        app:boxStrokeWidthFocused="2dp"
-                        app:endIconMode="custom"
-                        app:endIconTint="#C6D4DF"
-                        app:boxCornerRadiusTopStart="10dp"
-                        app:boxCornerRadiusTopEnd="10dp"
-                        app:boxCornerRadiusBottomStart="10dp"
-                        app:boxCornerRadiusBottomEnd="10dp">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edit_birthdate"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="예: 1998-07-06"
-                            android:focusable="false"
-                            android:clickable="true"
-                            android:inputType="none"
-                            android:padding="12dp"
-                            android:textColor="#E8F1F8"
-                            android:textColorHint="#FFFFFF"
-                            android:includeFontPadding="false"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- 태어난 시간 -->
-                    <TextView
-                        android:id="@+id/label_birthtime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="태어난 시간"
-                        android:textColor="#FABE41"
-                        android:includeFontPadding="false"/>
-
-                    <Spinner
-                        android:id="@+id/spinner_birthtime"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:minHeight="48dp"
-                        android:spinnerMode="dropdown"
-                        android:background="@drawable/bg_spinner_outline"
-                        android:popupBackground="@drawable/bg_spinner_popup"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="0dp"
-                        android:layout_marginBottom="14dp"/>
-
-                    <!-- 성별 -->
-                    <TextView
-                        android:id="@+id/label_gender"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="성별"
-                        android:textColor="#FABE41"
-                        android:includeFontPadding="false"/>
-
-                    <RadioGroup
-                        android:id="@+id/radioGroup_gender"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="14dp">
-
-                        <RadioButton
-                            android:id="@+id/radio_male"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="남성"
-                            android:textColor="#FABE41"
-                            android:buttonTint="#37C2D0"
-                            android:layout_marginEnd="24dp"/>
-
-                        <RadioButton
-                            android:id="@+id/radio_female"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="여성"
-                            android:textColor="#FABE41"
-                            android:buttonTint="#37C2D0"/>
-                    </RadioGroup>
-
-
-                    <TextView
-                        android:id="@+id/label_mbti"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="MBTI"
-                        android:textColor="#FABE41"
-                        android:includeFontPadding="false"/>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/tilMBTI"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="14dp"
-                        app:boxBackgroundMode="outline"
-                        app:boxBackgroundColor="@android:color/transparent"
-                        app:boxStrokeColor="#FDCA60"
-                        app:boxStrokeWidth="1dp"
-                        app:boxStrokeWidthFocused="2dp"
-                        app:boxCornerRadiusTopStart="10dp"
-                        app:boxCornerRadiusTopEnd="10dp"
-                        app:boxCornerRadiusBottomStart="10dp"
-                        app:boxCornerRadiusBottomEnd="10dp">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edit_MBTI"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="예: INFP"
-                            android:padding="12dp"
-                            android:textColor="#E8F1F8"
-                            android:textColorHint="#FFFFFF"
-                            android:inputType="textCapCharacters"
-                            android:maxLength="4"
-                            android:includeFontPadding="false"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <!-- 저장 버튼 -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_save"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:text="저장"
-                        android:textColor="#212121"
-                        android:textStyle="bold"
-                        android:includeFontPadding="false"
-                        android:gravity="center"
-                        app:cornerRadius="14dp"
-                        app:backgroundTint="#EBBB57"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- 프로필 요약 카드 -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/card_user_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:visibility="gone"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="10dp"
-                app:cardBackgroundColor="#FF352D49">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="24dp"
-                    android:gravity="center_horizontal">
-
-                    <TextView
-                        android:id="@+id/text_info_summary"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="내 프로필"
-                        android:textColor="#FFFFFF"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:includeFontPadding="false"
-                        android:layout_marginBottom="6dp"/>
-
-                    <!-- 🔐 로그인 방식 표시 -->
-                    <TextView
-                        android:id="@+id/text_login_provider"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="#FFD54F"
-                        android:textSize="13sp"
-                        android:includeFontPadding="false"
-                        android:layout_marginBottom="8dp"
-                        android:text=" "/>
-
-                    <TextView
-                        android:id="@+id/text_user_info"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="#CFE3F0"
-                        android:textSize="15sp"
-                        android:lineSpacingExtra="6dp"
-                        android:includeFontPadding="false"/>
-
-                    <ProgressBar
-                        android:id="@+id/progress_saving"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginTop="16dp"
-                        android:visibility="gone"
-                        style="?android:attr/progressBarStyleLarge" />
-
-                    <!-- 보기 모드에서 '수정' -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_edit_mode"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        android:layout_marginTop="16dp"
-                        android:text="수정"
-                        android:textAllCaps="false"
-                        android:textColor="#212121"
-                        android:textStyle="bold"
-                        app:cornerRadius="14dp"
-                        app:backgroundTint="#FDCA60"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- 로그아웃 -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_logout"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:text="로그아웃"
-                android:textSize="13sp"
-                android:textColor="#212121"
-                android:textStyle="bold"
-                android:includeFontPadding="false"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="28dp"
-                android:layout_marginBottom="20dp"
-                app:cornerRadius="20dp"
-                app:backgroundTint="#FBC149"/>
-        </LinearLayout>
-    </ScrollView>
-
-    <!-- 하단 배너 -->
+    <!-- 하단 배너 광고 -->
     <com.google.android.gms.ads.AdView
         android:id="@+id/adView_settings"
         android:layout_width="match_parent"
@@ -364,5 +16,437 @@
         app:adUnitId="ca-app-pub-1742201279182732/8682841157"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- 로그아웃: 배너 바로 위 고정 (겹치지 않음) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_logout"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:paddingHorizontal="22dp"
+        android:text="로그아웃"
+        android:textAllCaps="false"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        app:backgroundTint="#00FDCA60"
+        app:cornerRadius="16dp"
+        app:layout_constraintBottom_toTopOf="@id/adView_settings"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="8dp" />
+
+    <!-- 스크롤: 상단 ~ 로그아웃 버튼 위까지 -->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btn_logout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- 스크롤의 유일한 자식 -->
+        <LinearLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="0dp">
+
+            <LinearLayout
+                android:id="@+id/panel_box"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:background="@drawable/bg_panel_glass">
+
+
+                <LinearLayout
+                    android:id="@+id/card_profile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:padding="0dp"
+                    android:background="@android:color/transparent">
+
+                    <TextView
+                        android:id="@+id/text_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="프로필 편집"
+                        android:textColor="#FDCA60"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:letterSpacing="0.02"
+                        android:paddingBottom="8dp" />
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        app:dividerColor="#44FDCA60" />
+
+                    <LinearLayout
+                        android:id="@+id/section_edit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingTop="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="이름"
+                            android:textColor="#FABE41"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/til_nickname"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            app:boxBackgroundMode="outline"
+                            app:boxStrokeColor="#FDCA60"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:boxCornerRadiusTopStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusBottomEnd="8dp">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edit_nickname"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:minHeight="44dp"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="10dp"
+                                android:hint="예: 홍길동"
+                                android:inputType="textPersonName|textCapWords"
+                                android:imeOptions="flagNoFullscreen|actionDone"
+                                android:textColor="#E8F1F8"
+                                android:textColorHint="#B3FFFFFF"
+                                android:textSize="16sp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="생년월일"
+                            android:textColor="#FABE41"
+                            android:textSize="12sp" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/til_birthdate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            app:boxBackgroundMode="outline"
+                            app:boxStrokeColor="#FDCA60"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:boxCornerRadiusTopStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusBottomEnd="8dp">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edit_birthdate"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:minHeight="44dp"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="10dp"
+                                android:hint="YYYY-MM-DD"
+                                android:focusable="false"
+                                android:clickable="true"
+                                android:textColor="#E8F1F8"
+                                android:textColorHint="#B3FFFFFF"
+                                android:textSize="16sp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="성별"
+                            android:textColor="#FABE41"
+                            android:textSize="12sp" />
+
+                        <RadioGroup
+                            android:id="@+id/radio_group_gender"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="10dp">
+
+                            <RadioButton
+                                android:id="@+id/radio_male"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="남성"
+                                android:textColor="#FABE41"
+                                android:buttonTint="#37C2D0"
+                                android:textSize="16sp"
+                                android:layout_marginEnd="20dp" />
+
+                            <RadioButton
+                                android:id="@+id/radio_female"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="여성"
+                                android:textColor="#FABE41"
+                                android:buttonTint="#37C2D0"
+                                android:textSize="16sp" />
+                        </RadioGroup>
+
+                        <com.google.android.material.divider.MaterialDivider
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            app:dividerColor="#44FDCA60" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="MBTI"
+                            android:textColor="#FABE41"
+                            android:textSize="12sp" />
+
+                        <Spinner
+                            android:id="@+id/spinner_mbti"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_marginBottom="10dp"
+                            android:spinnerMode="dropdown" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="출생시간"
+                            android:textColor="#FABE41"
+                            android:textSize="12sp" />
+
+                        <Spinner
+                            android:id="@+id/spinner_birthtime"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:layout_marginBottom="10dp"
+                            android:spinnerMode="dropdown" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="end">
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_cancel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="40dp"
+                                android:paddingHorizontal="14dp"
+                                android:text="취소"
+                                android:textAllCaps="false"
+                                android:textColor="#212121"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:backgroundTint="#C7C7C7"
+                                app:cornerRadius="16dp"
+                                android:layout_marginEnd="8dp" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_save"
+                                android:layout_width="wrap_content"
+                                android:layout_height="40dp"
+                                android:paddingHorizontal="14dp"
+                                android:text="저장"
+                                android:textAllCaps="false"
+                                android:textColor="#212121"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                app:backgroundTint="#EBBB57"
+                                app:cornerRadius="16dp" />
+                        </LinearLayout>
+
+                        <ProgressBar
+                            android:id="@+id/progress_saving"
+                            style="?android:attr/progressBarStyleSmall"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:layout_marginTop="8dp"
+                            android:visibility="gone" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- 앱 설정 섹션: 기존 글/버튼 위치 유지 -->
+                <LinearLayout
+                    android:id="@+id/card_app_settings"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="0dp"
+                    android:background="@android:color/transparent">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⚙️ 앱 설정"
+                        android:textColor="#FDCA60"
+                        android:textStyle="bold"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tvAppProfileSummary"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        android:lineSpacingExtra="4dp" />
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="12dp"
+                        app:dividerColor="#33FFFFFF" />
+
+                    <!-- 간단 통계 (플랫) -->
+                    <LinearLayout
+                        android:id="@+id/quickStatus"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal"
+                        android:weightSum="2">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:paddingVertical="10dp">
+
+                            <TextView
+                                android:id="@+id/tvGptUsageLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="오늘 해몽"
+                                android:textColor="#FFD58A"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tvGptUsageValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="—"
+                                android:textColor="#FFFFFF"
+                                android:textStyle="bold"
+                                android:textSize="18sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:paddingVertical="10dp">
+
+                            <TextView
+                                android:id="@+id/tvDreamCountLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="꿈 기록"
+                                android:textColor="#FFD58A"
+                                android:textSize="12sp" />
+                            <TextView
+                                android:id="@+id/tvDreamCountValue"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="—"
+                                android:textColor="#FFFFFF"
+                                android:textStyle="bold"
+                                android:textSize="18sp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <com.google.android.material.divider.MaterialDivider
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="12dp"
+                        app:dividerColor="#33FFFFFF" />
+
+                    <!-- 언어 -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="언어"
+                        android:textColor="#FDCA60"
+                        android:textSize="12sp" />
+
+                    <Spinner
+                        android:id="@+id/spinner_lang"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:spinnerMode="dropdown" />
+
+                    <!-- 설정 -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="설정"
+                        android:textColor="#FDCA60"
+                        android:textSize="12sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_profile_edit"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:layout_marginVertical="6dp"
+                        android:text="프로필 편집"
+                        android:textAllCaps="false"
+                        android:textColor="#1D142E"
+                        app:backgroundTint="#F3EFBE58"
+                        app:cornerRadius="16dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_premium"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FDCA60"
+                        android:textSize="12sp"
+                        app:backgroundTint="#00000000"
+                        android:text="✨ 프리미엄 · 광고 제거" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_contact"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="#FDCA60"
+                        android:textSize="12sp"
+                        app:backgroundTint="#00000000"
+                        android:text="✉️ 문의·피드백 보내기" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_terms"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:backgroundTint="#00000000"
+                        android:textColor="#FDCA60"
+                        android:textSize="12sp"
+                        android:text="📄 약관 · 개인정보 처리방침" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,14 +6,13 @@ import android.view.View
 import android.view.animation.ScaleAnimation
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.auth.api.signin.*
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var googleSignInClient: GoogleSignInClient
 
@@ -209,26 +208,36 @@ class LoginActivity : AppCompatActivity() {
         loadingLayout.addView(loadingText)
         loginCardContent.addView(loadingLayout)
 
+        // 공통 진입 함수: 백스택 제거 후 메인으로
+        val launchMain = {
+            startActivity(Intent(this, MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            })
+            finish()
+        }
+
         val targetYears = listOf(2025, 2026)
         val holidays = mutableListOf<Holiday>()
         var doneCount = 0
         targetYears.forEach { year ->
-            HolidayApi.fetchHolidays(year, onSuccess = { list ->
-                holidays.addAll(list)
-                doneCount++
-                if (doneCount == targetYears.size) {
-                    HolidayStorage.saveHolidays(this, holidays)
-                    startActivity(Intent(this, MainActivity::class.java))
-                    finish()
+            HolidayApi.fetchHolidays(
+                year,
+                onSuccess = { list ->
+                    holidays.addAll(list)
+                    doneCount++
+                    if (doneCount == targetYears.size) {
+                        HolidayStorage.saveHolidays(this, holidays)
+                        launchMain()
+                    }
+                },
+                onError = {
+                    doneCount++
+                    if (doneCount == targetYears.size) {
+                        HolidayStorage.saveHolidays(this, holidays)
+                        launchMain()
+                    }
                 }
-            }, onError = {
-                doneCount++
-                if (doneCount == targetYears.size) {
-                    HolidayStorage.saveHolidays(this, holidays)
-                    startActivity(Intent(this, MainActivity::class.java))
-                    finish()
-                }
-            })
+            )
         }
     }
 

@@ -6,19 +6,13 @@
     android:background="@drawable/main_ground"
     android:fitsSystemWindows="true">
 
-    <!-- 화면 전체를 아래로 내리는 스페이서 (96dp → 72dp) -->
-    <Space
-        android:id="@+id/topSpacer"
-        android:layout_width="match_parent"
-        android:layout_height="72dp" />
-
-    <!-- 월 선택 바 -->
+    <!-- 월 이동 헤더 -->
     <LinearLayout
         android:id="@+id/monthSelector"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/topSpacer"
-        android:layout_marginTop="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="@dimen/calendar_top_margin"
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingTop="4dp"
@@ -26,9 +20,9 @@
 
         <ImageButton
             android:id="@+id/buttonPreviousMonth"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="?selectableItemBackgroundBorderless"
+            android:layout_width="@dimen/calendar_nav_button_size"
+            android:layout_height="@dimen/calendar_nav_button_size"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_chevron_left"
             android:contentDescription="@string/prev_month"
             app:tint="@color/white" />
@@ -38,19 +32,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="2025년 9월"
-            android:textSize="18sp"
-            android:textColor="@color/white"
+            android:textSize="@dimen/month_text"
             android:textStyle="bold"
-            android:layout_marginHorizontal="12dp"
+            android:textColor="#FABE41"
+            android:layout_marginHorizontal="@dimen/month_title_h_margin"
             android:maxLines="1"
             android:ellipsize="end"
-            android:includeFontPadding="false"/>
+            android:includeFontPadding="false" />
 
         <ImageButton
             android:id="@+id/buttonNextMonth"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="?selectableItemBackgroundBorderless"
+            android:layout_width="@dimen/calendar_nav_button_size"
+            android:layout_height="@dimen/calendar_nav_button_size"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_chevron_right"
             android:contentDescription="@string/next_month"
             app:tint="@color/white" />
@@ -63,24 +57,24 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/monthSelector"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:textColor="#EB5D56"
-        android:textSize="12sp"
+        android:textSize="@dimen/text_xs"
         android:fontFamily="@font/pretendard_bold"
         android:includeFontPadding="false"
         android:visibility="gone"
-        android:translationZ="8dp"/>
+        android:translationZ="8dp" />
 
-    <!-- 달력 카드 -->
+    <!-- 달력 카드(배경 적용) -->
     <FrameLayout
         android:id="@+id/calendarWrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/holidayTextView"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginBottom="12dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginStart="@dimen/calendar_side_margin"
+        android:layout_marginEnd="@dimen/calendar_side_margin"
+        android:layout_marginTop="@dimen/calendar_top_margin"
+        android:layout_marginBottom="@dimen/calendar_bottom_margin"
         android:background="@drawable/bg_calendar_rounded"
         android:elevation="8dp"
         android:clipToPadding="false">
@@ -93,7 +87,7 @@
             app:cv_monthHeaderResource="@layout/example_month_header" />
     </FrameLayout>
 
-    <!-- 리스트 타이틀 -->
+    <!-- 꿈 리스트 타이틀 -->
     <TextView
         android:id="@+id/dreamListTitle"
         android:layout_width="match_parent"
@@ -101,14 +95,14 @@
         android:layout_below="@id/calendarWrapper"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="10dp"
         android:text="2025-09-12 (금)의 꿈들"
-        android:textSize="15sp"
+        android:textSize="@dimen/list_title"
         android:textColor="#FFD54F"
         android:fontFamily="@font/pretendard_bold"
-        android:includeFontPadding="false"/>
+        android:includeFontPadding="false" />
 
-    <!-- 비어있을 때 표시 -->
+    <!-- 빈 리스트 안내 -->
     <TextView
         android:id="@+id/emptyDreamText"
         android:layout_width="match_parent"
@@ -118,13 +112,13 @@
         android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
         android:text="이 날짜의 꿈 기록이 없어요."
-        android:textSize="14sp"
+        android:textSize="@dimen/text_md"
         android:textColor="#CFE3F0"
         android:fontFamily="@font/pretendard_medium"
         android:includeFontPadding="false"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
-    <!-- 인라인 스크롤 리스트 -->
+    <!-- 꿈 리스트 -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerDreams"
         android:layout_width="match_parent"
@@ -136,15 +130,15 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:clipToPadding="false"
-        android:paddingBottom="12dp"/>
+        android:paddingBottom="12dp" />
 
-    <!-- 광고 배너 -->
+    <!-- 광고: 최하단 중앙 고정 -->
     <com.google.android.gms.ads.AdView
         android:id="@+id/adViewCalendar"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="-3dp"
+        android:layout_centerHorizontal="true"
         app:adSize="BANNER"
         app:adUnitId="ca-app-pub-1742201279182732/8682841157" />
 

@@ -204,24 +204,89 @@ exports.sendDreamResult = functionsV1
   .firestore
   .document("users/{userId}/dreams/{date}/entries/{entryId}")
   .onCreate(async (snap, context) => {
-    const { dream, result } = snap.data() || {};
+    const { dream, result, title } = snap.data() || {};
     const uid = context.params.userId;
+    const entryId = context.params.entryId;
+
     try {
       const user = await admin.auth().getUser(uid);
       const email = user.email; if (!email) return;
-      const html = `
-      <html><body style="font-family:Pretendard,system-ui,Segoe UI,Roboto,sans-serif;background:#0D0B1E;padding:30px;">
-        <div style="max-width:640px;margin:auto;background:rgba(29,27,58,0.7);backdrop-filter:blur(12px);border-radius:18px;padding:40px;color:#F3F8FC;">
-          <h2 style="text-align:center;color:#9BE7FF;">🔮 오늘의 꿈 해몽 결과</h2>
-          <p><strong>당신의 꿈:</strong></p>
-          <blockquote style="background:#1A1333;padding:16px;border-radius:8px;">${esc(dream || "")}</blockquote>
-          <p><strong>AI 해석:</strong></p>
-          <blockquote style="background:#132A40;padding:16px;border-radius:8px;">${esc(result || "")}</blockquote>
-          <p style="margin-top:28px;font-size:13px;color:#AAA;text-align:center;">오늘 하루도 꿈처럼 빛나길 바랍니다 ✨</p>
-        </div>
-      </body></html>`;
+
+      const dreamHighlights = takeHighlights(String(dream || ""));
+      const resultHighlights = takeHighlights(String(result || ""));
+
+      const dreamCard = card({
+        heading: "당신의 꿈",
+        contentHtml: pre(dream || "작성된 내용이 없습니다."),
+        tone: "indigo",
+      });
+
+      const insightsCard = card({
+        heading: "AI 인사이트",
+        contentHtml: `
+          ${resultHighlights.length ? `
+            <div style="margin:0 0 10px 0;color:#E6E9F4">핵심 요약</div>
+            ${toBullets(resultHighlights)}
+            <div style="height:8px"></div>
+          ` : ""}
+          ${pre(result || "해석 내용이 없습니다.")}`,
+        tone: "cyan",
+      });
+
+      const bodyHtml = `
+        ${title ? card({ heading: "제목", contentHtml: esc(title), tone: "rose" }) : ""}
+        ${dreamCard}
+        ${insightsCard}
+      `;
+
+      const deepLink = `dreamindream://dream?entryId=${encodeURIComponent(entryId)}&uid=${encodeURIComponent(uid)}`;
+
+      const html = shell({
+        title: "🔮 오늘의 꿈 해몽 결과",
+        subtitle: "가독성 향상 레이아웃 · 핵심 요약 포함",
+        bodyHtml,
+        ctaLabel: "앱에서 자세히 보기",
+        ctaHref: deepLink,
+      });
+
       await sendMail(email, "DreamInDream - 오늘의 해몽 결과", html);
     } catch (e) {
       console.error("sendDreamResult error:", e);
     }
+  });
+/* ───────── 문의/피드백 생성 시: 자동 메일 ───────── */
+exports.onFeedbackCreated = functionsV1
+  .runWith({ secrets: ["SMTP_PASS"] })
+  .firestore
+  .document("feedback/{id}")
+  .onCreate(async (snap) => {
+    const d = snap.data() || {};
+    const to = "dreamindream@dreamindream.app";
+    const created = d.createdAtStr || "";
+    const info = d.info || {};
+
+    const metaTable = `
+      <table cellpadding="0" cellspacing="0" style="width:100%;font-size:13px;color:#D8DEF0">
+        <tr><td style="padding:6px 0;width:120px;opacity:.8">앱</td><td>${esc(d.app || "DreamInDream")}</td></tr>
+        <tr><td style="padding:6px 0;opacity:.8">앱버전</td><td>${esc(info.appVersion || "")}</td></tr>
+        <tr><td style="padding:6px 0;opacity:.8">OS</td><td>${esc(info.os || "")} (SDK ${esc(String(info.sdk || ""))})</td></tr>
+        <tr><td style="padding:6px 0;opacity:.8">디바이스</td><td>${esc(info.device || "")}</td></tr>
+        <tr><td style="padding:6px 0;opacity:.8">유저ID</td><td>${esc(info.userId || "")}</td></tr>
+        <tr><td style="padding:6px 0;opacity:.8">설치ID</td><td>${esc(info.installId || "")}</td></tr>
+      </table>`;
+
+    const bodyHtml = `
+      ${card({ heading: "보낸이(연락처)", contentHtml: esc(d.contact || "미기재"), tone: "rose" })}
+      ${card({ heading: "메시지", contentHtml: pre(d.message || ""), tone: "indigo" })}
+      ${card({ heading: "디바이스/앱 정보", contentHtml: metaTable, tone: "cyan" })}
+      ${d.attachmentUrl ? card({ heading: "첨부", contentHtml: `<a href="${d.attachmentUrl}" style="color:#B9F6CA">첨부 보기</a>` }) : "" }
+    `;
+
+    const html = shell({
+      title: "📮 새 문의/피드백 도착",
+      subtitle: created,
+      bodyHtml,
+    });
+
+    await sendMail(to, `[DreamInDream] 새 피드백 (${created})`, html);
   });

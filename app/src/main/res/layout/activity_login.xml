@@ -1,32 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <!-- 배경 애니메이션 -->
+    <!-- 배경 애니메이션 (제약으로 전체 확장) -->
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/bg_lottie"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:background="#E12A1E49"
         app:lottie_rawRes="@raw/hwwprmbqc9"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         android:scaleType="centerCrop"
-        android:alpha="0.85"/>
+        android:alpha="0.85"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- 중앙 로그인 카드뷰 (모든 내용 이 안에만!) -->
+    <!-- 중앙 로그인 카드뷰: 폭 퍼센트 + 최대폭 cap -->
     <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
+        android:id="@+id/loginCard"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
         android:layout_margin="32dp"
+        android:maxWidth="380dp"
         app:cardCornerRadius="32dp"
         app:cardElevation="0dp"
         app:cardBackgroundColor="#CCFFFFFF"
-        app:cardUseCompatPadding="true">
+        app:cardUseCompatPadding="true"
+        app:layout_constraintWidth_percent="0.88"
+        app:layout_constraintWidth_max="380dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <FrameLayout
             android:id="@+id/loginCardContent"
@@ -34,7 +46,7 @@
             android:layout_height="wrap_content"
             android:padding="12dp">
 
-            <!-- 로그인 패널 -->
+            <!-- 로그인 패널 (내용 그대로) -->
             <LinearLayout
                 android:id="@+id/loginPanel"
                 android:layout_width="match_parent"
@@ -92,8 +104,6 @@
                     android:textColor="#000000"
                     android:textColorHint="#999999" />
 
-
-
                 <!-- 회원가입/비번찾기 (로그인 버튼 바로 아래) -->
                 <Button
                     android:id="@+id/btn_login"
@@ -103,6 +113,7 @@
                     android:backgroundTint="#FDCA60"
                     android:minHeight="48dp"
                     android:text="@string/login_btn_login"
+                    android:fontFamily="@font/pretendard_bold"
                     android:textAllCaps="false"
                     android:textColor="@color/black"
                     android:textStyle="bold" />
@@ -123,6 +134,7 @@
                         android:minHeight="48dp"
                         android:padding="12dp"
                         android:text="@string/forgot_password"
+                        android:fontFamily="@font/pretendard_medium"
                         android:textColor="#888"
                         android:textSize="14sp" />
 
@@ -144,6 +156,7 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:minHeight="48dp"
+                        android:fontFamily="@font/pretendard_medium"
                         android:padding="12dp"
                         android:text="@string/sign_up"
                         android:textColor="#888"
@@ -171,6 +184,7 @@
                         android:paddingStart="14dp"
                         android:paddingEnd="14dp"
                         android:text="or"
+                        android:fontFamily="@font/pretendard_medium"
                         android:textColor="#888"
                         android:textSize="16sp" />
 
@@ -193,6 +207,7 @@
                     android:contentDescription="@string/login_btn_google"
                     android:focusable="true"
                     android:minHeight="48dp"
+                    android:fontFamily="@font/pretendard_bold"
                     android:scaleType="fitCenter"
                     android:src="@drawable/btn_google" />
 
@@ -205,13 +220,12 @@
                     android:backgroundTint="#FDCA60"
                     android:minHeight="48dp"
                     android:text="체험"
+                    android:fontFamily="@font/pretendard_bold"
                     android:textColor="@color/black"
                     android:textStyle="bold" />
-
-
             </LinearLayout>
 
-            <!-- 회원가입 패널 -->
+            <!-- 회원가입 패널 (그대로) -->
             <LinearLayout
                 android:id="@+id/signupPanel"
                 android:layout_width="match_parent"
@@ -221,7 +235,6 @@
                 android:padding="28dp"
                 android:visibility="gone">
 
-                <!-- X 닫기 버튼 -->
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -310,7 +323,7 @@
                     android:textColor="#431D56" />
             </LinearLayout>
 
-            <!-- 비밀번호 찾기 패널 -->
+            <!-- 비밀번호 찾기 패널 (그대로) -->
             <LinearLayout
                 android:id="@+id/findPwPanel"
                 android:layout_width="match_parent"
@@ -320,7 +333,6 @@
                 android:padding="28dp"
                 android:visibility="gone">
 
-                <!-- X 닫기 버튼 -->
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -385,18 +397,20 @@
         </FrameLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- 하단 개인정보/버전 -->
+    <!-- 하단 개인정보/버전 (제약으로 하단 고정) -->
     <TextView
         android:id="@+id/privacy_and_version"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:text="@string/privacy_and_version"
         android:textSize="11sp"
         android:textColor="#000000"
         android:gravity="center"
+        android:fontFamily="@font/pretendard_bold"
         android:background="@android:color/transparent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
         android:paddingTop="10dp"
-        android:paddingBottom="24dp" />
-
-</FrameLayout>
+        android:paddingBottom="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

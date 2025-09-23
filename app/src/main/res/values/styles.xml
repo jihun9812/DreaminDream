@@ -4,10 +4,36 @@
     <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowBackground">#FFF9E5</item>
+        <item name="android:windowBackground">#FAF0D4</item>
         <item name="android:fontFamily">@font/pretendard_medium</item>
 
     </style>
+
+    <style name="TextInputLayout.Hint.Small" parent="@style/TextAppearance.MaterialComponents.Caption">
+        <item name="android:textSize">@dimen/text_sm</item>
+    </style>
+
+
+
+        <!-- 둥근 모서리 오버레이(카드/이미지 공용) -->
+        <style name="ShapeAppearanceOverlay.Dream">
+            <item name="cornerFamily">rounded</item>
+            <item name="cornerSize">12dp</item>
+        </style>
+
+    <style name="ShapeAppearanceOverlay">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
+
+        <!-- 100% 원형 오버레이 (프로필 아바타) -->
+        <style name="ShapeAppearanceOverlay.Dream.Circle">
+            <item name="cornerFamily">rounded</item>
+            <item name="cornerSize">50%</item>
+        </style>
+
+
+
 
     <style name="Widget.DreamIn.Chip.Info" parent="Widget.Material3.Chip.Assist.Elevated">
         <item name="chipBackgroundColor">#1AFFFFFF</item>
@@ -113,6 +139,8 @@
         <item name="colorOnSurface">#14828C</item>
         <item name="android:windowBackground">#FEF6E4</item>
     </style>
+
+
 
     <style name="DatePickerHeadline" parent="TextAppearance.Material3.HeadlineSmall">
         <item name="android:textColor">#4B123E5A</item>

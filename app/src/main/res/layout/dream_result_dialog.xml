@@ -6,7 +6,7 @@
     android:layout_margin="24dp"
     app:cardCornerRadius="28dp"
     app:cardElevation="22dp"
-    android:backgroundTint="#C73C2D57">
+    android:backgroundTint="#EB232222">
 
     <ScrollView
         android:id="@+id/scrollDialog"
@@ -23,7 +23,7 @@
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:paddingTop="16dp"
-            android:paddingBottom="28dp">   <!--  끝부분 안 잘리도록 여유 -->
+            android:paddingBottom="26dp">
 
             <ImageButton
                 android:id="@+id/btn_close"

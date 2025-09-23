@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- ===== 공통 폭 cap ===== -->
+    <!-- 기존 값(420dp)은 유지해서 다른 화면 영향 최소화 -->
+    <dimen name="max_phone_width">420dp</dimen>
+    <dimen name="content_max_width_phone">@dimen/max_phone_width</dimen>
+
+    <!-- AI 리포트 전용: 폴드/와이드에서 너무 퍼지지 않도록 별도 최대폭 사용 -->
+    <dimen name="ai_card_max_width">640dp</dimen>
+
+    <!-- ===== 공통 패딩 ===== -->
+    <dimen name="content_side_padding">24dp</dimen>
+    <dimen name="content_vertical_padding">32dp</dimen>
+
+    <!-- ===== 입력/버튼/카드 ===== -->
+    <dimen name="input_min_height">48dp</dimen>
+    <dimen name="input_pad_h">12dp</dimen>
+    <dimen name="input_pad_v">10dp</dimen>
+
+    <dimen name="btn_pad_h">14dp</dimen>
+    <dimen name="btn_radius">12dp</dimen>
+    <dimen name="btn_height">36dp</dimen>
+
+    <dimen name="card_pad">14dp</dimen>
+    <dimen name="ai_card_corner">18dp</dimen>
+    <dimen name="ai_card_elevation">10dp</dimen>
+
+    <dimen name="icon_btn">22dp</dimen>
+    <dimen name="ai_icon">24dp</dimen>
+
+    <!-- ===== 텍스트 규격 ===== -->
+    <dimen name="home_title_size">37sp</dimen>
+    <dimen name="title_margin_bottom">56dp</dimen>
+
+    <dimen name="text_md">14sp</dimen>
+    <dimen name="text_sm">12sp</dimen>
+    <dimen name="text_xs">11sp</dimen>
+
+    <!-- 본문/캡션/섹션 타이틀(다른 레이아웃 호환용) -->
+    <dimen name="body_text">14sp</dimen>
+    <dimen name="caption_text">12sp</dimen>
+    <dimen name="section_title_text">15sp</dimen>
+
+    <!-- AI 리포트 타이틀/서브/버튼 텍스트 -->
+    <dimen name="ai_title">15sp</dimen>
+    <dimen name="ai_sub">13sp</dimen>
+    <dimen name="bubble_text">13sp</dimen>
+    <dimen name="btn_text">14sp</dimen>
+
+    <!-- KPI -->
+    <dimen name="kpi_value">20sp</dimen>
+    <dimen name="kpi_label">12sp</dimen>
+    <dimen name="kpi_card_height">72dp</dimen>
+    <dimen name="kpi_gap_h">6dp</dimen>
+
+    <!-- 차트 높이 -->
+    <dimen name="chart_emotion_height">180dp</dimen>
+    <dimen name="chart_theme_height">150dp</dimen>
+
+    <!-- 구분선/섹션 간격 & 본문 줄간격 -->
+    <dimen name="divider_margin_top">12dp</dimen>
+    <dimen name="divider_margin_bottom">10dp</dimen>
+    <dimen name="section_margin_top">10dp</dimen>
+    <dimen name="section_margin_bottom">6dp</dimen>
+    <dimen name="body_line_space">4dp</dimen>
+
+    <!-- 광고 여백 -->
+    <dimen name="ads_bottom_inset">72dp</dimen>
+
+    <!-- ===== 캘린더 ===== -->
+    <dimen name="month_text">18sp</dimen>
+    <dimen name="list_title">15sp</dimen>
+    <dimen name="hint_input">16sp</dimen>
+
+    <dimen name="calendar_side_margin">12dp</dimen>
+    <dimen name="calendar_top_margin">6dp</dimen>
+    <dimen name="calendar_bottom_margin">12dp</dimen>
+    <dimen name="month_title_h_margin">10dp</dimen>
+    <dimen name="calendar_nav_button_size">36dp</dimen>
+
+    <dimen name="calendar_corner_radius">16dp</dimen>
+    <dimen name="calendar_border_width">2dp</dimen>
+
+    <dimen name="content_max_width">560dp</dimen>
+
+
+    <!-- 카드/패널 -->
+    <dimen name="panel_padding">16dp</dimen>
+    <dimen name="card_corner">16dp</dimen>
+
+    <!-- 폼/버튼 -->
+    <dimen name="field_height">48dp</dimen>
+    <dimen name="field_padding_h">12dp</dimen>
+    <dimen name="field_padding_v">10dp</dimen>
+
+    <dimen name="btn_padding_h">14dp</dimen>
+
+    <!-- 간격 -->
+    <dimen name="gap_xs">4dp</dimen>
+    <dimen name="gap_s">8dp</dimen>
+    <dimen name="gap_m">10dp</dimen>
+    <dimen name="gap_l">12dp</dimen>
+    <dimen name="gap_xl">16dp</dimen>
+
+    <!-- 기타 -->
+    <dimen name="divider_thickness">1dp</dimen>
+    <dimen name="ad_margin_bottom">8dp</dimen>
+    <dimen name="calendar_day_size">40dp</dimen>
+    <dimen name="calendar_day_margin">4dp</dimen>
+    <dimen name="calendar_day_text_size">15sp</dimen>
+    <dimen name="dream_indicator_size">6dp</dimen>
+    <dimen name="dream_indicator_margin_bottom">4dp</dimen>
+
+    <dimen name="month_header_row_height">28dp</dimen>
+    <dimen name="month_header_text_size">12sp</dimen>
+    <dimen name="month_header_padding_v">6dp</dimen>
+    <dimen name="month_header_padding_h">4dp</dimen>
+
+    <dimen name="day_circle_diameter">24dp</dimen>
+    <dimen name="day_circle_stroke">2dp</dimen>
+    <dimen name="day_today_stroke">2.5dp</dimen>
+</resources>

@@ -1,3 +1,4 @@
+// 파일 전체 교체본 — (내용 동일) 필요하면 그대로 붙여넣기
 package com.example.dreamindream
 
 import android.content.Context
@@ -20,17 +21,14 @@ class HomeFragment : Fragment() {
     private lateinit var prefs: SharedPreferences
     private val uid by lazy { FirebaseAuth.getInstance().currentUser?.uid }
 
-    // 홈 요약 캐시(게스트 모드 툴팁용)
     private var lastFeeling: String? = null
     private var lastKeywords: List<String>? = null
     private var lastAnalysis: String? = null
     private var lastScore: Int? = null
 
     private fun isAlive(): Boolean = isAdded && view != null
-
     companion object { private var homeAnimPlayed = false }
 
-    // 데일리 메시지 폴백
     private val dailyMsgFallbacks = listOf(
         "오늘은 마음의 속도를 잠시 늦춰 보세요.",
         "완벽함보다 한 걸음이 더 중요해요.",
@@ -49,11 +47,10 @@ class HomeFragment : Fragment() {
         val userId = uid ?: ""
         prefs = requireContext().getSharedPreferences("dream_history_$userId", Context.MODE_PRIVATE)
 
-        // ---------- 데일리 메시지 ----------
+        // 데일리 메시지
         val aiMessage = v.findViewById<TextView>(R.id.ai_message)
         prepareDailyMessageTextView(aiMessage)
         aiMessage.text = getString(R.string.ai_msg_loading)
-
         DailyMessageManager.getMessage(requireContext()) { msg ->
             if (!isAlive()) return@getMessage
             val safeMsg = msg?.trim().takeUnless {
@@ -62,13 +59,12 @@ class HomeFragment : Fragment() {
             aiMessage.post { if (isAlive()) aiMessage.text = safeMsg }
         }
 
-        // ---------- AI 리포트 홈 카드 ----------
+        // AI 리포트 카드
         val aiReportTitle = v.findViewById<TextView>(R.id.ai_report_title)
         val aiReportSummary = v.findViewById<TextView>(R.id.ai_report_summary)
         val btnAiReport = v.findViewById<MaterialButton>(R.id.btn_ai_report)
         val aiReportCard = v.findViewById<View>(R.id.ai_report_card)
 
-        // 카드/요약 뷰는 클릭 불가를 강제(이 화면에선 버튼만 진입 허용)
         aiReportCard.isClickable = false
         aiReportCard.isFocusable = false
         aiReportCard.setOnClickListener(null)
@@ -77,7 +73,6 @@ class HomeFragment : Fragment() {
         aiReportSummary.isClickable = false
         aiReportSummary.isFocusable = false
 
-        // 캐시 즉시 반영(빠릿)
         val cachedFeeling = prefs.getString("home_feeling", null)
         val cachedKeywords = prefs.getString("home_keywords", null)
             ?.split("|")?.filter { it.isNotBlank() }
@@ -86,37 +81,31 @@ class HomeFragment : Fragment() {
             "감정: $cachedFeeling\n키워드: ${cachedKeywords.joinToString(", ")}"
         else "분석 준비 중…"
 
-        // Fortune 스타일 입장 애니메이션(앱 세션당 1회)
         if (!homeAnimPlayed) {
             animateHomeCardLikeFortune(aiReportCard); homeAnimPlayed = true
         } else {
             aiReportCard.visibility = View.VISIBLE
         }
 
-        // 파이어베이스 연동: 이번 주 데이터 상태에 따라 홈 요약 갱신
         val thisWeekKey = WeekUtils.weekKey()
         val currentUid = uid
         if (currentUid == null) {
-            // 게스트도 버튼은 열리게
             btnAiReport.isEnabled = true
             btnAiReport.alpha = 1f
         } else {
             FirestoreManager.countDreamEntriesForWeek(currentUid, thisWeekKey) { count ->
                 if (!isAlive()) return@countDreamEntriesForWeek
                 if (count < 2) {
-                    // 2개 미만: 가이드 문구
                     val ctx = aiReportTitle.context
                     aiReportTitle.text = ctx.getString(R.string.ai_report_summary)
                     aiReportSummary.text = ctx.getString(R.string.ai_report_guide)
                     btnAiReport.isEnabled = true
                     btnAiReport.alpha = 1f
                 } else {
-                    // 2개 이상: 리포트 로드/필요시 재집계
                     FirestoreManager.loadWeeklyReportFull(
                         currentUid, thisWeekKey
                     ) { f, k, a, emoL, emoD, thL, thD, sourceCount, rebuiltAt, tier, proAt, stale ->
                         if (!isAlive()) return@loadWeeklyReportFull
-
                         val needRebuild = f.isBlank() || k.isEmpty() || a.isBlank() || stale || (sourceCount != count)
                         if (needRebuild) {
                             FirestoreManager.aggregateDreamsForWeek(currentUid, thisWeekKey) {
@@ -141,12 +130,11 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // ---------- 클릭 네비게이션 ----------
+        // 클릭 네비
         btnAiReport.setOnClickListener {
             it.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.scale_up))
             openAIReport()
         }
-
         fun View.applyScaleClick(action: () -> Unit) {
             setOnClickListener {
                 it.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.scale_up))
@@ -161,19 +149,17 @@ class HomeFragment : Fragment() {
         return v
     }
 
-    // ---------- 유틸: 데일리 메시지 텍스트뷰 멀티라인 안전 세팅 ----------
     private fun prepareDailyMessageTextView(tv: TextView) {
         tv.apply {
             isSelected = false
             setHorizontallyScrolling(false)
             isSingleLine = false
             ellipsize = null
-            maxLines = 5
+            setLineSpacing(dp(2).toFloat(), 1.05f)
             setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom + dp(2))
         }
     }
 
-    // Fortune 스타일 홈 카드 입장 애니
     private fun animateHomeCardLikeFortune(card: View) {
         val parent = card.parent as? ViewGroup ?: return
         val set = TransitionSet().apply {
@@ -187,12 +173,10 @@ class HomeFragment : Fragment() {
         card.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(160L).start()
     }
 
-    // AI 리포트 열기(버튼 전용)
     private fun openAIReport() {
         val thisWeekKey = WeekUtils.weekKey()
         val userId = uid
         if (userId == null) {
-            // 게스트: 최근 캐시가 있으면 전달
             if (!lastFeeling.isNullOrBlank()) {
                 navigateTo(
                     AIReportFragment().apply {
@@ -220,7 +204,6 @@ class HomeFragment : Fragment() {
         )
     }
 
-    // 공통 네비(애니메이션 유지)
     private fun navigateTo(fragment: Fragment) {
         val current = parentFragmentManager.findFragmentById(R.id.fragment_container)
         if (current?.javaClass == fragment.javaClass) return
@@ -234,7 +217,6 @@ class HomeFragment : Fragment() {
             .commit()
     }
 
-    // 홈 요약 적용 + 캐시
     private fun applyHomeSummary(
         aiReportTitle: TextView,
         aiReportSummary: TextView,
@@ -261,14 +243,12 @@ class HomeFragment : Fragment() {
         btnAiReport.isEnabled = true
         btnAiReport.alpha = 1f
 
-        // 로컬 캐시
         prefs.edit()
             .putString("home_feeling", feeling)
             .putString("home_keywords", top3.joinToString("|"))
             .apply()
     }
 
-    // dp 변환
     private fun dp(value: Int): Int {
         val dm = resources.displayMetrics
         return (value * dm.density).toInt()

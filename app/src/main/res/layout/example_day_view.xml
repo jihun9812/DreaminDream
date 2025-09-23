@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="40dp"
-    android:layout_height="40dp"
-    android:layout_margin="4dp"
+    android:layout_width="@dimen/calendar_day_size"
+    android:layout_height="@dimen/calendar_day_size"
+    android:layout_margin="@dimen/calendar_day_margin"
     android:background="?attr/selectableItemBackground"
     android:clipChildren="false"
     android:clipToPadding="false">
@@ -13,17 +13,17 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:textColor="#E8F1F8"
-        android:textSize="15sp"
+        android:textSize="@dimen/calendar_day_text_size"
         android:includeFontPadding="false"
         android:fontFamily="@font/pretendard_medium"
         android:background="@android:color/transparent"/>
 
     <View
         android:id="@+id/dreamIndicator"
-        android:layout_width="6dp"
-        android:layout_height="6dp"
+        android:layout_width="@dimen/dream_indicator_size"
+        android:layout_height="@dimen/dream_indicator_size"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="@dimen/dream_indicator_margin_bottom"
         android:background="@drawable/dream_indicator_dot"
         android:visibility="gone"/>
 </FrameLayout>

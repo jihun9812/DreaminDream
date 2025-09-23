@@ -1,3 +1,4 @@
+// app/src/main/java/com/example/dreamindream/FirestoreManager.kt
 package com.example.dreamindream
 
 import android.content.Context
@@ -79,13 +80,62 @@ object FirestoreManager {
                     SetOptions.merge()
                 ).addOnCompleteListener { onComplete?.invoke() }
 
-                // 새 꿈이 추가되면 이번 주 리포트를 'stale'로 표시 → 홈/리포트에서 자동 재집계
                 val weekKey = thisWeekKey()
                 db.collection("users").document(uid)
                     .collection("weekly_reports").document(weekKey)
                     .set(mapOf("stale" to true), SetOptions.merge())
             }
             .addOnFailureListener { e -> Log.e(TAG, "saveDream failed: ${e.message}", e); onError?.invoke(e) }
+    }
+
+    // ───────────── SettingsFragment용 카운터 ─────────────
+    fun countDreamEntriesToday(uid: String, onResult: (Int) -> Unit) {
+        if (uid.isBlank()) { onResult(0); return }
+        val dateKey = todayKey()
+        db.collection("users").document(uid)
+            .collection("dreams").document(dateKey)
+            .collection("entries")
+            .get()
+            .addOnSuccessListener { snap -> onResult(snap.size()) }
+            .addOnFailureListener { onResult(0) }
+    }
+
+    fun countDreamEntriesTotal(uid: String, onResult: (Int) -> Unit) {
+        if (uid.isBlank()) { onResult(0); return }
+        val dreamsRef = db.collection("users").document(uid).collection("dreams")
+        dreamsRef.get()
+            .addOnSuccessListener { snap ->
+                if (snap.isEmpty) { onResult(0); return@addOnSuccessListener }
+
+                val docs = snap.documents
+                var sumByCount = 0
+                val missing = mutableListOf<com.google.firebase.firestore.DocumentSnapshot>()
+
+                docs.forEach { d ->
+                    val c = d.getLong("count")
+                    if (c == null) missing += d else sumByCount += c.toInt()
+                }
+
+                if (missing.isEmpty()) {
+                    onResult(sumByCount)
+                    return@addOnSuccessListener
+                }
+
+                var acc = sumByCount
+                var done = 0
+                val totalNeed = missing.size
+                missing.forEach { d ->
+                    d.reference.collection("entries").get()
+                        .addOnSuccessListener { entries ->
+                            acc += entries.size()
+                            if (++done == totalNeed) onResult(acc)
+                        }
+                        .addOnFailureListener {
+                            if (++done == totalNeed) onResult(acc)
+                        }
+                }
+            }
+            .addOnFailureListener { onResult(0) }
     }
 
     // ───────────── 일일 운세(daily_fortunes) ─────────────
@@ -370,6 +420,7 @@ object FirestoreManager {
         if (dates.isEmpty()) { onResult(emptyList(), emptyList()); return }
 
         val dreams = mutableListOf<String>()
+        the@ run { }
         val interps = mutableListOf<String>()
         var fetched = 0
 
@@ -432,9 +483,13 @@ object FirestoreManager {
         }
     }
 
+    // 전체 수집(선택 UI 용) — 안전하게 50개 제한
+    fun collectWeekEntriesAll(uid: String, weekKey: String, onResult: (List<WeekEntry>, Int) -> Unit) {
+        collectWeekEntriesLimited(uid, weekKey, limit = 50, onResult)
+    }
+
     // 🔥 단일 파이프라인: GPT 스토리 요약 + 키워드/감정/점수 + 그래프 분포 저장
     fun aggregateDreamsForWeek(uid: String, weekKey: String, callback: (Boolean) -> Unit) {
-        // 최근 4개만 분석에 사용, 전체 개수는 sourceCount로 저장
         collectWeekEntriesLimited(uid, weekKey, limit = 4) { entries, totalCount ->
             val ref = db.collection("users").document(uid)
                 .collection("weekly_reports").document(weekKey)
@@ -443,11 +498,10 @@ object FirestoreManager {
             val interps = entries.map { it.interp }.filter { it.isNotBlank() }
 
             val meta = mapOf(
-                "snapshotDreams" to dreams,          // 사용된 최근 4개
+                "snapshotDreams" to dreams,
                 "snapshotInterps" to interps,
-                "sourceCount" to totalCount,         // ✅ 실제 주간 엔트리 총 개수(정확 기준)
+                "sourceCount" to totalCount,
                 "rebuildPolicy" to "ADD_ONLY",
-                "tier" to "base",
                 "lastRebuiltAt" to now(),
                 "timestamp" to now()
             )
@@ -459,7 +513,6 @@ object FirestoreManager {
                 return@collectWeekEntriesLimited
             }
 
-            // ── GPT 프롬프트 ──
             val prompt = buildString {
                 appendLine("아래는 사용자의 최근 1주 꿈 기록(최대 4개, 최신순)과 각 꿈에 대한 해몽/분석 텍스트입니다.")
                 dreams.forEachIndexed { idx, d -> appendLine("[꿈 원문 ${idx + 1}] $d") }
@@ -509,6 +562,7 @@ object FirestoreManager {
                         "feeling" to "",
                         "keywords" to emptyList<String>(),
                         "analysis" to "",
+                        "tier" to "base",
                         "emotionLabels" to dist.emotionLabels,
                         "emotionDist" to dist.emotionDist,
                         "themeLabels" to dist.themeLabels,
@@ -536,22 +590,45 @@ object FirestoreManager {
 
                         val dist = EmotionAnalyzer.analyzeWeek(dreams, interps)
 
-                        val payload = meta + mapOf(
-                            "stale" to false,          // 신선
-                            "tier" to "base",          // 심화는 리셋
-                            "feeling" to feeling,
-                            "keywords" to keywords.take(3),
-                            "analysis" to analysis,
-                            "score" to (score ?: 0),
-                            "emotionLabels" to dist.emotionLabels,
-                            "emotionDist" to dist.emotionDist,
-                            "themeLabels" to dist.themeLabels,
-                            "themeDist" to dist.themeDist
-                        )
+                        // [핵심] 프로 보호: 기존 문서가 tier=pro면 본문/티어는 건드리지 않음
+                        ref.get().addOnSuccessListener { doc ->
+                            val isPro = (doc.getString("tier") == "pro")
+                            val payload = (meta + mapOf(
+                                "stale" to false,
+                                "feeling" to feeling,
+                                "keywords" to keywords.take(3),
+                                "score" to (score ?: 0),
+                                "emotionLabels" to dist.emotionLabels,
+                                "emotionDist" to dist.emotionDist,
+                                "themeLabels" to dist.themeLabels,
+                                "themeDist" to dist.themeDist,
+                                "sourceCount" to entries.size
+                            ) + if (isPro) emptyMap() else mapOf(
+                                "analysis" to analysis,
+                                "tier" to "base"
+                            ))
 
-                        ref.set(payload, SetOptions.merge())
-                            .addOnSuccessListener { callback(true) }
-                            .addOnFailureListener { callback(false) }
+                            ref.set(payload, SetOptions.merge())
+                                .addOnSuccessListener { callback(true) }
+                                .addOnFailureListener { callback(false) }
+                        }.addOnFailureListener {
+                            // 문서 상태 확인 실패 시에는 기본 정책으로 저장
+                            val payload = meta + mapOf(
+                                "stale" to false,
+                                "tier" to "base",
+                                "feeling" to feeling,
+                                "keywords" to keywords.take(3),
+                                "analysis" to analysis,
+                                "score" to (score ?: 0),
+                                "emotionLabels" to dist.emotionLabels,
+                                "emotionDist" to dist.emotionDist,
+                                "themeLabels" to dist.themeLabels,
+                                "themeDist" to dist.themeDist
+                            )
+                            ref.set(payload, SetOptions.merge())
+                                .addOnSuccessListener { callback(true) }
+                                .addOnFailureListener { callback(false) }
+                        }
                     }
                 }
             })
@@ -583,6 +660,32 @@ object FirestoreManager {
                 SetOptions.merge()
             )
             .addOnCompleteListener { onDone?.invoke() }
+    }
+
+    // ✅ 일요일 리셋(이번 주만 비우고 stale=true, 과거 기록 유지)
+    fun resetWeeklyReport(uid: String, weekKey: String, onComplete: (() -> Unit)? = null) {
+        val ref = db.collection("users").document(uid)
+            .collection("weekly_reports").document(weekKey)
+
+        val payload = mapOf(
+            "feeling" to "",
+            "keywords" to emptyList<String>(),
+            "analysis" to "",
+            "tier" to "base",
+            "proAt" to 0L,
+            "proModel" to "",
+            "emotionLabels" to listOf("긍정","평온","활력","몰입","중립","혼란","불안","우울/피로"),
+            "emotionDist" to listOf(0f,0f,0f,0f,0f,0f,0f,0f),
+            "themeLabels" to listOf("관계","성취","변화","불안요인","자기성장"),
+            "themeDist" to listOf(0f,0f,0f,0f,0f),
+            "sourceCount" to 0,
+            "stale" to true,
+            "lastRebuiltAt" to now(),
+            "timestamp" to now()
+        )
+        ref.set(payload, SetOptions.merge())
+            .addOnSuccessListener { onComplete?.invoke() }
+            .addOnFailureListener { onComplete?.invoke() }
     }
 
     private fun com.google.firebase.firestore.DocumentSnapshot.getDoubleOrNull(key: String): Double? {

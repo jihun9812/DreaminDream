@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- 내부 저장소 filesDir/images 아래 파일 노출 -->
+    <files-path name="images" path="images/"/>
+</paths>

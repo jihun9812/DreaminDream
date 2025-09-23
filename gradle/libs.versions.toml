@@ -13,9 +13,11 @@ appcompat = "1.6.1"
 constraintlayout = "2.2.1"
 admob = "22.6.0"
 okhttp = "4.11.0"
+navigationFragmentKtx = "2.9.4"
+navigationUiKtx = "2.9.4"
 
 [plugins]
-android-application = { id = "com.android.application", version = "8.11.1" }
+android-application = { id = "com.android.application", version = "8.11.2" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version = "1.9.0" }
 
 [libraries]
@@ -38,3 +40,5 @@ androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", vers
 androidx-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "ui" }
 androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "ui" }
 androidx-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "ui" }
+androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
+androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }

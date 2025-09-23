@@ -1,14 +1,12 @@
-// file: app/src/main/java/com/example/dreamindream/fortune/FortuneApi.kt
-package com.example.dreamindream.fortune
+// FortuneApi.kt
+package com.example.dreamindream
 
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.util.Log
-import android.view.View                 // View.inflate
-import android.widget.TextView          // ✅ 추가
-import com.example.dreamindream.BuildConfig
-import com.example.dreamindream.R
+import android.view.View
+import android.widget.TextView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -30,7 +28,8 @@ class FortuneApi(
     private val http by lazy { OkHttpClient() }
     private val TAG = "FortuneFragment"
 
-    // ───────────────────────────────── Public API ─────────────────────────────
+    // 금지 로또 숫자(개별 숫자 차단)
+    private val BANNED_LOTTO = setOf(5, 12, 19, 23, 34, 41)
 
     fun fetchDaily(
         u: FortuneStorage.UserInfo,
@@ -134,7 +133,7 @@ class FortuneApi(
         })
     }
 
-    // ───────────────────────────────── UI helpers ─────────────────────────────
+    // ───────────────────────── UI helpers ─────────────────────────
 
     fun scoreColor(score: Int): Int = when {
         score >= 70 -> Color.parseColor("#17D7A0")
@@ -149,7 +148,7 @@ class FortuneApi(
         fun line(label: String, key: String) {
             val s = sections.optJSONObject(key) ?: JSONObject()
             val score = s.optInt("score", -1)
-            val text = s.optString("text").ifBlank { s.optString("advice") }
+            val text = cleanse(s.optString("text").ifBlank { s.optString("advice") })
             sb.append(label); if (score >= 0) sb.append(" (${score}점)")
             if (key == "lotto") {
                 if (lottoNums != null && lottoNums.length() == 6) {
@@ -166,8 +165,8 @@ class FortuneApi(
     }
 
     fun buildSectionDetails(title: String, score: Int, text: String?, advice: String?): String {
-        val base = text?.trim().orEmpty().ifBlank { "오늘의 흐름을 간결히 정리했어요." }
-        val tip  = advice?.trim().orEmpty().let { if (it.isNotBlank()) "• $it" else "" }
+        val base = cleanse(text?.trim().orEmpty().ifBlank { "오늘의 흐름을 간결히 정리했어요." })
+        val tip  = cleanse(advice?.trim().orEmpty().let { if (it.isNotBlank()) "• $it" else "" })
 
         fun extraBy(title: String, score: Int): String = when (title) {
             "총운" -> when {
@@ -183,10 +182,10 @@ class FortuneApi(
                 else        -> "• 복구: 기대치 낮추고 감사 한 줄 남기기."
             }
             "학업운" -> when {
-                score >= 85 -> "• 기회: 자신 있는 파트로 25분 집중 2회."
-                score >= 70 -> "• 유지: 분량 줄이고 핵심 개념 1개 정복."
+                score >= 85 -> "• 기회: 자신 있는 파트로 짧게 몰입해 한 덩어리를 끝내기."
+                score >= 70 -> "• 유지: 분량을 줄이고 핵심 1개만 잡기."
                 score >= 55 -> "• 주의: 노트 5줄 요약만 남기기."
-                else        -> "• 복구: 예열용 문제 3개로 감 되찾기."
+                else        -> "• 복구: 예열용 문제 소량으로 감 되찾기."
             }
             "직장운" -> when {
                 score >= 85 -> "• 기회: 임팩트 높은 태스크 1건 먼저."
@@ -203,11 +202,11 @@ class FortuneApi(
             "로또운" -> "• 참고: 오락 범위를 넘기지 않도록 상한선 설정."
             else -> "• 유지: 범위를 좁혀 꾸준함 확보."
         }
-        val extra = extraBy(title, score)
+        val extra = cleanse(extraBy(title, score))
         return listOf(base, tip, extra).filter { it.isNotBlank() }.joinToString("\n\n")
     }
 
-    // ────────────────────────────── Normalizers / Rules ───────────────────────
+    // ─────────────── Normalizers / Rules ───────────────
 
     fun sanitizeChecklist(items: List<String>): List<String> {
         val out = items.map { neutralizeChecklistText(it) }
@@ -220,7 +219,7 @@ class FortuneApi(
     private fun neutralizeChecklistText(src: String): String {
         var t = src.trim()
         t = neutralizeCorporateTerms(t)
-            .replace(Regex("숙제|과제|수업|강의|학원|시험|퀴즈|레포트|제출"), "정리")
+            .replace(Regex("숙제|과제|수업|강의|시험|퀴즈|레포트|제출"), "정리")
         if (Regex("연락|전화|메시지|문자|DM|카톡|카카오").containsMatchIn(t)) t = "알림 1건 정리"
         t = stripTimePhrases(t)
             .replace(Regex("^•\\s*"), "")
@@ -229,15 +228,19 @@ class FortuneApi(
         if (t.length > 18) t = t.take(18)
         if (t.length < 4) t = "핵심 할 일 1개 완료"
         t = t.replace(Regex("할 ?일.*(마무리|끝내기)"), "핵심 할 일 1개 완료")
-        return t
+        return cleanse(t)
     }
 
     private fun buildEssentialChecklist(): List<String> =
         listOf("핵심 작업 1개 완료", "알림·메모 3분 정리", "가벼운 스트레칭 5분")
 
+    /** ()를 제거하고 ‘오전/오후 HH시(~HH시)’를 한 줄로 정리 */
     fun humanizeLuckyTime(raw: String?): String {
         if (raw.isNullOrBlank()) return ""
-        val t = raw.trim()
+        var t = raw.trim()
+        // ( ~12시 ) → ~12시
+        t = t.replace(Regex("\\(\\s*~\\s*"), "~").replace(")", "")
+        // HH:MM~HH:MM → 오전/오후 HH시(~HH시)
         Regex("(\\d{1,2}):(\\d{2})~(\\d{1,2}):(\\d{2})").find(t)?.let { m ->
             fun h(hh:String): String {
                 val H=hh.toInt(); val ampm=if (H in 0..11) "오전" else "오후"
@@ -260,7 +263,7 @@ class FortuneApi(
         return hours.random()
     }
 
-    // ────────────────────────────── Builders / Parsers ────────────────────────
+    // ─────────────── Builders / Parsers ───────────────
 
     private fun buildDailyRequest(u: FortuneStorage.UserInfo, seed: Int): JSONObject {
         return JSONObject().apply {
@@ -339,20 +342,20 @@ class FortuneApi(
         val base = JSONObject().apply {
             put("keywords", JSONArray())
             put("lucky", JSONObject().apply {
-                put("colorHex", pickLuckyColorFallback())
-                put("number", pickLuckyNumberFallback(seed))
+                put("colorHex", pickLuckyColorDeterministic(seed, storage.getRecentLuckyColors(5)))
+                put("number", pickLuckyNumberDiversified(seed, storage.getRecentLuckyNumbers(10)))
                 put("time", pickLuckyTimeFallback())
             })
             put("emotions", JSONObject().apply { put("positive", p); put("neutral", n); put("negative", ng) })
             put("sections", JSONObject())
             put("checklist", JSONArray(buildEssentialChecklist()))
-            put("lottoNumbers", JSONArray().apply { genLottoNumbers(seed).forEach { put(it) } })
+            put("lottoNumbers", sanitizeLotto(null, seed))
         }
         base.put("tomorrow", JSONObject().put("long", makeTomorrowPlan(base)))
         return validateAndFill(base, seed)
     }
 
-    // ─────────────────────────────── Schema / Prompt ──────────────────────────
+    // ─────────────── Schema / Prompt ───────────────
 
     private fun fortuneSchema(): JSONObject {
         val obj = JSONObject()
@@ -421,7 +424,8 @@ date:"$today ($weekday)", age:$userAge, age_tag:$tag, seed:$seed, tone:"$tone"
 - 섹션 score 40~100. 각 섹션 2~3문장(80~160자), 실용 팁 1개. tone="$tone".
 - lucky.colorHex는 palette에서, 최근 5일 중복 회피(avoidColors/avoidTimes/avoidNumbers).
 - lucky.number 10~99, lucky.time ‘오전/오후 HH시(~HH시)’.
-- emotions 현실적 분포, lottoNumbers 6개(1~45).
+- emotions 현실적 분포, lottoNumbers 6개(1~45). 
+- “리뷰”, “25분 집중 2회”와 유사 문구 사용 금지(대체: ‘돌아보기’, ‘짧게 몰입’).
 
 [심화 유도]
 - tomorrow.long(400~700자): ‘아침/오후/저녁’ 소제목 + 최저점 영역 보완 액션(정량).
@@ -487,19 +491,20 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes, avoidNumbers
 
         val hl = (0 until (deep.optJSONArray("highlights")?.length() ?: 0))
             .mapNotNull { deep.optJSONArray("highlights")?.optString(it)?.trim() }
+            .map { "• ${cleanse(it)}" }
             .filter { it.isNotBlank() }
-            .joinToString("\n") { "• $it" }
+            .joinToString("\n")
             .ifBlank { "• 오늘 흐름을 간결히 정리했어요." }
         tvHigh.text = hl
 
         val plan = deep.optJSONObject("plan") ?: JSONObject()
-        tvMorn.text = neutralizeCorporateTerms(plan.optString("morning"))
-        tvAft.text  = neutralizeCorporateTerms(plan.optString("afternoon"))
-        tvEve.text  = neutralizeCorporateTerms(plan.optString("evening"))
+        tvMorn.text = cleanse(neutralizeCorporateTerms(plan.optString("morning")))
+        tvAft.text  = cleanse(neutralizeCorporateTerms(plan.optString("afternoon")))
+        tvEve.text  = cleanse(neutralizeCorporateTerms(plan.optString("evening")))
 
-        val tmr = deep.optString("tomorrowPrep", "")
+        val tmr = cleanse(deep.optString("tomorrowPrep", ""))
         val extra = buildTomorrowExtraTips(deep, lastDaily)
-        tvTmr.text = if (tmr.isNotBlank()) "${neutralizeCorporateTerms(tmr)}\n\n$extra" else extra
+        tvTmr.text = if (tmr.isNotBlank()) "${tmr}\n\n$extra" else extra
 
         val dialog = MaterialAlertDialogBuilder(ctx).setView(dialogView).create()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
@@ -517,7 +522,7 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes, avoidNumbers
         dialog.show()
     }
 
-    // ─────────────────────────────── Internals ────────────────────────────────
+    // ─────────────── Internals ───────────────
 
     private fun mapErrorToUserMessage(reason: String): String = when {
         reason.contains("401") -> "인증 오류가 발생했어요. 설정의 API 키를 확인해주세요. ($reason)"
@@ -530,19 +535,32 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes, avoidNumbers
     private fun mapHttpError(code: Int): String = mapErrorToUserMessage("http $code")
 
     private fun validateAndFill(obj: JSONObject, seed: Int): JSONObject {
+        // ----- lucky(color, number, time) 다변화 -----
+        val recentCols = storage.getRecentLuckyColors(5).map { it.uppercase(Locale.ROOT) }
+        val recentNums = storage.getRecentLuckyNumbers(10)
+
         val lucky = (obj.optJSONObject("lucky") ?: JSONObject()).apply {
-            val chosenHex = optString("colorHex").takeIf {
-                it.matches(Regex("#[0-9A-Fa-f]{6}")) && luckyPalette.contains(it.uppercase())
-            } ?: pickLuckyColorFallback()
-            var num = optInt("number", pickLuckyNumberFallback(seed)).coerceIn(10, 99)
-            if (storage.getRecentLuckyNumbers().contains(num)) {
-                num = ((num + (abs(seed) % 7) + 11) % 90) + 10
+            // 색상: 모델이 준 값이 팔레트 밖이거나 최근값이면 시드기반 로테이션으로 교체
+            val raw = optString("colorHex").uppercase(Locale.ROOT)
+            val base = if (raw.matches(Regex("#[0-9A-F]{6}")) && luckyPalette.contains(raw)) raw else null
+            var chosenHex = base ?: pickLuckyColorDeterministic(seed, recentCols)
+            if (recentCols.contains(chosenHex)) chosenHex = pickLuckyColorDeterministic(seed + 101, recentCols)
+
+            // 숫자: 10~99, 최근 10개·특히 27 회피, 필요시 시드 바꿔 재시도
+            var num = optInt("number", -1)
+            if (num !in 10..99) num = pickLuckyNumberDiversified(seed, recentNums)
+            if (num == 27 || recentNums.contains(num)) {
+                num = pickLuckyNumberDiversified(seed + 1337, recentNums)
             }
+
+            // 시간: 괄호 제거 후 사람이 읽기 좋게
             val t = humanizeLuckyTime(optString("time").ifBlank { pickLuckyTimeFallback() })
+
             put("colorHex", chosenHex); put("number", num); put("time", t)
         }
         obj.put("lucky", lucky)
 
+        // ----- emotions -----
         val (p, n, ng) = seededEmotions(seed)
         val emo = (obj.optJSONObject("emotions") ?: JSONObject()).apply {
             put("positive", optInt("positive", p).coerceIn(20, 90))
@@ -551,6 +569,7 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes, avoidNumbers
         }
         obj.put("emotions", emo)
 
+        // ----- sections -----
         val secIn = obj.optJSONObject("sections")
         val sec = secIn ?: JSONObject()
         val keys = listOf("overall","love","study","work","money","lotto")
@@ -559,29 +578,33 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes, avoidNumbers
                 sec.put(k, JSONObject().put("score", v).put("text","").put("advice",""))
             }
         }
-        val lt = lucky.optString("time"); val ln = lucky.optInt("number", pickLuckyNumberFallback(seed))
+        val lt = lucky.optString("time"); val ln = lucky.optInt("number", pickLuckyNumberDiversified(seed, recentNums))
         keys.forEach { k ->
             val s = sec.optJSONObject(k) ?: JSONObject().also { sec.put(k, it) }
             val sc = s.optInt("score", 70).coerceIn(40, 100)
             s.put("score", sc)
-            val curText = s.optString("text").trim(); val curAdv = s.optString("advice").trim()
+            var curText = s.optString("text").trim()
+            var curAdv  = s.optString("advice").trim()
             if (k != "lotto" && (curText.isBlank() || curAdv.isBlank())) {
                 val (t, a) = defaultSectionCopy(k, sc, lt, ln)
-                if (curText.isBlank()) s.put("text", t)
-                if (curAdv.isBlank())  s.put("advice", a)
+                if (curText.isBlank()) curText = t
+                if (curAdv.isBlank())  curAdv  = a
+            }
+            if (k != "lotto") {
+                s.put("text", cleanse(curText))
+                s.put("advice", cleanse(curAdv))
+            } else {
+                s.put("text",""); s.put("advice","")
             }
         }
         val baseKeys = listOf("love","study","work","money")
         val baseScores = baseKeys.mapNotNull { sec.optJSONObject(it)?.optInt("score", 70) }.ifEmpty { listOf(70,70,70,70) }
         val overallScore = calcTotalScore(baseScores)
         sec.optJSONObject("overall")?.put("score", overallScore)
-        sec.optJSONObject("lotto")?.put("text","")?.put("advice","")
         obj.put("sections", sec)
 
-        val lotto = obj.optJSONArray("lottoNumbers")
-        if (lotto == null || lotto.length() != 6) {
-            obj.put("lottoNumbers", JSONArray().apply { genLottoNumbers(seed).forEach { put(it) } })
-        }
+        // ----- lotto / checklist / tomorrow -----
+        obj.put("lottoNumbers", sanitizeLotto(obj.optJSONArray("lottoNumbers"), seed))
 
         val cl = obj.optJSONArray("checklist")
         val itemsRaw = (0 until (cl?.length() ?: 0)).mapNotNull { cl?.optString(it) }
@@ -589,8 +612,10 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes, avoidNumbers
         obj.put("checklist", JSONArray().apply { itemsClean.forEach { put(it) } })
 
         val tObj = (obj.optJSONObject("tomorrow") ?: JSONObject())
-        val longFixed = normalizePlan(tObj.optString("long"), lt, ln, lucky.optString("colorHex"))
-            .ifBlank { makeTomorrowPlan(obj) }
+        val longFixed = cleanse(
+            normalizePlan(tObj.optString("long"), lt, ln, lucky.optString("colorHex"))
+                .ifBlank { makeTomorrowPlan(obj) }
+        )
         tObj.put("long", longFixed); obj.put("tomorrow", tObj)
 
         return obj
@@ -601,7 +626,7 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes, avoidNumbers
             score >= 85 -> "상승세가 뚜렷합니다."
             score >= 70 -> "흐름이 안정적입니다."
             score >= 55 -> "기복이 있으니 속도를 조절하세요."
-            else -> "기대치보다 낮아 기본을 단단히 하는 날입니다."
+            else        -> "기대치보다 낮아 기본을 단단히 하는 날입니다."
         }
         val text = when (key) {
             "love"  -> "관계에서는 $mood 말보다 태도가 신뢰를 만듭니다. 감정선을 과장하지 말고, 편안한 주제로 속도를 맞춰보세요."
@@ -613,7 +638,7 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes, avoidNumbers
         }
         val advice = when (key) {
             "love"  -> "자극적인 화제 대신 편안한 대화로 분위기 안정."
-            "study" -> "25분 집중 2회, 핵심 1개만 끝내기."
+            "study" -> "짧게 몰입해 핵심 1개만 끝내기."
             "work"  -> "한 가지에 집중하기."
             "money" -> "필요 지출만 남기고 오늘 1건 점검."
             "overall"-> "확실한 한 가지에 집중하기."
@@ -648,31 +673,40 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes, avoidNumbers
             })
         }
         if (t.length > 900) t = t.take(900) + "…"
-        return t
+        return cleanse(t)
     }
 
     private fun makeTomorrowPlan(base: JSONObject): String = buildString {
         append("• 오늘 흐름을 간결히 정리했어요.\n\n")
         append("아침(09~12)\n - 핵심 작업 1개 완료\n - 알림·메모 3분 정리\n\n")
-        append("오후(13~17)\n - 20분 집중 2회로 꼭 한 가지 끝내기\n - 가벼운 스트레칭 5분\n\n")
-        append("저녁(19~22)\n - 하루 리뷰 3줄, 내일 첫 작업 1줄 적기\n")
+        append("오후(13~17)\n - 짧게 몰입해 한 가지를 끝내기\n - 가벼운 스트레칭 5분\n\n")
+        append("저녁(19~22)\n - 하루 기록 3줄, 내일 첫 작업 1줄 적기\n")
     }
 
     private fun buildTomorrowExtraTips(deep: JSONObject, daily: JSONObject?): String {
         val tips = (0 until (deep.optJSONArray("tips")?.length() ?: 0))
             .mapNotNull { deep.optJSONArray("tips")?.optString(it) }
-            .map { "• " + neutralizeCorporateTerms(stripTimePhrases(it)) }
+            .map { "• " + cleanse(neutralizeCorporateTerms(stripTimePhrases(it))) }
         val adj = (0 until (deep.optJSONArray("checklistAdjusted")?.length() ?: 0))
             .mapNotNull { deep.optJSONArray("checklistAdjusted")?.optString(it) }
-            .map { "• " + neutralizeChecklistText(it) }
+            .map { "• " + cleanse(neutralizeChecklistText(it)) }
         val fallback = daily?.optJSONArray("checklist")?.let { arr ->
-            (0 until arr.length()).map { "• " + neutralizeChecklistText(arr.optString(it)) }
+            (0 until arr.length()).map { "• " + cleanse(neutralizeChecklistText(arr.optString(it))) }
         } ?: emptyList()
         val lines = (tips + adj).ifEmpty { fallback }
         return if (lines.isNotEmpty()) lines.joinToString("\n") else "• 내일 아침 첫 10분은 오늘의 핵심 1개만 이어서 진행하세요."
     }
 
-    // ─────────────────────────────── Utility ──────────────────────────────────
+    // ─────────────── Utility ───────────────
+
+    // 금지 문구 정화기
+    private fun cleanse(text: String): String {
+        var s = text
+        s = s.replace("리뷰", "돌아보기")
+        s = s.replace(Regex("25\\s*분\\s*집중\\s*2\\s*회"), "짧게 몰입해 한 가지 끝내기")
+        s = s.replace(Regex("\\s{2,}"), " ").trim()
+        return s
+    }
 
     private fun styleTokens(seed: Int): String {
         val bank = listOf("차분한","단단한","선명한","기민한","유연한","담백한","리더십","분석적","균형감","민첩함","집중","꾸준함","정갈함","실용","낙관","침착","절제","명료","차분집중")
@@ -680,9 +714,28 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes, avoidNumbers
         return (0 until 3).map { bank[r.nextInt(bank.size)] }.distinct().joinToString(",")
     }
 
+    // 단색 10종 팔레트
     private val luckyPalette = listOf("#1E88E5","#3949AB","#43A047","#FB8C00","#E53935","#8E24AA","#546E7A","#00897B","#FDD835","#6D4C41")
-    private fun pickLuckyColorFallback(): String = luckyPalette.random()
-    private fun pickLuckyNumberFallback(seed: Int): Int = (Random(seed).nextInt(90) + 10)
+
+    // 최근 회피 + 시드 기반 로테이션
+    private fun pickLuckyColorDeterministic(seed: Int, recent: List<String>): String {
+        val recentSet = recent.map { it.uppercase(Locale.ROOT) }.toSet()
+        val candidates = luckyPalette.filter { it !in recentSet }
+        val pool = if (candidates.isNotEmpty()) candidates else luckyPalette
+        val idx = (abs(seed) % pool.size)
+        return pool[idx]
+    }
+
+    private fun pickLuckyNumberDiversified(seed: Int, recent: List<Int>): Int {
+        val bad = recent.toMutableSet().apply { add(27) } // 27 과다 대비
+        var num = (abs(seed) % 90) + 10
+        var tries = 0
+        while ((num in bad) && tries < 8) {
+            num = ((num + (abs(seed shr (tries + 1)) % 17) + 11) % 90) + 10
+            tries++
+        }
+        return num.coerceIn(10, 99)
+    }
 
     private fun seededEmotions(seed: Int): Triple<Int, Int, Int> {
         val r = Random(seed); val pos = 40 + r.nextInt(46); val neg = 5 + r.nextInt(26); val neu = (100 - pos - neg).coerceIn(10,50)
@@ -740,16 +793,36 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes, avoidNumbers
         }
     }
 
+    // 금지 숫자 제외 + 유효성 보정
+    private fun sanitizeLotto(arr: JSONArray?, seed: Int): JSONArray {
+        val set = LinkedHashSet<Int>()
+        if (arr != null) {
+            for (i in 0 until arr.length()) {
+                val v = arr.optInt(i, -1)
+                if (v in 1..45 && v !in BANNED_LOTTO) set += v
+            }
+        }
+        val r = Random(seed xor 0x9E3779B9u.toInt())
+        while (set.size < 6) {
+            val n = 1 + r.nextInt(45)
+            if (n !in set && n !in BANNED_LOTTO) set += n
+        }
+        return JSONArray().apply { set.toList().sorted().forEach { put(it) } }
+    }
+
     private fun genLottoNumbers(seed: Int): List<Int> {
         val r = Random(seed xor 0x9E3779B9u.toInt()); val set = LinkedHashSet<Int>()
-        while (set.size < 6) set += (1 + r.nextInt(45))
+        while (set.size < 6) {
+            val n = 1 + r.nextInt(45)
+            if (n !in BANNED_LOTTO) set += n
+        }
         return set.toList().sorted()
     }
 
     private fun mainThread(block: () -> Unit) =
         (context as? android.app.Activity)?.runOnUiThread { block() }
 
-    // ─────────────────────── 보조: ageTag / buildDeepPrompt ───────────────────
+    // ─────────────── 보조: ageTag / buildDeepPrompt ───────────────
 
     private fun ageTag(age: Int): String = when {
         age < 13 -> "아동"
@@ -793,8 +866,8 @@ palette:$palette, avoidColors:$avoidColors, avoidTimes:$avoidTimes, avoidNumbers
 
 [작성 규칙]
 - highlights: 오늘 흐름의 핵심 3~6개(짧고 임팩트).
-- plan: 아침/오후/저녁 각각 2~3줄, 실천 문장. 학생/학교/연락 지시 어휘 금지.
-- tips: 3~6개, 바로 실행 가능한 액션.
+- plan: 아침/오후/저녁 각각 2~3줄, 실천 문장. 학생/학교/연락 지시 어휘 금지. ‘리뷰’ 표현 금지.
+- tips: 3~6개, 바로 실행 가능한 액션. ‘25분 집중 2회’류 문구 금지(대체: ‘짧게 몰입’).
 - checklistAdjusted: daily.checklist를 현실적으로 다듬거나 대체(최대 3~5개).
 - luckyColorName: ${sanitizeColorName("", luckyHex)} 등 한글 색상명.
 - luckyTime: "${humanizeLuckyTime(luckyTime)}" 또는 명확한 시간대.

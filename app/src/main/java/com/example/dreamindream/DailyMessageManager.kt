@@ -47,13 +47,6 @@ object DailyMessageManager {
         "당신의 리듬을 믿고 천천히 가도 괜찮아요."
     )
 
-    /**
-     * 로직:
-     * 1) 로컬 캐시(오늘자) 있으면 즉시 보여주기
-     * 2) Firestore에서 오늘자 조회 → 있으면 로컬 갱신 후 표시
-     * 3) 없으면 GPT 생성 → 성공 시 FS/로컬 저장 후 표시
-     * 4) 모두 실패 시 마지막 캐시 또는 fallbackBank 중 하나 표시
-     */
     fun getMessage(context: Context, onResult: (String) -> Unit) {
         val today = todayKey()
         Log.d(TAG, "todayKey=$today tz=${TimeZone.getDefault().id}")
@@ -115,15 +108,15 @@ object DailyMessageManager {
 
         private fun fetchFromGPT(onResult: (String?) -> Unit) {
             val apiKey = BuildConfig.OPENAI_API_KEY
-            Log.d(TAG, "OPENAI len=${apiKey.length}") // 0이면 키 주입 문제
+            Log.d(TAG, "OPENAI len=${apiKey.length}")
 
             if (apiKey.isBlank()) { onResult(null); return }
 
             val prompt = "설명과 서사 없이, 전문 꿈해몽가의 톤으로 오늘(${SimpleDateFormat("yyyy년 M월 d일").format(Date())})의 조언을 한 문장 존댓말로만 작성해주세요."
             val body = JSONObject().apply {
                 put("model", "gpt-3.5-turbo")
-                put("max_tokens", 50)
-                put("temperature", 0.65)
+                put("max_tokens", 100)
+                put("temperature", 0.4)
                 put("messages", JSONArray().put(
                     JSONObject().put("role", "user").put("content", prompt)
                 ))

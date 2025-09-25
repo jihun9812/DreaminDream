@@ -8,8 +8,21 @@
     <color name="nebula_overlay">#44263366</color> <!-- 배경 어두운 오버레이 -->
     <color name="your_purple">#4A148C</color> <!-- 보라 -->
     <color name="your_black">#000000</color> <!-- 글자용 -->
-    <color name="your_light_background">#FFF9E5</color> <!-- 크림 배경 -->
 
+    <color name="your_light_background">#FFF9E5</color> <!-- 크림 배경 -->
+    <color name="btn_primary_bg">#382A52</color>
+    <color name="btn_primary_text">#FFFFFF</color>
+
+    <color name="btn_tonal_bg">#2E2541</color>
+    <color name="btn_tonal_text">#FFFFFF</color>
+
+    <color name="btn_outline_stroke">#33FFFFFF</color>
+    <color name="btn_outline_text">#EDEDED</color>
+
+    <color name="btn_google_stroke">#1A000000</color>
+
+    <color name="btn_stroke">#26FFFFFF</color>
+    <color name="btn_ripple">#40FFFFFF</color>
     <color name="purpleHighlight">#CA6EF6</color>
     <color name="chip_bg_idle">#1AFFFFFF</color>     <!-- 10% white -->
     <color name="chip_bg_pressed">#29FFFFFF</color>  <!-- 16% white -->

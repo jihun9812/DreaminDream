@@ -1,4 +1,3 @@
-// 파일 전체 교체본 — (내용 동일) 필요하면 그대로 붙여넣기
 package com.example.dreamindream
 
 import android.content.Context

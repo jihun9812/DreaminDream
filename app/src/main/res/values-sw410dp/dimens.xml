@@ -5,7 +5,7 @@
 
     <!-- home -->
     <dimen name="max_phone_width">540dp</dimen>
-    <dimen name="home_title_size">33sp</dimen>
+    <dimen name="home_title_size">38dp</dimen>
     <dimen name="title_margin_bottom">56dp</dimen>
     <dimen name="ai_title">14sp</dimen>
     <dimen name="ai_sub">12sp</dimen>
@@ -23,7 +23,7 @@
 
         <dimen name="text_md">15sp</dimen>
         <dimen name="text_xs">12sp</dimen>
-
+    <dimen name="panel_box_width">380dp</dimen>
         <!-- 여백/버튼 -->
         <dimen name="calendar_side_margin">14dp</dimen>
         <dimen name="calendar_top_margin">8dp</dimen>
@@ -53,8 +53,20 @@
         <dimen name="day_circle_stroke">2dp</dimen>
         <dimen name="day_today_stroke">2.5dp</dimen>
 
+        <dimen name="home_button_gap">12dp</dimen>
 
-        <!-- 410dp 요청 버킷 (411과 동일 세팅) -->
+
+
+    <!-- 홈  중간꺼 정렬 -->
+    <dimen name="home_card_width">350dp</dimen>
+    <dimen name="home_bubble_width">350dp</dimen>
+
+        <dimen name="profile_button_width">180dp</dimen>
+        <dimen name="profile_button_height">40dp</dimen>
+        <dimen name="profile_button_margin_vertical">50dp</dimen>
+
+
+    <!-- 410dp 요청 버킷 (411과 동일 세팅) -->
         <dimen name="content_max_width">640dp</dimen>
         <dimen name="content_side_padding">22dp</dimen>
         <dimen name="content_vertical_padding">24dp</dimen>

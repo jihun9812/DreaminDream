@@ -29,7 +29,7 @@
     <dimen name="ai_icon">24dp</dimen>
 
     <!-- ===== 텍스트 규격 ===== -->
-    <dimen name="home_title_size">37sp</dimen>
+    <dimen name="home_title_size">38sp</dimen>
     <dimen name="title_margin_bottom">56dp</dimen>
 
     <dimen name="text_md">14sp</dimen>
@@ -77,12 +77,29 @@
     <dimen name="calendar_bottom_margin">12dp</dimen>
     <dimen name="month_title_h_margin">10dp</dimen>
     <dimen name="calendar_nav_button_size">36dp</dimen>
-
+    <dimen name="home_week_card_max_width">420dp</dimen>
+    <dimen name="home_week_card_margin_horizontal">16dp</dimen>
+    <dimen name="home_week_card_margin_top">12dp</dimen>
+    <dimen name="home_week_card_radius">16dp</dimen>
+    <dimen name="home_week_card_elevation">4dp</dimen>
+    <dimen name="home_week_card_padding_h">16dp</dimen>
+    <dimen name="home_week_card_padding_v">12dp</dimen>
     <dimen name="calendar_corner_radius">16dp</dimen>
     <dimen name="calendar_border_width">2dp</dimen>
-
+    <!-- panel_box settings쪽 기본 폭 -->
+    <dimen name="panel_box_width">340dp</dimen>
     <dimen name="content_max_width">560dp</dimen>
+    <!-- 홈  중간꺼 정렬 -->
+    <dimen name="home_card_width">350dp</dimen>
+    <dimen name="home_bubble_width">350dp</dimen>
+    <!--settings 프로필편집 버튼-->
 
+    <dimen name="profile_button_width">180dp</dimen>
+    <dimen name="profile_button_height">44dp</dimen>
+    <dimen name="profile_button_margin_vertical">50dp</dimen>
+
+
+    <dimen name="home_button_gap">12dp</dimen>
 
     <!-- 카드/패널 -->
     <dimen name="panel_padding">16dp</dimen>
@@ -119,4 +136,7 @@
     <dimen name="day_circle_diameter">24dp</dimen>
     <dimen name="day_circle_stroke">2dp</dimen>
     <dimen name="day_today_stroke">2.5dp</dimen>
+
+
+
 </resources>

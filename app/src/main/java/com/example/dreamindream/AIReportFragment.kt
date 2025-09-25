@@ -137,7 +137,6 @@ class AIReportFragment : Fragment() {
             "상징·장면 해석"     to color("#F48FB1"),
             "명리 관점"         to color("#B39DDB"),
             "1~2주 전망"        to color("#81C784"),
-            "1-2주 전망"        to color("#81C784"),
             "체크리스트"         to color("#FFE082"),
 
             "감정 분포(%)"       to color("#FFE082"),
@@ -648,9 +647,9 @@ class AIReportFragment : Fragment() {
 
             val body = JSONObject().apply {
                 put("model", "gpt-4.1-mini")
-                put("temperature", 0.6)
+                put("temperature", 0.5)
                 put("messages", JSONArray().put(JSONObject().put("role", "user").put("content", prompt)))
-                put("max_tokens", 900)
+                put("max_tokens", 1300)
             }.toString().toRequestBody("application/json".toMediaType())
 
             val req = Request.Builder()
@@ -787,12 +786,24 @@ class AIReportFragment : Fragment() {
             appendLine()
             appendLine(
                 """
-                역할: 한국어만 사용하는 ‘주간 꿈 심화 분석가’.
-                출력: 순수 HTML fragment(<p>,<ul>), 코드블록 금지.
-                섹션: 주간 꿈 심화 분석 / 요약(3문장) / 수치 요약 / 감정 패턴 해석 /
-                      상징·장면 해석 / 명리 관점 / 1~2주 전망 / 체크리스트
-                """.trimIndent()
+            역할: 한국어만 사용하는 ‘주간 꿈 심화 분석가’.
+            출력: 순수 HTML fragment(<p>,<ul>), 코드블록 금지.
+            금지: 의학적/심리학적 진단, 공포·불길 예언, 과격한 단정.
+            톤: 불안 완화형, 실행가능한 조언 위주, 과장 금지.
+            섹션(순서 고정):
+            - 주간 꿈 심화 분석
+            - 요약(3문장)
+            - 수치 요약
+            - 감정 패턴 해석
+            - 상징·장면 해석
+            - 명리 관점
+            - 1~2주 전망  ← 반드시 포함. 최소 3문장. 
+              • ‘안심 가이드(3가지)’를 불릿으로 포함(짧고 실행 가능)
+              • “예언이 아닌 경향 기반 생활 가이드” 문장을 마지막에 덧붙일 것
+            - 체크리스트
+    """.trimIndent()
             )
+
         }
     }
 

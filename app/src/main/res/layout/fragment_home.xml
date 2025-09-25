@@ -60,10 +60,10 @@
         <!-- AI 리포트 카드 -->
         <androidx.cardview.widget.CardView
             android:id="@+id/ai_report_card"
-            android:layout_width="match_parent"
+            android:layout_width="@dimen/home_card_width"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            app:cardBackgroundColor="#FF352D49"
+            app:cardBackgroundColor="#E0362A50"
             app:cardCornerRadius="18dp"
             app:cardElevation="6dp">
 
@@ -72,8 +72,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="8dp">
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="10dp">
 
                 <ImageView
                     android:layout_width="28dp"
@@ -141,7 +141,7 @@
         <!-- 데일리 메시지 : 한 문단, 절대 안 잘림 -->
         <LinearLayout
             android:id="@+id/character_bubble"
-            android:layout_width="match_parent"
+            android:layout_width="@dimen/home_bubble_width"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:gravity="top"
@@ -152,7 +152,6 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:clipToPadding="false">
-
             <ImageView
                 android:id="@+id/ai_avatar"
                 android:layout_width="22dp"
@@ -205,7 +204,8 @@
                 app:iconSize="@dimen/icon_btn"
                 app:iconTint="#17212B"/>
 
-            <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
+            <Space
+                android:layout_width="@dimen/home_button_gap" android:layout_height="wrap_content" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_calendar"
@@ -228,7 +228,8 @@
                 app:iconSize="@dimen/icon_btn"
                 app:iconTint="#17212B"/>
 
-            <Space android:layout_width="12dp" android:layout_height="wrap_content"/>
+            <Space
+                android:layout_width="@dimen/home_button_gap" android:layout_height="wrap_content" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_fortune"

@@ -6,8 +6,8 @@
         <shape android:shape="rectangle">
             <corners android:radius="16dp"/>
             <gradient
-                android:startColor="#FFE6C25A"
-                android:endColor="#C79E56"
+                android:startColor="#E7BF4B"
+                android:endColor="#C79A4B"
                 android:angle="90"/>
 
 
@@ -19,7 +19,7 @@
     <!-- 상단 반사광: 거의 안 보이게(살짝만) -->
     <item android:insetTop="1dp">
         <shape android:shape="rectangle">
-            <corners android:radius="16dp"/>
+            <corners android:radius="21dp"/>
             <gradient
                 android:startColor="#09FFFFFF"
                 android:endColor="#00FFFFFF"

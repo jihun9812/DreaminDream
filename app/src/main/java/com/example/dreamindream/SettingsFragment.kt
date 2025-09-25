@@ -1,5 +1,8 @@
 package com.example.dreamindream
 
+
+import android.app.Activity
+import android.graphics.Color
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -15,21 +18,26 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import com.example.dreamindream.databinding.FragmentSettingsBinding
 import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.*
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import android.widget.Toast
 
 class SettingsFragment : Fragment() {
 
@@ -65,6 +73,58 @@ class SettingsFragment : Fragment() {
         "ISTP","ISFP","ESTP","ESFP"
     )
 
+    // ───────── Google 링크 런처 ─────────
+// 2) 결과 런처 (교체) — 성공/실패/취소 모두에서 UI 복구
+    private val linkGoogleLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val auth = FirebaseAuth.getInstance()
+
+            fun doneUI() {
+                binding.progressAccountLink.visibility = View.GONE
+                updateAccountLinkUi() // 연결되면 버튼 비활성/라벨 변경, 아니면 다시 활성
+                if (auth.currentUser?.providerData?.any { it.providerId == "google.com" } != true) {
+                    // 아직 구글 미연결이면 다시 눌러볼 수 있게
+                    binding.btnLinkGoogle.isEnabled = true
+                }
+            }
+
+            if (result.resultCode != Activity.RESULT_OK) {
+                doneUI()
+                return@registerForActivityResult
+            }
+
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)!!
+                val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+                val user = auth.currentUser
+
+                val op = when {
+                    user == null -> auth.signInWithCredential(credential)           // 비로그인 상태라면 로그인
+                    user.isAnonymous -> user.linkWithCredential(credential)         // 체험 → 구글 '통합'
+                    else -> user.linkWithCredential(credential)                     // 이메일 등 → 구글 추가 연결
+                }
+
+                op.addOnCompleteListener { t ->
+                    if (t.isSuccessful) {
+                        Toast.makeText(requireContext(), "Google 계정 연결 완료", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(requireContext(),
+                            "연결 실패: ${t.exception?.localizedMessage ?: "알 수 없는 오류"}",
+                            Toast.LENGTH_SHORT).show()
+                    }
+                    doneUI()
+                }
+            } catch (e: ApiException) {
+                Toast.makeText(requireContext(), "로그인 취소/실패: ${e.statusCode}", Toast.LENGTH_SHORT).show()
+                doneUI()
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "오류: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                doneUI()
+            }
+        }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         prefs = resolvePrefs()
@@ -79,12 +139,14 @@ class SettingsFragment : Fragment() {
         super.onViewCreated(v, s)
         prefs = resolvePrefs()
 
-        // 광고
+        // 하단 광고
         binding.adViewSettings.loadAd(AdRequest.Builder().build())
 
         initProfileEditor()
         setupPreferenceOnlySection()
         refreshQuickStatus()
+        setupGoogleLinkSection()     // ★ 구글 통합 섹션 초기화
+        updateAccountLinkUi()        // ★ 현재 상태 반영
 
         // 진입 시 현재 프로필 상태에 맞는 모드로 자동 전환
         enterCorrectMode()
@@ -118,7 +180,7 @@ class SettingsFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         refreshQuickStatus()
-        // 돌아왔을 때도 상태 확인 (다른 화면에서 저장했을 수 있음)
+        updateAccountLinkUi() // ★ 돌아올 때도 상태 재반영
         enterCorrectMode()
     }
 
@@ -175,7 +237,6 @@ class SettingsFragment : Fragment() {
                     loadUserIntoEditor()
                     updateAppProfileSummary()
                     refreshQuickStatus()
-                    // 서버 동기화 후 상태 재판단
                     enterCorrectMode()
                 }
             }
@@ -197,7 +258,6 @@ class SettingsFragment : Fragment() {
         val nn = prefs.getString("nickname", "").orEmpty().trim()
         val bd = (prefs.getString("birthdate_iso", null) ?: prefs.getString("birthdate", "")).orEmpty().trim()
         val gd = prefs.getString("gender", "").orEmpty().trim()
-        // MBTI/출생시간은 선택값(필수 아님)
         return nn.isBlank() || bd.isBlank() || gd.isBlank()
     }
 
@@ -272,7 +332,7 @@ class SettingsFragment : Fragment() {
         })
     }
 
-    // ───────────────── 퀵 상태칩 갱신(오늘 해몽 / 전체 꿈 기록) ─────────────────
+    // ───────────────── 퀵 상태칩 갱신 ─────────────────
     private fun refreshQuickStatus() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid
         if (uid == null || !isAdded) {
@@ -299,6 +359,82 @@ class SettingsFragment : Fragment() {
             prefs.edit().putInt("dream_total_count", total).apply()
         }
     }
+
+    // ───────────────── 계정 통합(구글 전용) ─────────────────
+    // 1) 구글 링크 섹션 세팅 (교체)
+    private fun setupGoogleLinkSection() {
+        // GSO/Client는 클릭 시마다 새로 만들어도 OK
+        binding.btnLinkGoogle.setOnClickListener {
+            binding.btnLinkGoogle.isEnabled = false
+            binding.progressAccountLink.visibility = View.VISIBLE
+
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build()
+            val client = GoogleSignIn.getClient(requireActivity(), gso)
+
+            // 매번 계정 선택창 뜨게(캐시된 계정 방지)
+            client.signOut().addOnCompleteListener {
+                try {
+                    linkGoogleLauncher.launch(client.signInIntent)
+                } catch (e: Exception) {
+                    binding.progressAccountLink.visibility = View.GONE
+                    binding.btnLinkGoogle.isEnabled = true
+                    Toast.makeText(requireContext(), "Google 로그인 시작 실패: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun updateAccountLinkUi() {
+        val user = FirebaseAuth.getInstance().currentUser
+
+        fun statusChip(label: String, hex: String): CharSequence {
+            val s = SpannableStringBuilder("상태: ")
+            val start = s.length
+            s.append(label)
+            s.setSpan(ForegroundColorSpan(Color.parseColor(hex)), start, s.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            s.setSpan(StyleSpan(android.graphics.Typeface.BOLD), start, s.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            return s
+        }
+
+        // 색상(테마에 맞춰 임의 선택)
+        val colorAnon   = "#FDCA60"   // 체험(앰버)
+        val colorGoogle = "#37C2D0"   // 구글(티얼/블루톤)
+        val colorEmail  = "#FFFFFF"   // 이메일 등 기본
+
+        if (user == null) {
+            binding.tvAccountStatus.text = statusChip("로그아웃", "#B3FFFFFF")
+            binding.btnLinkGoogle.isEnabled = true
+            binding.btnLinkGoogle.text = "Google로 로그인"
+            return
+        }
+
+        val providers = user.providerData.map { it.providerId }.toSet()
+
+        when {
+            user.isAnonymous -> {
+                // 체험 모드
+                binding.tvAccountStatus.text = statusChip("체험", colorAnon)
+                binding.btnLinkGoogle.isEnabled = true
+                binding.btnLinkGoogle.text = "Google로 계정 통합"
+            }
+            "google.com" in providers -> {
+                // 구글 로그인(연결 완료)
+                binding.tvAccountStatus.text = statusChip("구글 로그인", colorGoogle)
+                binding.btnLinkGoogle.isEnabled = false
+                binding.btnLinkGoogle.text = "Google 연결됨"
+            }
+            else -> {
+                // 이메일/기타
+                binding.tvAccountStatus.text = statusChip("이메일 로그인", colorEmail)
+                binding.btnLinkGoogle.isEnabled = true
+                binding.btnLinkGoogle.text = "Google 계정 연결"
+            }
+        }
+    }
+
 
     // ───────────────── 에디터 바인딩/검증/저장 ─────────────────
     private fun loadUserIntoEditor() {
@@ -328,7 +464,6 @@ class SettingsFragment : Fragment() {
         if (binding.editNickname.text.isNullOrBlank()) { binding.tilNickname.error = "이름을 입력해주세요."; ok = false }
         val birthIso = normalizeDate(binding.editBirthdate.text?.toString())
         if (birthIso.isBlank()) { binding.tilNickname.error = "생년월일을 선택해주세요."; ok = false }
-        // 성별은 라디오 체크 유무로
         if (binding.radioGroupGender.checkedRadioButtonId == -1) {
             Snackbar.make(requireView(), "성별을 선택해주세요.", Snackbar.LENGTH_SHORT).show()
             ok = false
@@ -386,7 +521,6 @@ class SettingsFragment : Fragment() {
     private fun onSaved() {
         isSaving = false
         binding.progressSaving.visibility = View.GONE
-        // 저장 후에는 요약 모드로
         showAppMode()
         Snackbar.make(requireView(), "저장되었습니다!", Snackbar.LENGTH_SHORT).show()
     }

@@ -65,7 +65,6 @@
         android:visibility="gone"
         app:layout_constrainedHeight="true"
         app:cardCornerRadius="18dp"
-
         app:cardUseCompatPadding="false"
         app:contentPadding="2dp"
         app:cardPreventCornerOverlap="true"

@@ -2,6 +2,7 @@ package com.example.dreamindream.chart
 
 import android.graphics.*
 import android.view.View
+import com.example.dreamindream.R
 import com.github.mikephil.charting.animation.ChartAnimator
 import com.github.mikephil.charting.charts.BarChart
 import com.github.mikephil.charting.components.Legend
@@ -16,11 +17,11 @@ import com.github.mikephil.charting.renderer.BarChartRenderer
 import com.github.mikephil.charting.utils.ViewPortHandler
 import kotlin.math.roundToInt
 
-/** 퍼센트 라벨(소수 1자리) */
+/** 값 라벨(소수 1자리) — % 기호 제거 */
 class PercentFormatter : ValueFormatter() {
     override fun getBarLabel(e: BarEntry?): String {
         val v = e?.y ?: 0f
-        return "${String.format("%.1f", v)}%"
+        return String.format("%.1f", v) // ← 여기서 % 제거
     }
 }
 
@@ -33,7 +34,7 @@ fun setupBarChart(chart: BarChart) = chart.apply {
     setExtraOffsets(8f, 8f, 8f, 16f)
     setDrawValueAboveBar(true)
     setDrawBarShadow(false)
-    setNoDataText("데이터가 없습니다")
+    setNoDataText(chart.context.getString(R.string.chart_no_data)) // 리소스로 분리
     setNoDataTextColor(Color.parseColor("#9AA3AB"))
     animateY(0)
 
@@ -176,10 +177,11 @@ fun renderPercentBars(
 
     chart.data = BarData(set).apply { barWidth = 0.56f }
 
-    // 접근성: 최고치 안내
+    // 접근성: 최고치 안내 ( % 없이 읽어주도록 수정 )
     val topIdx = values.indexOf(values.maxOrNull() ?: 0f).coerceAtLeast(0)
-    chart.contentDescription =
-        "최고치: ${labels.getOrNull(topIdx) ?: ""} ${(values.getOrNull(topIdx) ?: 0f).roundToInt()}%"
+    val topLabel = labels.getOrNull(topIdx) ?: ""
+    val topValue = (values.getOrNull(topIdx) ?: 0f).roundToInt()
+    chart.contentDescription = chart.context.getString(R.string.chart_accessibility_top, topLabel, topValue)
 
     chart.invalidate()
 }

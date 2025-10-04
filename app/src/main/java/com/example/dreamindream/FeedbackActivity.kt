@@ -38,22 +38,25 @@ class FeedbackActivity : AppCompatActivity() {
         val title = binding.editTitle.text?.toString()?.trim().orEmpty()
         val message = binding.editMessage.text?.toString()?.trim().orEmpty()
 
-        if (title.isBlank()) { alert("제목을 입력해주세요"); return }
-        if (message.isBlank()) { alert("내용을 입력해주세요"); return }
+        if (title.isBlank()) { alert(getString(R.string.fb_title_need)); return }
+        if (message.isBlank()) { alert(getString(R.string.fb_msg_need)); return }
 
         setBusy(true)
 
         lifecycleScope.launchWhenStarted {
             try {
-                // 익명 로그인 보장 (규칙 create: auth != null 대응)
+                // 익명 로그인 보장 (보안규칙: auth != null)
                 if (Firebase.auth.currentUser == null) {
                     Firebase.auth.signInAnonymously().await()
                 }
 
                 val now = System.currentTimeMillis()
-                val dateStr = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                    .format(Date(now))
+                val datePattern = getString(R.string.fb_date_format) // "yyyy-MM-dd HH:mm:ss"
+                val dateStr = SimpleDateFormat(datePattern, Locale.getDefault()).format(Date(now))
 
+                val appName = getString(R.string.app_name)
+
+                // 상위 호환: 기존 평면 필드 + info 오브젝트 동시 저장
                 val data = hashMapOf(
                     "createdAt" to now,
                     "createdAtStr" to dateStr,
@@ -61,11 +64,20 @@ class FeedbackActivity : AppCompatActivity() {
                     "message" to message,
                     "userId" to (Firebase.auth.currentUser?.uid ?: "guest"),
                     "installId" to Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID),
-                    "app" to "DreamInDream",
+                    "app" to appName,
                     "status" to "new",
                     "device" to "${Build.MANUFACTURER} ${Build.MODEL}",
                     "os" to "Android ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})",
-                    "appVersion" to BuildConfig.VERSION_NAME
+                    "appVersion" to BuildConfig.VERSION_NAME,
+                    // 신규 info 블럭(Functions에서 우선 사용)
+                    "info" to mapOf(
+                        "appVersion" to BuildConfig.VERSION_NAME,
+                        "os" to "Android ${Build.VERSION.RELEASE}",
+                        "sdk" to Build.VERSION.SDK_INT,
+                        "device" to "${Build.MANUFACTURER} ${Build.MODEL}",
+                        "userId" to (Firebase.auth.currentUser?.uid ?: "guest"),
+                        "installId" to Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+                    )
                 )
 
                 withTimeout(10_000L) {
@@ -73,12 +85,16 @@ class FeedbackActivity : AppCompatActivity() {
                 }
 
                 MaterialAlertDialogBuilder(this@FeedbackActivity)
-                    .setTitle("전송 완료")
-                    .setMessage("접수되었습니다. 빠르게 확인하겠습니다.")
-                    .setPositiveButton("확인") { _, _ -> finish() }
+                    .setTitle(R.string.fb_sent_title)
+                    .setMessage(R.string.fb_sent_body)
+                    .setPositiveButton(R.string.common_ok) { _, _ -> finish() }
                     .show()
             } catch (e: Exception) {
-                alert("전송에 실패했습니다. 잠시 후 다시 시도해주세요.\n\n${e.message ?: e}")
+                alert(
+                    getString(R.string.fb_send_fail_title) + "\n\n" +
+                            getString(R.string.fb_send_fail_fmt, e.message ?: e.toString())
+                )
+            } finally {
                 setBusy(false)
             }
         }
@@ -91,9 +107,9 @@ class FeedbackActivity : AppCompatActivity() {
 
     private fun alert(msg: String) {
         MaterialAlertDialogBuilder(this)
-            .setTitle("안내")
+            .setTitle(R.string.common_notice)
             .setMessage(msg)
-            .setPositiveButton("확인", null)
+            .setPositiveButton(R.string.common_ok, null)
             .show()
     }
 }

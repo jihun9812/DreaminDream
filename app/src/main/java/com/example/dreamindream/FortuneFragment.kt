@@ -1,5 +1,5 @@
+// app/src/main/java/com/example/dreamindream/FortuneFragment.kt
 package com.example.dreamindream
-
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -57,7 +57,6 @@ import kotlin.random.Random
 
 class FortuneFragment : Fragment() {
 
-    // Views
     private lateinit var rootLayout: ConstraintLayout
     private lateinit var fortuneCard: MaterialCardView
     private lateinit var fortuneButton: MaterialButton
@@ -82,33 +81,30 @@ class FortuneFragment : Fragment() {
     private lateinit var layoutChecklist: LinearLayout
     private var sectionsContainer: LinearLayout? = null
 
-    // State
     private lateinit var prefs: SharedPreferences
     private lateinit var storage: FortuneStorage
     private lateinit var api: FortuneApi
     private var lastPayload: JSONObject? = null
     private var isExpanded = false
 
-    // Anim state
     private var suppressButtonState = false
     private var breathingAnim: ValueAnimator? = null
 
-    // Sound
     private var soundPool: SoundPool? = null
     private var sfxClickId: Int = 0
     private var sfxChimeId: Int = 0
 
     companion object { private var fortuneIntroPlayed = false }
 
-    // UI helpers
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
     private fun gradientBg(vararg colors: Int) =
         GradientDrawable(GradientDrawable.Orientation.TL_BR, colors).apply { cornerRadius = dp(16).toFloat() }
 
     private val BTN_GRAD = intArrayOf(Color.parseColor("#9B8CFF"), Color.parseColor("#6F86FF"))
     private val BTN_DISABLED = Color.parseColor("#475166")
-    private val TRAIT_TITLES = setOf("창의성", "소통", "적응력", "결단력")
     private val GOLD = Color.parseColor("#FDCA60")
+
+    private val TRAIT_TITLES by lazy { resources.getStringArray(R.array.trait_titles).map { it.trim() }.toSet() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,7 +117,6 @@ class FortuneFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val v = inflater.inflate(R.layout.fragment_fortune, container, false)
 
-        // Bind
         rootLayout      = v.findViewById(R.id.root_fortune_layout)
         fortuneCard     = v.findViewById(R.id.fortuneCard)
         fortuneButton   = v.findViewById(R.id.fortuneButton)
@@ -146,40 +141,33 @@ class FortuneFragment : Fragment() {
         layoutChecklist = v.findViewById(R.id.layoutChecklist)
         sectionsContainer = v.findViewById(R.id.sectionsContainer)
 
-        // Ads
         v.findViewById<AdView>(R.id.adView_fortune)?.loadAd(AdRequest.Builder().build())
         AdManager.initialize(requireContext())
         AdManager.loadRewarded(requireContext())
 
-        // 초기 프레임 깜빡임 방지
         setPendingFortune()
-
-        // 칩 골드 틴트
         applyGoldToTraitChips(rootLayout)
-
-        // FS → Prefs 동기화 후 초기 UI
         storage.syncProfileFromFirestore { decideInitialUi(v) }
 
-        // 복사/공유
         btnCopy.setOnClickListener {
             val cm = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
             cm.setPrimaryClip(android.content.ClipData.newPlainText("fortune", resultText.text))
-            Toast.makeText(requireContext(),"복사됨",Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.toast_copied), Toast.LENGTH_SHORT).show()
         }
         btnShare.setOnClickListener {
             val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
                 type = "text/plain"; putExtra(android.content.Intent.EXTRA_TEXT, resultText.text.toString())
-            }; startActivity(android.content.Intent.createChooser(send, "공유"))
+            }
+            startActivity(android.content.Intent.createChooser(send, getString(R.string.share_chooser_title)))
         }
 
-        // 버튼 클릭
         fortuneButton.setOnClickListener {
             if (!storage.isProfileComplete()) {
                 showProfileRequiredDialog()
                 return@setOnClickListener
             }
             if (storage.isFortuneSeenToday()) {
-                Toast.makeText(requireContext(),"오늘은 이미 확인했어요. 내일 다시 이용해주세요.",Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_already_seen_today), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -239,7 +227,7 @@ class FortuneFragment : Fragment() {
 
         btnDeep.setOnClickListener {
             if (lastPayload == null) {
-                Toast.makeText(requireContext(),"먼저 ‘행운 보기’를 실행해주세요.",Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), getString(R.string.toast_run_fortune_first), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             openDeepWithGate()
@@ -264,8 +252,6 @@ class FortuneFragment : Fragment() {
         }
         applyPrimaryButtonStyle()
     }
-
-    // ------- 애니메이션 -------
 
     private fun playFortuneButtonIntro(btn: View) {
         btn.visibility = View.VISIBLE
@@ -347,7 +333,6 @@ class FortuneFragment : Fragment() {
         AnimatorSet().apply { playSequentially(press, release); start() }
     }
 
-    // ✨ 스파클
     private fun popSparkles(anchor: View, count: Int = 10) {
         val root = rootLayout
         if (!isAdded || root.width == 0 || root.height == 0) return
@@ -409,8 +394,6 @@ class FortuneFragment : Fragment() {
         }
     }
 
-    // ------- Bind & Helpers -------
-
     private fun bindFromPayload(obj: JSONObject) {
         val kwArr = obj.optJSONArray("keywords") ?: JSONArray()
         val kws = (0 until kwArr.length()).mapNotNull { kwArr.optString(it).takeIf { it.isNotBlank() } }
@@ -431,8 +414,11 @@ class FortuneFragment : Fragment() {
         )
 
         val rendered = renderSectionCards(obj)
-        resultText.visibility = if (rendered) View.GONE else View.VISIBLE
-        if (!rendered) resultText.text = api.formatSections(obj)
+        resultText.visibility = View.GONE
+        if (!rendered) {
+            resultText.visibility = View.VISIBLE
+            resultText.text = api.formatSections(obj)
+        }
 
         val items = api.sanitizeChecklist(
             (0 until (obj.optJSONArray("checklist")?.length() ?: 0))
@@ -494,7 +480,7 @@ class FortuneFragment : Fragment() {
         with(fortuneButton) {
             visibility = View.VISIBLE; isEnabled = true
             setBackgroundResource(R.drawable.fortune_button_bg); backgroundTintList = null
-            setTextColor(Color.WHITE); text = "운세\n보기"
+            setTextColor(Color.WHITE); text = getString(R.string.btn_fortune_show)
             alpha = 1f; scaleX = 1f; scaleY = 1f; rotation = 0f
         }
         moveButtonCentered()
@@ -507,16 +493,16 @@ class FortuneFragment : Fragment() {
         fortuneButton.isEnabled = false
         fortuneButton.background = GradientDrawable().apply { cornerRadius = dp(16).toFloat(); setColor(BTN_DISABLED) }
         fortuneButton.setTextColor(Color.parseColor("#B3C1CC"))
-        fortuneButton.text = "내일 다시"
+        fortuneButton.text = getString(R.string.btn_come_tomorrow)
         moveButtonTop()
         stopBreathing()
     }
 
     private fun showProfileRequiredDialog() {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("설정이 필요해요")
-            .setMessage("닉네임·생년월일·성별만 저장하면 맞춤 운세를 볼 수 있어요.\n(출생시간·MBTI는 선택)")
-            .setPositiveButton("확인", null)
+            .setTitle(getString(R.string.dialog_profile_title))
+            .setMessage(getString(R.string.dialog_profile_message))
+            .setPositiveButton(getString(R.string.dialog_ok), null)
             .show()
     }
 
@@ -536,7 +522,9 @@ class FortuneFragment : Fragment() {
         barPos.setProgressCompat(v(pos), true)
         barNeu.setProgressCompat(v(neu), true)
         barNeg.setProgressCompat(v(neg), true)
-        tvPos.text = "${v(pos)}%"; tvNeu.text = "${v(neu)}%"; tvNeg.text = "${v(neg)}%"
+        tvPos.text = getString(R.string.score_points, v(pos))
+        tvNeu.text = getString(R.string.score_points, v(neu))
+        tvNeg.text = getString(R.string.score_points, v(neg))
     }
 
     private fun setKeywords(list: List<String>) {
@@ -586,7 +574,7 @@ class FortuneFragment : Fragment() {
             val badge = card.findViewById<TextView>(R.id.tvScoreBadge)
             val color = api.scoreColor(score)
             badge.apply {
-                text = "${score}점"
+                text = getString(R.string.score_points, score)
                 background = GradientDrawable().apply { cornerRadius = dp(999).toFloat(); setColor(color) }
                 visibility = if (key == "lotto") View.GONE else View.VISIBLE
             }
@@ -603,9 +591,9 @@ class FortuneFragment : Fragment() {
             body.text = if (key == "lotto") {
                 if (lottoNums != null && lottoNums.length() == 6) {
                     val arr = (0 until 6).map { lottoNums.optInt(it) }.sorted()
-                    "번호: ${arr.joinToString(", ")}"
-                } else "번호: -"
-            } else bodyText.ifBlank { "오늘 흐름과 실행 팁을 확인해보세요." }
+                    getString(R.string.label_lotto_numbers, arr.joinToString(", "))
+                } else getString(R.string.label_lotto_numbers_dash)
+            } else bodyText.ifBlank { getString(R.string.section_body_fallback) }
 
             if (key != "lotto") {
                 card.isClickable = true
@@ -617,8 +605,12 @@ class FortuneFragment : Fragment() {
             card.animate().alpha(1f).translationY(0f).setDuration(260).start()
         }
 
-        addCard("총운","overall"); addCard("연애운","love"); addCard("학업운","study")
-        addCard("직장운","work"); addCard("재물운","money"); addCard("로또운","lotto")
+        addCard(getString(R.string.section_overall), "overall")
+        addCard(getString(R.string.section_love), "love")
+        addCard(getString(R.string.section_study), "study")
+        addCard(getString(R.string.section_work), "work")
+        addCard(getString(R.string.section_money), "money")
+        addCard(getString(R.string.section_lotto), "lotto")
         return true
     }
 
@@ -634,14 +626,15 @@ class FortuneFragment : Fragment() {
         content.findViewById<NestedScrollView>(R.id.scrollBody)
 
         tvTitle.text = title
-        tvScore.text = "${score}점"
+        tvScore.text = getString(R.string.score_points, score)
         tvScore.background = GradientDrawable().apply { cornerRadius = dp(999).toFloat(); setColor(api.scoreColor(score)) }
         tvBody.text = api.buildSectionDetails(title, score, text, advice)
 
-        val dlg = MaterialAlertDialogBuilder(
-            requireContext(),
-            com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog
-        ).setView(content).create().apply { window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT)) }
+        // ⬇️ 여기 부분: 스타일 파라미터 제거 (두 번째 인자 삭제)
+        val dlg = MaterialAlertDialogBuilder(requireContext())
+            .setView(content)
+            .create()
+            .apply { window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT)) }
 
         dlg.setOnShowListener {
             val dm = resources.displayMetrics
@@ -655,22 +648,22 @@ class FortuneFragment : Fragment() {
         dlg.show()
     }
 
+
     private fun beginTransitionIfAllowed(target: ViewGroup, set: TransitionSet? = null) {
         if (suppressButtonState) return
         if (set != null) TransitionManager.beginDelayedTransition(target, set)
         else TransitionManager.beginDelayedTransition(target)
     }
 
-    // ------- Layout/Loading -------
     private fun relayoutCardToTop() {
         beginTransitionIfAllowed(rootLayout)
         val lp = fortuneCard.layoutParams as ConstraintLayout.LayoutParams
         lp.startToStart = ConstraintLayout.LayoutParams.PARENT_ID
         lp.endToEnd     = ConstraintLayout.LayoutParams.PARENT_ID
         lp.topToTop     = ConstraintLayout.LayoutParams.PARENT_ID
+        lp.bottomToTop  = R.id.adContainer
         lp.topMargin    = dp(10)
-        lp.bottomToBottom = ConstraintLayout.LayoutParams.UNSET
-        lp.bottomToTop    = ConstraintLayout.LayoutParams.UNSET
+        lp.bottomMargin = dp(10)
         fortuneCard.layoutParams = lp
         fortuneCard.requestLayout()
     }
@@ -723,21 +716,15 @@ class FortuneFragment : Fragment() {
     }
 
     private fun expandFortuneCard(view: View) {
-        if (isExpanded) return; isExpanded = true
-        val scroll = view.findViewById<ScrollView>(R.id.resultScrollView)
-        val set = TransitionSet().apply { addTransition(Slide(Gravity.TOP)); addTransition(Fade(Fade.IN)); duration=450 }
+        if (isExpanded) return
+        isExpanded = true
+        val set = TransitionSet().apply {
+            addTransition(Slide(Gravity.TOP))
+            addTransition(Fade(Fade.IN))
+            duration = 450
+        }
         beginTransitionIfAllowed(rootLayout as ViewGroup, set)
         fortuneCard.visibility = View.VISIBLE
-        val targetH = (resources.displayMetrics.heightPixels * 0.80f).toInt()
-        val curH = max(scroll?.height ?: 160, 160)
-        ValueAnimator.ofInt(curH, targetH).apply {
-            duration = 700; startDelay=150; interpolator = DecelerateInterpolator()
-            addUpdateListener { a ->
-                scroll?.layoutParams?.height = (a.animatedValue as Int)
-                scroll?.requestLayout()
-            }
-            start()
-        }
     }
 
     private fun setCardContentVisible(visible: Boolean) {
@@ -751,7 +738,6 @@ class FortuneFragment : Fragment() {
         btnCopy.visibility = vis; btnShare.visibility = vis; btnDeep.visibility = vis
     }
 
-    // ------- Ad gate / Deep -------
     private fun openDeepWithGate() {
         val key = "fortune_deep_unlocked_${storage.todayPersonaKey()}"
         if (prefs.getBoolean(key, false)) { openDeepNow(); return }
@@ -767,14 +753,14 @@ class FortuneFragment : Fragment() {
         btnWatch.setOnClickListener {
             btnWatch.isEnabled = false
             progress.visibility = View.VISIBLE
-            textStatus.text = "광고 준비 중…"
+            textStatus.text = getString(R.string.ad_preparing)
 
             AdManager.showRewarded(
                 requireActivity(),
                 onRewardEarned = {
                     prefs.edit().putBoolean(key, true).apply()
                     progress.visibility = View.GONE
-                    textStatus.text = "보상 확인됨"
+                    textStatus.text = "OK"
                     bs.dismiss()
                     openDeepNow()
                     AdManager.loadRewarded(requireContext())
@@ -782,10 +768,10 @@ class FortuneFragment : Fragment() {
                 onClosed = {
                     btnWatch.isEnabled = true
                     progress.visibility = View.GONE
-                    textStatus.text = "광고가 닫혔어요. 보상을 받지 못했습니다."
+                    textStatus.text = getString(R.string.ad_closed_no_reward)
                 },
                 onFailed = { reason ->
-                    Toast.makeText(requireContext(),"광고 실패($reason) → 심화분석 바로 열기", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.ad_failed_open_deep_now, reason), Toast.LENGTH_SHORT).show()
                     bs.dismiss()
                     openDeepNow()
                 }
@@ -797,7 +783,7 @@ class FortuneFragment : Fragment() {
 
     private fun openDeepNow() {
         if (lastPayload == null) {
-            Toast.makeText(requireContext(),"먼저 ‘행운 보기’를 실행해주세요.",Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), getString(R.string.toast_run_fortune_first), Toast.LENGTH_SHORT).show()
             return
         }
         val today = storage.todayPersonaKey()
@@ -805,17 +791,16 @@ class FortuneFragment : Fragment() {
             api.showDeepDialog(requireContext(), it, lastPayload)
             return
         }
-        btnDeep.isEnabled=false; btnDeep.alpha=0.7f; btnDeep.text="생성 중…"
+        btnDeep.isEnabled=false; btnDeep.alpha=0.7f; btnDeep.text=getString(R.string.deep_generating_label)
 
         val u = storage.loadUserInfoStrict(); val seed = storage.seedForToday(u)
         api.fetchDeep(u, lastPayload!!, seed) { deep ->
-            btnDeep.isEnabled=true; btnDeep.alpha=1f; btnDeep.text="심화 분석 보기"
+            btnDeep.isEnabled=true; btnDeep.alpha=1f; btnDeep.text=getString(R.string.deep_button_label)
             deep?.let { storage.cacheDeep(today, it) }
             api.showDeepDialog(requireContext(), deep ?: JSONObject(), lastPayload)
         }
     }
 
-    // ------- Sound -------
     private fun initSound() {
         soundPool = SoundPool.Builder().setMaxStreams(2).build()
         sfxClickId = loadSfxFirstFound("sfx_fortune_click_dreamy", "sfx_fortune_click")

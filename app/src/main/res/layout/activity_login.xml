@@ -55,6 +55,47 @@
                 android:orientation="vertical"
                 android:padding="28dp">
 
+                <!-- Language chips (top-right of the card) -->
+                <LinearLayout
+                    android:id="@+id/langRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:orientation="horizontal"
+                    android:paddingBottom="6dp">
+
+                    <!-- 언어 선택 칩 (Login 상단) -->
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chips_language"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:singleSelection="true"
+                        app:selectionRequired="true"
+                        app:chipSpacingHorizontal="8dp"
+                        app:chipSpacingVertical="8dp">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_ko"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/language_korean"
+                            app:checkedIconVisible="false" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_en"
+                            style="@style/Widget.Material3.Chip.Filter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/language_english"
+                            app:checkedIconVisible="false" />
+
+                    </com.google.android.material.chip.ChipGroup>
+
+                </LinearLayout>
+        
+
                 <!-- 타이틀/슬로건 -->
                 <TextView
                     android:layout_width="match_parent"
@@ -219,7 +260,7 @@
                     android:layout_marginTop="10dp"
                     android:backgroundTint="#FDCA60"
                     android:minHeight="48dp"
-                    android:text="체험"
+                    android:text="@string/login_btn_guest"
                     android:fontFamily="@font/pretendard_bold"
                     android:textColor="@color/black"
                     android:textStyle="bold" />

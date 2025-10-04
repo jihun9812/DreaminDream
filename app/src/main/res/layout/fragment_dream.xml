@@ -37,13 +37,12 @@
                 app:layout_constraintWidth_percent="0.95"
                 app:layout_constraintWidth_max="@dimen/max_phone_width">
 
-
+                <!-- 입력 카드 -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/editCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:minHeight="300dp"
                     app:cardCornerRadius="16dp"
                     app:strokeWidth="0dp"
                     app:cardElevation="0dp"
@@ -73,7 +72,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="• 꿈 내용 입력"
+                                android:text="@string/dream_input_label"
                                 android:textColor="#FDCA60"
                                 android:textSize="@dimen/text_md"
                                 android:textStyle="bold" />
@@ -82,11 +81,12 @@
                                 android:id="@+id/usageTextView"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="오늘 남은 횟수 : 0회"
+                                android:text="@string/usage_left_default"
                                 android:textColor="#B6C5D0"
                                 android:textSize="@dimen/text_sm" />
                         </LinearLayout>
 
+                        <!-- 입력칸 -->
                         <EditText
                             android:id="@+id/dreamEditText"
                             android:layout_width="match_parent"
@@ -95,12 +95,15 @@
                             android:background="@android:color/transparent"
                             android:gravity="top|start"
                             android:hint="@string/hint_input"
+                            android:imeOptions="flagNoFullscreen|actionDone"
                             android:includeFontPadding="false"
                             android:inputType="textCapSentences|textMultiLine|textNoSuggestions"
-                            android:imeOptions="flagNoFullscreen|actionDone"
                             android:lineSpacingExtra="2dp"
-                            android:maxLines="8"
-                            android:minHeight="180dp"
+                            android:minLines="10"
+                            android:maxLines="14"
+                            android:scrollbars="vertical"
+                            android:nestedScrollingEnabled="true"
+                            android:overScrollMode="ifContentScrolls"
                             android:paddingStart="2dp"
                             android:paddingTop="12dp"
                             android:paddingEnd="12dp"
@@ -109,12 +112,11 @@
                             android:textColorHint="#9FB1BF"
                             android:textSize="@dimen/hint_input" />
 
-
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/interpretButton"
                             android:layout_width="match_parent"
                             android:layout_height="42dp"
-                            android:layout_marginTop="44dp"
+                            android:layout_marginTop="16dp"
                             android:text="@string/button_interpret"
                             android:textAllCaps="false"
                             android:textColor="#212121"
@@ -138,18 +140,32 @@
                     app:lottie_rawRes="@raw/just_flow_teal"
                     app:lottie_loop="true" />
 
-                <TextView
-                    android:id="@+id/resultTextView"
+                <!-- 결과 카드 (전체 카드뷰 + 화면 전체 스크롤) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/resultCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:background="@drawable/bg_glass_card"
-                    android:lineSpacingExtra="4dp"
-                    android:minHeight="52dp"
-                    android:padding="12dp"
-                    android:text="여기에 해몽 결과가 표시됩니다."
-                    android:textColor="#FFFFFF"
-                    android:textSize="@dimen/text_md" />
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp"
+                    app:strokeColor="@android:color/transparent"
+                    app:cardBackgroundColor="#99312943"
+                    app:cardUseCompatPadding="false"
+                    app:cardPreventCornerOverlap="true">
+
+                    <TextView
+                        android:id="@+id/resultTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="12dp"
+                        android:minHeight="52dp"
+                        android:lineSpacingExtra="4dp"
+                        android:text="@string/dream_result_placeholder"
+                        android:textColor="#FFFFFF"
+                        android:textSize="@dimen/text_md" />
+                </com.google.android.material.card.MaterialCardView>
+
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
@@ -159,7 +175,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:adSize="BANNER"
-        app:adUnitId="ca-app-pub-1742201279182732/8682841157"
+        app:adUnitId="@string/ad_unit_dream_banner"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

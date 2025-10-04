@@ -12,7 +12,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
-        android:title="문의 · 피드백"
+        android:title="@string/feedbacktitle"
         app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"
         app:navigationIconTint="@android:color/white"
         app:titleTextColor="@android:color/white"
@@ -41,9 +41,9 @@
             android:id="@+id/editTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="제목"
+            android:hint="@string/title_hint"
             android:maxLines="1"
-            android:textColor="@android:color/white"
+            android:textColor="@color/black"
             android:textColorHint="#B3FFFFFF"/>
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -68,9 +68,9 @@
             android:layout_width="match_parent"
             android:layout_height="180dp"
             android:gravity="top"
-            android:hint="문의/피드백 내용을 적어주세요"
+            android:hint="@string/feedback_contents"
             android:inputType="textMultiLine"
-            android:textColor="@android:color/white"
+            android:textColor="@color/black"
             android:textColorHint="#B3FFFFFF"/>
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -82,7 +82,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="16dp"
-        android:text="보내기"
+        android:text="@string/send"
         android:textStyle="bold"
         android:textColor="#212121"
         app:backgroundTint="#EBBB57"

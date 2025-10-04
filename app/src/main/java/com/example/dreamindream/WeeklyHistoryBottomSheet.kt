@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.google.android.material.textview.MaterialTextView
@@ -31,7 +30,7 @@ class WeeklyHistoryBottomSheet(
     private val currentWeekKey: String?,
     private val onPick: (String) -> Unit,
     private val maxItems: Int = 26,
-    private val onEmptyCta: (() -> Unit)? = null,          // 비어있을 때 CTA(옵션)
+    private val onEmptyCta: (() -> Unit)? = null,
 ) : BottomSheetDialogFragment() {
 
     companion object {
@@ -68,19 +67,17 @@ class WeeklyHistoryBottomSheet(
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val ctx = requireContext()
 
-        // Root (브랜드 골드 바탕)
         val root = LinearLayout(ctx).apply {
             orientation = LinearLayout.VERTICAL
             layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             setPadding(0, 0, 0, 10.dp(ctx))
             background = GradientDrawable().apply {
-                setColor(Color.parseColor("#FDCA60"))
+                setColor(Color.parseColor("#7EF8C050"))
                 cornerRadius = 22.dp(ctx).toFloat()
                 setStroke(1.dp(ctx), Color.parseColor("#E0B34A"))
             }
         }
 
-        // Handle
         val handle = View(ctx).apply {
             layoutParams = LinearLayout.LayoutParams(43.dp(ctx), 4.dp(ctx)).apply {
                 gravity = Gravity.CENTER_HORIZONTAL
@@ -92,7 +89,6 @@ class WeeklyHistoryBottomSheet(
             }
         }
 
-        // Header
         val header = LinearLayout(ctx).apply {
             orientation = LinearLayout.HORIZONTAL
             layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -106,7 +102,7 @@ class WeeklyHistoryBottomSheet(
             layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
         }
         val title = MaterialTextView(ctx).apply {
-            text = "분석 기록"
+            text = ctx.getString(R.string.bs_title_history)
             setTextSize(TypedValue.COMPLEX_UNIT_SP, 18f)
             setTextColor(Color.parseColor("#1F2234"))
         }
@@ -120,7 +116,6 @@ class WeeklyHistoryBottomSheet(
         titleCol.addView(title); titleCol.addView(meta)
         header.addView(titleCol)
 
-        // List
         val rv = RecyclerView(ctx).apply {
             layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
             layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
@@ -137,13 +132,13 @@ class WeeklyHistoryBottomSheet(
 
         // 로그인 가드
         val userId: String = uid ?: run {
-            meta.text = "로그인 필요"
+            meta.text = ctx.getString(R.string.bs_meta_login_required)
             rv.adapter = object : RecyclerView.Adapter<InfoVH>() {
                 override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): InfoVH {
                     val tv = MaterialTextView(parent.context).apply {
                         layoutParams = RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
                         setPadding(24.dp(context), 20.dp(context), 24.dp(context), 24.dp(context))
-                        text = "로그인이 필요합니다."
+                        text = context.getString(R.string.bs_login_required_msg)
                         setTextColor(Color.parseColor("#1F2234"))
                         textSize = 16f
                     }
@@ -155,104 +150,16 @@ class WeeklyHistoryBottomSheet(
             return root
         }
 
-        // 데이터 로드
         FirestoreManager.listWeeklyReportKeys(userId, limit = maxItems) { list ->
             keys = list.toMutableList()
 
-            // ===== 빈 상태 전용 UI =====
             if (keys.isEmpty()) {
-                meta.text = "첫 리포트를 만들려면 이번 주 꿈을 2개 이상 기록하세요."
-
-                // 리스트 숨기고, 비어있는 전용 섹션 추가
-                rv.visibility = View.GONE
-
-                // Hero 카드 (보라 그라데이션 · 글래스 느낌)
-                val hero = LinearLayout(ctx).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                    layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-                        leftMargin = 16.dp(ctx); rightMargin = 16.dp(ctx); topMargin = 6.dp(ctx); bottomMargin = 10.dp(ctx)
-                    }
-                    setPadding(16.dp(ctx), 14.dp(ctx), 16.dp(ctx), 14.dp(ctx))
-                    background = GradientDrawable(
-                        GradientDrawable.Orientation.TL_BR,
-                        intArrayOf(Color.parseColor("#352D49"), Color.parseColor("#221B2E"))
-                    ).apply {
-                        cornerRadius = 18.dp(ctx).toFloat()
-                    }
-                }
-
-                val icon = TextView(ctx).apply {
-                    text = "✨"
-                    textSize = 22f
-                    setTextColor(Color.WHITE)
-                    gravity = Gravity.CENTER
-                    layoutParams = LinearLayout.LayoutParams(36.dp(ctx), 36.dp(ctx)).apply {
-                        rightMargin = 10.dp(ctx)
-                    }
-                    background = GradientDrawable().apply {
-                        cornerRadius = 999f
-                        setColor(Color.parseColor("#33FFFFFF"))
-                    }
-                }
-                val heroTextCol = LinearLayout(ctx).apply {
-                    orientation = LinearLayout.VERTICAL
-                    layoutParams = LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f)
-                }
-                val heroTitle = MaterialTextView(ctx).apply {
-                    text = "아직 생성된 리포트가 없어요"
-                    setTextColor(Color.parseColor("#FFE9F2"))
-                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 16f)
-                }
-                val heroSub = MaterialTextView(ctx).apply {
-                    text = "이번 주 꿈을 최소 2개 기록하면 자동으로 주간 요약을 만들어 드려요."
-                    setTextColor(Color.parseColor("#BFE1FF"))
-                    setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-                    setPadding(0, 4.dp(ctx), 0, 0)
-                }
-                heroTextCol.addView(heroTitle); heroTextCol.addView(heroSub)
-                hero.addView(icon); hero.addView(heroTextCol)
-
-                // 가이드 칩 3개
-                val chipRow = LinearLayout(ctx).apply {
-                    orientation = LinearLayout.HORIZONTAL
-                    layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-                        leftMargin = 18.dp(ctx); rightMargin = 18.dp(ctx); topMargin = 6.dp(ctx)
-                    }
-                }
-                chipRow.addView(makeChip(ctx, "이번 주 2개 이상", "#14FFFFFF", "#1F2234"))
-                chipRow.addView(Space(ctx).apply { layoutParams = LinearLayout.LayoutParams(6.dp(ctx), 1) })
-                chipRow.addView(makeChip(ctx, "키워드 적기", "#14FFFFFF", "#1F2234"))
-                chipRow.addView(Space(ctx).apply { layoutParams = LinearLayout.LayoutParams(6.dp(ctx), 1) })
-                chipRow.addView(makeChip(ctx, "감정 선택", "#14FFFFFF", "#1F2234"))
-
-                // CTA
-                val cta = MaterialButton(ctx, null, com.google.android.material.R.attr.materialButtonOutlinedStyle).apply {
-                    text = "꿈 기록하러 가기"
-                    setTextColor(Color.parseColor("#1F2234"))
-                    strokeWidth = 1.dp(ctx)
-                    strokeColor = ColorStateList.valueOf(Color.parseColor("#332A355C"))
-                    backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FFF8DC"))
-                    cornerRadius = 16.dp(ctx)
-                    insetTop = 10; insetBottom = 10
-                    layoutParams = LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-                        leftMargin = 16.dp(ctx); rightMargin = 16.dp(ctx); topMargin = 14.dp(ctx); bottomMargin = 14.dp(ctx)
-                    }
-                }
-                cta.setOnClickListener {
-                    dismissAllowingStateLoss()
-                    onEmptyCta?.invoke()
-                }
-
-                // 붙이기
-                root.addView(hero)
-                root.addView(chipRow)
-                root.addView(cta)
-
+                dismissAllowingStateLoss()
+                onEmptyCta?.invoke()
                 return@listWeeklyReportKeys
             }
 
-            // ===== 기존 리스트 화면 =====
-            meta.text = "총 ${keys.size}주 · 최신순"
+            meta.text = ctx.getString(R.string.bs_meta_total_weeks_format, keys.size)
 
             rv.adapter = SimpleAdapter(
                 keys = keys,
@@ -264,22 +171,27 @@ class WeeklyHistoryBottomSheet(
                 onItemDelete = { idx ->
                     val key = keys[idx]
                     if (idx != 0) {
-                        Toast.makeText(requireContext(), "가장 최근 주만 삭제할 수 있어요.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), ctx.getString(R.string.bs_toast_delete_only_latest), Toast.LENGTH_SHORT).show()
                         return@SimpleAdapter
                     }
+                    val rel = WeekUtils.relativeLabel(key, WeekUtils.weekKey())
                     MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("리포트 삭제")
-                        .setMessage("‘${WeekUtils.relativeLabel(key, WeekUtils.weekKey())}’ 리포트를 삭제할까요?")
-                        .setPositiveButton("삭제") { _, _ ->
+                        .setTitle(ctx.getString(R.string.bs_dialog_delete_title))
+                        .setMessage(ctx.getString(R.string.bs_dialog_delete_msg_format, rel))
+                        .setPositiveButton(ctx.getString(R.string.common_delete)) { _, _ ->
                             FirestoreManager.deleteWeeklyReport(userId, key) {
                                 if (idx in keys.indices) {
                                     keys.removeAt(idx)
                                     rv.adapter?.notifyItemRemoved(idx)
-                                    meta.text = "총 ${keys.size}주 · 최신순"
+                                    meta.text = ctx.getString(R.string.bs_meta_total_weeks_format, keys.size)
+                                    if (keys.isEmpty()) {
+                                        dismissAllowingStateLoss()
+                                        onEmptyCta?.invoke()
+                                    }
                                 }
                             }
                         }
-                        .setNegativeButton("취소", null)
+                        .setNegativeButton(ctx.getString(R.string.common_cancel), null)
                         .show()
                 }
             )
@@ -288,7 +200,6 @@ class WeeklyHistoryBottomSheet(
         return root
     }
 
-    // --- VHs ---
     private class InfoVH(val tv: MaterialTextView) : RecyclerView.ViewHolder(tv)
 
     private class VH(val row: LinearLayout) : RecyclerView.ViewHolder(row) {
@@ -300,7 +211,6 @@ class WeeklyHistoryBottomSheet(
         val delete: ImageButton = row.findViewWithTag("delete")
     }
 
-    // --- Adapter ---
     private class SimpleAdapter(
         private val keys: List<String>,
         private val currentKey: String?,
@@ -372,7 +282,7 @@ class WeeklyHistoryBottomSheet(
                 scaleType = ImageView.ScaleType.CENTER_INSIDE
                 layoutParams = LinearLayout.LayoutParams(36.dp(ctx), 36.dp(ctx))
                 setPadding(6.dp(ctx), 6.dp(ctx), 6.dp(ctx), 6.dp(ctx))
-                contentDescription = "삭제"
+                contentDescription = ctx.getString(R.string.common_delete)
                 setBackgroundColor(Color.TRANSPARENT)
             }
 
@@ -395,7 +305,7 @@ class WeeklyHistoryBottomSheet(
             holder.accent.setBackgroundColor(if (isCurrent) Color.parseColor("#4D352D49") else Color.parseColor("#352D49"))
 
             holder.chipWrap.removeAllViews()
-            if (isCurrent) holder.chipWrap.addView(makeChip(ctx, "현재", "#332A355C", "#1F2234"))
+            if (isCurrent) holder.chipWrap.addView(makeChip(ctx, ctx.getString(R.string.chip_current), "#332A355C", "#1F2234"))
 
             holder.delete.visibility = if (position == 0) View.VISIBLE else View.GONE
             holder.itemView.setOnClickListener { onItemClick(position) }
@@ -431,20 +341,6 @@ class WeeklyHistoryBottomSheet(
             "${fmt.format(monday)}–${fmt.format(sunday)}"
         } catch (_: Exception) { key }
     }
-
-    // 공용 칩(빈 상태용)
-    private fun makeChip(ctx: Context, text: String, bgHex: String, fgHex: String): View =
-        MaterialTextView(ctx).apply {
-            setText(text)
-            setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-            setTextColor(Color.parseColor(fgHex))
-            setPadding(12.dp(ctx), 6.dp(ctx), 12.dp(ctx), 6.dp(ctx))
-            background = GradientDrawable().apply {
-                cornerRadius = 999f
-                setColor(Color.parseColor(bgHex))
-                setStroke(1.dp(ctx), Color.parseColor("#26000000"))
-            }
-        }
 }
 
 private fun Int.dp(ctx: Context) = (this * ctx.resources.displayMetrics.density).toInt()

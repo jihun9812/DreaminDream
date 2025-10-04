@@ -28,12 +28,12 @@ class HomeFragment : Fragment() {
     private fun isAlive(): Boolean = isAdded && view != null
     companion object { private var homeAnimPlayed = false }
 
-    private val dailyMsgFallbacks = listOf(
-        "오늘은 마음의 속도를 잠시 늦춰 보세요.",
-        "완벽함보다 한 걸음이 더 중요해요.",
-        "걱정은 내려놓고 할 수 있는 일부터 시작해요.",
-        "오늘의 선택이 내일의 나를 만듭니다.",
-        "당신의 리듬을 믿고 천천히 가도 괜찮아요."
+    private fun dailyFallbacks(): List<String> = listOf(
+        getString(R.string.daily_fallback_1),
+        getString(R.string.daily_fallback_2),
+        getString(R.string.daily_fallback_3),
+        getString(R.string.daily_fallback_4),
+        getString(R.string.daily_fallback_5)
     )
 
     override fun onCreateView(
@@ -54,7 +54,7 @@ class HomeFragment : Fragment() {
             if (!isAlive()) return@getMessage
             val safeMsg = msg?.trim().takeUnless {
                 it.isNullOrEmpty() || it.contains("불러올 수 없어요")
-            } ?: dailyMsgFallbacks.random()
+            } ?: dailyFallbacks().random()
             aiMessage.post { if (isAlive()) aiMessage.text = safeMsg }
         }
 
@@ -76,9 +76,16 @@ class HomeFragment : Fragment() {
         val cachedKeywords = prefs.getString("home_keywords", null)
             ?.split("|")?.filter { it.isNotBlank() }
         aiReportTitle.text = getString(R.string.ai_report_summary)
-        aiReportSummary.text = if (cachedFeeling != null && !cachedKeywords.isNullOrEmpty())
-            "감정: $cachedFeeling\n키워드: ${cachedKeywords.joinToString(", ")}"
-        else "분석 준비 중…"
+        aiReportSummary.text =
+            if (cachedFeeling != null && !cachedKeywords.isNullOrEmpty()) {
+                getString(
+                    R.string.ai_emotion_keywords_simple,
+                    cachedFeeling,
+                    cachedKeywords.joinToString(", ")
+                )
+            } else {
+                getString(R.string.preparing_analysis)
+            }
 
         if (!homeAnimPlayed) {
             animateHomeCardLikeFortune(aiReportCard); homeAnimPlayed = true
@@ -102,12 +109,13 @@ class HomeFragment : Fragment() {
                     btnAiReport.alpha = 1f
                 } else {
                     FirestoreManager.loadWeeklyReportFull(
+                        requireContext(),
                         currentUid, thisWeekKey
                     ) { f, k, a, emoL, emoD, thL, thD, sourceCount, rebuiltAt, tier, proAt, stale ->
                         if (!isAlive()) return@loadWeeklyReportFull
                         val needRebuild = f.isBlank() || k.isEmpty() || a.isBlank() || stale || (sourceCount != count)
                         if (needRebuild) {
-                            FirestoreManager.aggregateDreamsForWeek(currentUid, thisWeekKey) {
+                            FirestoreManager.aggregateDreamsForWeek(currentUid, thisWeekKey, requireContext()) {
                                 if (!isAlive()) return@aggregateDreamsForWeek
                                 FirestoreManager.loadWeeklyReport(currentUid, thisWeekKey) { ff, kk, aa, sc2 ->
                                     if (!isAlive()) return@loadWeeklyReport
@@ -191,7 +199,7 @@ class HomeFragment : Fragment() {
                 )
             } else {
                 context?.let {
-                    Toast.makeText(it, "이번 주 꿈을 2개 이상 기록하면 AI 리포트를 볼 수 있어요.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(it, getString(R.string.toast_need_two_dreams), Toast.LENGTH_SHORT).show()
                 }
             }
             return
@@ -231,7 +239,11 @@ class HomeFragment : Fragment() {
 
         aiReportSummary.animate().alpha(0f).setDuration(120).withEndAction {
             aiReportTitle.text = ctx.getString(R.string.ai_report_summary)
-            aiReportSummary.text = "감정: $feeling\n키워드: ${top3.joinToString(", ")}"
+            aiReportSummary.text = ctx.getString(
+                R.string.ai_emotion_keywords_simple,
+                feeling,
+                top3.joinToString(", ")
+            )
             aiReportSummary.animate().alpha(1f).setDuration(120).start()
         }.start()
 

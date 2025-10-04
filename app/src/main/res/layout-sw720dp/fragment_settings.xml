@@ -13,19 +13,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:adSize="BANNER"
-        app:adUnitId="ca-app-pub-1742201279182732/8682841157"
+        app:adUnitId="@string/ad_unit_settings_banner"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- 로그아웃: 배너 바로 위 -->
+    <!-- 로그아웃 -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_logout"
         android:layout_width="wrap_content"
         android:layout_height="44dp"
         android:layout_marginBottom="8dp"
         android:paddingHorizontal="22dp"
-        android:text="로그아웃"
+        android:text="@string/btn_logout"
         android:textAllCaps="false"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
@@ -35,7 +35,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- 스크롤: 상단 ~ 로그아웃 버튼 위까지 -->
+    <!-- 스크롤 -->
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="0dp"
@@ -66,7 +66,7 @@
                 android:orientation="vertical"
                 android:padding="14dp">
 
-                <!-- ===== (필요시 보이는) 프로필 편집 카드: 그대로 유지 ===== -->
+                <!-- ===== (필요시 보이는) 프로필 편집 카드 ===== -->
                 <LinearLayout
                     android:id="@+id/card_profile"
                     android:layout_width="match_parent"
@@ -80,7 +80,7 @@
                         android:id="@+id/text_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="프로필 편집"
+                        android:text="@string/btn_profile_edit"
                         android:textColor="#FDCA60"
                         android:textStyle="bold"
                         android:textSize="20sp"
@@ -103,7 +103,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="이름"
+                            android:text="@string/label_name"
                             android:textColor="#FABE41"
                             android:textSize="12sp"
                             android:layout_marginTop="2dp"/>
@@ -129,7 +129,7 @@
                                 android:minHeight="44dp"
                                 android:paddingHorizontal="12dp"
                                 android:paddingVertical="10dp"
-                                android:hint="예: 홍길동"
+                                android:hint="@string/hint_name_example"
                                 android:inputType="textPersonName|textCapWords"
                                 android:imeOptions="flagNoFullscreen|actionDone"
                                 android:textColor="#E8F1F8"
@@ -141,7 +141,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="생년월일"
+                            android:text="@string/label_birthdate"
                             android:textColor="#FABE41"
                             android:textSize="12sp"/>
 
@@ -166,7 +166,7 @@
                                 android:minHeight="44dp"
                                 android:paddingHorizontal="12dp"
                                 android:paddingVertical="10dp"
-                                android:hint="YYYY-MM-DD"
+                                android:hint="@string/hint_birthdate_format"
                                 android:focusable="false"
                                 android:clickable="true"
                                 android:textColor="#E8F1F8"
@@ -178,7 +178,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="성별"
+                            android:text="@string/label_gender"
                             android:textColor="#FABE41"
                             android:textSize="12sp"/>
 
@@ -193,7 +193,7 @@
                                 android:id="@+id/radio_male"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="남성"
+                                android:text="@string/gender_male"
                                 android:textColor="#FABE41"
                                 android:buttonTint="#37C2D0"
                                 android:textSize="16sp"
@@ -203,7 +203,7 @@
                                 android:id="@+id/radio_female"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="여성"
+                                android:text="@string/gender_female"
                                 android:textColor="#FABE41"
                                 android:buttonTint="#37C2D0"
                                 android:textSize="16sp"/>
@@ -218,7 +218,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="MBTI"
+                            android:text="@string/label_mbti"
                             android:textColor="#FABE41"
                             android:textSize="12sp"/>
 
@@ -233,7 +233,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="출생시간"
+                            android:text="@string/label_birthtime"
                             android:textColor="#FABE41"
                             android:textSize="12sp"/>
 
@@ -257,7 +257,7 @@
                                 android:layout_height="40dp"
                                 android:layout_marginEnd="8dp"
                                 android:paddingHorizontal="14dp"
-                                android:text="취소"
+                                android:text="@string/btn_cancel"
                                 android:textAllCaps="false"
                                 android:textColor="#212121"
                                 android:textSize="14sp"
@@ -270,7 +270,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="40dp"
                                 android:paddingHorizontal="14dp"
-                                android:text="저장"
+                                android:text="@string/btn_save"
                                 android:textAllCaps="false"
                                 android:textColor="#212121"
                                 android:textSize="14sp"
@@ -302,12 +302,12 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="⚙️ 앱 설정"
+                        android:text="@string/settings_title"
                         android:textColor="#FDCA60"
                         android:textStyle="bold"
                         android:textSize="16sp"/>
 
-                    <!-- 요약(좌) + 통계(우) -->
+                    <!-- 요약 + 통계 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -365,14 +365,14 @@
                                         android:id="@+id/tvGptUsageLabel"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="오늘 해몽"
-                                        android:textColor="#FFD58A"
+                                        android:text="@string/gpt_usage_today"
+                                        android:textColor="#B4FBFB"
                                         android:textSize="12sp"/>
                                     <TextView
                                         android:id="@+id/tvGptUsageValue"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="—"
+                                        android:text="@string/value_placeholder_dash"
                                         android:textColor="#FFFFFF"
                                         android:textStyle="bold"
                                         android:textSize="20sp"/>
@@ -390,14 +390,14 @@
                                         android:id="@+id/tvDreamCountLabel"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="꿈 기록"
-                                        android:textColor="#FFD58A"
+                                        android:text="@string/dream_count"
+                                        android:textColor="#B4FBFB"
                                         android:textSize="12sp"/>
                                     <TextView
                                         android:id="@+id/tvDreamCountValue"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
-                                        android:text="—"
+                                        android:text="@string/value_placeholder_dash"
                                         android:textColor="#FFFFFF"
                                         android:textStyle="bold"
                                         android:textSize="20sp"/>
@@ -412,12 +412,12 @@
                         android:layout_marginTop="10dp"
                         app:dividerColor="#33FFFFFF"/>
 
-                    <!-- ✅ 설정(위로 끌어올림) -->
+                    <!-- 설정 -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="설정"
+                        android:text="@string/settings_section"
                         android:textColor="#FDCA60"
                         android:textSize="12sp"/>
 
@@ -426,10 +426,9 @@
                         android:layout_width="300dp"
                         android:layout_height="44dp"
                         android:layout_marginTop="8dp"
-                        android:text="프로필 편집"
+                        android:text="@string/btn_profile_edit"
                         android:textAllCaps="false"
                         android:textColor="#1D142E"
-                        android:fontFamily="@font/pretendard_bold"
                         app:backgroundTint="#F3EFBE58"
                         app:cornerRadius="16dp"
                         android:layout_gravity="center_horizontal"/>
@@ -439,9 +438,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:layout_marginTop="4dp"
-                        android:text="✨ 프리미엄 · 광고 제거"
+                        android:text="@string/btn_premium"
                         android:textAllCaps="false"
-                        android:textColor="#FDCA60"
+                        android:textColor="#B4FBFB"
                         android:textSize="12sp"
                         app:backgroundTint="#00000000"/>
 
@@ -449,9 +448,9 @@
                         android:id="@+id/btn_contact"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
-                        android:text="✉️ 문의·피드백 보내기"
+                        android:text="@string/btn_contact"
                         android:textAllCaps="false"
-                        android:textColor="#FDCA60"
+                        android:textColor="#B4FBFB"
                         android:textSize="12sp"
                         app:backgroundTint="#00000000"/>
 
@@ -459,13 +458,26 @@
                         android:id="@+id/btn_terms"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
-                        android:text="📄 약관 · 개인정보 처리방침"
+                        android:text="@string/btn_terms"
                         android:textAllCaps="false"
-                        android:textColor="#FDCA60"
+                        android:textColor="#B4FBFB"
                         android:textSize="12sp"
                         app:backgroundTint="#00000000"/>
 
-                    <!-- 언어 (아래로 이동) -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_delete_account"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/btn_delete_account"
+                        android:textAllCaps="false"
+                        android:textColor="#FF5555"
+                        android:textSize="12sp"
+                        app:backgroundTint="#00000000"/>
+
+                    <!-- ── 언어 섹션 삭제됨 ── -->
+
+                    <!-- 계정 통합 -->
                     <com.google.android.material.divider.MaterialDivider
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
@@ -476,28 +488,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:text="언어"
-                        android:textColor="#FDCA60"
-                        android:textSize="12sp"/>
-
-                    <Spinner
-                        android:id="@+id/spinner_lang"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:spinnerMode="dropdown"/>
-
-                    <!-- 계정 통합(구글) -->
-                    <com.google.android.material.divider.MaterialDivider
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginTop="6dp"
-                        app:dividerColor="#1FFFFFFF"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="계정 통합"
+                        android:text="@string/label_account_link"
                         android:textColor="#FDCA60"
                         android:textSize="12sp"/>
 
@@ -506,7 +497,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="상태: -"
+                        android:text="@string/account_status_default"
                         android:textColor="#B3FFFFFF"
                         android:textSize="13sp"/>
 
@@ -515,7 +506,7 @@
                         android:layout_width="300dp"
                         android:layout_height="48dp"
                         android:layout_marginTop="8dp"
-                        android:text="Google로 계정 통합"
+                        android:text="@string/btn_google_link"
                         android:textAllCaps="false"
                         android:textColor="@color/black"
                         android:layout_gravity="center_horizontal"
@@ -523,7 +514,7 @@
                         app:iconTint="@null"
                         app:iconGravity="textStart"
                         app:iconPadding="12dp"
-                        app:backgroundTint="#EEFDCA60"
+                        app:backgroundTint="#DCDCDC"
                         app:cornerRadius="16dp"/>
 
                     <ProgressBar
@@ -539,7 +530,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="* 체험(익명) 데이터는 Google 계정 연결 시 그대로 유지됩니다."
+                        android:text="@string/account_link_note"
                         android:textColor="#80FFFFFF"
                         android:textSize="11sp"/>
                 </LinearLayout>

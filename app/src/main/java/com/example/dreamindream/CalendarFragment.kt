@@ -37,15 +37,19 @@ class CalendarFragment : Fragment() {
 
     private var selectedDate: LocalDate? = null
 
-    /**
-     * 휴일을 스레드-세이프하게 보관하기 위한 맵.
-     * key: 날짜, value: 휴일명
-     */
+    /** 휴일 캐시 (스레드 세이프) */
     private val holidayMap = ConcurrentHashMap<LocalDate, String>()
 
-    private val dateFormatter = DateTimeFormatter.ofPattern("yyyy년 M월")
+    /** ✅ 앱 현재 언어 로케일 */
+    private val appLocale: Locale
+        get() = resources.configuration.locales[0]
 
-    // ✅ 캘린더 표시 범위: 2024.01 ~ 2030.12
+    /** ✅ 월/년 포맷도 앱 언어로 */
+    private val dateFormatter by lazy {
+        DateTimeFormatter.ofPattern(getString(R.string.fmt_month_year), appLocale)
+    }
+
+    // 캘린더 범위
     private val CAL_START_YEAR = 2024
     private val CAL_END_YEAR = 2030
 
@@ -75,7 +79,6 @@ class CalendarFragment : Fragment() {
         adapter = DreamInlineAdapter(
             mutableListOf(),
             onOpen = { entry ->
-                // 폴드 전용 우측 패널이 없다면 기존 다이얼로그 사용
                 DreamFragment.showResultDialog(requireContext(), entry.result)
             },
             onDelete = { pos, _ -> confirmDelete { deleteEntryAt(pos) } }
@@ -86,7 +89,7 @@ class CalendarFragment : Fragment() {
         // Calendar
         binding.calendarView.monthScrollListener = { month ->
             updateMonthText(month.yearMonth)
-            clearHolidayBanner() // 🔴 달 바뀌면 휴일 라벨 숨김
+            clearHolidayBanner()
             binding.textViewMonthYear.alpha = 0f
             binding.textViewMonthYear.animate().alpha(1f).setDuration(200).start()
         }
@@ -98,11 +101,11 @@ class CalendarFragment : Fragment() {
 
         setupCalendar(currentMonth, daysOfWeek)
         setupEventListeners()
-        loadHolidays2030() // ✅ 2024~2030 캐시+프리패치
+        loadHolidays2030()
         updateMonthText(currentMonth)
         setupAds(view)
 
-        // Firestore->로컬 동기화 후 반영
+        // Firestore -> 로컬 동기화 후 반영
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
             FirestoreManager.getAllDreamDates(requireContext(), userId) {
@@ -129,10 +132,9 @@ class CalendarFragment : Fragment() {
 
         binding.calendarView.monthHeaderBinder =
             object : MonthHeaderFooterBinder<MonthHeaderViewContainer> {
-                override fun create(view: View): MonthHeaderViewContainer =
-                    MonthHeaderViewContainer(view)
+                override fun create(view: View) = MonthHeaderViewContainer(view)
                 override fun bind(container: MonthHeaderViewContainer, month: CalendarMonth) {
-                    // 요일 헤더 필요 시 여기에서 처리
+                    // 헤더 커스터마이즈 필요 시 사용
                 }
             }
     }
@@ -141,7 +143,7 @@ class CalendarFragment : Fragment() {
         container.textView.text = day.date.dayOfMonth.toString()
         val isSelected = selectedDate == day.date
         val isToday = day.date == LocalDate.now()
-        val holidayName = holidayMap[day.date] // ✅ O(1) 조회, 동시 접근 안전
+        val holidayName = holidayMap[day.date]
 
         // 기록 도트(강도)
         val count = getDreamCount(day.date)
@@ -213,14 +215,14 @@ class CalendarFragment : Fragment() {
 
     private fun setupEventListeners() {
         binding.buttonPreviousMonth.setOnClickListener {
-            clearHolidayBanner() // 🔴 버튼으로 이전 달 이동 전 숨김
+            clearHolidayBanner()
             binding.calendarView.findFirstVisibleMonth()?.yearMonth?.minusMonths(1)?.let {
                 binding.calendarView.smoothScrollToMonth(it)
                 updateMonthText(it)
             }
         }
         binding.buttonNextMonth.setOnClickListener {
-            clearHolidayBanner() // 🔴 버튼으로 다음 달 이동 전 숨김
+            clearHolidayBanner()
             binding.calendarView.findFirstVisibleMonth()?.yearMonth?.plusMonths(1)?.let {
                 binding.calendarView.smoothScrollToMonth(it)
                 updateMonthText(it)
@@ -228,40 +230,34 @@ class CalendarFragment : Fragment() {
         }
     }
 
-    /** 🔴 상단 휴일 라벨 즉시 숨김 */
+    /** 상단 휴일 라벨 숨김 */
     private fun clearHolidayBanner() {
         binding.holidayTextView.text = ""
         binding.holidayTextView.visibility = View.GONE
     }
 
-    /**
-     * ✅ 2024~2030 전체 휴일을 캐시에서 즉시 로드 후,
-     *    비어있는 연도만 네트워크로 가져와 저장/반영.
-     *    (holidayMap은 ConcurrentHashMap으로 동시 접근 안전)
-     */
+    /** 2024~2030 휴일: 캐시 → 누락 연도만 프리패치 */
     private fun loadHolidays2030() {
         try {
             holidayMap.clear()
 
-            // 1) 캐시 우선 로드
+            // 1) 캐시
             val cached = HolidayStorage.loadHolidaysRange(requireContext(), CAL_START_YEAR, CAL_END_YEAR)
             for (h in cached) holidayMap[h.date] = h.name
             binding.calendarView.notifyCalendarChanged()
 
-            // 2) 빈 연도만 API 호출해서 채우기
+            // 2) 누락 연도만 API
             val missingYears = (CAL_START_YEAR..CAL_END_YEAR).filter { year ->
                 HolidayStorage.loadHolidays(requireContext(), year).isEmpty()
             }
             if (missingYears.isEmpty()) return
 
-            // 순차 프리패치
             fun fetchNext(idx: Int) {
                 if (idx >= missingYears.size) return
                 val y = missingYears[idx]
                 HolidayApi.fetchHolidays(
                     y,
                     onSuccess = { list ->
-                        // 맵에 병합 (원자적 대입)
                         for (h in list) holidayMap[h.date] = h.name
                         binding.calendarView.notifyCalendarChanged()
                         fetchNext(idx + 1)
@@ -295,8 +291,9 @@ class CalendarFragment : Fragment() {
     // --- Inline list helpers ---
 
     private fun refreshInlineListFor(date: LocalDate) {
-        val dow = date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.KOREA)
-        binding.dreamListTitle.text = "${date} (${dow})의 꿈들"
+        // ✅ 요일 약칭도 앱 언어로
+        val dow = date.dayOfWeek.getDisplayName(TextStyle.SHORT, appLocale)
+        binding.dreamListTitle.text = getString(R.string.dream_list_title, date.toString(), dow)
 
         val arr = getDreamArray(date)
         val list = mutableListOf<DreamEntry>()
@@ -329,6 +326,16 @@ class CalendarFragment : Fragment() {
         for (i in 0 until arr.length()) if (i != pos) newArr.put(arr.getJSONObject(i))
         saveDreamArray(date, newArr)
 
+        // 1-1) 서버 동기화(로그인 상태)
+        FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
+            FirestoreManager.updateDreamsForDate(
+                uid = uid,
+                dateKey = date.toString(),
+                itemsJson = newArr.toString(),
+                onComplete = { /* no-op */ }
+            )
+        }
+
         // 2) UI 반영
         adapter.removeAt(pos)
         if (adapter.itemCount == 0) {
@@ -341,10 +348,10 @@ class CalendarFragment : Fragment() {
 
     private fun confirmDelete(onConfirm: () -> Unit) {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("삭제하시겠습니까?")
-            .setMessage("이 꿈 기록을 삭제하면 되돌릴 수 없습니다.")
-            .setPositiveButton("삭제") { _, _ -> onConfirm() }
-            .setNegativeButton("취소", null)
+            .setTitle(R.string.cal_delete_title)
+            .setMessage(R.string.cal_delete_message)
+            .setPositiveButton(R.string.common_delete) { _, _ -> onConfirm() }
+            .setNegativeButton(R.string.common_cancel, null)
             .show()
     }
 

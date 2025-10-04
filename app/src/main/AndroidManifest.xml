@@ -9,12 +9,14 @@
 
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:label="DreaminDream"
         android:icon="@mipmap/starcloud"
         android:roundIcon="@mipmap/starcloud"
         android:supportsRtl="true"
-        android:theme="@style/Theme.DreaminDream">
+        android:theme="@style/Theme.DreaminDream"
+        android:localeConfig="@xml/locales_config">
 
         <activity
             android:name=".FeedbackActivity"

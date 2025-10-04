@@ -31,7 +31,7 @@
             android:id="@+id/textViewMonthYear"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="2025년 9월"
+            android:text="@string/calendar_month_year_sample"
             android:textSize="@dimen/month_text"
             android:textStyle="bold"
             android:textColor="#FABE41"
@@ -50,7 +50,7 @@
             app:tint="@color/white" />
     </LinearLayout>
 
-    <!-- 공휴일 라벨 -->
+    <!-- 공휴일 라벨 (동적 텍스트) -->
     <TextView
         android:id="@+id/holidayTextView"
         android:layout_width="wrap_content"
@@ -96,7 +96,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="10dp"
-        android:text="2025-09-12 (금)의 꿈들"
+        android:text="@string/dream_list_title_sample"
         android:textSize="@dimen/list_title"
         android:textColor="#FFD54F"
         android:fontFamily="@font/pretendard_bold"
@@ -111,7 +111,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
-        android:text="이 날짜의 꿈 기록이 없어요."
+        android:text="@string/dream_list_empty"
         android:textSize="@dimen/text_md"
         android:textColor="#CFE3F0"
         android:fontFamily="@font/pretendard_medium"
@@ -140,6 +140,5 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         app:adSize="BANNER"
-        app:adUnitId="ca-app-pub-1742201279182732/8682841157" />
-
+        app:adUnitId="@string/ad_unit_calendar_banner" />
 </RelativeLayout>

@@ -261,32 +261,74 @@ exports.onFeedbackCreated = functionsV1
   .document("feedback/{id}")
   .onCreate(async (snap) => {
     const d = snap.data() || {};
-    const to = "dreamindream@dreamindream.app";
+    const to = process.env.SMTP_TO || "dreamindream@dreamindream.app";
     const created = d.createdAtStr || "";
     const info = d.info || {};
 
+    const _esc = (typeof esc === "function")
+      ? esc
+      : (s = "") => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    // ▶ 제목: 입력값 없으면 메시지 첫 줄로 보강
+    const rawTitle = (d.title || "").toString().trim();
+    const msg = (d.message || "").toString();
+    const fallbackTitle = (msg.split(/\r?\n/)[0] || "").slice(0, 60);
+    const finalTitle = rawTitle || fallbackTitle || "제목 없음";
+
+    // 템플릿
+    const pre = (text = "") =>
+      `<pre style="white-space:pre-wrap;word-break:break-word;margin:0;line-height:1.6">${_esc(text)}</pre>`;
+
+    const section = (heading = "", innerHtml = "") => `
+      <section style="border:1px solid #dfe3ee;border-radius:12px;padding:14px 16px;margin:12px 0;background:#fafbff">
+        ${heading ? `<h3 style="margin:0 0 8px 0;font-size:15px;color:#374151">${_esc(heading)}</h3>` : ""}
+        <div style="font-size:14px;color:#111827">${innerHtml || ""}</div>
+      </section>`;
+
     const metaTable = `
-      <table cellpadding="0" cellspacing="0" style="width:100%;font-size:13px;color:#D8DEF0">
-        <tr><td style="padding:6px 0;width:120px;opacity:.8">앱</td><td>${esc(d.app || "DreamInDream")}</td></tr>
-        <tr><td style="padding:6px 0;opacity:.8">앱버전</td><td>${esc(info.appVersion || "")}</td></tr>
-        <tr><td style="padding:6px 0;opacity:.8">OS</td><td>${esc(info.os || "")} (SDK ${esc(String(info.sdk || ""))})</td></tr>
-        <tr><td style="padding:6px 0;opacity:.8">디바이스</td><td>${esc(info.device || "")}</td></tr>
-        <tr><td style="padding:6px 0;opacity:.8">유저ID</td><td>${esc(info.userId || "")}</td></tr>
-        <tr><td style="padding:6px 0;opacity:.8">설치ID</td><td>${esc(info.installId || "")}</td></tr>
+      <table cellpadding="0" cellspacing="0" style="width:100%;font-size:13px;color:#111827">
+        <tr><td style="padding:6px 0;width:120px;opacity:.7">앱</td><td>${_esc(d.app || "DreamInDream")}</td></tr>
+        <tr><td style="padding:6px 0;opacity:.7">앱버전</td><td>${_esc(info.appVersion || "")}</td></tr>
+        <tr><td style="padding:6px 0;opacity:.7">OS</td><td>${_esc(info.os || "")} (SDK ${_esc(String(info.sdk || ""))})</td></tr>
+        <tr><td style="padding:6px 0;opacity:.7">디바이스</td><td>${_esc(info.device || "")}</td></tr>
+        <tr><td style="padding:6px 0;opacity:.7">유저ID</td><td>${_esc(info.userId || "")}</td></tr>
+        <tr><td style="padding:6px 0;opacity:.7">설치ID</td><td>${_esc(info.installId || "")}</td></tr>
       </table>`;
 
+    // ▶ 본문 구성: 제목 추가, 연락처 없으면 섹션 숨김, 메시지는 헤더 없이 내용만
     const bodyHtml = `
-      ${card({ heading: "보낸이(연락처)", contentHtml: esc(d.contact || "미기재"), tone: "rose" })}
-      ${card({ heading: "메시지", contentHtml: pre(d.message || ""), tone: "indigo" })}
-      ${card({ heading: "디바이스/앱 정보", contentHtml: metaTable, tone: "cyan" })}
-      ${d.attachmentUrl ? card({ heading: "첨부", contentHtml: `<a href="${d.attachmentUrl}" style="color:#B9F6CA">첨부 보기</a>` }) : "" }
+      ${section("제목", _esc(finalTitle))}
+      ${d.contact ? section("보낸이(연락처)", _esc(d.contact)) : ""}
+      ${section("", pre(msg))}
+      ${section("디바이스/앱 정보", metaTable)}
+      ${d.attachmentUrl ? section("첨부", `<a href="${_esc(d.attachmentUrl)}" style="color:#2563eb">첨부 보기</a>`) : ""}
     `;
 
-    const html = shell({
-      title: "📮 새 문의/피드백 도착",
-      subtitle: created,
-      bodyHtml,
-    });
+    const html = `
+      <html>
+        <body style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Pretendard,sans-serif;background:#f5f7fb;margin:0;padding:24px;color:#111827">
+          <div style="max-width:720px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px 20px">
+            <header style="margin:0 0 12px 0">
+              <h1 style="margin:0 0 4px 0;font-size:18px;color:#111827">📮 새 문의/피드백 도착</h1>
+              ${created ? `<div style="font-size:12px;color:#6b7280">${_esc(created)}</div>` : ""}
+            </header>
+            ${bodyHtml}
+            <footer style="margin-top:16px;font-size:12px;color:#6b7280;opacity:.8">
+              Dream in Dream • ${new Date().getFullYear()}
+            </footer>
+          </div>
+        </body>
+      </html>`;
 
-    await sendMail(to, `[DreamInDream] 새 피드백 (${created})`, html);
+    // ▶ 메일 제목도 최종 제목으로
+    const opts = {
+      to,
+      subject: `[DreamInDream] ${finalTitle}${created ? ` (${created})` : ""}`,
+      html,
+    };
+    if (d.contact && String(d.contact).includes("@")) {
+      opts.replyTo = d.contact;
+    }
+
+    await sendMail(opts.to, opts.subject, opts.html, opts.replyTo);
   });

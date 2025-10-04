@@ -1,43 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:paddingVertical="@dimen/month_header_padding_v"
     android:paddingHorizontal="@dimen/month_header_padding_h">
 
-    <!-- 공통 스타일을 맞추기 위해 높이/글자 크기 DIMENS 적용 -->
-    <TextView android:layout_width="0dp" android:layout_height="@dimen/month_header_row_height" android:layout_weight="1"
-        android:gravity="center" android:text="일" android:textColor="#FF6B6B"
-        android:textSize="@dimen/month_header_text_size" android:textStyle="bold" android:includeFontPadding="false"
-        android:fontFamily="@font/pretendard_bold"/>
+    <!-- Sun -->
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="@dimen/month_header_row_height"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/weekday_sun"
+        android:textColor="#FF6B6B"
+        android:textSize="@dimen/month_header_text_size"
+        android:textStyle="bold"
+        android:includeFontPadding="false"
+        android:fontFamily="@font/pretendard_bold" />
 
-    <TextView android:layout_width="0dp" android:layout_height="@dimen/month_header_row_height" android:layout_weight="1"
-        android:gravity="center" android:text="월" android:textColor="#C6D4DF"
-        android:textSize="@dimen/month_header_text_size" android:textStyle="bold" android:includeFontPadding="false"
-        android:fontFamily="@font/pretendard_bold"/>
+    <!-- Mon -->
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="@dimen/month_header_row_height"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/weekday_mon"
+        android:textColor="#C6D4DF"
+        android:textSize="@dimen/month_header_text_size"
+        android:textStyle="bold"
+        android:includeFontPadding="false"
+        android:fontFamily="@font/pretendard_bold" />
 
-    <TextView android:layout_width="0dp" android:layout_height="@dimen/month_header_row_height" android:layout_weight="1"
-        android:gravity="center" android:text="화" android:textColor="#C6D4DF"
-        android:textSize="@dimen/month_header_text_size" android:textStyle="bold" android:includeFontPadding="false"
-        android:fontFamily="@font/pretendard_bold"/>
+    <!-- Tue -->
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="@dimen/month_header_row_height"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/weekday_tue"
+        android:textColor="#C6D4DF"
+        android:textSize="@dimen/month_header_text_size"
+        android:textStyle="bold"
+        android:includeFontPadding="false"
+        android:fontFamily="@font/pretendard_bold" />
 
-    <TextView android:layout_width="0dp" android:layout_height="@dimen/month_header_row_height" android:layout_weight="1"
-        android:gravity="center" android:text="수" android:textColor="#C6D4DF"
-        android:textSize="@dimen/month_header_text_size" android:textStyle="bold" android:includeFontPadding="false"
-        android:fontFamily="@font/pretendard_bold"/>
+    <!-- Wed -->
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="@dimen/month_header_row_height"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/weekday_wed"
+        android:textColor="#C6D4DF"
+        android:textSize="@dimen/month_header_text_size"
+        android:textStyle="bold"
+        android:includeFontPadding="false"
+        android:fontFamily="@font/pretendard_bold" />
 
-    <TextView android:layout_width="0dp" android:layout_height="@dimen/month_header_row_height" android:layout_weight="1"
-        android:gravity="center" android:text="목" android:textColor="#C6D4DF"
-        android:textSize="@dimen/month_header_text_size" android:textStyle="bold" android:includeFontPadding="false"
-        android:fontFamily="@font/pretendard_bold"/>
+    <!-- Thu -->
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="@dimen/month_header_row_height"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/weekday_thu"
+        android:textColor="#C6D4DF"
+        android:textSize="@dimen/month_header_text_size"
+        android:textStyle="bold"
+        android:includeFontPadding="false"
+        android:fontFamily="@font/pretendard_bold" />
 
-    <TextView android:layout_width="0dp" android:layout_height="@dimen/month_header_row_height" android:layout_weight="1"
-        android:gravity="center" android:text="금" android:textColor="#C6D4DF"
-        android:textSize="@dimen/month_header_text_size" android:textStyle="bold" android:includeFontPadding="false"
-        android:fontFamily="@font/pretendard_bold"/>
+    <!-- Fri -->
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="@dimen/month_header_row_height"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/weekday_fri"
+        android:textColor="#C6D4DF"
+        android:textSize="@dimen/month_header_text_size"
+        android:textStyle="bold"
+        android:includeFontPadding="false"
+        android:fontFamily="@font/pretendard_bold" />
 
-    <TextView android:layout_width="0dp" android:layout_height="@dimen/month_header_row_height" android:layout_weight="1"
-        android:gravity="center" android:text="토" android:textColor="#6FA8FF"
-        android:textSize="@dimen/month_header_text_size" android:textStyle="bold" android:includeFontPadding="false"
-        android:fontFamily="@font/pretendard_bold"/>
+    <!-- Sat -->
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="@dimen/month_header_row_height"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="@string/weekday_sat"
+        android:textColor="#6FA8FF"
+        android:textSize="@dimen/month_header_text_size"
+        android:textStyle="bold"
+        android:includeFontPadding="false"
+        android:fontFamily="@font/pretendard_bold" />
 </LinearLayout>

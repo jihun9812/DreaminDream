@@ -24,7 +24,7 @@
 
     <dimen name="card_pad">16dp</dimen>
     <dimen name="ai_card_corner">20dp</dimen>
-    <dimen name="ai_card_elevation">10dp</dimen>
+    <dimen name="ai_card_elevation">4dp</dimen>
     <dimen name="icon_btn">22dp</dimen>
     <dimen name="ai_icon">24dp</dimen>
 

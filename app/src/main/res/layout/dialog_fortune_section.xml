@@ -34,7 +34,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="총운"
+                    android:text="@string/fortune_section_title_total"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:textColor="#FFFFFF" />
@@ -43,7 +43,7 @@
                     android:id="@+id/tvSectionDialogScore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="80점"
+                    android:text="@string/fortune_section_score_sample"
                     android:textColor="#FFFFFF"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
@@ -78,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="#212121"
                 app:backgroundTint="#F6AF1E"
-                android:text="확인" />
+                android:text="@string/ok" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </FrameLayout>

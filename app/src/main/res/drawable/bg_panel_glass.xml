@@ -3,13 +3,13 @@
     <!-- 은은한 유리 배경 그라데이션 -->
     <item>
         <shape android:shape="rectangle">
-            <corners android:radius="18dp" />
+            <corners android:radius="20dp" />
             <gradient
                 android:type="linear"
                 android:angle="270"
-                android:startColor="#913D2A6A"
-                android:endColor="#88382756" />
+                android:startColor="#B8231937"
+                android:centerColor="#85524661"
+                android:endColor="#B8231937" />
         </shape>
     </item>
-
 </layer-list>

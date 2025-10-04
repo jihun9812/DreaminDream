@@ -38,13 +38,13 @@ object DailyMessageManager {
     private fun prefs(ctx: Context) = ctx.getSharedPreferences("daily_msg_cache", Context.MODE_PRIVATE)
     private fun localKey(date: String) = "dm_$date"
 
-    // 완전 실패 시 마지막 안전망
-    private val fallbackBank = listOf(
-        "오늘은 마음의 속도를 잠시 늦춰 보세요.",
-        "완벽함보다 한 걸음이 더 중요해요.",
-        "걱정은 내려놓고 할 수 있는 일부터 시작해요.",
-        "오늘의 선택이 내일의 나를 만듭니다.",
-        "당신의 리듬을 믿고 천천히 가도 괜찮아요."
+    // 완전 실패 시 마지막 안전망 (문구는 strings.xml)
+    private fun fallbackBank(ctx: Context) = listOf(
+        ctx.getString(R.string.daily_fallback_1),
+        ctx.getString(R.string.daily_fallback_2),
+        ctx.getString(R.string.daily_fallback_3),
+        ctx.getString(R.string.daily_fallback_4),
+        ctx.getString(R.string.daily_fallback_5),
     )
 
     fun getMessage(context: Context, onResult: (String) -> Unit) {
@@ -66,7 +66,7 @@ object DailyMessageManager {
                     onResult(fromFs)
                 } else {
                     // 3) GPT 생성
-                    fetchFromGPT { gpt ->
+                    fetchFromGPT(context) { gpt ->
                         if (!gpt.isNullOrBlank()) {
                             Log.d(TAG, "GPT ok (no FS doc)")
                             db.collection("daily_messages").document(today)
@@ -79,7 +79,7 @@ object DailyMessageManager {
                         } else {
                             Log.w(TAG, "GPT failed, fallback")
                             val last = p.getString("dm_last", null)
-                            onResult(last ?: fallbackBank.random())
+                            onResult(last ?: fallbackBank(context).random())
                         }
                     }
                 }
@@ -87,7 +87,7 @@ object DailyMessageManager {
             .addOnFailureListener { e ->
                 Log.w(TAG, "FS fail: ${e.message}")
                 // FS 실패 → GPT 시도
-                fetchFromGPT { gpt ->
+                fetchFromGPT(context) { gpt ->
                     if (!gpt.isNullOrBlank()) {
                         Log.d(TAG, "GPT ok (FS fail)")
                         db.collection("daily_messages").document(today)
@@ -100,34 +100,41 @@ object DailyMessageManager {
                     } else {
                         Log.w(TAG, "GPT failed, fallback (FS fail)")
                         val last = p.getString("dm_last", null)
-                        onResult(last ?: fallbackBank.random())
+                        onResult(last ?: fallbackBank(context).random())
                     }
                 }
             }
     }
 
-        private fun fetchFromGPT(onResult: (String?) -> Unit) {
-            val apiKey = BuildConfig.OPENAI_API_KEY
-            Log.d(TAG, "OPENAI len=${apiKey.length}")
+    // ▼ 문자열 리소스 기반 프롬프트 (컨텍스트 필요)
+    private fun fetchFromGPT(context: Context, onResult: (String?) -> Unit) {
+        val apiKey = BuildConfig.OPENAI_API_KEY
+        Log.d(TAG, "OPENAI len=${apiKey.length}")
 
-            if (apiKey.isBlank()) { onResult(null); return }
+        if (apiKey.isBlank()) { onResult(null); return }
 
-            val prompt = "설명과 서사 없이, 전문 꿈해몽가의 톤으로 오늘(${SimpleDateFormat("yyyy년 M월 d일").format(Date())})의 조언을 한 문장 존댓말로만 작성해주세요."
-            val body = JSONObject().apply {
-                put("model", "gpt-3.5-turbo")
-                put("max_tokens", 100)
-                put("temperature", 0.4)
-                put("messages", JSONArray().put(
-                    JSONObject().put("role", "user").put("content", prompt)
-                ))
-            }.toString().toRequestBody("application/json".toMediaType())
+        // 날짜 포맷 템플릿도 strings.xml 로 이동
+        val datePattern = context.getString(R.string.daily_date_format) // 예: "yyyy년 M월 d일"
+        val dateStr = SimpleDateFormat(datePattern, Locale.getDefault()).format(Date())
 
-            val req = Request.Builder()
-                .url("https://api.openai.com/v1/chat/completions")
-                .addHeader("Authorization", "Bearer $apiKey")
-                .addHeader("Content-Type", "application/json")
-                .post(body)
-                .build()
+        // 프롬프트 템플릿(strings.xml) 적용
+        val prompt = context.getString(R.string.daily_prompt_template, dateStr)
+
+        val body = JSONObject().apply {
+            put("model", "gpt-3.5-turbo")
+            put("max_tokens", 100)
+            put("temperature", 0.4)
+            put("messages", JSONArray().put(
+                JSONObject().put("role", "user").put("content", prompt)
+            ))
+        }.toString().toRequestBody("application/json".toMediaType())
+
+        val req = Request.Builder()
+            .url("https://api.openai.com/v1/chat/completions")
+            .addHeader("Authorization", "Bearer $apiKey")
+            .addHeader("Content-Type", "application/json")
+            .post(body)
+            .build()
 
         http.newCall(req).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {

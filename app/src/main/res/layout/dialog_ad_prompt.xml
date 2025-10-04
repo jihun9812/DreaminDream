@@ -6,28 +6,28 @@
     android:layout_height="wrap_content"
     android:layout_margin="16dp"
     app:cardCornerRadius="22dp"
-    app:cardElevation="0dp"
-    app:strokeWidth="1dp"
-    app:strokeColor="#26FFFFFF"
-    app:cardBackgroundColor="@android:color/transparent">
+    app:cardElevation="8dp"
+    app:strokeWidth="2dp"
+    app:strokeColor="#2C000000">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="18dp"
-        android:background="@drawable/bg_glass_ad_section">
+        android:padding="15dp"
+        android:background="@drawable/bg_glass_ad_section"
+       >
 
         <!-- 제목 -->
         <TextView
             android:id="@+id/textTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="맞춤 해몽을 준비 중이에요"
-            android:textColor="#FFFFFF"
+            android:text="@string/ad_prompt_title"
+            android:textColor="#E5FAFD"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:letterSpacing="0.02"
+            android:letterSpacing="0.07"
             android:lineHeight="24sp"/>
 
         <!-- 보조 설명 -->
@@ -36,9 +36,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="잠시만요! 광고를 보고나면 심화 해석이 열려요."
-            android:textColor="#B9C7D6"
-            android:textSize="14sp"
+            android:letterSpacing="0.07"
+            android:text="@string/ad_prompt_status"
+            android:textColor="#E5FAFD"
+            android:textSize="15sp"
             android:lineHeight="20sp"/>
 
         <!-- 진행 표시 (M3 원형 인디케이터) -->
@@ -68,42 +69,39 @@
             android:gravity="end"
             android:orientation="horizontal">
 
-            <!-- 취소: 아웃라인 보라톤 -->
+            <!-- 취소 버튼 -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancel"
                 style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="41dp"
                 android:minHeight="0dp"
-                android:text="취소"
+                android:text="@string/ad_prompt_cancel"
                 android:textSize="14sp"
-                app:backgroundTint="#434343"
-                android:textColor="#EAF2FA"
+                app:backgroundTint="#C3C2C2"
+                android:textColor="#050505"
                 app:strokeColor="#0DFFFFFF"
-                app:strokeWidth="1dp"
-                app:rippleColor="#36FFFFFF"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
                 app:cornerRadius="16dp"/>
 
-            <!-- 광고 보기: 골드 글로시(노란색), 대기업 톤 -->
+            <!-- 광고 보기 버튼 -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnWatchAd"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="41dp"
                 android:layout_marginStart="10dp"
-                android:minWidth="0dp"
                 android:minHeight="0dp"
+                android:backgroundTint="#FDCA60"
+                android:fontFamily="@font/pretendard_medium"
+                android:minWidth="0dp"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
-                android:text="광고 보기"
-                android:textStyle="bold"
+                android:text="@string/ad_prompt_watch_ad"
+                android:textColor="#040404"
                 android:textSize="14sp"
-                android:textColor="#29203A"
-                app:backgroundTint="@null"
-                android:background="@drawable/btn_gold_gloss_selector"
-                app:rippleColor="#207A6CF1"
-                app:cornerRadius="16dp"/>
-
+                app:cornerRadius="16dp" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

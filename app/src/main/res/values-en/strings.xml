@@ -1,0 +1,1034 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+      <!-- en -->
+
+    <!-- login.xml -->
+<string name="login_slogan">Find answers in your dreams</string>
+<string name="dreamin_slogan1"> </string>
+<string name="login_password_confirm_hint">Confirm password</string>
+<string name="login_findpw">Find password</string>
+<string name="login_findpw_send">Send by email</string>
+<string name="forgot_password">Forgot your password?</string>
+<string name="sign_up">Sign up</string>
+<string name="sign_up_title">Create a new account</string>
+<string name="email_hint">Email</string>
+<string name="password_hint">Password</string>
+<string name="password_confirm_hint">Confirm password</string>
+<string name="sign_up_button">Sign up</string>
+<string name="cancel">Cancel</string>
+<string name="password_reset_title">Reset password</string>
+<string name="send_reset_email">Send reset email</string>
+<string name="text_divider"> / </string>
+<string name="login_email_hint">Email</string>
+<string name="login_password_hint">Password</string>
+<string name="login_btn_login">Log in</string>
+<string name="login_btn_signup">Sign up</string>
+<string name="login_btn_google">Continue with Google</string>
+<string name="login_btn_guest">Try</string>
+<string name="privacy_and_version">v1.07 Dream in Dream | Privacy Policy</string>
+<string name="brand_logo_desc">Dream in Dream</string>
+
+    <!-- activity_feedback.xml -->
+<string name="feedbacktitle">Contact · Feedback</string>
+<string name="title_hint">Title</string>
+<string name="feedback_contents">Write your inquiry/feedback</string>
+<string name="send">Send</string>
+
+    <!-- activity_terms.xml -->
+<string name="title_terms_privacy">Terms · Privacy Policy</string>
+<string name="tab_terms">Terms</string>
+<string name="tab_privacy">Privacy</string>
+
+    <!-- dialog_ad_prompt.xml -->
+<string name="ad_prompt_title">Preparing your tailored interpretation</string>
+<string name="ad_prompt_status">Just a moment! Watch an ad to unlock deep analysis.</string>
+<string name="ad_prompt_cancel">Cancel</string>
+<string name="ad_prompt_watch_ad">Watch ad</string>
+
+    <!-- dialog_dream_list.xml -->
+<string name="day_dream">Dreams of the day</string>
+
+    <!-- dialog_fortune_deep.xml -->
+<string name="fortune_deep_title">Deep analysis</string>
+<string name="fortune_deep_chip_time">3–4 PM</string>
+<string name="fortune_deep_chip_number">No. 56</string>
+<string name="fortune_deep_chip_color">Color Blue</string>
+<string name="fortune_deep_highlights_label">Today’s highlights</string>
+<string name="fortune_deep_plan_label">Action plan</string>
+<string name="fortune_deep_plan_morning">Morning 09–12</string>
+<string name="fortune_deep_plan_afternoon">Afternoon 13–17</string>
+<string name="fortune_deep_plan_evening">Evening 19–22</string>
+<string name="fortune_deep_tomorrow_label">Prepare for tomorrow</string>
+
+    <!-- dialog_fortune_section.xml -->
+<string name="fortune_section_title_total">Overall</string>
+<string name="fortune_section_score_sample">80 pts</string>
+
+    <!-- example_month_header.xml -->
+<string name="weekday_sun">Sun</string>
+<string name="weekday_mon">Mon</string>
+<string name="weekday_tue">Tue</string>
+<string name="weekday_wed">Wed</string>
+<string name="weekday_thu">Thu</string>
+<string name="weekday_fri">Fri</string>
+<string name="weekday_sat">Sat</string>
+
+    <!-- fragment_ai_report.xml -->
+<string name="empty_string"></string>
+<string name="ai_report_empty">No data to analyze.</string>
+    <string name="ai_report_week_label_default">This week’s report
+0 entries · -</string>
+    <string name="ai_report_week_label_format">This week’s report
+%1$d entries · %2$s</string>
+<string name="ai_report_history">History ▼</string>
+<string name="kpi_positive">Positive</string>
+<string name="kpi_neutral">Neutral</string>
+<string name="kpi_negative">Negative</string>
+<string name="value_placeholder_dash">-</string>
+<string name="chart_emotion_balance">Emotion balance</string>
+<string name="chart_info_desc">Info</string>
+<string name="chart_theme">Main themes</string>
+<string name="chart_caption">Weekly auto-summary</string>
+<string name="chart_keywords_placeholder">Emotions/keywords appear here.</string>
+<string name="btn_pro_upgrade">Deep analysis</string>
+<string name="ai_analysis_title">AI Analysis</string>
+<string name="ai_analysis_placeholder">Analysis will appear here.</string>
+<string name="ad_unit_ai_banner">ca-app-pub-1742201279182732/8682841157</string>
+
+    <!-- fragment_calendar.xml -->
+<string name="prev_month">Previous</string>
+<string name="next_month">Next</string>
+<string name="calendar_month_year_sample">September 2025</string>
+<string name="calendar_month_year_format">%1$d %2$d</string>
+<string name="dream_list_title_sample">Dreams on 2025-09-12 (Fri)</string>
+<string name="dream_list_title_format">Dreams on %1$s (%2$s)</string>
+<string name="dream_list_empty">No dream logs for this date.</string>
+<string name="ad_unit_calendar_banner">ca-app-pub-1742201279182732/8682841157</string>
+
+    <!-- Calendar -->
+<string name="calendar_title_placeholder">July 2025</string>
+<string name="dream_list_label">🌙 Dream logs today</string>
+<string name="calendar_dream_list_title">Dream list for selected date:</string>
+<string name="selected_date_default">Date</string>
+<string name="selected_date_placeholder">Date selected</string>
+
+<string name="desc_calendar">Calendar</string>
+<string name="desc_dream_scroll">Dream log scroll</string>
+<string name="dream_usage_count">💭 Tries today: %1$d</string>
+
+    <!-- Common -->
+<string name="close">Close</string>
+<string name="ok">OK</string>
+<string name="placeholder_dash">-</string>
+<string name="percent_placeholder">0%%</string>
+
+    <!-- Dream.xml -->
+<string name="dream_input_label">• Enter dream details</string>
+<string name="usage_left_default">Tries left today: 0</string>
+<string name="usage_left_format">Tries left today: %1$d</string>
+<string name="hint_input">Write your dream in detail… e.g., A big shark appeared and I ran away.</string>
+<string name="button_interpret">Interpret</string>
+<string name="ad_unit_dream_banner">ca-app-pub-1742201279182732/8682841157</string>
+
+    <!-- Fortune.xml -->
+    <string name="fortune_start">See
+Fortune</string>
+<string name="fortune_lucky_color">Lucky color</string>
+<string name="fortune_lucky_number">Lucky number</string>
+<string name="fortune_good_time">Good time</string>
+<string name="fortune_today_check_toggle">Today’s check ▾</string>
+<string name="fortune_today_check">Today’s check</string>
+<string name="btn_deep_analysis">Deep analysis</string>
+<string name="action_copy">Copy</string>
+<string name="action_share">Share</string>
+<string name="ad_unit_fortune_banner">ca-app-pub-1742201279182732/8682841157</string>
+
+    <!-- Base & navigation -->
+<string name="app_name">DreamInDream</string>
+<string name="back_button">Back</string>
+<string name="app_logo_description">App logo</string>
+<string name="back_arrow">←</string>
+<string name="left_arrow">←</string>
+<string name="right_arrow">→</string>
+<string name="desc_prev_month">Previous month</string>
+<string name="desc_next_month">Next month</string>
+
+    <!-- Home Fragment.xml -->
+<string name="settings">Settings</string>
+<string name="home_ai_title">Weekly dream analysis</string>
+<string name="ai_report">AI Report</string>
+<string name="ai_report_btn">AI Report</string>
+<string name="ai_avatar">AI Avatar</string>
+<string name="home_title">Dream In Dream</string>
+<string name="home_daily_message_sample">Today’s message appears here.</string>
+<string name="btn_dream">Interpret</string>
+<string name="btn_calendar">Calendar</string>
+<string name="btn_fortune">Fortune</string>
+<string name="home_ai_sub">Summarizes this week’s dreams and themes</string>
+<string name="ai_no_dream">No dream logs yet</string>
+<string name="ai_report_guide">Weekly AI dream analysis</string>
+<string name="ai_not_enough_data">Not enough data</string>
+<string name="ai_need_more">More dream logs are needed for analysis.</string>
+<string name="ai_loading">Generating weekly analysis…</string>
+<string name="ai_loading2">AI is generating a weekly dream analysis.</string>
+<string name="ai_report_fail">AI analysis failed</string>
+<string name="ai_retry">Please try again later.</string>
+<string name="ai_report_summary">Weekly analysis summary</string>
+    <string name="ai_emotion_keywords_ai">Emotion: %1$s
+Keywords: %2$s
+AI: %3$s</string>
+<string name="ai_msg_loading">✨ Fetching today’s interpretation…</string>
+    <string name="ai_emotion_keywords_simple">Emotion: %1$s
+Keywords: %2$s</string>
+
+    <!-- settings.xml -->
+<string name="btn_cancel">Cancel</string>
+<string name="btn_save">Save</string>
+<string name="ad_unit_settings_banner">ca-app-pub-1742201279182732/8682841157</string>
+<string name="btn_logout">Log out</string>
+<string name="settings_title">App Settings</string>
+<string name="settings_section">Settings</string>
+<string name="gpt_usage_today">Interpretations today</string>
+<string name="dream_count">Dream logs</string>
+<string name="btn_profile_edit">Edit profile</string>
+<string name="btn_premium">Premium · Remove ads</string>
+<string name="btn_contact">Contact / Feedback</string>
+<string name="btn_terms">Terms · Privacy</string>
+<string name="btn_delete_account">Delete account</string>
+<string name="label_language">Language</string>
+<string name="label_account_link">Account linking</string>
+<string name="account_status_default">Status: -</string>
+<string name="btn_google_link">Link with Google</string>
+<string name="account_link_note">* Anonymous data is preserved after linking with Google.</string>
+<string name="label_name">Name</string>
+<string name="hint_name_example">e.g., John Doe</string>
+<string name="label_birthdate">Birthdate</string>
+<string name="hint_birthdate_format">YYYY-MM-DD</string>
+<string name="label_gender">Gender</string>
+<string name="gender_male">Male</string>
+<string name="gender_female">Female</string>
+<string name="label_mbti">MBTI</string>
+<string name="label_birthtime">Birth time</string>
+
+    <!-- Settings/Profile/Info -->
+<string name="default_web_client_id">886944015637-96pcphpcqug6pga1v9aogdcg4bfr7mav.apps.googleusercontent.com</string>
+
+    <!-- Terms & Privacy (in-app long text) -->
+    <string name="terms_privacy_text">
+<![CDATA[DreamInDream Terms of Service
+
+1. Purpose
+These terms govern the rights and obligations between the user and the operator regarding the use of DreamInDream (“Service”).
+
+2. Account & Use
+- Rated for all ages; however, comply with privacy policies and applicable laws.
+- Users must keep account information accurate.
+- Features may change or be discontinued without notice.
+
+3. Paid Features & Ads
+- Premium (ad removal, etc.) follows separate policies.
+- Advertisements may be shown.
+
+4. Prohibited Conduct
+Posting unlawful/harmful content, automated scraping, reverse engineering/modification.
+
+5. Intellectual Property
+Rights to the Service and provided content belong to the operator or respective right holders.
+
+6. Disclaimer
+Accuracy and usefulness of interpretations/fortune results are not guaranteed.
+
+7. Changes
+Material changes will be notified in the app.
+
+Privacy Policy
+
+1. Data Collected
+Required: Email (or anonymous ID), nickname, birthdate/gender, usage logs
+Optional: MBTI, birth time, profile image
+Automatically collected: device/app version, ad ID, FCM token
+
+2. Purpose of Use
+Provide dream logging/analysis, send push notifications, improve quality, customer support, abuse prevention
+
+3. Retention
+Deleted without delay upon account deletion or achievement of purpose, except where laws require retention
+
+4. Processing/Overseas Transfer
+Limited delegation/overseas transfer to cloud providers may occur.
+
+5. User Rights
+Access, correction, deletion, suspension of processing
+
+6. Security
+HTTPS, least-privilege access, access logs
+
+Contact: support@dreamindream.app]]>
+</string>
+
+    <!-- SettingsFragment.kt : i18n keys -->
+<string name="profile_edit_title">Edit profile</string>
+<string name="unit_times_value">%1$d times</string>
+<string name="unit_entries_value">%1$d entries</string>
+<string name="dlg_delete_title">Delete account</string>
+    <string name="dlg_delete_need_login_msg" formatted="false">
+Deleting an account is only available when logged in with Google/Email.&#10;Please link your Google account first.
+</string>
+    <string name="dlg_delete_soft_msg">Your account will be deactivated immediately.
+If you log in again within 7 days, it will be restored. After 7 days, it will be permanently deleted.</string>
+<string name="toast_deactivated">Your account has been deactivated. You can restore it within 7 days.</string>
+<string name="status_prefix">Status: </string>
+<string name="status_logged_out">Logged out</string>
+<string name="status_guest">Guest</string>
+<string name="status_google">Google login</string>
+<string name="status_email">Email login</string>
+<string name="btn_google_login">Log in with Google</string>
+<string name="btn_google_merge">Merge with Google</string>
+<string name="btn_google_connected">Google linked</string>
+<string name="btn_google_connect">Link Google account</string>
+<string name="toast_merge_partial">Partial merge completed: %1$s</string>
+<string name="toast_link_failed">Link failed: %1$s</string>
+<string name="toast_login_cancel_failed_code">Login cancelled/failed: %1$d</string>
+<string name="toast_error_with_reason">Error: %1$s</string>
+<string name="toast_google_signin_start_failed">Failed to start Google Sign-In: %1$s</string>
+<string name="toast_process_failed_with_reason">Processing failed: %1$s</string>
+<string name="toast_local_migration_failed">Local data migration failed: %1$s</string>
+<string name="dlg_save_title">Save now?</string>
+<string name="dlg_save_msg">Save your profile with the entered information.</string>
+<string name="summary_name_prefix">🧑 Name:</string>
+<string name="summary_birth_prefix">🎂 Birthdate:</string>
+<string name="summary_gender_prefix">⚧️ Gender:</string>
+<string name="summary_mbti_prefix">🔮 MBTI:</string>
+<string name="summary_age_prefix">🎂 Age:</string>
+<string name="summary_age_value">%1$d yrs</string>
+<string name="summary_cz_prefix">%1$s zodiac (East):</string>
+<string name="summary_wz_prefix">%1$s zodiac (West):</string>
+<string name="summary_birthtime_prefix">⏰ Birth time:</string>
+<string name="select_none">None</string>
+<string name="birthtime_none">None</string>
+<string name="err_enter_name">Please enter your name.</string>
+<string name="err_select_birthdate">Please select your birthdate.</string>
+<string name="err_select_gender">Please select your gender.</string>
+<string name="dlg_birthdate_title">🌙 Select birthdate</string>
+<string name="cz_unknown">Zodiac -</string>
+<string name="cz_rat">Rat</string>
+<string name="cz_ox">Ox</string>
+<string name="cz_tiger">Tiger</string>
+<string name="cz_rabbit">Rabbit</string>
+<string name="cz_dragon">Dragon</string>
+<string name="cz_snake">Snake</string>
+<string name="cz_horse">Horse</string>
+<string name="cz_goat">Goat</string>
+<string name="cz_monkey">Monkey</string>
+<string name="cz_rooster">Rooster</string>
+<string name="cz_dog">Dog</string>
+<string name="cz_pig">Pig</string>
+<string name="cz_format">%1$s</string>
+<string name="dlg_premium_title">Coming soon</string>
+<string name="dlg_premium_msg">Premium (remove ads) is being prepared.</string>
+<string name="deactivate">Deactivate</string>
+<string name="dlg_logout_title">Log out</string>
+<string name="dlg_logout_msg">Go back to the login screen. Continue?</string>
+<string name="logout">Log out</string>
+<string name="toast_google_linked">Google account linked</string>
+<string name="toast_google_signed_in">Signed in with this Google account.</string>
+<string name="toast_google_login_failed">Google login failed: %1$s</string>
+<string name="toast_merge_done">Account merge complete</string>
+<string name="toast_saved">Saved!</string>
+
+    <!-- Common -->
+<string name="common_ok">OK</string>
+<string name="common_cancel">Cancel</string>
+<string name="common_delete">Delete</string>
+
+    <!-- Date/format -->
+<string name="fmt_month_year">MMMM yyyy</string>
+<string name="dream_list_title">Dreams on %1$s (%2$s)</string>
+
+    <!-- Calendar delete dialog -->
+<string name="cal_delete_title">Delete?</string>
+<string name="cal_delete_message">This cannot be undone.</string>
+
+    <!-- Charts -->
+<string name="chart_cd_top">Top: %1$s %2$d%%</string>
+
+    <!-- Dream screen -->
+<string name="dream_result_placeholder">Your interpretation will appear here.</string>
+<string name="dream_loading">Interpreting…</string>
+<string name="dream_today_left">Tries left today: %1$d</string>
+<string name="dream_need_input">Please enter your dream.</string>
+<string name="dream_need_meaningful">Please write a meaningful dream description.</string>
+<string name="dream_limit_title">No tries left today</string>
+<string name="dream_limit_message">You’ve used all tries today (Free %1$d + Ads %2$d). Please try again tomorrow.</string>
+<string name="dream_network_fail">Failed to fetch the result. Check your network and try again.</string>
+<string name="dream_parse_error">Could not parse the result.</string>
+<string name="dream_request_fail_fmt">Request failed (%1$s)</string>
+
+    <!-- Result section labels -->
+<string name="sec_message">Message from your dream</string>
+<string name="sec_symbols">Core symbols</string>
+<string name="sec_foresight">Premonition points</string>
+<string name="sec_tips_today">Tips for today</string>
+<string name="sec_actions3">3 actions today</string>
+<string name="dream_result_empty">Result is empty.</string>
+
+    <!-- Ad status bottom sheet -->
+<string name="ad_preparing">Preparing ad…</string>
+<string name="ad_closed_try_again">Ad closed. Please try again.</string>
+<string name="ad_load_failed_fmt">Ad load failed (%1$s). Please try again later.</string>
+
+    <!-- Feedback -->
+<string name="fb_title_need">Enter a title</string>
+<string name="fb_msg_need">Enter a message</string>
+<string name="fb_sent_title">Sent</string>
+<string name="fb_sent_body">We received your message. We’ll check quickly.</string>
+<string name="fb_send_fail_title">Notice</string>
+    <string name="fb_send_fail_fmt">Failed to send. Please try again later.
+
+%1$s</string>
+
+    <!-- Fortune / deep -->
+<string name="fortune_overall">Overall</string>
+<string name="fortune_love">Love</string>
+<string name="fortune_study">Study</string>
+<string name="fortune_work">Work</string>
+<string name="fortune_money">Money</string>
+<string name="fortune_lotto">Lotto</string>
+<string name="fortune_number_label">No. %1$s</string>
+<string name="label_lotto_numbers">Numbers: %1$s</string>
+<string name="label_lotto_numbers_dash">Numbers: -</string>
+<string name="score_points">%1$d pts</string>
+<string name="section_body_fallback">Check today’s flow and tips.</string>
+
+
+    <!-- mood by score -->
+<string name="mood_high">Momentum is clearly rising.</string>
+<string name="mood_good">Stable flow.</string>
+<string name="mood_fair">Some ups and downs; adjust your pace.</string>
+<string name="mood_low">Below expectations; a good day to focus on fundamentals.</string>
+
+    <!-- Section bodies -->
+<string name="sec_love_text">In relationships, %1$s. Keep tone calm and build trust with attitude over words.</string>
+<string name="sec_study_text">For study, %1$s. Keep it steady and focus on key points.</string>
+<string name="sec_work_text">At work, %1$s. Reduce distraction and reorder priorities.</string>
+<string name="sec_money_text">In finances, %1$s. Trim impulse spending and review one item.</string>
+<string name="sec_overall_text">Overall, %1$s. Focus on one clear goal for stability.</string>
+<string name="sec_love_advice">Prefer comfortable topics over provocative ones.</string>
+<string name="sec_study_advice">Try one short burst of focus.</string>
+<string name="sec_work_advice">Concentrating on one task yields clarity.</string>
+<string name="sec_money_advice">Keep only necessary spending; check one item today.</string>
+<string name="sec_overall_advice">Don’t overdo it—one solid task is enough.</string>
+<string name="sec_lotto_tip">• Note: Keep it recreational; set your own limit.</string>
+
+    <!-- Basic checklist -->
+<string name="essential_check_1">Complete 1 key task</string>
+<string name="essential_check_2">Declutter notes/alerts for 3 minutes</string>
+<string name="essential_check_3">Light stretching 5 minutes</string>
+
+    <!-- Tomorrow plan -->
+    <string name="tomorrow_plan_template"><![CDATA[
+• A brief review of today.
+
+Morning (09–12)
+ - Warm up lightly and set direction.
+ - Start with a “first step” on a low-friction task.
+
+Afternoon (13–17)
+ - Reduce interruptions and try one short burst of focus.
+ - Reset with light stretching if possible.
+
+Evening (19–22)
+ - Note one thing that went well and one lesson.
+ - Choose what to start in the first 10 minutes tomorrow.
+]]></string>
+<string name="tomorrow_extra_fallback">• Tomorrow morning, continue just one key item for the first 10 minutes.</string>
+
+    <!-- Time labels -->
+<string name="label_am">AM</string>
+<string name="label_pm">PM</string>
+<string name="label_hour_suffix">h</string>
+
+    <!-- Errors -->
+<string name="err_auth">Auth error. Check API key in settings. (%1$s)</string>
+<string name="err_forbidden">Access denied. Check permissions/billing. (%1$s)</string>
+<string name="err_not_found">Server not found. Try again later. (%1$s)</string>
+<string name="err_rate_limit">Rate limit exceeded. Try again later. (%1$s)</string>
+<string name="err_timeout">Network is slow. Check your connection and try again. (%1$s)</string>
+<string name="err_network_generic">Network error. (%1$s)</string>
+
+    <!-- week prompts -->
+<string name="week_prompt_intro">Below are the user’s recent 1-week dream logs (up to 4, newest first) and each dream’s interpretation/analysis.</string>
+
+    <string name="week_prompt_lang_line">Answer in <xliff:g id="lang">%1$s</xliff:g> only.</string>
+    <string name="week_prompt_rules" formatted="false"><![CDATA[
+Role: Weekly dream deep analyst .
+Output: Pure HTML fragment (<p>,<ul>), no code blocks.
+Forbid: Medical/psychological diagnoses, fear-mongering, extreme assertions.
+Tone: Anxiety-calming, practical, no exaggeration.
+
+Sections (fixed order):
+- Weekly dream deep analysis
+- Summary (3 sentences)
+- Quant summary
+- Emotion pattern analysis
+- Symbols & scenes
+- Myeongri view
+- 1–2 week outlook  ← must include, at least 3 sentences
+  • Include “Reassurance guide (3 items)” as bullets (short, actionable)
+  • Add the sentence “This is a life guide based on tendencies, not a prophecy.” at the end
+- Checklist
+]]></string>
+    <!-- time suffixes (AIReportFragment.formatAgo 에서 사용) -->
+    <string name="time_seconds_suffix">s</string>
+    <string name="time_minutes_suffix">m</string>
+    <string name="time_hours_suffix">h</string>
+    <string name="time_days_suffix">d</string>
+
+    
+    <string name="pro_meta_emotion_label">Emotion</string>
+    <string name="pro_meta_keywords_label">Keywords</string>
+    <string name="pro_meta_score_label">Score</string>
+    <string name="pro_meta_ai_label">AI Analysis</string>
+
+<!-- header/meta -->
+    <string name="report_title_this_week">This week’s analysis</string>
+    <string name="report_title_prev_week">Last week’s analysis</string>
+    <string name="report_switched_due_to_lack">Switched automatically due to insufficient logs</string>
+    <string name="report_meta_format">%1$d entries · %2$s</string>
+
+    <!-- pro / CTA / states -->
+    <string name="retry">Retry</string>
+    <string name="please_try_again">Please try again later</string>
+    <string name="pro_cta">Deep analysis</string>
+    <string name="pro_completed">Deep analysis completed</string>
+    <string name="pro_refresh">Deep analysis (refresh)</string>
+    <string name="pro_limited_range">Deep analysis limited (%1$d–%2$d)</string>
+    <string name="pro_in_progress">Running deep analysis…</string>
+    <string name="ai_basic_title">AI Analysis</string>
+    <string name="ai_pro_title">AI Deep Analysis</string>
+    <string name="refresh_hint_count_limited">This week %1$d dreams · will analyze up to %2$d–%3$d.</string>
+    <string name="login_required">Login required.</string>
+    <string name="api_key_missing">API key not set. Please contact admin.</string>
+    <string name="pro_requires_min">Deep analysis is available with %1$d+ dreams this week.</string>
+    <string name="pro_too_many_entries">Too many dreams this week. Deep analysis supports %1$d–%2$d.</string>
+    <string name="network_error_pro">Network error during deep analysis.</string>
+    <string name="server_response_error">Server error(%1$d): %2$s</string>
+    <string name="pro_timeout">Deep analysis timed out. Please check network and retry.</string>
+    <string name="pro_applied">Deep analysis applied.</string>
+    <string name="pro_result_unparsable">Couldn’t read the result.</string>
+    <string name="ad_closed_no_reward">Ad closed. Reward not confirmed.</string>
+    <string name="ad_error_with_reason">Ad error(%1$s) — please try again.</string>
+    <string name="preparing_analysis">Preparing analysis…</string>
+    <string name="preparing_ad">Preparing ad…</string>
+    <string name="reward_confirmed">Reward confirmed</string>
+    <string name="updating_ellipsis">Updating…</string>
+
+    <!-- top card: "Emotion • Keywords" -->
+    <string name="keywords_format">Emotion: %1$s • Keywords: %2$s</string>
+
+    <!-- section titles (색 강조 대상) -->
+    <string name="section_title_weekly_deep_main">Weekly dream deep analysis</string>
+    <string name="section_title_deep">Deep analysis</string>
+    <string name="section_title_ai_pro">AI Deep Analysis</string>
+    <string name="section_title_summary3">Summary (3 sentences)</string>
+    <string name="section_title_quant">Quant summary</string>
+    <string name="section_title_emotion_pattern">Emotion pattern analysis</string>
+    <string name="section_title_symbols">Symbols &amp; scenes</string>
+    <string name="section_title_myeongri">Myeongri view</string>
+    <string name="section_title_outlook">1–2 week outlook</string>
+    <string name="section_title_checklist">Checklist</string>
+    <string name="section_title_emotion_percent">Emotion distribution(%%)</string>
+    <string name="section_title_emotion">Emotion distribution</string>
+    <string name="section_title_theme_percent">Theme share(%%)</string>
+    <string name="section_title_theme">Theme share</string>
+    <string name="section_title_key_summary">Key summary</string>
+    <string name="section_title_insights">Insights</string>
+
+    <!-- emotion labels (차트/요약에 필수) -->
+    <string name="emo_positive">Positive</string>
+    <string name="emo_calm">Calm</string>
+    <string name="emo_vitality">Vitality</string>
+    <string name="emo_flow">Flow</string>
+    <string name="emo_neutral">Neutral</string>
+    <string name="emo_confusion">Confusion</string>
+    <string name="emo_anxiety">Anxiety</string>
+    <string name="emo_depression_fatigue">Depression/Fatigue</string>
+    <string name="emo_depression">Depression</string>
+    <string name="emo_fatigue">Fatigue</string>
+
+    <string-array name="emo_labels_default">
+        <item>@string/emo_positive</item>
+        <item>@string/emo_calm</item>
+        <item>@string/emo_vitality</item>
+        <item>@string/emo_flow</item>
+        <item>@string/emo_neutral</item>
+        <item>@string/emo_confusion</item>
+        <item>@string/emo_anxiety</item>
+        <item>@string/emo_depression_fatigue</item>
+    </string-array>
+    <string name="recommended">recommend</string>
+    <!-- theme labels -->
+    <string name="theme_rel">Relationship</string>
+    <string name="theme_achieve">Achievement</string>
+    <string name="theme_change">Change</string>
+    <string name="theme_risk">Risk factors</string>
+    <string name="theme_growth">Self-growth</string>
+    <string name="theme_other">Other</string>
+
+    <string-array name="theme_labels_default">
+        <item>@string/theme_rel</item>
+        <item>@string/theme_achieve</item>
+        <item>@string/theme_change</item>
+        <item>@string/theme_risk</item>
+        <item>@string/theme_growth</item>
+    </string-array>
+
+    <!-- chart info dialog -->
+    <string name="chart_info_title">Chart guide</string>
+    <string name="chart_info_message">
+• If you have %1$d+ dreams this week, the report is generated immediately.
+\n• After generation, you can watch one ad to unlock deep analysis.
+\n• If total dreams during the week reach %2$d+, the report refreshes (up to %3$d shown),
+\n  and deep analysis can be rerun after watching an ad.
+\n• Bars indicate weekly ratios(%%) of 8 emotions and 5 themes.
+\n• Week: Mon–Sun (previous reports in “History”)
+</string>
+
+    <!-- firestore manager helpers -->
+<string name="week_prompt_header_note">[Formatting rule] Emotion/Theme labels are fixed by the app. Provide only distribution values (emotionDist/themeDist). Provide enough core keywords.</string>
+<string name="tag_dream_original">[Dream original %1$d]</string>
+<string name="tag_interpret_text">[Interpretation %1$d]</string>
+
+    <!-- FortuneApi.kt -->
+<string name="deep_dialog_title">Deep analysis</string>
+<string name="chip_lucky_time">Time  %1$s</string>
+<string name="chip_lucky_number">Number  %1$d</string>
+<string name="chip_lucky_color">Color  %1$s</string>
+<string name="fallback_highlights">• A concise summary of today’s flow.</string>
+
+<string name="section_overall">Overall</string>
+<string name="section_love">Love</string>
+<string name="section_study">Study</string>
+<string name="section_work">Work</string>
+<string name="section_money">Money</string>
+<string name="section_lotto">Lotto</string>
+<string name="section_header_with_score">%1$s (%2$d pts)</string>
+<string name="color_name_fallback">Lucky color</string>
+
+<string name="daily_summary_base">A concise summary of today’s flow.</string>
+<string name="bullet_with_text">• %1$s</string>
+
+    <!-- Trait titles -->
+    <string-array name="trait_titles">
+        <item>Creativity</item>
+        <item>Communication</item>
+        <item>Adaptability</item>
+        <item>Decisiveness</item>
+    </string-array>
+
+    <!-- FortuneStorage.kt -->
+<string name="birth_time_not_selected">None</string>
+<string name="guest_prefix">guest-</string>
+<string name="device_fallback">device</string>
+
+    <!-- HomeFragment.kt -->
+<string name="toast_need_two_dreams">Log at least 2 dreams this week to see the AI report.</string>
+
+    <!-- LoginActivity.kt -->
+<string name="toast_fill_email_password">Enter email/password.</string>
+<string name="toast_fill_all_fields">Fill in all fields.</string>
+<string name="toast_password_mismatch">Passwords do not match.</string>
+<string name="toast_enter_email">Enter your email.</string>
+<string name="toast_login_failed_fmt">Login failed: %1$s</string>
+<string name="toast_email_verify_first">Please verify your email first.</string>
+<string name="toast_signup_success">Sign-up successful! Verification email sent. Check your mail and log in.</string>
+<string name="toast_signup_failed_fmt">Sign-up failed: %1$s</string>
+<string name="toast_reset_sent">Password reset email sent.</string>
+<string name="toast_reset_failed_fmt">Failed to send email: %1$s</string>
+<string name="toast_google_login_failed_fmt">Google login failed: %1$s</string>
+<string name="toast_google_login_error_fmt">Google login error: %1$s</string>
+<string name="toast_anonymous_failed_fmt">Anonymous login failed: %1$s</string>
+<string name="dialog_reactivate_title">Restore account</string>
+    <string name="dialog_reactivate_message">This account is deactivated.
+Restore now?</string>
+<string name="dialog_reactivate_positive">Restore</string>
+<string name="dialog_reactivate_negative">Cancel</string>
+<string name="toast_reactivate_failed_fmt">Restore failed: %1$s</string>
+<string name="toast_account_deleted">This account has been permanently deleted.</string>
+    <string name="loading_calendar_prep">Preparing calendar data…
+Please wait.</string>
+<string name="name_guest_default">Guest</string>
+<string name="name_anonymous_default">Anonymous</string>
+
+    <!-- TermsActivity -->
+<string name="terms_title">DreamInDream Terms of Service</string>
+<string name="terms_section1">1. Purpose</string>
+<string name="terms_section1_body">These terms govern the rights and obligations between the user and the operator regarding the use of the Service.</string>
+<string name="terms_section2">2. Account &amp; Use</string>
+    <string-array name="terms_section2_items">
+        <item>Rated for all ages; however, target users are 13+ for privacy compliance.</item>
+        <item>Users must keep account information accurate.</item>
+        <item>Features may change or be discontinued without notice.</item>
+    </string-array>
+<string name="terms_section3">3. Paid Features &amp; Ads</string>
+    <string-array name="terms_section3_items">
+        <item>Premium (remove ads, etc.) follows separate policies.</item>
+        <item>Advertisements may be shown.</item>
+    </string-array>
+<string name="terms_section4">4. Prohibited Conduct</string>
+    <string-array name="terms_section4_items">
+        <item>Posting unlawful/harmful content or infringing others’ rights</item>
+        <item>Automated collection, crawling, reverse engineering/modification</item>
+    </string-array>
+<string name="terms_section5">5. Intellectual Property</string>
+<string name="terms_section5_body">Rights to the Service and provided content belong to the operator or respective right holders.</string>
+<string name="terms_section6">6. Disclaimer</string>
+<string name="terms_section6_body">Accuracy and usefulness of dream interpretations/fortunes are not guaranteed.</string>
+<string name="terms_section7">7. Changes</string>
+<string name="terms_section7_body">Material changes will be notified in the app.</string>
+
+    <!-- Privacy -->
+<string name="privacy_title">Privacy Policy</string>
+<string name="privacy_intro">Rated for all ages… If we learn that data from a child under 13 has been collected, we will delete it immediately.</string>
+<string name="privacy_section1">1. Data Collected</string>
+    <string-array name="privacy_section1_items">
+        <item>Required: Email (or anonymous ID), nickname, birthdate/gender, usage logs</item>
+        <item>Optional: MBTI, birth time, profile image</item>
+        <item>Automatically: device/app version, ad ID (AAID), FCM token, diagnostics/crash logs</item>
+        <item>Content data: dream texts/keywords/timestamps, etc.</item>
+    </string-array>
+<string name="privacy_section2">2. Purpose of Use</string>
+    <string-array name="privacy_section2_items">
+        <item>Provide dream logging/analysis and notifications</item>
+        <item>Quality improvement, customer support, abuse prevention</item>
+    </string-array>
+<string name="privacy_section3">3. Retention</string>
+<string name="privacy_section3_body">Deleted without delay upon account deletion or purpose fulfillment, except where laws require retention.</string>
+<string name="privacy_section4">4. Processing/Overseas Transfer</string>
+<string name="privacy_section4_body">Limited delegation/overseas transfer to cloud/analytics/ads services like OpenAI, AdMob, Firebase may occur.</string>
+<string name="privacy_section5">5. User Rights</string>
+<string name="privacy_section5_body">You can request access, correction, deletion, suspension of processing, and withdraw consent. Contact: dreamindream@dreamindream.app</string>
+<string name="privacy_section6">6. Security</string>
+    <string-array name="privacy_section6_items">
+        <item>HTTPS, least-privilege access, access logs</item>
+    </string-array>
+
+    <!-- WeeklyHistoryBottomSheet.kt -->
+<string name="weekly_history_title">Analysis history</string>
+<string name="weekly_history_login_needed">Login required</string>
+<string name="weekly_history_login_message">Login is required.</string>
+<string name="weekly_history_empty_meta">Log at least 2 dreams this week to create your first report.</string>
+<string name="weekly_history_empty_title">No reports yet</string>
+<string name="weekly_history_empty_sub">Once you log 2+ dreams this week, we’ll auto-generate a weekly summary.</string>
+<string name="weekly_history_chip_2plus">2+ this week</string>
+<string name="weekly_history_chip_keywords">Add keywords</string>
+<string name="weekly_history_chip_emotion">Select emotions</string>
+<string name="cta_go_record_dream">Go record a dream</string>
+<string name="weekly_history_meta_count">%1$d weeks · newest first</string>
+<string name="weekly_history_delete_restrict">Only the most recent week can be deleted.</string>
+<string name="weekly_history_delete_title">Delete report</string>
+<string name="weekly_history_delete_message">Delete report “%1$s”?</string>
+<string name="weekly_history_delete_positive">Delete</string>
+<string name="weekly_history_delete_negative">Cancel</string>
+<string name="weekly_history_chip_current">Current</string>
+<string name="weekly_history_content_desc_delete">Delete</string>
+<string name="icon_sparkles">✨</string>
+<string name="chevron_right">›</string>
+<string name="weekly_history_item_subtitle">%1$s · %2$s</string>
+
+    <!-- WeeklyHistoryBottomSheet -->
+<string name="bs_title_history">Analysis history</string>
+<string name="bs_meta_login_required">Login required</string>
+<string name="bs_login_required_msg">Login is required.</string>
+<string name="bs_meta_total_weeks_format">%1$d weeks · newest first</string>
+<string name="bs_toast_delete_only_latest">Only the most recent week can be deleted.</string>
+<string name="bs_dialog_delete_title">Delete report</string>
+<string name="bs_dialog_delete_msg_format">Delete report “%1$s”?</string>
+<string name="chip_current">Current</string>
+
+    <!-- WeeklyHistoryDialogFragment -->
+<string name="whd_title">Analysis guide</string>
+<string name="whd_generation_rule">Report generation rule: If you have 2+ dreams this week, an AI report is created immediately. (Week: Mon–Sun)</string>
+<string name="whd_hero_title">No reports yet</string>
+<string name="whd_hero_sub">Feel free to log your dreams this week. As soon as you have 2 or more, we’ll build your AI report.</string>
+<string name="whd_chip_instant">2+ this week · instant</string>
+<string name="whd_chip_week_range">Week: Mon–Sun</string>
+<string name="whd_pro_text">Deep analysis is available after watching an ad during the week the report is generated.</string>
+<string name="whd_close">Close</string>
+<string name="whd_cta_go_record">Go record a dream</string>
+
+    <!-- EXTRA: Language onboarding strings -->
+<string name="choose_language">Choose your language</string>
+<string name="language_korean">한국어</string>
+<string name="language_english">English</string>
+<string name="save_and_continue">Save &amp; continue</string>
+<string name="you_can_change_in_settings">You can change this anytime in Settings.</string>
+<string name="language">Language</string>
+<string name="language_changed">Language updated.</string>
+
+    <!-- ChartStyler -->
+<string name="chart_no_data">No data</string>
+<string name="chart_accessibility_top">Top: %1$s %2$d</string>
+
+    <!-- DailyMessageManager -->
+<string name="daily_date_format">MMMM d, yyyy</string>
+<string name="daily_prompt_template">Without explanation or narrative, Write a short, poetic one-line message for today (%1$s), like an inspiring quote from a dream. Keep it under 60 words.</string>
+
+        <string name="deep_title">Deep analysis</string>
+        <string name="deep_chip_time">Time  %1$s</string>
+        <string name="deep_chip_number">Number  %1$d</string>
+        <string name="deep_chip_color">Color  %1$s</string>
+        <string name="fortune_default_section_body">A concise summary of today flows.</string>
+
+        <!-- Fortune error mapping -->
+        <string name="err_auth_fmt">An authentication error occurred. Please check the API key in Settings. (%1$s)</string>
+        <string name="err_forbidden_fmt">Access was denied. Please check your permissions or billing status. (%1$s)</string>
+        <string name="err_not_found_fmt">The server address could not be found. Please try again later. (%1$s)</string>
+        <string name="err_rate_fmt">Rate limit exceeded. Please try again later. (%1$s)</string>
+        <string name="err_timeout_fmt">Network timeout. Please check your connection and try again. (%1$s)</string>
+        <string name="err_network_fmt">A network error occurred. (%1$s)</string>
+
+        <!-- DailyMessageManager fallbacks -->
+        <string name="daily_fallback_1">Slow your pace a little today.</string>
+        <string name="daily_fallback_2">One step matters more than perfection.</string>
+        <string name="daily_fallback_3">Set worries down and start with what you can do.</string>
+        <string name="daily_fallback_4">Today choices shape tomorrow you.</string>
+        <string name="daily_fallback_5">Trust your rhythm — its okay to go slowly.</string>
+
+
+    <!-- DreamFragment -->
+<string name="dream_input_empty">Please enter your dream.</string>
+<string name="dream_input_not_meaningful">Please write a meaningful dream description.</string>
+<string name="dream_network_error">Failed to fetch the result. Check your network and try again.</string>
+<string name="dream_request_failed">Request failed (%1$d)</string>
+<string name="dream_quota_title">No tries left today</string>
+<string name="dream_quota_message">You have used all free %1$d + ad %2$d tries today. Please try again tomorrow.</string>
+
+    <!-- Prompt template (dream) -->
+    <string name="dream_prompt_template">
+You are a professional dream analyst who offers grounded, realistic interpretations.
+Rules:
+- <xliff:g id="msg">%2$s</xliff:g>
+- <xliff:g id="sym">%3$s</xliff:g>
+- <xliff:g id="pre">%4$s</xliff:g>
+- <xliff:g id="tip">%5$s</xliff:g>
+- <xliff:g id="act">%6$s</xliff:g>
+[Dream] "<xliff:g id="dream">%1$s</xliff:g>"
+</string>
+
+<string name="dream_section_message">💭 Message from your dream</string>
+<string name="dream_section_symbols">🧠 Core symbols</string>
+<string name="dream_section_premonition">📌 Premonition points</string>
+<string name="dream_section_tips_today">☀️ Tips for today</string>
+<string name="dream_section_actions_three">🎯 3 actions today</string>
+
+    <!-- EmotionAnalyzer dictionaries (EN equivalents) -->
+    <string-array name="emotion_dict_positive">
+        <item>joy</item><item>happiness</item><item>gratitude</item><item>hope</item><item>thrill</item>
+        <item>love</item><item>satisfaction</item><item>delight</item><item>pride</item><item>achievement</item>
+        <item>relief</item><item>confidence</item>
+    </string-array>
+    <string-array name="emotion_dict_calm">
+        <item>calm</item><item>stability</item><item>composed</item><item>relaxed</item><item>rest</item>
+        <item>quiet</item><item>leisurely</item><item>ease</item>
+    </string-array>
+    <string-array name="emotion_dict_vitality">
+        <item>vitality</item><item>energy</item><item>focus</item><item>drive</item><item>motivation</item>
+        <item>liveliness</item><item>power</item><item>momentum</item><item>passion</item>
+    </string-array>
+    <string-array name="emotion_dict_flow">
+        <item>flow</item><item>immersion</item><item>deep</item><item>absorbed</item><item>involved</item>
+        <item>engrossed</item><item>sucked in</item>
+    </string-array>
+    `
+    <string-array name="emotion_dict_neutral">
+        <item>average</item><item>ordinary</item><item>daily</item><item>common</item><item>neutral</item>
+    </string-array>
+
+    <string-array name="emotion_dict_confusion">
+        <item>confusion</item><item>conflicted</item><item>ambiguous</item><item>hesitant</item><item>indecisive</item><item>complex</item><item>mixed</item><item>puzzled</item>
+    </string-array>
+    <string-array name="emotion_dict_anxiety">
+        <item>anxiety</item><item>nervous</item><item>worried</item><item>tense</item><item>pressure</item><item>stress</item><item>fear</item><item>scared</item><item>urgent</item>
+    </string-array>
+    <string-array name="emotion_dict_depression_fatigue">
+        <item>depressed</item><item>sadness</item><item>tired</item><item>fatigue</item><item>lethargy</item><item>boredom</item><item>emptiness</item><item>lonely</item><item>frustrated</item>
+    </string-array>
+
+    <!-- Theme dictionaries -->
+    <string-array name="theme_dict_rel">
+        <item>family</item><item>parents</item><item>siblings</item><item>friends</item><item>lover</item><item>colleague</item><item>boss</item><item>team</item>
+        <item>gathering</item><item>talk</item><item>trust</item><item>conflict</item><item>cooperation</item>
+    </string-array>
+    <string-array name="theme_dict_achieve">
+        <item>exam</item><item>success</item><item>promotion</item><item>performance</item><item>goal</item><item>practice</item><item>challenge</item><item>accomplish</item>
+        <item>complete</item><item>presentation</item><item>interview</item><item>prepare</item><item>achieve</item>
+    </string-array>
+    <string-array name="theme_dict_change">
+        <item>move</item><item>job change</item><item>transition</item><item>travel</item><item>new</item><item>start</item><item>change</item><item>cleanup</item>
+        <item>closing</item><item>plan</item><item>decision</item><item>relocation</item>
+    </string-array>
+    <string-array name="theme_dict_risk">
+        <item>deadline</item><item>money</item><item>finance</item><item>health</item><item>illness</item><item>mistake</item><item>evaluation</item><item>pressure</item>
+        <item>failure</item><item>late</item><item>loss</item><item>fall</item><item>chase</item><item>accident</item>
+    </string-array>
+
+
+
+
+    <string-array name="evidence_neg_strong_markers">
+        <item>nightmare</item><item>horrible</item><item>awful</item><item>terrifying</item><item>panic</item><item>scream</item>
+        <item>chased</item><item>killing</item><item>death</item><item>blood</item><item>knife</item><item>gun</item>
+        <item>falling</item><item>drowning</item><item>suffocating</item><item>monster</item><item>ghost</item>
+        <item>explosion</item><item>fire</item>
+    </string-array>
+
+    <string-array name="evidence_scene_negative">
+        <item>chase</item><item>fall</item><item>drown</item><item>suffocate</item><item>trapped</item><item>maze</item>
+        <item>storm</item><item>flood</item><item>earthquake</item><item>war</item><item>fight</item><item>argument</item>
+        <item>exam</item><item>deadline</item><item>late</item><item>fired</item><item>accident</item><item>monster</item><item>blood</item>
+    </string-array>
+
+    <string-array name="evidence_scene_positive">
+        <item>gift</item><item>money</item><item>refund</item><item>pass</item><item>promotion</item>
+        <item>hug</item><item>laugh</item><item>travel</item><item>cleanup</item><item>clean</item>
+        <item>house</item><item>yard</item><item>gate</item><item>entrance</item><item>pig</item>
+    </string-array>
+
+
+
+
+    <!-- Korean particles/stopwords tails (EN substitutes for en locale) -->
+    <string-array name="josa_ko">
+        <item>of</item><item>to</item><item>at</item><item>in</item><item>for</item><item>on</item><item>with</item><item>by</item>
+        <item>from</item><item>into</item><item>onto</item><item>over</item><item>under</item><item>and</item><item>or</item><item>but</item>
+    </string-array>
+
+    <string-array name="stopwords_ko">
+        <item>and</item><item>so</item><item>however</item><item>but</item><item>or</item><item>also</item><item>then</item>
+        <item>do</item><item>did</item><item>being</item><item>been</item><item>are</item><item>is</item><item>was</item><item>were</item><item>be</item><item>doing</item><item>does</item>
+        <item>thing</item><item>stuff</item><item>some</item><item>very</item><item>too</item><item>really</item><item>all</item><item>overall</item>
+        <item>content</item><item>tendency</item><item>meaning</item><item>situation</item><item>story</item><item>part</item><item>aspect</item><item>general</item>
+        <item>today</item><item>weekly</item><item>record</item><item>analysis</item><item>summary</item><item>key</item><item>point</item><item>important</item><item>check</item><item>checklist</item>
+        <item>issue</item><item>opportunity</item><item>abundance</item><item>factor</item><item>state</item><item>view</item><item>guide</item><item>advice</item><item>type</item><item>forecast</item><item>reality</item><item>event</item><item>solution</item><item>purification</item><item>stability</item><item>pursuit</item>
+        <item>dream</item><item>interpretation</item><item>text</item><item>sentence</item><item>expression</item><item>emotion</item><item>theme</item><item>keyword</item>
+    </string-array>
+
+    <string-array name="token_tails_ko">
+        <item>ing</item><item>ed</item><item>ly</item><item>ness</item><item>ful</item><item>less</item><item>s</item><item>es</item><item>er</item><item>est</item>
+    </string-array>
+
+    <!-- EmotionAnalyzer narrative headings -->
+<string name="ea_heading_summary">Summary</string>
+<string name="ea_heading_link">Symbol links</string>
+<string name="ea_heading_emotion_theme">Emotion/Theme</string>
+<string name="ea_heading_outlook">1–2 week outlook</string>
+<string name="ea_heading_conclusion">Conclusion</string>
+<string name="ea_arrow_delim"> → </string>
+<string name="ea_summary_suffix"> follows.</string>
+
+    <!-- Narrative parts -->
+<string name="ea_part_clear_blockage">Scenes of clearing what was blocked</string>
+<string name="ea_part_fortune_enters">Scenes where symbols of fortune/material enter your life</string>
+<string name="ea_part_home_foundation">Scenes confirming home/inner foundation</string>
+<string name="ea_part_boundary_opening">Boundaries opening between your domain and outside</string>
+<string name="ea_part_default_flow">A flow of “clearing then inflow” across two dreams</string>
+
+    <!-- Links -->
+<string name="ea_link_clear_then_fortune">After clearing (purification), fortune comes in — a classic “clear → inflow” narrative.</string>
+<string name="ea_link_fortune_with_home">Fortune (pig) + home hints at positive signals in real-life finances/family.</string>
+<string name="ea_link_hands_on">Hands-on resolution implies regaining agency.</string>
+<string name="ea_link_default">Two dreams create a “closed → opened” transition.</string>
+
+    <!-- Emotion/Theme sentences -->
+<string name="ea_emotion_theme_with">Emotion leans toward “%1$s”, with themes centered on %2$s.</string>
+<string name="ea_emotion_theme_only">Emotion currently leans toward “%1$s”.</string>
+
+    <!-- Outlook/Tips/Conclusion -->
+<string name="ea_outlook_cash_inbound">Small income/gifts/offers come to the doorstep. Opportunities surface nearby.</string>
+<string name="ea_outlook_small_gain">Weak but present signs of financial/material gains. “Small favors” around you are clues.</string>
+<string name="ea_outlook_unblock_one">One blocked task clears neatly, moving you to the next step.</string>
+<string name="ea_outlook_slow_open">Closed flows open slowly; tangible signs of change appear.</string>
+<string name="ea_tip_cash_signals">Don’t miss cash-like signals: small offers, gifts, refunds.</string>
+<string name="ea_tip_home_cleanup">Pick one item to tidy up in your home/life domain.</string>
+<string name="ea_tip_take_action">When you take action (paperwork, contact, claims), momentum builds.</string>
+<string name="ea_conclusion">“Clearing then inflow” narrative: you fill as you empty.</string>
+
+    <!-- Keyword detection markers -->
+<string name="ea_kw_toilet1">toilet</string>
+<string name="ea_kw_toilet2">restroom</string>
+<string name="ea_kw_poop1">poop</string>
+<string name="ea_kw_poop2">feces</string>
+<string name="ea_kw_pig">pig</string>
+<string name="ea_kw_house">house</string>
+<string name="ea_kw_yard1">yard</string>
+<string name="ea_kw_yard2">gate</string>
+<string name="ea_kw_yard3">entrance</string>
+<string name="ea_kw_hand1">hand</string>
+<string name="ea_kw_hand2">by hand</string>
+<string name="ea_kw_hand3">wipe</string>
+
+<string name="ea_heading_sep"> — </string>
+<string name="ea_bullet_delim">·</string>
+<string name="ea_trend_up"> ↑</string>
+
+    <!-- FeedbackActivity.kt -->
+<string name="common_notice">Notice</string>
+<string name="fb_date_format">yyyy-MM-dd HH:mm:ss</string>
+
+    <!-- fortune deep prompt template -->
+    <string name="fortune_deep_prompt_template"><![CDATA[
+[Context]
+- user: nickname="%1$s", mbti="%2$s", birthdate="%3$s", gender="%4$s", birth_time="%5$s"
+- date: %6$s, tone="%7$s", seed=%8$s
+- daily fortune (JSON): %9$s
+
+[Request]
+Call only the function defined by the schema below. Return function arguments (JSON) only.
+
+[Tone/Rules]
+- highlights: 3–6 key points (short & punchy).
+- plan: 2–3 lines each for morning/afternoon/evening in a suggestive style (“You could…”, “It’s recommended…”).
+- Avoid school/contact directives. Use “review” alternatives (“a quick review”), not “25-min pomodoro”-style wording.
+- tips: 3–6 immediately actionable items.
+- checklistAdjusted: refine/replace daily.checklist realistically (max 3–5).
+- luckyColorName: sanitizeColorName("", luckyHex).
+- luckyTime: humanizeLuckyTime(luckyTime) or a clear time range.
+- luckyNumber: keep luckyNum when possible.
+- tomorrowPrep: a paragraph to improve the lowest-score area (worstKey).
+
+You must call deep_fortune_analysis.
+]]></string>
+
+    <!-- FortuneApi: system prompts -->
+<string name="fortune_system_daily">You are a premium life coach and fortune analyst. Always return JSON via function calls only.</string>
+<string name="fortune_system_deep">You are a premium life coach and fortune analyst. Return JSON via tool calls only.</string>
+
+    <!-- FortuneApi normalization terms -->
+<string name="replace_meeting">Review/Organize</string>
+<string name="replace_email">Note/Reminder</string>
+<string name="replace_report">Summarize notes</string>
+<string name="replace_approval">Check</string>
+<string name="replace_messenger">Contact</string>
+<string name="contact_sanitized">Clean up 1 reminder</string>
+
+<string name="default_generic_advice">Try one checklist item lightly.</string>
+
+    <!-- FortuneFragment.kt -->
+    <string name="btn_fortune_show">See
+Fortune</string>
+<string name="btn_come_tomorrow">Come back tomorrow</string>
+<string name="toast_already_seen_today">You’ve already viewed today. Please try again tomorrow.</string>
+<string name="toast_run_fortune_first">Please tap “See Fortune” first.</string>
+<string name="toast_copied">Copied</string>
+<string name="share_chooser_title">Share</string>
+<string name="dialog_profile_title">Setup required</string>
+    <string name="dialog_profile_message">Save nickname, birthdate, and gender to view personalized fortune.
+(Birth time / MBTI are optional)</string>
+<string name="dialog_ok">OK</string>
+<string name="ad_failed_open_deep_now">Ad failed (%1$s) → Open deep analysis now</string>
+<string name="deep_generating_label">Generating…</string>
+<string name="deep_button_label">Open deep analysis</string>
+
+
+</resources>

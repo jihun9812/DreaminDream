@@ -1,4 +1,3 @@
-// app/src/main/java/com/example/dreamindream/DreamFragment.kt
 package com.example.dreamindream
 
 import android.content.Context
@@ -28,9 +27,11 @@ import java.text.SimpleDateFormat
 import java.util.*
 import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.method.ScrollingMovementMethod
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.text.style.RelativeSizeSpan
+import com.example.dreamindream.ads.Ads
 
 class DreamFragment : Fragment() {
 
@@ -77,7 +78,7 @@ class DreamFragment : Fragment() {
         AdManager.initialize(requireContext())
         AdManager.loadRewarded(requireContext())
 
-        // ✅ uid 보관 (로그인/익명 모두 값 존재)
+        // ✅ uid 보관 (로그인/익명 모두 값 존재하도록 앱 전체에서 Anonymous sign-in 보장 필요)
         userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
         prefs = requireContext().getSharedPreferences("dream_history_$userId", Context.MODE_PRIVATE)
@@ -106,12 +107,28 @@ class DreamFragment : Fragment() {
         lottieLoading   = root.findViewById(R.id.lottieLoading)
 
         // ▼ 안내 문구
-        resultTextView.text = "여기에 해몽 결과가 표시됩니다."
+        resultTextView.text = getString(R.string.dream_result_placeholder)
         resultTextView.setTextColor(Color.parseColor("#BFD0DC"))
     }
 
     private fun initUi(root: View) {
         updateUsageLabel()
+
+        // ✅ 입력칸 내부 스크롤 + 부모 ScrollView와의 제스처 충돌 방지
+        dreamEditText.isVerticalScrollBarEnabled = true
+        dreamEditText.movementMethod = ScrollingMovementMethod.getInstance()
+        dreamEditText.setOnTouchListener { v, event ->
+            v.parent.requestDisallowInterceptTouchEvent(true)
+            if (event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL) {
+                v.parent.requestDisallowInterceptTouchEvent(false)
+            }
+            false
+        }
+
+        // ⛔ 결과칸은 내부 스크롤 제거 → 화면 전체(바깥 ScrollView)로 스크롤
+        resultTextView.isVerticalScrollBarEnabled = false
+        resultTextView.setOnTouchListener(null)
+        resultTextView.movementMethod = null
 
         interpretButton.setOnClickListener {
             it.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.scale_up))
@@ -153,7 +170,7 @@ class DreamFragment : Fragment() {
         btnWatch.setOnClickListener {
             btnWatch.isEnabled = false
             progress.visibility = View.VISIBLE
-            textStatus.text = "광고 준비 중…"
+            textStatus.text = getString(R.string.ad_preparing)
             AdManager.showRewarded(
                 activity = requireActivity(),
                 onRewardEarned = {
@@ -164,13 +181,13 @@ class DreamFragment : Fragment() {
                 onClosed = {
                     btnWatch.isEnabled = true
                     progress.visibility = View.GONE
-                    textStatus.text = "광고가 닫혔어요. 다시 시도해 주세요."
+                    textStatus.text = getString(R.string.ad_closed_try_again)
                     AdManager.loadRewarded(requireContext())
                 },
                 onFailed = { reason ->
                     btnWatch.isEnabled = true
                     progress.visibility = View.GONE
-                    textStatus.text = "광고 로드 실패 ($reason). 잠시 후 다시 시도해 주세요."
+                    textStatus.text = getString(R.string.ad_load_failed_fmt, reason)
                     AdManager.loadRewarded(requireContext())
                 }
             )
@@ -193,7 +210,7 @@ class DreamFragment : Fragment() {
     }
     private fun updateUsageLabel() {
         val remain = (freeLimit + adLimit - getTodayCount()).coerceAtLeast(0)
-        usageTextView?.text = "오늘 남은 횟수 : ${remain}회"
+        usageTextView?.text = getString(R.string.dream_today_left, remain)
     }
 
     // 입력 검증
@@ -202,8 +219,8 @@ class DreamFragment : Fragment() {
         val isMath = Regex("^\\s*\\d+\\s*[-+*/]\\s*\\d+\\s*$").containsMatchIn(input)
         val smallTalk = bannedStarters.any { lower.startsWith(it) }
         return when {
-            input.isBlank() -> { toast("꿈 내용을 입력해주세요."); false }
-            input.length < 10 || isMath || smallTalk -> { toast("의미 있는 꿈 내용을 구체적으로 입력해주세요."); false }
+            input.isBlank() -> { toast(getString(R.string.dream_input_empty)); false }
+            input.length < 10 || isMath || smallTalk -> { toast(getString(R.string.dream_input_not_meaningful)); false }
             else -> true
         }
     }
@@ -211,27 +228,27 @@ class DreamFragment : Fragment() {
     private fun startInterpret(prompt: String) {
         showLoading()
 
+        // 프롬프트를 strings.xml에서 가져와 삽입
+        val content = getString(
+            R.string.dream_prompt_template,
+            prompt,
+            getString(R.string.dream_section_message),
+            getString(R.string.dream_section_symbols),
+            getString(R.string.dream_section_premonition),
+            getString(R.string.dream_section_tips_today),
+            getString(R.string.dream_section_actions_three)
+        )
+
         val messages = JSONArray().put(
-            JSONObject().put("role", "user").put("content", """
-                너는 '예지몽 분석 해몽가'야.
-                아래 꿈 내용을 바탕으로 현실적이고 신뢰감 있게 해석해.
-                구조:
-                - 💭 꿈이 전하는 메시지
-                - 🧠 핵심 상징 해석
-                - 📌 예지 포인트
-                - ☀️ 오늘의 활용 팁
-                - 🎯 오늘의 행동 3가지
-                [꿈 내용] "$prompt"
-            """.trimIndent())
+            JSONObject().put("role", "user").put("content", content)
         )
 
         val body = JSONObject().apply {
             put("model", "gpt-4.1-mini")
-            put("temperature", 0.6)
+            put("temperature", 0.86)
             put("messages", messages)
-            put("max_tokens", 900)
+            put("max_tokens", 1100)
         }.toString().toRequestBody("application/json".toMediaType())
-
         val req = Request.Builder()
             .url("https://api.openai.com/v1/chat/completions")
             .post(body)
@@ -242,15 +259,15 @@ class DreamFragment : Fragment() {
         OkHttpClient().newCall(req).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e(logTag, "GPT 요청 실패", e)
-                ui { onResultArrived("해몽 결과를 받아올 수 없습니다. 네트워크를 확인하고 다시 시도해 주세요.") }
+                ui { onResultArrived(getString(R.string.dream_network_error)) }
             }
             override fun onResponse(call: Call, response: Response) {
                 val text = if (response.isSuccessful) {
                     val raw = response.body?.string().orEmpty()
                     try {
                         JSONObject(raw).getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content").trim()
-                    } catch (_: Exception) { "결과 파싱 오류가 발생했어요." }
-                } else "해몽 요청 실패 (${response.code})"
+                    } catch (_: Exception) { getString(R.string.dream_parse_error) }
+                } else getString(R.string.dream_request_failed, response.code)
                 response.close()
                 ui { onResultArrived(text) }
                 saveDream(prompt, text)
@@ -276,10 +293,9 @@ class DreamFragment : Fragment() {
     private fun onResultArrived(text: String) {
         hideLoading()
         resultTextView.setTextColor(Color.parseColor("#FFFFFF"))
-        resultTextView.text = styleResult(text.ifBlank { "해몽 결과가 비어있습니다." })
+        resultTextView.text = styleResult(text.ifBlank { getString(R.string.dream_result_empty) })
     }
 
-    // (스타일링/로딩/유틸 메서드는 기존 그대로 …)
     // ─────────────────────────────────────────────
     private fun showLoading() {
         interpretButton.isEnabled = false
@@ -289,7 +305,7 @@ class DreamFragment : Fragment() {
             animate().alpha(1f).translationY(0f).scaleX(1f).scaleY(1f).setDuration(400).start()
             playAnimation()
         }
-        resultTextView.text = "해석 중입니다…"
+        resultTextView.text = getString(R.string.dream_loading)
         resultTextView.setTextColor(Color.parseColor("#BFD0DC"))
     }
     private fun hideLoading() {
@@ -297,20 +313,9 @@ class DreamFragment : Fragment() {
         lottieLoading?.apply { cancelAnimation(); visibility = View.GONE }
     }
 
-    /**
-     * 해몽 결과 텍스트에서 섹션 헤더를 자동 감지해
-     * (색상 + Bold + 살짝 크게) 적용.
-     */
-
-    /**
-     * 해몽 결과를 섹션 단위로 가독성 좋게 스타일링.
-     * - 섹션 헤더는 굵게/컬러/살짝 크게
-     * - 섹션 본문은 은은한 컬러 톤으로 구분
-     * - 섹션 사이에는 한 줄 공백을 자동 삽입
-     */
-// 섹션별 색 적용 + 섹션 사이 한 줄 공백
+    // 섹션별 색 적용 + 섹션 사이 한 줄 공백
     private fun styleResult(raw: String): CharSequence {
-        var text = raw.ifBlank { "해몽 결과가 비어있습니다." }
+        var text = raw.ifBlank { getString(R.string.dream_result_empty) }
             .replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")      // # 헤더 제거
             .replace("**", "")                              // 볼드 마크 제거
             .replace(Regex("`{1,3}"), "")                   // 코드 마크 제거
@@ -319,23 +324,21 @@ class DreamFragment : Fragment() {
 
         data class Sec(val key: Regex, val headerColor: Int, val bodyColor: Int)
 
-        // 이모지/기호/공백/콜론 여부와 상관없이 매칭되게: ^(?:\P{L}*)? -> 앞의 이모지/기호 무시
         val secs = listOf(
-            Sec(Regex("""^(?:\P{L}*)?\s*(꿈이\s*전하는\s*메시지)\s*:?\s*$""", RegexOption.IGNORE_CASE),
+            Sec(Regex("""^(?:\P{L}*)?\s*(${Regex.escape(getString(R.string.dream_section_message))})\s*:?\s*$""", RegexOption.IGNORE_CASE),
                 Color.parseColor("#9BE7FF"), Color.parseColor("#E6F7FF")),
-            Sec(Regex("""^(?:\P{L}*)?\s*(핵심\s*상징(\s*(해석|분석))?|핵심\s*포인트)\s*:?\s*$""", RegexOption.IGNORE_CASE),
+            Sec(Regex("""^(?:\P{L}*)?\s*(${Regex.escape(getString(R.string.dream_section_symbols))}|핵심\s*포인트)\s*:?\s*$""", RegexOption.IGNORE_CASE),
                 Color.parseColor("#FFB3C1"), Color.parseColor("#FFE6EC")),
-            Sec(Regex("""^(?:\P{L}*)?\s*(예지\s*포인트)\s*:?\s*$""", RegexOption.IGNORE_CASE),
+            Sec(Regex("""^(?:\P{L}*)?\s*(${Regex.escape(getString(R.string.dream_section_premonition))})\s*:?\s*$""", RegexOption.IGNORE_CASE),
                 Color.parseColor("#FFD166"), Color.parseColor("#FFF1CC")),
-            Sec(Regex("""^(?:\P{L}*)?\s*(오늘의\s*활용\s*팁)\s*:?\s*$""", RegexOption.IGNORE_CASE),
+            Sec(Regex("""^(?:\P{L}*)?\s*(${Regex.escape(getString(R.string.dream_section_tips_today))})\s*:?\s*$""", RegexOption.IGNORE_CASE),
                 Color.parseColor("#FFE082"), Color.parseColor("#FFF4D6")),
-            Sec(Regex("""^(?:\P{L}*)?\s*(오늘의\s*행동\s*3\s*가지)\s*:?\s*$""", RegexOption.IGNORE_CASE),
+            Sec(Regex("""^(?:\P{L}*)?\s*(${Regex.escape(getString(R.string.dream_section_actions_three))})\s*:?\s*$""", RegexOption.IGNORE_CASE),
                 Color.parseColor("#A5D6A7"), Color.parseColor("#E9F8ED"))
         )
 
         fun matchHeader(line: String): Sec? = secs.firstOrNull { it.key.matches(line.trim()) }
 
-        // 섹션 간 공백 추가
         val lines = text.split('\n')
         val rebuilt = StringBuilder(text.length + 64)
         var metFirst = false
@@ -349,7 +352,6 @@ class DreamFragment : Fragment() {
 
         val sb = SpannableStringBuilder(finalText)
 
-        // 헤더 범위 수집
         data class Hit(val start: Int, val end: Int, val sec: Sec)
         val hits = mutableListOf<Hit>()
         var idx = 0
@@ -361,14 +363,12 @@ class DreamFragment : Fragment() {
         }
         if (hits.isEmpty()) return sb
 
-        // 헤더 스타일
         hits.forEach { h ->
             sb.setSpan(ForegroundColorSpan(h.sec.headerColor), h.start, h.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             sb.setSpan(StyleSpan(Typeface.BOLD),               h.start, h.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             sb.setSpan(RelativeSizeSpan(1.08f),                h.start, h.end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
 
-        // 본문 톤 (연한 색감)
         for (i in hits.indices) {
             val bodyStart = hits[i].end + 1
             val bodyEnd   = if (i + 1 < hits.size) hits[i + 1].start - 1 else finalText.length
@@ -378,8 +378,6 @@ class DreamFragment : Fragment() {
         }
         return sb
     }
-
-
 
     private fun hideKeyboardAndScrollToResult(root: View) {
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -401,19 +399,18 @@ class DreamFragment : Fragment() {
 
     private fun showLimitDialog() {
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("오늘 기회 소진")
-            .setMessage("오늘은 해몽 가능 횟수(무료 1회 + 광고 2회)를 모두 사용했어요. 내일 다시 시도해 주세요.")
-            .setPositiveButton("확인", null)
+            .setTitle(getString(R.string.dream_quota_title))
+            .setMessage(getString(R.string.dream_quota_message)) // 인자 제거
+            .setPositiveButton(getString(R.string.ok), null)
             .show()
     }
-
 
     companion object {
         fun showResultDialog(context: Context, result: String) {
             val v = View.inflate(context, R.layout.dream_result_dialog, null)
             val tv = v.findViewById<TextView>(R.id.resultTextView)
 
-            var text = result.ifBlank { "해몽 결과가 비어있습니다." }
+            var text = result.ifBlank { context.getString(R.string.dream_result_empty) }
                 .replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")
                 .replace("**", "")
                 .replace(Regex("`{1,3}"), "")
@@ -422,11 +419,11 @@ class DreamFragment : Fragment() {
 
             data class Sec(val emoji: String, val label: String, val headerColor: Int, val bodyColor: Int)
             val secs = listOf(
-                Sec("💭", "꿈이 전하는 메시지", Color.parseColor("#9BE7FF"), Color.parseColor("#E6F7FF")),
-                Sec("🧠", "핵심 상징 해석",   Color.parseColor("#FFB3C1"), Color.parseColor("#FFE6EC")),
-                Sec("📌", "예지 포인트",     Color.parseColor("#FFD166"), Color.parseColor("#FFF1CC")),
-                Sec("☀️", "오늘의 활용 팁",  Color.parseColor("#FFE082"), Color.parseColor("#FFF4D6")),
-                Sec("🎯", "오늘의 행동 3가지",Color.parseColor("#A5D6A7"), Color.parseColor("#E9F8ED"))
+                Sec("💭", context.getString(R.string.dream_section_message),   Color.parseColor("#9BE7FF"), Color.parseColor("#E6F7FF")),
+                Sec("🧠", context.getString(R.string.dream_section_symbols),   Color.parseColor("#FFB3C1"), Color.parseColor("#FFE6EC")),
+                Sec("📌", context.getString(R.string.dream_section_premonition),Color.parseColor("#FFD166"), Color.parseColor("#FFF1CC")),
+                Sec("☀️", context.getString(R.string.dream_section_tips_today),Color.parseColor("#FFE082"), Color.parseColor("#FFF4D6")),
+                Sec("🎯", context.getString(R.string.dream_section_actions_three), Color.parseColor("#A5D6A7"), Color.parseColor("#E9F8ED"))
             )
 
             fun matchHeader(line: String): Sec? {
@@ -437,7 +434,6 @@ class DreamFragment : Fragment() {
                 }
             }
 
-            // 섹션 간 한 칸 띄우기
             val lines = text.split('\n')
             val rebuilt = StringBuilder(text.length + 64)
             var metFirst = false
@@ -491,5 +487,4 @@ class DreamFragment : Fragment() {
             dialog.show()
         }
     }
-
 }

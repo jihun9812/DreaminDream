@@ -10,7 +10,7 @@
     android:paddingStart="16dp"
     android:paddingEnd="10dp"
     android:background="@drawable/bg_glass_card"
-    android:foreground="?attr/selectableItemBackground"
+
     android:minHeight="56dp"
     android:elevation="0dp">
 

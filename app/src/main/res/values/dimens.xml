@@ -19,11 +19,11 @@
 
     <dimen name="btn_pad_h">14dp</dimen>
     <dimen name="btn_radius">12dp</dimen>
-    <dimen name="btn_height">36dp</dimen>
+    <dimen name="btn_height">40dp</dimen>
 
     <dimen name="card_pad">14dp</dimen>
     <dimen name="ai_card_corner">18dp</dimen>
-    <dimen name="ai_card_elevation">10dp</dimen>
+    <dimen name="ai_card_elevation">4dp</dimen>
 
     <dimen name="icon_btn">22dp</dimen>
     <dimen name="ai_icon">24dp</dimen>

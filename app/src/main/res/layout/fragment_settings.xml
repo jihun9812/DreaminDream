@@ -54,9 +54,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:paddingTop="16dp"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:paddingTop="20dp"
             android:paddingBottom="0dp">
 
             <LinearLayout
@@ -73,19 +73,19 @@
                     android:id="@+id/card_app_settings"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
                     android:orientation="vertical"
-                    android:padding="0dp"
-                    android:background="@android:color/transparent">
+                    android:padding="0dp">
 
                     <!-- 섹션 타이틀 -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:letterSpacing="0.01"
                         android:text="@string/settings_title"
                         android:textColor="#FDCA60"
-                        android:textStyle="bold"
                         android:textSize="18sp"
-                        android:letterSpacing="0.01"/>
+                        android:textStyle="bold" />
 
                     <!-- 요약 -->
                     <TextView
@@ -93,23 +93,23 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
+                        android:lineSpacingExtra="2dp"
                         android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:lineSpacingExtra="2dp"/>
+                        android:textSize="15sp" />
 
                     <com.google.android.material.divider.MaterialDivider
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="10dp"
-                        app:dividerColor="#33FFFFFF"/>
+                        app:dividerColor="#33FFFFFF" />
 
                     <!-- 간단 통계 -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        app:cardCornerRadius="12dp"
                         app:cardBackgroundColor="#1AFFFFFF"
+                        app:cardCornerRadius="12dp"
                         app:strokeWidth="0dp">
 
                         <LinearLayout
@@ -117,16 +117,16 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:paddingVertical="8dp"
                             android:paddingHorizontal="4dp"
+                            android:paddingVertical="8dp"
                             android:weightSum="2">
 
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:orientation="vertical"
                                 android:gravity="center"
+                                android:orientation="vertical"
                                 android:paddingVertical="6dp">
 
                                 <TextView
@@ -134,24 +134,25 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/gpt_usage_today"
-                                    android:textColor="#B4FBFB"
-                                    android:textSize="12sp"/>
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="12sp" />
+
                                 <TextView
                                     android:id="@+id/tvGptUsageValue"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/value_placeholder_dash"
                                     android:textColor="#FFFFFF"
-                                    android:textStyle="bold"
-                                    android:textSize="20sp"/>
+                                    android:textSize="20sp"
+                                    android:textStyle="bold" />
                             </LinearLayout>
 
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:orientation="vertical"
                                 android:gravity="center"
+                                android:orientation="vertical"
                                 android:paddingVertical="6dp">
 
                                 <TextView
@@ -159,16 +160,17 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/dream_count"
-                                    android:textColor="#B4FBFB"
-                                    android:textSize="12sp"/>
+                                    android:textColor="#FFFFFF"
+                                    android:textSize="12sp" />
+
                                 <TextView
                                     android:id="@+id/tvDreamCountValue"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="@string/value_placeholder_dash"
                                     android:textColor="#FFFFFF"
-                                    android:textStyle="bold"
-                                    android:textSize="20sp"/>
+                                    android:textSize="20sp"
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
@@ -179,8 +181,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="14dp"
                         android:text="@string/settings_section"
-                        android:textColor="#FDCA60"
-                        android:textSize="12sp"/>
+                        android:textColor="#EDDF90"
+                        android:textSize="12sp" />
 
                     <!-- 프로필 편집 -->
                     <com.google.android.material.button.MaterialButton
@@ -188,12 +190,18 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_marginTop="8dp"
+                        android:gravity="start|center_vertical"
+                        android:insetLeft="0dp"
+                        android:insetRight="0dp"
+                        android:paddingStart="0dp"
                         android:text="@string/btn_profile_edit"
                         android:textAllCaps="false"
-                        android:textColor="#1D142E"
-                        app:cornerRadius="12dp"
-                        app:backgroundTint="#FDCA60"
-                        app:rippleColor="#22FFFFFF"/>
+                        android:textColor="#56E7E5"
+                        android:textSize="14sp"
+                        app:backgroundTint="@android:color/transparent"
+                        app:cornerRadius="10dp"
+                        app:iconPadding="0dp"
+                        app:rippleColor="#22FFFFFF" />
 
                     <!-- 프리미엄 -->
                     <com.google.android.material.button.MaterialButton
@@ -201,52 +209,52 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_marginTop="4dp"
+                        android:gravity="start|center_vertical"
                         android:insetLeft="0dp"
                         android:insetRight="0dp"
-                        android:gravity="start|center_vertical"
                         android:paddingStart="0dp"
                         android:text="@string/btn_premium"
                         android:textAllCaps="false"
-                        android:textColor="#B4FBFB"
+                        android:textColor="#FFFFFF"
                         android:textSize="14sp"
-                        app:iconPadding="0dp"
+                        app:backgroundTint="@android:color/transparent"
                         app:cornerRadius="10dp"
-                        app:backgroundTint="@android:color/transparent"/>
+                        app:iconPadding="0dp" />
 
                     <!-- 문의/피드백 -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_contact"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
+                        android:gravity="start|center_vertical"
                         android:insetLeft="0dp"
                         android:insetRight="0dp"
-                        android:gravity="start|center_vertical"
                         android:paddingStart="0dp"
                         android:text="@string/btn_contact"
                         android:textAllCaps="false"
-                        android:textColor="#B4FBFB"
+                        android:textColor="#FFFFFF"
                         android:textSize="14sp"
-                        app:iconPadding="0dp"
+                        app:backgroundTint="@android:color/transparent"
                         app:cornerRadius="10dp"
-                        app:backgroundTint="@android:color/transparent"/>
+                        app:iconPadding="0dp" />
 
                     <!-- 약관/개인정보 -->
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_terms"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
+                        android:gravity="start|center_vertical"
                         android:insetLeft="0dp"
                         android:insetRight="0dp"
-                        android:gravity="start|center_vertical"
                         android:paddingStart="0dp"
                         android:text="@string/btn_terms"
                         android:textAllCaps="false"
-                        android:textColor="#B4FBFB"
+                        android:textColor="#FFFFFF"
                         android:textSize="14sp"
-                        app:iconPadding="0dp"
-                        app:cornerRadius="10dp"
                         app:backgroundTint="@android:color/transparent"
-                        app:rippleColor="#22FFFFFF"/>
+                        app:cornerRadius="10dp"
+                        app:iconPadding="0dp"
+                        app:rippleColor="#22FFFFFF" />
 
                     <!-- 계정 삭제 -->
                     <com.google.android.material.button.MaterialButton
@@ -254,18 +262,18 @@
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_marginTop="2dp"
+                        android:gravity="start|center_vertical"
                         android:insetLeft="0dp"
                         android:insetRight="0dp"
-                        android:gravity="start|center_vertical"
                         android:paddingStart="0dp"
                         android:text="@string/btn_delete_account"
                         android:textAllCaps="false"
-                        android:textColor="#FF6B6B"
+                        android:textColor="#CE3434"
                         android:textSize="14sp"
-                        app:iconPadding="0dp"
-                        app:cornerRadius="10dp"
                         app:backgroundTint="@android:color/transparent"
-                        app:rippleColor="#33FF6B6B"/>
+                        app:cornerRadius="10dp"
+                        app:iconPadding="0dp"
+                        app:rippleColor="#33FF6B6B" />
 
                     <!-- ── 여기부터 언어 섹션 삭제됨 ── -->
 
@@ -274,15 +282,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="8dp"
-                        app:dividerColor="#1FFFFFFF"/>
+                        app:dividerColor="#1FFFFFFF" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
                         android:text="@string/label_account_link"
-                        android:textColor="#FDCA60"
-                        android:textSize="12sp"/>
+                        android:textColor="#EDDF90"
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/tv_account_status"
@@ -291,7 +299,7 @@
                         android:layout_marginTop="4dp"
                         android:text="@string/account_status_default"
                         android:textColor="#B3FFFFFF"
-                        android:textSize="13sp"/>
+                        android:textSize="13sp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_link_google"
@@ -301,13 +309,13 @@
                         android:text="@string/btn_google_link"
                         android:textAllCaps="false"
                         android:textColor="@color/black"
+                        app:backgroundTint="#DCDCDC"
+                        app:cornerRadius="12dp"
                         app:icon="@drawable/google_logo"
-                        app:iconTint="@null"
                         app:iconGravity="textStart"
                         app:iconPadding="12dp"
-                        app:cornerRadius="12dp"
-                        app:backgroundTint="#DCDCDC"
-                        app:rippleColor="#22000000"/>
+                        app:iconTint="@null"
+                        app:rippleColor="#22000000" />
 
                     <ProgressBar
                         android:id="@+id/progress_account_link"
@@ -316,7 +324,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="8dp"
-                        android:visibility="gone"/>
+                        android:visibility="gone" />
 
                     <TextView
                         android:layout_width="match_parent"
@@ -324,7 +332,7 @@
                         android:layout_marginTop="6dp"
                         android:text="@string/account_link_note"
                         android:textColor="#80FFFFFF"
-                        android:textSize="11sp"/>
+                        android:textSize="11sp" />
                 </LinearLayout>
 
                 <!-- ===== (옵션) 프로필 편집 카드 ===== -->
@@ -332,26 +340,26 @@
                     android:id="@+id/card_profile"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
                     android:orientation="vertical"
-                    android:visibility="gone"
                     android:paddingTop="20dp"
-                    android:background="@android:color/transparent">
+                    android:visibility="gone">
 
                     <TextView
                         android:id="@+id/text_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:letterSpacing="0.02"
+                        android:paddingBottom="8dp"
                         android:text="@string/btn_profile_edit"
                         android:textColor="#FDCA60"
-                        android:textStyle="bold"
                         android:textSize="20sp"
-                        android:letterSpacing="0.02"
-                        android:paddingBottom="8dp"/>
+                        android:textStyle="bold" />
 
                     <com.google.android.material.divider.MaterialDivider
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        app:dividerColor="#44FDCA60"/>
+                        app:dividerColor="#44FDCA60" />
 
                     <!-- 이름 -->
                     <TextView
@@ -360,7 +368,7 @@
                         android:layout_marginTop="10dp"
                         android:text="@string/label_name"
                         android:textColor="#FABE41"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp" />
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/til_nickname"
@@ -368,27 +376,27 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         app:boxBackgroundMode="outline"
+                        app:boxCornerRadiusBottomEnd="8dp"
+                        app:boxCornerRadiusBottomStart="8dp"
+                        app:boxCornerRadiusTopEnd="8dp"
+                        app:boxCornerRadiusTopStart="8dp"
                         app:boxStrokeColor="#FDCA60"
                         app:boxStrokeWidth="1dp"
-                        app:boxStrokeWidthFocused="2dp"
-                        app:boxCornerRadiusTopStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusBottomEnd="8dp">
+                        app:boxStrokeWidthFocused="2dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/edit_nickname"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:hint="@string/hint_name_example"
+                            android:imeOptions="flagNoFullscreen|actionDone"
+                            android:inputType="textPersonName|textCapWords"
                             android:minHeight="44dp"
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="10dp"
-                            android:hint="@string/hint_name_example"
-                            android:inputType="textPersonName|textCapWords"
-                            android:imeOptions="flagNoFullscreen|actionDone"
                             android:textColor="#E8F1F8"
                             android:textColorHint="#B3FFFFFF"
-                            android:textSize="16sp"/>
+                            android:textSize="16sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- 생년월일 -->
@@ -397,7 +405,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/label_birthdate"
                         android:textColor="#FABE41"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp" />
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/til_birthdate"
@@ -405,27 +413,27 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         app:boxBackgroundMode="outline"
+                        app:boxCornerRadiusBottomEnd="8dp"
+                        app:boxCornerRadiusBottomStart="8dp"
+                        app:boxCornerRadiusTopEnd="8dp"
+                        app:boxCornerRadiusTopStart="8dp"
                         app:boxStrokeColor="#FDCA60"
                         app:boxStrokeWidth="1dp"
-                        app:boxStrokeWidthFocused="2dp"
-                        app:boxCornerRadiusTopStart="8dp"
-                        app:boxCornerRadiusTopEnd="8dp"
-                        app:boxCornerRadiusBottomStart="8dp"
-                        app:boxCornerRadiusBottomEnd="8dp">
+                        app:boxStrokeWidthFocused="2dp">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/edit_birthdate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="false"
+                            android:hint="@string/hint_birthdate_format"
                             android:minHeight="44dp"
                             android:paddingHorizontal="12dp"
                             android:paddingVertical="10dp"
-                            android:hint="@string/hint_birthdate_format"
-                            android:focusable="false"
-                            android:clickable="true"
                             android:textColor="#E8F1F8"
                             android:textColorHint="#B3FFFFFF"
-                            android:textSize="16sp"/>
+                            android:textSize="16sp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- 성별 -->
@@ -434,39 +442,39 @@
                         android:layout_height="wrap_content"
                         android:text="@string/label_gender"
                         android:textColor="#FABE41"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp" />
 
                     <RadioGroup
                         android:id="@+id/radio_group_gender"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
+                        android:layout_marginBottom="8dp"
+                        android:orientation="horizontal">
 
                         <RadioButton
                             android:id="@+id/radio_male"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginEnd="16dp"
+                            android:buttonTint="#37C2D0"
                             android:text="@string/gender_male"
                             android:textColor="#FABE41"
-                            android:buttonTint="#37C2D0"
-                            android:textSize="16sp"
-                            android:layout_marginEnd="16dp"/>
+                            android:textSize="16sp" />
 
                         <RadioButton
                             android:id="@+id/radio_female"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:buttonTint="#37C2D0"
                             android:text="@string/gender_female"
                             android:textColor="#FABE41"
-                            android:buttonTint="#37C2D0"
-                            android:textSize="16sp"/>
+                            android:textSize="16sp" />
                     </RadioGroup>
 
                     <com.google.android.material.divider.MaterialDivider
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        app:dividerColor="#44FDCA60"/>
+                        app:dividerColor="#44FDCA60" />
 
                     <!-- MBTI -->
                     <TextView
@@ -474,14 +482,14 @@
                         android:layout_height="wrap_content"
                         android:text="@string/label_mbti"
                         android:textColor="#FABE41"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp" />
 
                     <Spinner
                         android:id="@+id/spinner_mbti"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_marginBottom="8dp"
-                        android:spinnerMode="dropdown"/>
+                        android:spinnerMode="dropdown" />
 
                     <!-- 출생시간 -->
                     <TextView
@@ -489,22 +497,22 @@
                         android:layout_height="wrap_content"
                         android:text="@string/label_birthtime"
                         android:textColor="#FABE41"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp" />
 
                     <Spinner
                         android:id="@+id/spinner_birthtime"
                         android:layout_width="match_parent"
                         android:layout_height="48dp"
                         android:layout_marginBottom="8dp"
-                        android:spinnerMode="dropdown"/>
+                        android:spinnerMode="dropdown" />
 
                     <!-- 취소/저장 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:layout_marginTop="4dp"
                         android:gravity="end"
-                        android:layout_marginTop="4dp">
+                        android:orientation="horizontal">
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_cancel"
@@ -517,8 +525,8 @@
                             android:textColor="#212121"
                             android:textSize="14sp"
                             android:textStyle="bold"
-                            app:cornerRadius="10dp"
-                            app:backgroundTint="#C7C7C7"/>
+                            app:backgroundTint="#C7C7C7"
+                            app:cornerRadius="10dp" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_save"
@@ -530,8 +538,8 @@
                             android:textColor="#212121"
                             android:textSize="14sp"
                             android:textStyle="bold"
-                            app:cornerRadius="10dp"
-                            app:backgroundTint="#EBBB57"/>
+                            app:backgroundTint="#EBBB57"
+                            app:cornerRadius="10dp" />
                     </LinearLayout>
 
                     <ProgressBar
@@ -541,7 +549,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="8dp"
-                        android:visibility="gone"/>
+                        android:visibility="gone" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

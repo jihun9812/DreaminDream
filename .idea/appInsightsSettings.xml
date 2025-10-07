@@ -9,7 +9,7 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.example.dreamindream" />
+                  <option name="appId" value="com.dreamindream.app" />
                   <option name="mobileSdkAppId" value="1:886944015637:android:45a31dc45a8c1d1aea751c" />
                   <option name="projectId" value="dreamindream-439e6" />
                   <option name="projectNumber" value="886944015637" />

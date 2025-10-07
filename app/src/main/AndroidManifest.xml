@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.dreamindream">
+    package="com.dreamindream.app">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <queries>
+        <package android:name="com.google.android.gms"/>
+        <package android:name="com.android.vending"/>
+    </queries>
 
     <application
         android:name=".App"
@@ -19,24 +23,24 @@
         android:localeConfig="@xml/locales_config">
 
         <activity
-            android:name=".FeedbackActivity"
+            android:name="com.dreamindream.app.FeedbackActivity"
             android:exported="false"
             android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
 
         <activity
-            android:name=".TermsActivity"
+            android:name="com.dreamindream.app.TermsActivity"
             android:exported="false"
             android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.dreamindream.app.MainActivity"
             android:launchMode="singleTop"
             android:exported="true"
             android:windowSoftInputMode="adjustResize|stateUnspecified" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.example.dreamindream.fileprovider"
+            android:authorities="com.dreamindream.app.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -56,7 +60,7 @@
 
 
         <activity
-            android:name=".SplashActivity"
+            android:name="com.dreamindream.app.SplashActivity"
             android:theme="@style/Theme.DreaminDream.TransparentFullScreen"
             android:exported="true">
             <intent-filter>
@@ -68,7 +72,7 @@
 
 
         <activity
-            android:name=".LoginActivity"
+            android:name="com.dreamindream.app.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.DreaminDream">
 

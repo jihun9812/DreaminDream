@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:886944015637:android:45a31dc45a8c1d1aea751c",
         "android_client_info": {
-          "package_name": "com.example.dreamindream"
+          "package_name": "com.dreamindream.app"
         }
       },
       "oauth_client": [
@@ -17,7 +17,7 @@
           "client_id": "886944015637-h12o49ko1s2hfkbg6i8cvnis49qfu6ee.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.dreamindream",
+            "package_name": "com.dreamindream.app",
             "certificate_hash": "7db25166b27892546ccc6503a53728d0b7b50ba7"
           }
         },

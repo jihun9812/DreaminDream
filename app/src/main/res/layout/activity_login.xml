@@ -11,12 +11,11 @@
         android:id="@+id/bg_lottie"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#E12A1E49"
+        android:background="@drawable/main_ground"
         app:lottie_rawRes="@raw/hwwprmbqc9"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         android:scaleType="centerCrop"
-        android:alpha="0.85"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -80,6 +79,7 @@
                             style="@style/Widget.Material3.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            app:chipStrokeColor="#FDCA60"
                             android:text="@string/language_korean"
                             app:checkedIconVisible="false" />
 
@@ -88,13 +88,14 @@
                             style="@style/Widget.Material3.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            app:chipStrokeColor="#FDCA60"
                             android:text="@string/language_english"
                             app:checkedIconVisible="false" />
 
                     </com.google.android.material.chip.ChipGroup>
 
                 </LinearLayout>
-        
+
 
                 <!-- 타이틀/슬로건 -->
                 <TextView
@@ -115,7 +116,7 @@
                     android:gravity="center"
                     android:text="@string/login_slogan"
                     android:fontFamily="@font/pretendard_bold"
-                    android:textColor="#431D56"
+                    android:textColor="#666666"
                     android:textSize="14sp" />
 
                 <!-- 이메일/비밀번호 -->
@@ -445,7 +446,7 @@
         android:layout_height="wrap_content"
         android:text="@string/privacy_and_version"
         android:textSize="11sp"
-        android:textColor="#000000"
+        android:textColor="#FBFBFB"
         android:gravity="center"
         android:fontFamily="@font/pretendard_bold"
         android:background="@android:color/transparent"

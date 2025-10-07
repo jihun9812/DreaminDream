@@ -70,7 +70,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_chevron_left"
                     android:contentDescription="@string/prev_month"
-                    app:tint="#FDCA60" />
+                    app:tint="#95BAE4" />
 
                 <TextView
                     android:id="@+id/textViewMonthYear"
@@ -79,8 +79,8 @@
                     android:layout_marginHorizontal="12dp"
                     android:text="@string/calendar_month_year_sample"
                     android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="#FABE41"
+                    android:fontFamily="@font/pretendard_bold"
+                    android:textColor="#95BAE4"
                     android:includeFontPadding="false"
                     android:maxLines="1"
                     android:ellipsize="end" />
@@ -92,7 +92,7 @@
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_chevron_right"
                     android:contentDescription="@string/next_month"
-                    app:tint="#FDCA60" />
+                    app:tint="#95BAE4" />
             </LinearLayout>
 
             <TextView

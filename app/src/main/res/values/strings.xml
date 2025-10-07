@@ -77,6 +77,8 @@
     <string name="weekday_fri">금</string>
     <string name="weekday_sat">토</string>
 
+    <string name="tutorial_lang_tip">언어는 여기에서 바꿀 수 있어요. 누르면 한국어/English 전환됩니다.</string>
+
     <!-- fragment_ai_report.xml -->
     <string name="empty_string"></string>
     <string name="ai_report_empty">분석할 데이터가 없습니다.</string>
@@ -1124,7 +1126,6 @@ eep prompt 템플릿 -->
     <string name="language_korean">한국어</string>
     <string name="language_english">English</string>
     <string name="save_and_continue">저장하고 계속</string>
-    <string name="you_can_change_in_settings">설정에서 언제든 변경할 수 있어요.</string>
     <string name="language">언어</string>
     <string name="language_changed">언어가 업데이트되었습니다.</string>
     <string name="recommended">추천</string>

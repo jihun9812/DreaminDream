@@ -71,7 +71,7 @@
     <!-- 캘린더 -->
     <dimen name="month_text">18sp</dimen>
     <dimen name="list_title">16sp</dimen>
-    <dimen name="hint_input">16sp</dimen>
+    <dimen name="hint_input">21sp</dimen>
 
     <dimen name="calendar_side_margin">12dp</dimen>
     <dimen name="calendar_top_margin">6dp</dimen>

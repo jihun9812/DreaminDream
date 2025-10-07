@@ -43,19 +43,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/title_margin_bottom"
-            android:text="@string/home_title"
-            android:fontFamily="@font/jalnan"
-            android:textColor="#F4B635"
-            android:textSize="@dimen/home_title_size"
-            android:maxLines="1"
             android:ellipsize="end"
-            android:shadowColor="#976803"
-            android:shadowDx="2"
-            android:shadowDy="2"
-            android:shadowRadius="2"
+            android:fontFamily="@font/jalnan"
             android:includeFontPadding="true"
+            android:maxLines="1"
             android:paddingTop="2dp"
-            android:paddingBottom="2dp" />
+            android:paddingBottom="2dp"
+            android:shadowColor="#FDCA60"
+            android:shadowDx="2"
+            android:shadowDy="4"
+            android:shadowRadius="2"
+            android:text="@string/home_title"
+            android:textColor="#F8B227"
+            android:textSize="@dimen/home_title_size" />
 
         <!-- AI 리포트 카드 -->
         <androidx.cardview.widget.CardView
@@ -63,7 +63,7 @@
             android:layout_width="@dimen/home_card_width"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            app:cardBackgroundColor="#E0362A50"
+            app:cardBackgroundColor="#17153B"
             app:cardCornerRadius="18dp"
             app:cardElevation="6dp">
 
@@ -198,7 +198,7 @@
                 app:backgroundTint="@null"
                 android:background="@drawable/btn_gold_gloss_selector"
                 app:cornerRadius="14dp"
-                app:rippleColor="#33FFFFFF"
+                app:rippleColor="#AFFFFFFF"
                 app:icon="@drawable/ic_dream"
                 app:iconGravity="textStart"
                 app:iconPadding="4dp"

@@ -64,6 +64,8 @@
 <string name="fortune_section_title_total">Overall</string>
 <string name="fortune_section_score_sample">80 pts</string>
 
+    <string name="tutorial_lang_tip">언어는 여기에서 바꿀 수 있어요. 누르면 한국어/English 전환됩니다.</string>
+
     <!-- example_month_header.xml -->
 <string name="weekday_sun">Sun</string>
 <string name="weekday_mon">Mon</string>
@@ -762,7 +764,6 @@ Please wait.</string>
 <string name="language_korean">한국어</string>
 <string name="language_english">English</string>
 <string name="save_and_continue">Save &amp; continue</string>
-<string name="you_can_change_in_settings">You can change this anytime in Settings.</string>
 <string name="language">Language</string>
 <string name="language_changed">Language updated.</string>
 

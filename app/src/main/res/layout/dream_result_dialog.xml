@@ -6,7 +6,7 @@
     android:layout_margin="24dp"
     app:cardCornerRadius="28dp"
     app:cardElevation="22dp"
-    android:backgroundTint="#EB232222">
+    android:backgroundTint="#F217153B">
 
     <ScrollView
         android:id="@+id/scrollDialog"

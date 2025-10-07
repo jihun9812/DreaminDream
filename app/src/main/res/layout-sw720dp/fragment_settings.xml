@@ -366,7 +366,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/gpt_usage_today"
-                                        android:textColor="#B4FBFB"
+                                        android:textColor="#FFFFFF"
                                         android:textSize="12sp"/>
                                     <TextView
                                         android:id="@+id/tvGptUsageValue"
@@ -391,7 +391,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/dream_count"
-                                        android:textColor="#B4FBFB"
+                                        android:textColor="#FFFFFF"
                                         android:textSize="12sp"/>
                                     <TextView
                                         android:id="@+id/tvDreamCountValue"
@@ -418,7 +418,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="@string/settings_section"
-                        android:textColor="#FDCA60"
+                        android:textColor="#EDDF90"
                         android:textSize="12sp"/>
 
                     <com.google.android.material.button.MaterialButton
@@ -440,7 +440,7 @@
                         android:layout_marginTop="4dp"
                         android:text="@string/btn_premium"
                         android:textAllCaps="false"
-                        android:textColor="#B4FBFB"
+                        android:textColor="#FFFFFF"
                         android:textSize="12sp"
                         app:backgroundTint="#00000000"/>
 
@@ -450,7 +450,7 @@
                         android:layout_height="40dp"
                         android:text="@string/btn_contact"
                         android:textAllCaps="false"
-                        android:textColor="#B4FBFB"
+                        android:textColor="#FFFFFF"
                         android:textSize="12sp"
                         app:backgroundTint="#00000000"/>
 
@@ -460,7 +460,7 @@
                         android:layout_height="40dp"
                         android:text="@string/btn_terms"
                         android:textAllCaps="false"
-                        android:textColor="#B4FBFB"
+                        android:textColor="#FFFFFF"
                         android:textSize="12sp"
                         app:backgroundTint="#00000000"/>
 
@@ -471,7 +471,7 @@
                         android:layout_marginTop="6dp"
                         android:text="@string/btn_delete_account"
                         android:textAllCaps="false"
-                        android:textColor="#FF5555"
+                        android:textColor="#CE3434"
                         android:textSize="12sp"
                         app:backgroundTint="#00000000"/>
 
@@ -489,7 +489,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="@string/label_account_link"
-                        android:textColor="#FDCA60"
+                        android:textColor="#EDDF90"
                         android:textSize="12sp"/>
 
                     <TextView

@@ -98,12 +98,7 @@
         <item name="android:elevation">2dp</item>
     </style>
 
-    <!-- 카드뷰 -->
-    <style name="DreamCardView" parent="Base.CardView">
-        <item name="cardCornerRadius">20dp</item>
-        <item name="cardElevation">8dp</item>
-        <item name="android:backgroundTint">#848DC8</item>
-    </style>
+
 
     <!-- 캘린더 -->
     <style name="CalendarDateText" parent="TextAppearance.Material3.BodyMedium">
@@ -153,7 +148,8 @@
 
     <style name="CustomMaterial3AlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <!-- 배경색 -->
-        <item name="colorSurface">#4B184866</item>
+        <item name="colorSurface">#8FFFFFFF</item>
+        <item name="materialAlertDialogTheme">@style/CustomMaterial3AlertDialog</item>
 
         <!-- 제목 텍스트 색상 -->
         <item name="colorOnSurface">@color/black</item>

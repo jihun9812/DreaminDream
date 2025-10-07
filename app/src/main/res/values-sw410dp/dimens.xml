@@ -1,7 +1,7 @@
 <resources>
     <!-- 고해상도에서 살짝 축소 -->
     <dimen name="ads_bottom_inset">96dp</dimen>
-    <dimen name="hint_input">14sp</dimen>
+    <dimen name="hint_input">18sp</dimen>
 
     <!-- home -->
     <dimen name="max_phone_width">540dp</dimen>

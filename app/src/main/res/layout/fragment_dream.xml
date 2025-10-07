@@ -37,28 +37,25 @@
                 app:layout_constraintWidth_percent="0.95"
                 app:layout_constraintWidth_max="@dimen/max_phone_width">
 
-                <!-- 입력 카드 -->
-                <com.google.android.material.card.MaterialCardView
+                <!-- ▼ 입력 카드 (MaterialCardView → FrameLayout + bg_panel_glass) -->
+                <FrameLayout
                     android:id="@+id/editCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    app:cardCornerRadius="16dp"
-                    app:strokeWidth="0dp"
-                    app:cardElevation="0dp"
-                    android:outlineAmbientShadowColor="@android:color/transparent"
-                    android:outlineSpotShadowColor="@android:color/transparent"
-                    app:strokeColor="@android:color/transparent"
-                    app:cardBackgroundColor="#99312943"
-                    app:cardForegroundColor="@android:color/transparent"
-                    app:cardPreventCornerOverlap="true"
-                    app:cardUseCompatPadding="false">
+                    android:background="@drawable/bg_panel_glass"
+                    android:padding="16dp"
+                    android:elevation="6dp"
+                    android:clipToOutline="true"
+                    android:outlineProvider="background"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
+                        android:orientation="vertical">
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -127,7 +124,8 @@
                             app:cornerRadius="12dp"
                             app:rippleColor="#33FFC54D" />
                     </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                </FrameLayout>
+                <!-- ▲ 입력 카드 끝 -->
 
                 <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/lottieLoading"
@@ -140,19 +138,16 @@
                     app:lottie_rawRes="@raw/just_flow_teal"
                     app:lottie_loop="true" />
 
-                <!-- 결과 카드 (전체 카드뷰 + 화면 전체 스크롤) -->
-                <com.google.android.material.card.MaterialCardView
+                <!-- ▼ 결과 카드 (MaterialCardView → FrameLayout + bg_panel_glass) -->
+                <FrameLayout
                     android:id="@+id/resultCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp"
-                    app:strokeColor="@android:color/transparent"
-                    app:cardBackgroundColor="#99312943"
-                    app:cardUseCompatPadding="false"
-                    app:cardPreventCornerOverlap="true">
+                    android:background="@drawable/bg_panel_glass"
+                    android:elevation="6dp"
+                    android:clipToOutline="true"
+                    android:outlineProvider="background">
 
                     <TextView
                         android:id="@+id/resultTextView"
@@ -164,7 +159,8 @@
                         android:text="@string/dream_result_placeholder"
                         android:textColor="#FFFFFF"
                         android:textSize="@dimen/text_md" />
-                </com.google.android.material.card.MaterialCardView>
+                </FrameLayout>
+                <!-- ▲ 결과 카드 끝 -->
 
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -63,7 +63,7 @@
             android:layout_width="@dimen/home_card_width"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            app:cardBackgroundColor="#17153B"
+            app:cardBackgroundColor="#442A2597"
             app:cardCornerRadius="18dp"
             app:cardElevation="6dp">
 
@@ -108,6 +108,7 @@
                         android:fontFamily="@font/pretendard_medium"
                         android:text="@string/home_ai_sub"
                         android:textColor="#C6D4DF"
+
                         android:textSize="@dimen/ai_sub"
                         android:maxLines="1"
                         android:ellipsize="end"
@@ -124,6 +125,7 @@
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
                     android:layout_marginStart="8dp"
+                    android:fontFamily="@font/pretendard_medium"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:text="@string/ai_report_btn"
@@ -196,6 +198,7 @@
                 android:textColor="#17212B"
                 android:textSize="@dimen/btn_text"
                 app:backgroundTint="@null"
+                android:fontFamily="@font/pretendard_medium"
                 android:background="@drawable/btn_gold_gloss_selector"
                 app:cornerRadius="14dp"
                 app:rippleColor="#AFFFFFFF"
@@ -219,6 +222,7 @@
                 android:text="@string/btn_calendar"
                 android:textColor="#17212B"
                 android:textSize="@dimen/btn_text"
+                android:fontFamily="@font/pretendard_medium"
                 app:backgroundTint="@null"
                 android:background="@drawable/btn_gold_gloss_selector"
                 app:cornerRadius="14dp"
@@ -243,6 +247,7 @@
                 android:text="@string/btn_fortune"
                 android:textColor="#17212B"
                 android:textSize="@dimen/btn_text"
+                android:fontFamily="@font/pretendard_medium"
                 app:backgroundTint="@null"
                 android:background="@drawable/btn_gold_gloss_selector"
                 app:cornerRadius="14dp"

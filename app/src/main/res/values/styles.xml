@@ -111,6 +111,26 @@
         <item name="android:textColor">#888888</item>
     </style>
 
+    <!-- ...기존 스타일들 위/아래로 유지... -->
+
+    <!-- 대기업 톤: 담백한 외곽선, 둥근 모서리, 가독 컬러 -->
+    <style name="SettingsChip" parent="Widget.Material3.Chip.Assist">
+        <item name="chipBackgroundColor">#26FFFFFF</item>
+        <item name="chipStrokeColor">#40FFFFFF</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Chip.RoundedXL</item>
+        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="rippleColor">#22FFFFFF</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="closeIconVisible">false</item>
+    </style>
+
+    <style name="ShapeAppearance.Chip.RoundedXL" parent="">
+        <item name="cornerSize">18dp</item>
+    </style>
+
+
     <style name="CalendarWeekday">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
@@ -130,12 +150,10 @@
     <style name="MyDatePickerColorTheme" parent="Theme.Material3.DayNight.Dialog">
         <item name="colorPrimary">#224859</item>
         <item name="colorOnPrimary">#FEF6E4</item>
-        <item name="colorSurface">#FEF6E4</item>
+        <item name="colorSurface">#EBB1B0AF</item>
         <item name="colorOnSurface">#14828C</item>
         <item name="android:windowBackground">#FEF6E4</item>
     </style>
-
-
 
     <style name="DatePickerHeadline" parent="TextAppearance.Material3.HeadlineSmall">
         <item name="android:textColor">#4B123E5A</item>
@@ -148,7 +166,7 @@
 
     <style name="CustomMaterial3AlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <!-- 배경색 -->
-        <item name="colorSurface">#8FFFFFFF</item>
+        <item name="colorSurface">#A62A0D4E</item>
         <item name="materialAlertDialogTheme">@style/CustomMaterial3AlertDialog</item>
 
         <!-- 제목 텍스트 색상 -->

@@ -231,7 +231,9 @@ class SettingsFragment : Fragment() {
         binding.btnLogout.setOnClickListener { showLogoutConfirm() }
 
         binding.tvGptUsageLabel.text = getString(R.string.gpt_usage_today)
-        updateAppProfileSummary()
+
+        // 초기 헤더/요약 갱신
+        updateAppProfileSummary()      // 내부에서 아바타/헤더도 함께 갱신
     }
 
     override fun onResume() {
@@ -240,6 +242,7 @@ class SettingsFragment : Fragment() {
         updateAccountLinkUi()
         enterCorrectMode()
         binding.btnDeleteAccount.visibility = if (canShowDeleteAccount()) View.VISIBLE else View.GONE
+        updateAppProfileSummary()
     }
 
     override fun onDestroyView() {
@@ -293,7 +296,7 @@ class SettingsFragment : Fragment() {
                     }.apply()
 
                     loadUserIntoEditor()
-                    updateAppProfileSummary()
+                    updateAppProfileSummary() // 헤더/요약 동시 갱신
                     refreshQuickStatus()
                     enterCorrectMode()
                 }
@@ -327,6 +330,8 @@ class SettingsFragment : Fragment() {
         binding.scrollView.post { binding.scrollView.smoothScrollTo(0, binding.cardProfile.top - 24) }
     }
 
+    /** 헤더(띠 아이콘 아바타/이름/서브)와 요약을 모두 갱신한다.
+     *  - 요구사항: 띠 텍스트 라인 제거, 아이콘(이모지)만 노출 */
     private fun updateAppProfileSummary() {
         val nn = profilePrefs.getString("nickname","") ?: ""
         val bd = (profilePrefs.getString("birthdate_iso", null) ?: profilePrefs.getString("birthdate","") ?: "")
@@ -337,9 +342,21 @@ class SettingsFragment : Fragment() {
 
         val age = calcAge(bd)
         val (cz, czIcon) = chineseZodiac(bd)
-        val (wz, wzIcon) = westernZodiac(bd)
+        val (wz, _) = westernZodiac(bd)
 
-        val labelColor = ContextCompat.getColor(requireContext(), android.R.color.holo_orange_light)
+        // --- 헤더(아바타/이름/서브레이블) ---
+        binding.tvZodiacAvatar?.text = czIcon.ifBlank { "🧿" }
+        binding.tvProfileName?.text = if (nn.isBlank()) getString(R.string.value_placeholder_dash) else nn
+
+        val subParts = mutableListOf<String>()
+        if (age >= 0) subParts.add(getString(R.string.summary_age_value, age)) // e.g. "나이 25세"
+        if (gd.isNotBlank()) subParts.add(gd)
+        if (mb.isNotBlank()) subParts.add(mb)
+        if (btLabel.isNotBlank() && !btLabel.equals(getStringSafe(R.string.birthtime_none, "선택안함"), true)) subParts.add(btLabel)
+        binding.tvProfileSub?.text = subParts.joinToString(" · ")
+
+        // --- 텍스트 요약(띠 텍스트 라인 제거됨) ---
+        val labelColor = ContextCompat.getColor(requireContext(), R.color.summary_label)
         fun line(label: String, value: String): CharSequence {
             val s = SpannableStringBuilder()
             val prefix = "$label "
@@ -350,14 +367,15 @@ class SettingsFragment : Fragment() {
         }
 
         val sb = SpannableStringBuilder()
-            .append(line(getString(R.string.summary_name_prefix), if (nn.isBlank()) getString(R.string.value_placeholder_dash) else nn)).append("\n")
             .append(line(getString(R.string.summary_birth_prefix), if (bd.isBlank()) getString(R.string.value_placeholder_dash) else bd)).append("\n")
             .append(line(getString(R.string.summary_gender_prefix), if (gd.isBlank()) getString(R.string.value_placeholder_dash) else gd)).append("\n")
             .append(line(getString(R.string.summary_mbti_prefix), if (mb.isBlank()) getString(R.string.value_placeholder_dash) else mb)).append("\n")
             .append(line(getString(R.string.summary_age_prefix), if (age >= 0) getString(R.string.summary_age_value, age) else getString(R.string.value_placeholder_dash))).append("\n")
-            .append(line(getString(R.string.summary_cz_prefix, czIcon), cz)).append("\n")
-            .append(line(getString(R.string.summary_wz_prefix, wzIcon), wz)).append("\n")
+
+            // .append(line(getString(R.string.summary_cz_prefix, czIcon), cz)).append("\n")
+            .append(line(getString(R.string.summary_wz_prefix, ""), wz)).append("\n")
             .append(line(getString(R.string.summary_birthtime_prefix), btLabel))
+
         binding.tvAppProfileSummary.text = sb
     }
 
@@ -558,7 +576,7 @@ class SettingsFragment : Fragment() {
         age
     }.getOrElse { -1 }
     private fun westernZodiac(iso: String): Pair<String,String> = runCatching {
-        if (iso.isBlank()) return "Zodiac -" to "✨"
+        if (iso.isBlank()) return "Zodiac -" to ""
         val (m,d) = iso.substring(5).split("-").map { it.toInt() }
         val arr = listOf(
             Triple(1,20,"♑ Capricorn"), Triple(2,19,"♒ Aquarius"), Triple(3,21,"♓ Pisces"),
@@ -665,7 +683,6 @@ class SettingsFragment : Fragment() {
 
     // ───────── 계정 비활성화(삭제 예약) ─────────
     private fun showDeactivateDialog() {
-        // ✅ 로그아웃 다이얼로그와 동일 스타일: 버튼 텍스트 컬러 #FDCA60 (+연보라 배경 보정)
         val dlg = MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.dlg_delete_title))
             .setMessage(getString(R.string.dlg_delete_soft_msg))
@@ -784,7 +801,7 @@ class SettingsFragment : Fragment() {
         return tv.data
     }
     private fun brandGoldForSurface(): Int {
-        val base = Color.parseColor("#FDCA60")
+        val base = Color.parseColor("#48286D")
         val surface = themedColor(com.google.android.material.R.attr.colorSurface)
         val isLightSurface = ColorUtils.calculateLuminance(surface) > 0.7
         return if (isLightSurface) ColorUtils.blendARGB(base, Color.BLACK, 0.15f) else base

@@ -6,14 +6,14 @@
         <shape android:shape="rectangle">
             <corners android:radius="16dp"/>
             <gradient
-                android:startColor="#F2F4B635"
-                android:centerColor="#E4F4B635"
-                android:endColor="#AAF4B635"
+                android:startColor="#F2F4B636"
+                android:centerColor="#EDF8AF18"
+                android:endColor="#CDE9A81F"
                 android:angle="90"/>
 
 
             <!-- 외곽선: 과하지 않게 아주 옅은 하이라이트 -->
-            <stroke android:width="1dp" android:color="#A1140D21"/>
+            <stroke android:width="3dp" android:color="#AE040724"/>
         </shape>
     </item>
 

@@ -8,7 +8,7 @@
 <string name="login_password_confirm_hint">Confirm password</string>
 <string name="login_findpw">Find password</string>
 <string name="login_findpw_send">Send by email</string>
-<string name="forgot_password">Forgot your password?</string>
+<string name="forgot_password">Forgot your\npassword?</string>
 <string name="sign_up">Sign up</string>
 <string name="sign_up_title">Create a new account</string>
 <string name="email_hint">Email</string>
@@ -38,6 +38,7 @@
 <string name="title_terms_privacy">Terms · Privacy Policy</string>
 <string name="tab_terms">Terms</string>
 <string name="tab_privacy">Privacy</string>
+
 
     <!-- dialog_ad_prompt.xml -->
 <string name="ad_prompt_title">Preparing your tailored interpretation</string>
@@ -235,7 +236,7 @@ These terms govern the rights and obligations between the user and the operator 
 Posting unlawful/harmful content, automated scraping, reverse engineering/modification.
 
 5. Intellectual Property
-Rights to the Service and provided content belong to the operator or respective right holders.
+Rights to the Service and provided content belong to the operator**\n**or respective right holders.
 
 6. Disclaimer
 Accuracy and usefulness of interpretations/fortune results are not guaranteed.
@@ -246,9 +247,9 @@ Material changes will be notified in the app.
 Privacy Policy
 
 1. Data Collected
-Required: Email (or anonymous ID), nickname, birthdate/gender, usage logs
-Optional: MBTI, birth time, profile image
-Automatically collected: device/app version, ad ID, FCM token
+Required:\nEmail (or anonymous ID), nickname, birthdate/gender, usage logs
+Optional:\nMBTI, birth time, profile image
+Automatically collected:\ndevice/app version, ad ID, FCM token
 
 2. Purpose of Use
 Provide dream logging/analysis, send push notifications, improve quality, customer support, abuse prevention
@@ -297,15 +298,14 @@ If you log in again within 7 days, it will be restored. After 7 days, it will be
 <string name="toast_local_migration_failed">Local data migration failed: %1$s</string>
 <string name="dlg_save_title">Save now?</string>
 <string name="dlg_save_msg">Save your profile with the entered information.</string>
-<string name="summary_name_prefix">🧑 Name:</string>
-<string name="summary_birth_prefix">🎂 Birthdate:</string>
-<string name="summary_gender_prefix">⚧️ Gender:</string>
-<string name="summary_mbti_prefix">🔮 MBTI:</string>
-<string name="summary_age_prefix">🎂 Age:</string>
+
+<string name="summary_birth_prefix">Birthdate:</string>
+<string name="summary_gender_prefix">Gender:</string>
+<string name="summary_mbti_prefix">MBTI:</string>
+<string name="summary_age_prefix">Age:</string>
 <string name="summary_age_value">%1$d yrs</string>
-<string name="summary_cz_prefix">%1$s zodiac (East):</string>
 <string name="summary_wz_prefix">%1$s zodiac (West):</string>
-<string name="summary_birthtime_prefix">⏰ Birth time:</string>
+<string name="summary_birthtime_prefix"> Birth time:</string>
 <string name="select_none">None</string>
 <string name="birthtime_none">None</string>
 <string name="err_enter_name">Please enter your name.</string>
@@ -668,7 +668,7 @@ Please wait.</string>
 <string name="terms_section1_body">These terms govern the rights and obligations between the user and the operator regarding the use of the Service.</string>
 <string name="terms_section2">2. Account &amp; Use</string>
     <string-array name="terms_section2_items">
-        <item>Rated for all ages; however, target users are 13+ for privacy compliance.</item>
+        <item>Rated for all ages;\nhowever, target users are 13+ for privacy compliance.</item>
         <item>Users must keep account information accurate.</item>
         <item>Features may change or be discontinued without notice.</item>
     </string-array>
@@ -691,7 +691,7 @@ Please wait.</string>
 
     <!-- Privacy -->
 <string name="privacy_title">Privacy Policy</string>
-<string name="privacy_intro">Rated for all ages… If we learn that data from a child under 13 has been collected, we will delete it immediately.</string>
+<string name="privacy_intro">Rated for all ages.\nIf we learn that data from a child under 13 has been collected, we will delete it immediately.</string>
 <string name="privacy_section1">1. Data Collected</string>
     <string-array name="privacy_section1_items">
         <item>Required: Email (or anonymous ID), nickname, birthdate/gender, usage logs</item>
@@ -707,9 +707,9 @@ Please wait.</string>
 <string name="privacy_section3">3. Retention</string>
 <string name="privacy_section3_body">Deleted without delay upon account deletion or purpose fulfillment, except where laws require retention.</string>
 <string name="privacy_section4">4. Processing/Overseas Transfer</string>
-<string name="privacy_section4_body">Limited delegation/overseas transfer to cloud/analytics/ads services like OpenAI, AdMob, Firebase may occur.</string>
+<string name="privacy_section4_body">Limited delegation/overseas transfer to cloud/analytics/ads services\nlike OpenAI, AdMob, Firebase may occur.</string>
 <string name="privacy_section5">5. User Rights</string>
-<string name="privacy_section5_body">You can request access, correction, deletion, suspension of processing, and withdraw consent. Contact: dreamindream@dreamindream.app</string>
+<string name="privacy_section5_body">You can request access, correction, deletion, suspension of processing, and withdraw consent.\nContact: dreamindream@dreamindream.app</string>
 <string name="privacy_section6">6. Security</string>
     <string-array name="privacy_section6_items">
         <item>HTTPS, least-privilege access, access logs</item>

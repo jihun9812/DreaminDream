@@ -8,7 +8,7 @@
     <!-- 오늘 강조선 두께: dimen 분리 -->
     <stroke
         android:width="1dp"
-        android:color="#B665CE23" />
+        android:color="#8B94CE" />
 
     <!-- 지름: 공통 dimen -->
     <size

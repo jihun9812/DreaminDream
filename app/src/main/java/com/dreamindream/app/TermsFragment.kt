@@ -31,12 +31,18 @@ class TermsActivity : AppCompatActivity() {
         // 기본 탭
         binding.toggleGroup.check(binding.btnTermsTab.id)
 
-        // 가독성 옵션
+        // 언어별 가독성: ko만 양쪽정렬/하이픈, 그 외는 끔(영문 벌어짐 방지)
+        val lang = resources.configuration.locales[0].language
+        val isKo = lang.equals("ko", ignoreCase = true)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            binding.tvTerms.justificationMode = LineBreaker.JUSTIFICATION_MODE_INTER_WORD
+            binding.tvTerms.justificationMode =
+                if (isKo) LineBreaker.JUSTIFICATION_MODE_INTER_WORD
+                else LineBreaker.JUSTIFICATION_MODE_NONE
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            binding.tvTerms.hyphenationFrequency = Layout.HYPHENATION_FREQUENCY_NORMAL
+            binding.tvTerms.hyphenationFrequency =
+                if (isKo) Layout.HYPHENATION_FREQUENCY_NORMAL
+                else Layout.HYPHENATION_FREQUENCY_NONE
         }
 
         setBody(isTerms = true)
@@ -63,11 +69,8 @@ class TermsActivity : AppCompatActivity() {
     private fun SpannableStringBuilder.p(text: String) {
         append(text).append("\n\n")
     }
-
     private fun SpannableStringBuilder.bullets(items: List<String>) {
-        // ✅ attr/Material R 전혀 사용 안 함 — 현재 텍스트 색으로 통일
         val bulletColor = binding.tvTerms.currentTextColor
-
         items.forEach {
             val start = length
             append(it).append("\n")
@@ -81,7 +84,7 @@ class TermsActivity : AppCompatActivity() {
         append("\n")
     }
 
-    // ---------- 약관 ----------
+    // ---------- 이용약관 ----------
     private fun buildTerms() = buildSpannedString {
         h1(getString(R.string.terms_title))
         h2(getString(R.string.terms_section1)); p(getString(R.string.terms_section1_body))

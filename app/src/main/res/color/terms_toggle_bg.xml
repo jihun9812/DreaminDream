@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 선택된(checked) 상태일 때 보라색 -->
-    <item android:state_checked="true" android:color="#596E45AF"/>
+    <item android:state_checked="true" android:color="#37FFFFFF"/>
     <!-- 선택 안 됐을 때 투명 -->
     <item android:color="@android:color/transparent"/>
 </selector>

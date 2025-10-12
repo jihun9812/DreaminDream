@@ -157,6 +157,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/kpi_positive"
+                                        android:fontFamily="@font/pretendard_medium"
                                         android:textColor="#89EFCB"
                                         android:textSize="@dimen/kpi_label" />
 
@@ -193,6 +194,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/kpi_neutral"
+                                        android:fontFamily="@font/pretendard_medium"
                                         android:textColor="#BFCBD1"
                                         android:textSize="@dimen/kpi_label" />
 
@@ -228,6 +230,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/kpi_negative"
+                                        android:fontFamily="@font/pretendard_medium"
                                         android:textColor="#FB99AD"
                                         android:textSize="@dimen/kpi_label" />
 
@@ -255,6 +258,7 @@
                                 android:id="@+id/chart_title"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:fontFamily="@font/pretendard_medium"
                                 android:layout_weight="1"
                                 android:text="@string/chart_emotion_balance"
                                 android:textColor="#FDCA60"
@@ -286,6 +290,7 @@
                             android:layout_marginTop="@dimen/section_margin_top"
                             android:layout_marginBottom="@dimen/section_margin_bottom"
                             android:text="@string/chart_theme"
+                            android:fontFamily="@font/pretendard_medium"
                             android:textColor="#FDCA60"
                             android:textSize="@dimen/section_title_text"
                             android:textStyle="bold" />
@@ -311,6 +316,7 @@
                             android:id="@+id/text_keywords"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendard_medium"
                             android:layout_marginBottom="@dimen/section_margin_bottom"
                             android:text="@string/chart_keywords_placeholder"
                             android:textColor="#CBDAE4"
@@ -330,6 +336,7 @@
                                 android:layout_height="@dimen/btn_height"
                                 android:backgroundTint="#FDCA60"
                                 android:text="@string/btn_pro_upgrade"
+                                android:fontFamily="@font/pretendard_medium"
                                 android:textAllCaps="false"
                                 android:textColor="#352D00"
                                 android:textSize="@dimen/text_sm"
@@ -366,7 +373,7 @@
                                 android:text="@string/ai_analysis_title"
                                 android:textColor="#FDCA60"
                                 android:textSize="@dimen/section_title_text"
-                                android:textStyle="bold" />
+                                android:fontFamily="@font/pretendard_bold" />
 
                             <TextView
                                 android:id="@+id/text_ai_comment"
@@ -378,6 +385,7 @@
                                 android:includeFontPadding="false"
                                 android:justificationMode="inter_word"
                                 android:letterSpacing="0.01"
+                                android:fontFamily="@font/pretendard_medium"
                                 android:lineSpacingExtra="@dimen/body_line_space"
                                 android:lineSpacingMultiplier="1.12"
                                 android:text="@string/ai_analysis_placeholder"

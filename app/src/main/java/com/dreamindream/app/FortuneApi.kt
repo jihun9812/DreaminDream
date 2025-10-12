@@ -454,7 +454,7 @@ class FortuneApi(
             })
             put("keywords", JSONObject().apply { put("type", "array"); put("items", JSONObject().put("type", "string")); put("minItems", 1); put("maxItems", 4) })
             put("emotions", JSONObject().apply {
-                put("type", "object"); put("required", JSONArray().apply { put("positive"); put("neutral"); put("negative") })
+                put("type", "object"); put("description", "Sum to 100 (positive+neutral+negative=100). Keep daily variety; avoid extremes."); put("required", JSONArray().apply { put("positive"); put("neutral"); put("negative") })
                 put("properties", JSONObject().apply {
                     put("positive", JSONObject().put("type", "integer").put("minimum", 20).put("maximum", 90))
                     put("neutral", JSONObject().put("type", "integer").put("minimum", 10).put("maximum", 50))
@@ -636,6 +636,67 @@ date:"$today ($weekday)", age:$userAge, age_tag:$tag, seed:$seed, tone:"$tone"
             put("negative", optInt("negative", ng).coerceIn(5, 35))
         }
         obj.put("emotions", emo)
+        // --- Emotion normalization & balancing to avoid sticky 70% positives ---
+        run {
+            val e = obj.getJSONObject("emotions")
+            val p0 = e.optInt("positive")
+            val n0 = e.optInt("neutral")
+            val g0 = e.optInt("negative")
+
+            // 1) Normalize to sum = 100
+            var sum = (p0 + n0 + g0).coerceAtLeast(1)
+            var pf = p0 * 100f / sum
+            var nf = n0 * 100f / sum
+            var gf = g0 * 100f / sum
+
+            // 2) Light "pull-to-center" to keep daily variety while avoiding extremes
+            // Target bands chosen to look natural in UI and avoid constant 70+ green.
+            fun clamp(x: Float, lo: Int, hi: Int) = x.coerceIn(lo.toFloat(), hi.toFloat())
+            val pCentered = clamp(pf, 35, 55)
+            val nCentered = clamp(nf, 20, 40)
+            val gCentered = clamp(gf, 10, 25)
+
+            // Blend original with centered (alpha=0.35 keeps API trend but softens bias)
+            val alpha = 0.35f
+            pf = pf * (1f - alpha) + pCentered * alpha
+            nf = nf * (1f - alpha) + nCentered * alpha
+            gf = gf * (1f - alpha) + gCentered * alpha
+
+            // 3) Round to ints and fix rounding drift to make sum exactly 100
+            var pi = pf.toInt()
+            var ni = nf.toInt()
+            var gi = gf.toInt()
+            var drift = 100 - (pi + ni + gi)
+            // Assign remainder to the largest component by absolute fractional part
+            if (drift != 0) {
+                val fracs = listOf(
+                    Pair("p", pf - pi),
+                    Pair("n", nf - ni),
+                    Pair("g", gf - gi)
+                ).sortedByDescending { it.second }
+                when (fracs.first().first) {
+                    "p" -> pi += drift
+                    "n" -> ni += drift
+                    else -> gi += drift
+                }
+            }
+
+            // Final safety clamp and write back
+            pi = pi.coerceIn(20, 90)
+            ni = ni.coerceIn(10, 50)
+            gi = gi.coerceIn(5, 35)
+
+            // If clamping broke the sum, nudge neutral to compensate
+            val fix = 100 - (pi + ni + gi)
+            if (fix != 0) ni = (ni + fix).coerceIn(10, 50)
+
+            e.put("positive", pi)
+            e.put("neutral", ni)
+            e.put("negative", gi)
+            obj.put("emotions", e)
+        }
+        // --- /Emotion normalization ---
+
 
         val secIn = obj.optJSONObject("sections")
         val sec = secIn ?: JSONObject()

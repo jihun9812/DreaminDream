@@ -6,7 +6,7 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.content.Context
+
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -38,7 +38,6 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
-import com.dreamindream.app.AdManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.material.button.MaterialButton
@@ -73,9 +72,6 @@ class FortuneFragment : Fragment() {
     private lateinit var tvPos: TextView
     private lateinit var tvNeu: TextView
     private lateinit var tvNeg: TextView
-
-    private lateinit var btnCopy: TextView
-    private lateinit var btnShare: TextView
     private lateinit var btnDeep: MaterialButton
     private lateinit var layoutChecklist: LinearLayout
     private var sectionsContainer: LinearLayout? = null
@@ -134,8 +130,7 @@ class FortuneFragment : Fragment() {
         tvNeu           = v.findViewById(R.id.tvNeu)
         tvNeg           = v.findViewById(R.id.tvNeg)
 
-        btnCopy         = v.findViewById(R.id.btnCopy)
-        btnShare        = v.findViewById(R.id.btnShare)
+
         btnDeep         = v.findViewById(R.id.btnDeep)
         layoutChecklist = v.findViewById(R.id.layoutChecklist)
         sectionsContainer = v.findViewById(R.id.sectionsContainer)
@@ -147,18 +142,6 @@ class FortuneFragment : Fragment() {
         setPendingFortune()
         applyGoldToTraitChips(rootLayout)
         storage.syncProfileFromFirestore { decideInitialUi(v) }
-
-        btnCopy.setOnClickListener {
-            val cm = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-            cm.setPrimaryClip(android.content.ClipData.newPlainText("fortune", resultText.text))
-            Toast.makeText(requireContext(), getString(R.string.toast_copied), Toast.LENGTH_SHORT).show()
-        }
-        btnShare.setOnClickListener {
-            val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                type = "text/plain"; putExtra(android.content.Intent.EXTRA_TEXT, resultText.text.toString())
-            }
-            startActivity(android.content.Intent.createChooser(send, getString(R.string.share_chooser_title)))
-        }
 
         fortuneButton.setOnClickListener {
             if (!storage.isProfileComplete()) {
@@ -615,6 +598,7 @@ class FortuneFragment : Fragment() {
 
     private fun openSectionDialog(title: String, score: Int, text: String?, advice: String?) {
         val content = layoutInflater.inflate(R.layout.dialog_fortune_section, null)
+        val color = Color.parseColor("#A62A0D4E")
 
         val rootCard = content.findViewById<MaterialCardView>(R.id.dialogRoot)
         val tvTitle  = content.findViewById<TextView>(R.id.tvSectionDialogTitle)
@@ -633,7 +617,7 @@ class FortuneFragment : Fragment() {
         val dlg = MaterialAlertDialogBuilder(requireContext())
             .setView(content)
             .create()
-            .apply { window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT)) }
+            .apply { window?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#A62A0D4E"))) }
 
         dlg.setOnShowListener {
             val dm = resources.displayMetrics
@@ -734,7 +718,7 @@ class FortuneFragment : Fragment() {
         sectionsContainer?.visibility = vis
         resultText.visibility = vis
         layoutChecklist.visibility = vis
-        btnCopy.visibility = vis; btnShare.visibility = vis; btnDeep.visibility = vis
+        btnDeep.visibility = vis
     }
 
     private fun openDeepWithGate() {

@@ -42,6 +42,8 @@ class LoginActivity : BaseActivity() {
         skipLoginButton.applyPressEffect {
             auth.signInAnonymously()
                 .addOnSuccessListener {
+                    // ✅ 홈 페이드인 예약
+                    markPendingHomeFade()
                     saveUserInfoToFirestore()
                     showCardLoadingAndDownloadHolidays()
                 }
@@ -112,7 +114,11 @@ class LoginActivity : BaseActivity() {
                     if (auth.currentUser?.isEmailVerified == true) {
                         saveUserInfoToFirestore()
                         val uid = auth.currentUser?.uid ?: return@addOnSuccessListener
-                        checkReactivation(uid) { showCardLoadingAndDownloadHolidays() }
+                        // ✅ 홈 페이드인 예약은 실제 진입 직전에
+                        checkReactivation(uid) {
+                            markPendingHomeFade()
+                            showCardLoadingAndDownloadHolidays()
+                        }
                     } else {
                         Toast.makeText(this, getString(R.string.toast_email_verify_first), Toast.LENGTH_LONG).show()
                         auth.signOut()
@@ -185,7 +191,11 @@ class LoginActivity : BaseActivity() {
                 .addOnSuccessListener {
                     saveUserInfoToFirestore()
                     val uid = auth.currentUser?.uid ?: return@addOnSuccessListener
-                    checkReactivation(uid) { showCardLoadingAndDownloadHolidays() }
+                    // ✅ 홈 페이드인 예약은 실제 진입 직전에
+                    checkReactivation(uid) {
+                        markPendingHomeFade()
+                        showCardLoadingAndDownloadHolidays()
+                    }
                 }
                 .addOnFailureListener {
                     Toast.makeText(this, getString(R.string.toast_google_login_failed_fmt, it.message ?: "-"), Toast.LENGTH_SHORT).show()
@@ -250,6 +260,7 @@ class LoginActivity : BaseActivity() {
         val launchMain = {
             startActivity(Intent(this, MainActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                // 참고: 필요하다면 여기서도 putExtra("from_login", true) 가능
             })
             finish()
         }
@@ -279,6 +290,13 @@ class LoginActivity : BaseActivity() {
         }
     }
 
+    /** ✅ 홈 첫 진입에서 페이드인을 실행시키도록 사용자별 프리퍼런스에 예약 표시 */
+    private fun markPendingHomeFade() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        getSharedPreferences("dream_history_$uid", MODE_PRIVATE)
+            .edit().putBoolean("pending_home_fade", true).apply()
+    }
+
     private fun saveUserInfoToFirestore() {
         val user = FirebaseAuth.getInstance().currentUser ?: return
         val db = FirebaseFirestore.getInstance()
@@ -286,7 +304,9 @@ class LoginActivity : BaseActivity() {
 
         val userData = mapOf(
             "email" to (if (user.isAnonymous) "guest" else user.email ?: "unknown"),
-            "name" to (user.displayName ?: if (user.isAnonymous) getString(R.string.name_guest_default) else getString(R.string.name_anonymous_default)),
+            "name" to (user.displayName
+                ?: if (user.isAnonymous) getString(R.string.name_guest_default)
+                else getString(R.string.name_anonymous_default)),
             "last_login" to System.currentTimeMillis()
         )
 
@@ -295,7 +315,10 @@ class LoginActivity : BaseActivity() {
 
     private fun View.applyPressEffect(scale: Float = 0.95f, duration: Long = 100L, action: () -> Unit) {
         this.setOnClickListener {
-            val anim = ScaleAnimation(1f, scale, 1f, scale, (this.width / 2).toFloat(), (this.height / 2).toFloat()).apply {
+            val anim = ScaleAnimation(
+                1f, scale, 1f, scale,
+                (this.width / 2).toFloat(), (this.height / 2).toFloat()
+            ).apply {
                 this.duration = duration
                 fillAfter = true
             }
@@ -390,13 +413,11 @@ class LoginActivity : BaseActivity() {
             container.getLocationInWindow(contWin)
 
             val x = (anchorWin[0] - contWin[0]) + anchor.width / 2f - tip.width / 2f
-            // ⬇️ 여기 수정
             val y = (anchorWin[1] - contWin[1]).toFloat() + anchor.height.toFloat() + dp(8).toFloat()
 
             tip.x = x
             tip.y = y
         }
-
 
         // 6초 뒤 자동 닫힘
         tip.postDelayed({

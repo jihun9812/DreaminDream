@@ -37,7 +37,7 @@
                 android:id="@+id/subtitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="광고 없이, 더 빠르게. 우리 앱답게."
+                android:text="광고 없이, 더 빠르게"
                 android:textSize="14sp"
                 android:layout_marginTop="6dp"
                 android:textColor="#B3FFFFFF"/>

@@ -10,7 +10,6 @@
     android:paddingStart="16dp"
     android:paddingEnd="10dp"
     android:background="@drawable/bg_glass_card"
-
     android:minHeight="56dp"
     android:elevation="0dp">
 
@@ -23,7 +22,7 @@
         android:ellipsize="end"
         android:text="사자와 호랑이가 싸웠어…"
         android:textSize="15sp"
-        android:textColor="@android:color/white"
+        android:textColor="#DDEBF2FA"
         android:fontFamily="@font/pretendard_medium"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/btnDelete"
@@ -37,8 +36,8 @@
         android:layout_height="32dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="삭제"
-        android:src="@drawable/ic_close_red"
-        app:tint="@android:color/white"
+        android:src="@drawable/ic_close"
+        app:tint="#FBA29D9D"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>

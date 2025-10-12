@@ -93,7 +93,7 @@
                 android:layout_height="41dp"
                 android:layout_marginStart="10dp"
                 android:minHeight="0dp"
-                android:backgroundTint="#FDCA60"
+                android:backgroundTint="#FDC54F"
                 android:fontFamily="@font/pretendard_medium"
                 android:minWidth="0dp"
                 android:paddingStart="14dp"

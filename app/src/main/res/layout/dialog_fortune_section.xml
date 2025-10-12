@@ -14,7 +14,7 @@
         app:strokeColor="#454545"
         app:strokeWidth="1dp"
         app:cardElevation="10dp"
-        app:cardBackgroundColor="#F3111728">
+        app:cardBackgroundColor="#C420153C">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -36,7 +36,7 @@
                     android:layout_weight="1"
                     android:text="@string/fortune_section_title_total"
                     android:textSize="18sp"
-                    android:textStyle="bold"
+                    android:fontFamily="@font/pretendard_medium"
                     android:textColor="#FFFFFF" />
 
                 <TextView
@@ -44,7 +44,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/fortune_section_score_sample"
-                    android:textColor="#FFFFFF"
+                    android:textColor="#000000"
+                    android:fontFamily="@font/pretendard_medium"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:paddingTop="4dp"
@@ -67,6 +68,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="#EAF2FA"
                     android:textSize="14sp"
+                    android:fontFamily="@font/pretendard_medium"
                     android:lineSpacingExtra="3dp"
                     android:letterSpacing="0.01" />
             </androidx.core.widget.NestedScrollView>
@@ -76,7 +78,8 @@
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#212121"
+                android:fontFamily="@font/pretendard_medium"
+                android:textColor="#090909"
                 app:backgroundTint="#F6AF1E"
                 android:text="@string/ok" />
         </LinearLayout>

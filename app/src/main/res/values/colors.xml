@@ -1,37 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#FFCA28</color> <!-- Yellow gold -->
-    <color name="primary_gradient_start">#3A0CA3</color> <!-- 진보라 -->
-    <color name="primary_gradient_end">#4361EE</color> <!-- 밝은 파랑 -->
-    <color name="glass_background">#40FFFFFF</color> <!-- Glass 효과용 투명 흰색 -->
-    <color name="bubble_bg">#F5F5F5</color> <!-- 말풍선 배경 -->
-    <color name="nebula_overlay">#44263366</color> <!-- 배경 어두운 오버레이 -->
-    <color name="your_black">#000000</color> <!-- 글자용 -->
+    <color name="colorPrimary">#FFCA28</color>
+    <color name="primary_gradient_start">#3A0CA3</color>
+    <color name="primary_gradient_end">#4361EE</color>
+    <color name="glass_background">#40FFFFFF</color>
+    <color name="bubble_bg">#F5F5F5</color>
+    <color name="nebula_overlay">#44263366</color>
+    <color name="your_black">#000000</color>
 
-    <color name="your_light_background">#FFF9E5</color> <!-- 크림 배경 -->
+    <color name="your_light_background">#FFF9E5</color>
     <color name="btn_primary_bg">#382A52</color>
     <color name="btn_primary_text">#FFFFFF</color>
 
-    <color name="btn_tonal_bg">#2E2541</color>
+    <color name="btn_tonal_bg">#C90F143A</color>
     <color name="btn_tonal_text">#FFFFFF</color>
 
     <color name="btn_outline_stroke">#33FFFFFF</color>
     <color name="btn_outline_text">#EDEDED</color>
 
+    <color name="summary_label">#F8E56F</color>
+
     <color name="btn_google_stroke">#1A000000</color>
 
     <color name="btn_stroke">#26FFFFFF</color>
     <color name="btn_ripple">#40FFFFFF</color>
-    <color name="chip_bg_idle">#1AFFFFFF</color>     <!-- 10% white -->
-    <color name="chip_bg_pressed">#29FFFFFF</color>  <!-- 16% white -->
-    <color name="chip_stroke">#33FFFFFF</color>      <!-- 20% white -->
-    <color name="chip_text">#E6FFFFFF</color>        <!-- 90% white -->
+    <color name="chip_bg_idle">#1AFFFFFF</color>
+    <color name="chip_bg_pressed">#29FFFFFF</color>
+    <color name="chip_stroke">#33FFFFFF</color>
+    <color name="chip_text">#E6FFFFFF</color>
     <color name="chip_ripple">#33FFFFFF</color>
 
-    <color name="dd_surface_card">#15202A</color>   <!-- 포춘 카드와 동일 -->
-    <color name="dd_stroke_card">#26FFFFFF</color>  <!-- 얇은 유리 느낌 스트로크 -->
+    <color name="dd_surface_card">#15202A</color>
+    <color name="dd_stroke_card">#26FFFFFF</color>
 
-    <color name="colorPrimaryDark">#1A1333</color> <!-- Deep navy -->
+    <color name="colorPrimaryDark">#1A1333</color>
 
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
@@ -42,7 +44,11 @@
     <color name="button_pressed_color">#CCCCCC</color>
     <color name="dark_background">#1D1D2F</color>
     <color name="textPrimary">#FFFFFF</color>
-    <color name="card_background">#2E2651</color> <!-- 카드 배경 (보라+딥톤) -->
-    <color name="textSecondary">#BBBBBB</color> <!-- 해몽 결과용 보조 텍스트 -->
+    <color name="card_background">#2E2651</color>
+    <color name="textSecondary">#BBBBBB</color>
 
+    <!-- New for unified dialogs -->
+    <color name="brand_gold">#FDCA60</color>
+    <!-- Slightly warm white surface for dialogs -->
+    <color name="dialog_surface">#FFFDFB</color>
 </resources>

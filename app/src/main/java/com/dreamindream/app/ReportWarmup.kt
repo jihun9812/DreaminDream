@@ -1,15 +1,24 @@
 package com.dreamindream.app
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 
 object ReportWarmup {
+    private val main by lazy { Handler(Looper.getMainLooper()) }
+
+    /**
+     * Fire-and-forget warmup for this week's aggregated AI report.
+     * We assume aggregation is idempotent. We trigger immediately and once more after a short delay
+     * to absorb write propagation lag so that navigation into AIReportFragment feels instant.
+     */
     fun warmUpThisWeek(ctx: Context, uid: String) {
         val weekKey = WeekUtils.weekKey()
-        FirestoreManager.countDreamEntriesForWeek(uid, weekKey) { count ->
-            if (count >= 2) {
-                // 리포트가 없으면 즉시 생성 (AIReportFragment에서 바로 로딩 완료 상태가 되도록)
-                FirestoreManager.aggregateDreamsForWeek(uid, weekKey, ctx) { /* no-op */ }
-            }
-        }
+        // immediate
+        FirestoreManager.aggregateDreamsForWeek(uid, weekKey, ctx) { /* no-op */ }
+        // small delayed retry
+        main.postDelayed({
+            FirestoreManager.aggregateDreamsForWeek(uid, weekKey, ctx) { /* no-op */ }
+        }, 1200)
     }
 }

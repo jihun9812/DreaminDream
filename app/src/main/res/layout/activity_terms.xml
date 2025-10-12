@@ -13,10 +13,10 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"
-        app:navigationIconTint="#FDCA60"
+        app:navigationIconTint="#FFFFFF"
         app:title="@string/title_terms_privacy"
         app:titleCentered="true"
-        app:titleTextColor="#FDCA60"/>
+        app:titleTextColor="#B8D5F6"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -42,9 +42,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/tab_terms"
-                app:strokeColor="#FDCA60"
+                app:strokeColor="#B8D5F6"
                 app:backgroundTint="@color/terms_toggle_bg"
-                android:textColor="#FDCA60"/>
+                android:textColor="#B8D5F6"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPrivacyTab"
@@ -53,9 +53,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/tab_privacy"
-                app:strokeColor="#FDCA60"
+                app:strokeColor="#B8D5F6"
                 app:backgroundTint="@color/terms_toggle_bg"
-                android:textColor="#FDCA60"/>
+                android:textColor="#B8D5F6"/>
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
         <androidx.core.widget.NestedScrollView
@@ -71,9 +71,8 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="18dp"
                 app:cardElevation="0dp"
-                app:strokeColor="#FDCA60"
-                app:strokeWidth="1dp"
-                app:cardBackgroundColor="#1BFFFFFF">
+                app:strokeWidth="0dp"
+                app:cardBackgroundColor="#6903082E">
 
                 <TextView
                     android:id="@+id/tvTerms"
@@ -81,7 +80,7 @@
                     android:layout_height="wrap_content"
                     android:padding="18dp"
                     android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
-                    android:textColor="#FDCA60"
+                    android:textColor="#E5D5D5D5"
                     android:lineSpacingExtra="6dp"
                     android:autoLink="email|web"
                     android:linksClickable="true"

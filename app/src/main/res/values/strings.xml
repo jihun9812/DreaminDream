@@ -10,7 +10,7 @@
     <string name="login_password_confirm_hint">비밀번호 확인</string>
     <string name="login_findpw">비밀번호 찾기</string>
     <string name="login_findpw_send">이메일로 전송</string>
-    <string name="forgot_password">비밀번호를 잊으셨나요?</string>
+    <string name="forgot_password">비밀번호를\n잊으셨나요?</string>
     <string name="sign_up">회원가입</string>
     <string name="sign_up_title">새 계정 만들기</string>
     <string name="email_hint">이메일</string>
@@ -213,7 +213,7 @@
         <string name="btn_delete_account">계정 삭제</string>
         <string name="label_language">언어</string>
         <string name="label_account_link">계정 통합</string>
-        <string name="account_status_default">상태: -</string>
+        <string name="account_status_default">상태:  -</string>
         <string name="btn_google_link">Google로 계정 통합</string>
         <string name="account_link_note">* 체험(익명) 데이터는 Google 계정 연결 시 그대로 유지됩니다.</string>
 
@@ -320,7 +320,6 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
 
 
     <string name="toast_merge_partial">계정 병합(부분) 완료: %1$s</string>
-
     <string name="toast_link_failed">연결 실패: %1$s</string>
     <string name="toast_login_cancel_failed_code">로그인 취소/실패: %1$d</string>
     <string name="toast_error_with_reason">오류: %1$s</string>
@@ -331,15 +330,15 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="dlg_save_title">저장하시겠어요?</string>
     <string name="dlg_save_msg">입력한 정보로 프로필을 저장합니다.</string>
 
-    <string name="summary_name_prefix">🧑 이름:</string>
-    <string name="summary_birth_prefix">🎂 생일:</string>
-    <string name="summary_gender_prefix">⚧️ 성별:</string>
-    <string name="summary_mbti_prefix">🔮 MBTI:</string>
-    <string name="summary_age_prefix">🎂 나이:</string>
+
+    <string name="summary_birth_prefix">생일:</string>
+    <string name="summary_gender_prefix">️성별:</string>
+    <string name="summary_mbti_prefix">MBTI:</string>
+    <string name="summary_age_prefix">나이:</string>
     <string name="summary_age_value">%1$d세</string>
-    <string name="summary_cz_prefix">%1$s 띠:</string>
-    <string name="summary_wz_prefix">%1$s 별자리:</string>
-    <string name="summary_birthtime_prefix">⏰ 출생시간:</string>
+
+    <string name="summary_wz_prefix">%1$s별자리:</string>
+    <string name="summary_birthtime_prefix"> 출생시간:</string>
 
 
     <string name="select_none">선택안함</string>
@@ -1019,6 +1018,7 @@ eep prompt 템플릿 -->
         <item>서비스는 예고 없이 기능을 변경·중단할 수 있습니다.</item>
     </string-array>
 
+
     <string name="terms_section3">3. 유료 기능 및 광고</string>
     <string-array name="terms_section3_items">
         <item>프리미엄(광고 제거 등) 기능은 별도 정책을 따릅니다.</item>
@@ -1042,7 +1042,7 @@ eep prompt 템플릿 -->
 
     <!-- 개인정보 처리방침 -->
     <string name="privacy_title">개인정보 처리방침</string>
-    <string name="privacy_intro">콘텐츠 등급은 전체이용가이나, ... 13세 미만 아동의 개인정보가 수집된 사실이 확인되면 즉시 삭제합니다.</string>
+    <string name="privacy_intro">콘텐츠 등급은 전체이용가이나, 13세 미만 아동의 개인정보가 수집된 사실이 확인되면 즉시 삭제합니다.</string>
 
     <string name="privacy_section1">1. 수집 항목</string>
     <string-array name="privacy_section1_items">
@@ -1065,8 +1065,9 @@ eep prompt 템플릿 -->
     <string name="privacy_section4_body">OpenAI·AdMob·Firebase 등 클라우드/분석·광고 서비스에 한정하여 위탁·국외 이전이 있을 수 있습니다.</string>
 
     <string name="privacy_section5">5. 이용자 권리</string>
-    <string name="privacy_section5_body">개인정보 열람·정정·삭제·처리정지 요구 및 동의 철회가 가능합니다. 문의: dreamindream@dreamindream.app</string>
-
+    <string name="privacy_section5_body">
+        개인정보 열람·정정·삭제·처리정지 요구 및 동의 철회가 가능합니다.\n문의: dreamindream@dreamindream.app
+    </string>
     <string name="privacy_section6">6. 안전성 확보 조치</string>
     <string-array name="privacy_section6_items">
         <item>HTTPS 통신, 접근권한 최소화, 접근기록 관리 등</item>

@@ -3,12 +3,12 @@
     android:shape="oval">
 
     <!-- 선택된 날 채움색(기존 유지) -->
-    <solid android:color="#10FFFFFF" />
+    <solid android:color="#1DFFFFFF" />
 
     <!-- 두께: dimen 참조 -->
     <stroke
         android:width="1dp"
-        android:color="#FAF4CE0A" />
+        android:color="#E4424242" />
 
     <!-- 지름: dimen 참조 -->
     <size

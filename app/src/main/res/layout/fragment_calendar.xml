@@ -25,7 +25,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_chevron_left"
             android:contentDescription="@string/prev_month"
-            app:tint="#95BAE4" />
+            app:tint="#D6E5F6" />
 
         <TextView
             android:id="@+id/textViewMonthYear"
@@ -34,7 +34,7 @@
             android:text="@string/calendar_month_year_sample"
             android:textSize="@dimen/month_text"
             android:fontFamily="@font/pretendard_bold"
-            android:textColor="#95BAE4"
+            android:textColor="#D6E5F6"
             android:layout_marginHorizontal="@dimen/month_title_h_margin"
             android:maxLines="1"
             android:ellipsize="end"
@@ -47,7 +47,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_chevron_right"
             android:contentDescription="@string/next_month"
-            app:tint="#95BAE4" />
+            app:tint="#D6E5F6" />
     </LinearLayout>
 
     <!-- 공휴일 라벨 (동적 텍스트) -->
@@ -98,7 +98,7 @@
         android:layout_marginTop="10dp"
         android:text="@string/dream_list_title_sample"
         android:textSize="@dimen/list_title"
-        android:textColor="#FFD54F"
+        android:textColor="#FBDF86"
         android:fontFamily="@font/pretendard_bold"
         android:includeFontPadding="false" />
 
@@ -113,7 +113,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/dream_list_empty"
         android:textSize="@dimen/text_md"
-        android:textColor="#CFE3F0"
+        android:textColor="#E4EFF6"
         android:fontFamily="@font/pretendard_medium"
         android:includeFontPadding="false"
         android:visibility="gone" />

@@ -6,7 +6,8 @@
     android:layout_margin="24dp"
     app:cardCornerRadius="28dp"
     app:cardElevation="22dp"
-    android:backgroundTint="#F217153B">
+    android:fontFamily="@font/pretendard_medium"
+    android:backgroundTint="#E5030523">
 
     <ScrollView
         android:id="@+id/scrollDialog"
@@ -32,17 +33,15 @@
                 android:layout_gravity="end"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_close"
+                app:tint="#F8A6A6A6"
                 android:contentDescription="닫기" />
 
-            <TextView
-                android:id="@+id/resultTextView"
+            <LinearLayout
+                android:id="@+id/sectionsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:lineSpacingExtra="6dp"
-                android:paddingTop="6dp"
-                android:fontFamily="@font/pretendard_medium" />
+                android:orientation="vertical"
+                android:paddingTop="6dp"/>
         </LinearLayout>
     </ScrollView>
 </androidx.cardview.widget.CardView>

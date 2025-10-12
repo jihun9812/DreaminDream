@@ -25,8 +25,15 @@ class HomeFragment : Fragment() {
     private var lastAnalysis: String? = null
     private var lastScore: Int? = null
 
+    // 페이드인 1회 실행 제어
+    private var fadePlayed = false
     private fun isAlive(): Boolean = isAdded && view != null
-    companion object { private var homeAnimPlayed = false }
+
+    companion object {
+        private var homeAnimPlayed = false
+        private const val ARG_FROM_LOGIN = "from_login"
+        private const val KEY_PENDING_HOME_FADE = "pending_home_fade"
+    }
 
     private fun dailyFallbacks(): List<String> = listOf(
         getString(R.string.daily_fallback_1),
@@ -154,6 +161,43 @@ class HomeFragment : Fragment() {
         v.findViewById<ImageButton>(R.id.btn_settings).applyScaleClick { navigateTo(SettingsFragment()) }
 
         return v
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // 로그인 진입 표시 (arguments) 또는 로그인 성공 시 세팅한 pending 플래그가 있으면 페이드인 실행
+        val fromLogin = arguments?.getBoolean(ARG_FROM_LOGIN, false) == true
+        val pending = if (this::prefs.isInitialized)
+            prefs.getBoolean(KEY_PENDING_HOME_FADE, false) else false
+
+        playHomeFadeIfNeeded(view, fromLogin, pending)
+    }
+
+    /** Pre-draw 시점에 fade_in을 확실히 걸어준다 (네가 res/anim/fade_in.xml을 조절) */
+    private fun playHomeFadeIfNeeded(root: View, fromLogin: Boolean, pending: Boolean) {
+        if (fadePlayed || !(fromLogin || pending)) return
+
+        // 혹시 모를 잔여 애니메이션 제거
+        root.clearAnimation()
+
+        val vto = root.viewTreeObserver
+        val listener = object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                if (!root.viewTreeObserver.isAlive) return true
+                root.viewTreeObserver.removeOnPreDrawListener(this)
+
+                // 여기서 네가 만든 fade_in.xml을 사용
+                val anim = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in)
+                root.startAnimation(anim)
+
+                fadePlayed = true
+                if (pending) prefs.edit().putBoolean(KEY_PENDING_HOME_FADE, false).apply()
+                if (fromLogin) arguments?.putBoolean(ARG_FROM_LOGIN, false)
+                return true
+            }
+        }
+        vto.addOnPreDrawListener(listener)
     }
 
     private fun prepareDailyMessageTextView(tv: TextView) {

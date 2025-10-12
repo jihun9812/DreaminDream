@@ -42,9 +42,9 @@
                     android:id="@+id/editCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="20dp"
                     android:background="@drawable/bg_panel_glass"
-                    android:padding="16dp"
+                    android:padding="23dp"
                     android:elevation="6dp"
                     android:clipToOutline="true"
                     android:outlineProvider="background"
@@ -68,6 +68,7 @@
                                 android:id="@+id/editLabel"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:fontFamily="@font/pretendard_medium"
                                 android:layout_weight="1"
                                 android:text="@string/dream_input_label"
                                 android:textColor="#FDCA60"
@@ -79,7 +80,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/usage_left_default"
-                                android:textColor="#B6C5D0"
+                                android:fontFamily="@font/pretendard_medium"
+                                android:textColor="#B8D5F6"
                                 android:textSize="@dimen/text_sm" />
                         </LinearLayout>
 
@@ -98,6 +100,7 @@
                             android:lineSpacingExtra="2dp"
                             android:minLines="10"
                             android:maxLines="14"
+                            android:fontFamily="@font/pretendard_medium"
                             android:scrollbars="vertical"
                             android:nestedScrollingEnabled="true"
                             android:overScrollMode="ifContentScrolls"
@@ -114,13 +117,15 @@
                             android:layout_width="match_parent"
                             android:layout_height="42dp"
                             android:layout_marginTop="16dp"
+                            android:layout_marginLeft="100dp"
+                            android:layout_marginRight="100dp"
                             android:text="@string/button_interpret"
                             android:textAllCaps="false"
-                            android:textColor="#212121"
+                            android:textColor="#FDCA60"
                             android:textSize="@dimen/text_md"
-                            android:textStyle="bold"
+                            android:fontFamily="@font/pretendard_medium"
                             android:includeFontPadding="false"
-                            app:backgroundTint="#EBBB57"
+                            app:backgroundTint="#54080B2C"
                             app:cornerRadius="12dp"
                             app:rippleColor="#33FFC54D" />
                     </LinearLayout>
@@ -155,9 +160,11 @@
                         android:layout_height="wrap_content"
                         android:padding="12dp"
                         android:minHeight="52dp"
+                        android:fontFamily="@font/pretendard_medium"
                         android:lineSpacingExtra="4dp"
                         android:text="@string/dream_result_placeholder"
-                        android:textColor="#FFFFFF"
+                        android:textColor="#B8D5F6"
+
                         android:textSize="@dimen/text_md" />
                 </FrameLayout>
                 <!-- ▲ 결과 카드 끝 -->

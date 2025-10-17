@@ -7,7 +7,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:886944015637:android:45a31dc45a8c1d1aea751c",
+        "mobilesdk_app_id": "1:886944015637:android:943b08f7749dc9d2ea751c",
         "android_client_info": {
           "package_name": "com.dreamindream.app"
         }
@@ -41,7 +41,7 @@
           ]
         }
       },
-      "admob_app_id": "ca-app-pub-1742201279182732~2775090110"
+      "admob_app_id": "ca-app-pub-1742201279182732~5140331053"
     }
   ],
   "configuration_version": "1"

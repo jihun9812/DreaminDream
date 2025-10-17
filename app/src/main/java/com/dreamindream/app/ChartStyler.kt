@@ -153,7 +153,7 @@ private fun makeSet(values: List<Float>, labels: List<String>, colorFor: (String
             labels.size >= 7 -> 9.5f
             else -> 11f
         }
-        valueTypeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+        valueTypeface = Typeface.create("pretendard_medium", Typeface.NORMAL)
         colors = labels.map { colorFor(it) }
         highLightAlpha = 28
         barBorderWidth = 0f

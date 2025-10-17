@@ -6,36 +6,14 @@
         <shape android:shape="rectangle">
             <corners android:radius="16dp"/>
             <gradient
-                android:startColor="#F2F4B636"
-                android:centerColor="#EDF8AF18"
-                android:endColor="#CDE9A81F"
+                android:startColor="#0AF4F5FA"
+                android:centerColor="#10F4F5FA"
+                android:endColor="#0CF4F5FA"
                 android:angle="90"/>
 
 
-            <!-- 외곽선: 과하지 않게 아주 옅은 하이라이트 -->
-            <stroke android:width="3dp" android:color="#AE040724"/>
-        </shape>
-    </item>
 
-    <!-- 상단 반사광: 거의 안 보이게(살짝만) -->
-    <item android:insetTop="5dp">
-        <shape android:shape="rectangle">
-            <corners android:radius="21dp"/>
-            <gradient
-                android:startColor="#15F2F0F0"
-                android:endColor="#14313131"
-                android:angle="90"/>
-        </shape>
-    </item>
 
-    <!-- 하단 내음영: 최소화 -->
-    <item android:insetBottom="1dp">
-        <shape android:shape="rectangle">
-            <corners android:radius="16dp"/>
-            <gradient
-                android:startColor="#0A000000"
-                android:endColor="#12000000"
-                android:angle="90"/>
         </shape>
     </item>
 </layer-list>

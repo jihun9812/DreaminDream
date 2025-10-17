@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+<resources
+    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
       <!-- en -->
+    <string name="bs_subtitle_key_range_format">%1$s · %2$s</string>
 
     <!-- login.xml -->
 <string name="login_slogan">Find answers in your dreams</string>
@@ -8,7 +10,7 @@
 <string name="login_password_confirm_hint">Confirm password</string>
 <string name="login_findpw">Find password</string>
 <string name="login_findpw_send">Send by email</string>
-<string name="forgot_password">Forgot your\npassword?</string>
+<string name="forgot_password">Find password</string>
 <string name="sign_up">Sign up</string>
 <string name="sign_up_title">Create a new account</string>
 <string name="email_hint">Email</string>
@@ -96,7 +98,7 @@
 <string name="btn_pro_upgrade">Deep analysis</string>
 <string name="ai_analysis_title">AI Analysis</string>
 <string name="ai_analysis_placeholder">Analysis will appear here.</string>
-<string name="ad_unit_ai_banner">ca-app-pub-1742201279182732/8682841157</string>
+<string name="ad_unit_ai_banner">ca-app-pub-1742201279182732/9282239127</string>
 
     <!-- fragment_calendar.xml -->
 <string name="prev_month">Previous</string>
@@ -106,7 +108,7 @@
 <string name="dream_list_title_sample">Dreams on 2025-09-12 (Fri)</string>
 <string name="dream_list_title_format">Dreams on %1$s (%2$s)</string>
 <string name="dream_list_empty">No dream logs for this date.</string>
-<string name="ad_unit_calendar_banner">ca-app-pub-1742201279182732/8682841157</string>
+<string name="ad_unit_calendar_banner">ca-app-pub-1742201279182732/9282239127</string>
 
     <!-- Calendar -->
 <string name="calendar_title_placeholder">July 2025</string>
@@ -131,7 +133,7 @@
 <string name="usage_left_format">Tries left today: %1$d</string>
 <string name="hint_input">Write your dream in detail… e.g., A big shark appeared and I ran away.</string>
 <string name="button_interpret">Interpret</string>
-<string name="ad_unit_dream_banner">ca-app-pub-1742201279182732/8682841157</string>
+<string name="ad_unit_dream_banner">ca-app-pub-1742201279182732/9282239127</string>
 
     <!-- Fortune.xml -->
     <string name="fortune_start">See
@@ -144,7 +146,7 @@ Fortune</string>
 <string name="btn_deep_analysis">Deep analysis</string>
 <string name="action_copy">Copy</string>
 <string name="action_share">Share</string>
-<string name="ad_unit_fortune_banner">ca-app-pub-1742201279182732/8682841157</string>
+<string name="ad_unit_fortune_banner">ca-app-pub-1742201279182732/9282239127</string>
 
     <!-- Base & navigation -->
 <string name="app_name">DreamInDream</string>
@@ -187,7 +189,7 @@ Keywords: %2$s</string>
     <!-- settings.xml -->
 <string name="btn_cancel">Cancel</string>
 <string name="btn_save">Save</string>
-<string name="ad_unit_settings_banner">ca-app-pub-1742201279182732/8682841157</string>
+<string name="ad_unit_settings_banner">ca-app-pub-1742201279182732/9282239127</string>
 <string name="btn_logout">Log out</string>
 <string name="settings_title">App Settings</string>
 <string name="settings_section">Settings</string>
@@ -1016,8 +1018,7 @@ You must call deep_fortune_analysis.
 <string name="default_generic_advice">Try one checklist item lightly.</string>
 
     <!-- FortuneFragment.kt -->
-    <string name="btn_fortune_show">See
-Fortune</string>
+    <string name="btn_fortune_show">❓</string>
 <string name="btn_come_tomorrow">Come back tomorrow</string>
 <string name="toast_already_seen_today">You’ve already viewed today. Please try again tomorrow.</string>
 <string name="toast_run_fortune_first">Please tap “See Fortune” first.</string>

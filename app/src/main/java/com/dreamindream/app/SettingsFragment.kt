@@ -19,11 +19,13 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.ScrollView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.widget.NestedScrollView
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import com.dreamindream.app.databinding.FragmentSettingsBinding
@@ -312,6 +314,20 @@ class SettingsFragment : Fragment() {
         val gd = profilePrefs.getString("gender", "").orEmpty().trim()
         return nn.isBlank() || bd.isBlank() || gd.isBlank()
     }
+
+    // === 스크롤 헬퍼(ScrollView/NestedScrollView 모두 지원) ===
+    private fun Int.dp(): Int =
+        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), resources.displayMetrics).toInt()
+
+    private fun scrollToInsideCard(target: View, offsetPx: Int = 24.dp()) {
+        val y = (target.top - offsetPx).coerceAtLeast(0)
+        when (val sv = binding.scrollView) {
+            is NestedScrollView -> sv.post { sv.smoothScrollTo(0, y) }
+            is ScrollView       -> sv.post { sv.smoothScrollTo(0, y) }
+            else                -> sv.post { sv.scrollTo(0, y) } // safety fallback
+        }
+    }
+
     private fun showAppMode() {
         mode = Mode.APP
         binding.cardAppSettings.visibility = View.VISIBLE
@@ -319,7 +335,7 @@ class SettingsFragment : Fragment() {
         binding.sectionEdit?.visibility = View.GONE
         binding.textTitle.text = getString(R.string.settings_title)
         updateAppProfileSummary()
-        binding.scrollView.post { binding.scrollView.smoothScrollTo(0, binding.cardAppSettings.top - 24) }
+        scrollToInsideCard(binding.cardAppSettings)
     }
     private fun showEditMode() {
         mode = Mode.EDIT
@@ -327,7 +343,7 @@ class SettingsFragment : Fragment() {
         binding.cardProfile.visibility = View.VISIBLE
         binding.sectionEdit?.visibility = View.VISIBLE
         binding.textTitle.text = getString(R.string.profile_edit_title)
-        binding.scrollView.post { binding.scrollView.smoothScrollTo(0, binding.cardProfile.top - 24) }
+        scrollToInsideCard(binding.cardProfile)
     }
 
     /** 헤더(띠 아이콘 아바타/이름/서브)와 요약을 모두 갱신한다.
@@ -371,7 +387,6 @@ class SettingsFragment : Fragment() {
             .append(line(getString(R.string.summary_gender_prefix), if (gd.isBlank()) getString(R.string.value_placeholder_dash) else gd)).append("\n")
             .append(line(getString(R.string.summary_mbti_prefix), if (mb.isBlank()) getString(R.string.value_placeholder_dash) else mb)).append("\n")
             .append(line(getString(R.string.summary_age_prefix), if (age >= 0) getString(R.string.summary_age_value, age) else getString(R.string.value_placeholder_dash))).append("\n")
-
             // .append(line(getString(R.string.summary_cz_prefix, czIcon), cz)).append("\n")
             .append(line(getString(R.string.summary_wz_prefix, ""), wz)).append("\n")
             .append(line(getString(R.string.summary_birthtime_prefix), btLabel))

@@ -22,7 +22,8 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 import androidx.appcompat.app.AppCompatDelegate
 import java.util.Locale
-
+import android.view.LayoutInflater
+import android.view.ContextThemeWrapper
 
 class FortuneApi(
     private val context: Context,
@@ -32,7 +33,7 @@ class FortuneApi(
     private val http by lazy { OkHttpClient() }
     private val TAG = "FortuneApi"
 
-    private val BANNED_LOTTO = setOf(5, 12, 19, 23, 34, 41)
+    private val BANNED_LOTTO = setOf(5, 11, 34, 38, 40, 41)
 
     private fun langCode(): String {
         val appLocales = AppCompatDelegate.getApplicationLocales()
@@ -534,18 +535,23 @@ date:"$today ($weekday)", age:$userAge, age_tag:$tag, seed:$seed, tone:"$tone"
     }
 
     fun showDeepDialog(ctx: Context, deep: JSONObject, lastDaily: JSONObject?) {
-        val dialogView = View.inflate(ctx, R.layout.dialog_fortune_deep, null)
+        // 1) Material3 AlertDialog 테마 오버레이 적용
+        val themed = ContextThemeWrapper(
+            ctx,
+            com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog
+        )
+        val dialogView = LayoutInflater.from(themed).inflate(R.layout.dialog_fortune_deep, null, false)
 
         val tvTitle = dialogView.findViewById<TextView>(R.id.tvDeepTitle)
         val chipTime = dialogView.findViewById<Chip>(R.id.chipLuckyTime)
-        val chipNum = dialogView.findViewById<Chip>(R.id.chipLuckyNumber)
-        val chipCol = dialogView.findViewById<Chip>(R.id.chipLuckyColor)
+        val chipNum  = dialogView.findViewById<Chip>(R.id.chipLuckyNumber)
+        val chipCol  = dialogView.findViewById<Chip>(R.id.chipLuckyColor)
 
         val tvHigh = dialogView.findViewById<TextView>(R.id.tvDeepHighlights)
         val tvMorn = dialogView.findViewById<TextView>(R.id.tvPlanMorning)
-        val tvAft = dialogView.findViewById<TextView>(R.id.tvPlanAfternoon)
-        val tvEve = dialogView.findViewById<TextView>(R.id.tvPlanEvening)
-        val tvTmr = dialogView.findViewById<TextView>(R.id.tvDeepTomorrow)
+        val tvAft  = dialogView.findViewById<TextView>(R.id.tvPlanAfternoon)
+        val tvEve  = dialogView.findViewById<TextView>(R.id.tvPlanEvening)
+        val tvTmr  = dialogView.findViewById<TextView>(R.id.tvDeepTomorrow)
         val btnClose = dialogView.findViewById<MaterialButton>(R.id.btnDeepClose)
 
         val lucky = lastDaily?.optJSONObject("lucky") ?: JSONObject()
@@ -581,20 +587,38 @@ date:"$today ($weekday)", age:$userAge, age_tag:$tag, seed:$seed, tone:"$tone"
         val extra = buildTomorrowExtraTips(deep, lastDaily)
         tvTmr.text = if (tmr.isNotBlank()) "${tmr}\n\n$extra" else extra
 
-        val dialog = MaterialAlertDialogBuilder(ctx).setView(dialogView).create()
+        val dialog = MaterialAlertDialogBuilder(themed)
+            .setView(dialogView)
+            .create()
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+
         dialog.setOnShowListener {
-            val dm = ctx.resources.displayMetrics
+            val dm = themed.resources.displayMetrics
             dialog.window?.setLayout((dm.widthPixels * 0.94f).toInt(), (dm.heightPixels * 0.80f).toInt())
         }
-        btnClose.setTextColor(Color.WHITE)
+
+        val r = 22f * themed.resources.displayMetrics.density
+
+        btnClose.isAllCaps = false
+        btnClose.setTextColor(Color.BLACK)
+        btnClose.backgroundTintList = null
+        btnClose.rippleColor = ColorStateList.valueOf(Color.parseColor("#33FFFFFF"))
+
+
         btnClose.background = GradientDrawable().apply {
-            cornerRadius = 22f
-            colors = intArrayOf(Color.parseColor("#9B8CFF"), Color.parseColor("#6F86FF"))
+            cornerRadius = r
+            colors = intArrayOf(
+                Color.parseColor("#FFFEDCA6"),
+                Color.parseColor("#FF8BAAFF")
+            )
             orientation = GradientDrawable.Orientation.TL_BR
         }
+
+        btnClose.textSize = 13f
+
         btnClose.setOnClickListener { dialog.dismiss() }
         dialog.show()
+
     }
 
     private fun mapErrorToUserMessage(reason: String): String = when {

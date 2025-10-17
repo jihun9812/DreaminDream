@@ -19,12 +19,13 @@
         style="@style/Widget.Material3.Button"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:text="@string/fortune_start"
+        android:text="❔"
         android:gravity="center"
         android:textAlignment="center"
         android:textAllCaps="false"
-        android:textColor="#FFFFFF"
-        android:textSize="20sp"
+        android:textColor="#D111F2"
+        android:textSize="40sp"
+        android:elevation="6dp"
         android:fontFamily="@font/pretendard_medium"
         android:background="@drawable/fortune_button_bg"
         app:useMaterialThemeColors="false"
@@ -42,7 +43,7 @@
         android:id="@+id/fortune_loading"
         android:layout_width="96dp"
         android:layout_height="96dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="10dp"
         android:visibility="gone"
         android:elevation="8dp"
         app:lottie_rawRes="@raw/generator"
@@ -56,8 +57,8 @@
         android:id="@+id/fortuneCard"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
         android:animateLayoutChanges="false"
@@ -67,16 +68,15 @@
         app:cardUseCompatPadding="false"
         app:contentPadding="2dp"
         app:cardPreventCornerOverlap="true"
-        app:strokeColor="#454545"
+        app:strokeColor="#7E050505"
         app:strokeWidth="1dp"
-        app:cardBackgroundColor="#0D154D94"
-
+        app:cardBackgroundColor="#1F0A2242"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/adContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="percent"
-        app:layout_constraintHeight_percent="0.90">
+        app:layout_constraintHeight_percent="0.92">
 
         <ScrollView
             android:id="@+id/resultScrollView"
@@ -105,6 +105,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:scrollbars="none"
+
                     android:overScrollMode="never">
                     <com.google.android.material.chip.ChipGroup
                         android:id="@+id/chipsFortune"
@@ -209,9 +210,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/chart_emotion_balance"
-                        android:textColor="#B3FFFFFF"
+                        android:textColor="#C6D4DF"
                         android:fontFamily="@font/pretendard_medium"
-                        android:textSize="12sp"
+                        android:textSize="13sp"
                         android:layout_marginBottom="4dp"/>
 
                     <LinearLayout
@@ -344,7 +345,7 @@
                     android:textAllCaps="false"
                     app:cornerRadius="14dp"
                     app:backgroundTint="#FFD86B"
-                    app:rippleColor="#33FFFFFF" />
+                    app:rippleColor="#49FFFFFF" />
 
                 <TextView
                     android:id="@+id/fortune_result"

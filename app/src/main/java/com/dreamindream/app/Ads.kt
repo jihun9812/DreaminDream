@@ -8,9 +8,10 @@ import com.dreamindream.app.billing.SubscriptionManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 
+@Suppress("unused")  // ✅ 린트 경고 억제
 object Ads {
 
-
+    @Suppress("unused")  // ✅ bindBanner 미사용 억제
     fun bindBanner(root: View, @IdRes adViewId: Int, owner: LifecycleOwner) {
         val adView = root.findViewById<AdView>(adViewId) ?: return
 
@@ -28,15 +29,13 @@ object Ads {
         SubscriptionManager.observePremium(owner) { apply(it) }
     }
 
+    @Suppress("unused")  // ✅ maybeBypassDeepGate 미사용 억제
     fun maybeBypassDeepGate(
         context: Context,
-        onProceedDeep: () -> Unit,   // 심화분석 실제 실행(다이얼로그 열기 등)
-        onShowGate: () -> Unit       // 무료 유저용 기존 게이트(리워드/구독 안내)
+        onProceedDeep: () -> Unit,   // 심화분석 실행 (다이얼로그 열기 등)
+        onShowGate: () -> Unit       // 무료 유저 게이트 (리워드/구독 안내)
     ) {
-        if (SubscriptionManager.isPremium(context)) {
-            onProceedDeep()
-        } else {
-            onShowGate()
-        }
+        if (SubscriptionManager.isPremium(context)) onProceedDeep()
+        else onShowGate()
     }
 }

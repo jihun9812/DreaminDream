@@ -7,18 +7,34 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:886944015637:android:45a31dc45a8c1d1aea751c",
+        "mobilesdk_app_id": "1:886944015637:android:943b08f7749dc9d2ea751c",
         "android_client_info": {
           "package_name": "com.dreamindream.app"
         }
       },
       "oauth_client": [
         {
-          "client_id": "886944015637-h12o49ko1s2hfkbg6i8cvnis49qfu6ee.apps.googleusercontent.com",
+          "client_id": "886944015637-2at3nkhpfanqv1gniou31pf2of4bmcgq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.dreamindream.app",
-            "certificate_hash": "7db25166b27892546ccc6503a53728d0b7b50ba7"
+            "certificate_hash": "2475b5313c778dcf89b858759b6b9e2282a38f0d"
+          }
+        },
+        {
+          "client_id": "886944015637-2rao3vgkugrc9ao3bdh1k729n3gull56.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dreamindream.app",
+            "certificate_hash": "74c14ac8029ff375652482c659078a036ecba4da"
+          }
+        },
+        {
+          "client_id": "886944015637-9rkucjbpi0rpif6d31hltivvjga5ovbn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dreamindream.app",
+            "certificate_hash": "a83b90e16b6d7f094ee279033b049e3ebb2bb539"
           }
         },
         {
@@ -41,6 +57,89 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:886944015637:android:288559967b35a1f7ea751c",
+        "android_client_info": {
+          "package_name": "com.dreamindream.dreammunity"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "886944015637-kfs3knlk6m8j1l40k61psgd0fe8ce3eo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dreamindream.dreammunity",
+            "certificate_hash": "2475b5313c778dcf89b858759b6b9e2282a38f0d"
+          }
+        },
+        {
+          "client_id": "886944015637-96pcphpcqug6pga1v9aogdcg4bfr7mav.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCI1aEqU1dr02WoEvZBsFtdVsnZeN5dWE0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "886944015637-96pcphpcqug6pga1v9aogdcg4bfr7mav.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:886944015637:android:45a31dc45a8c1d1aea751c",
+        "android_client_info": {
+          "package_name": "com.example.dreamindream"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "886944015637-h12o49ko1s2hfkbg6i8cvnis49qfu6ee.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dreamindream",
+            "certificate_hash": "7db25166b27892546ccc6503a53728d0b7b50ba7"
+          }
+        },
+        {
+          "client_id": "886944015637-j7hnqu8us3oj9s8magc15cp44p720kr4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.dreamindream",
+            "certificate_hash": "2475b5313c778dcf89b858759b6b9e2282a38f0d"
+          }
+        },
+        {
+          "client_id": "886944015637-96pcphpcqug6pga1v9aogdcg4bfr7mav.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCI1aEqU1dr02WoEvZBsFtdVsnZeN5dWE0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "886944015637-96pcphpcqug6pga1v9aogdcg4bfr7mav.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      },
+      "admob_app_id": "ca-app-pub-1742201279182732~2775090110"
     }
   ],
   "configuration_version": "1"

@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services") // Firebase
     id("com.google.firebase.crashlytics") // Crashlytics
+    id("kotlin-parcelize")
 }
 
 val localProperties = Properties().apply {
@@ -28,8 +29,8 @@ android {
         applicationId =  "com.dreamindream.app"
         minSdk = 28
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 7
+        versionName = "1.07"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "OPENAI_API_KEY", "\"$openaiKey\"")
@@ -114,7 +115,7 @@ dependencies {
 
     // Lottie / Ads / Calendar / 기타
     implementation("com.airbnb.android:lottie:6.4.0")
-    implementation("com.google.android.gms:play-services-ads:22.6.0")
+    implementation("com.google.android.gms:play-services-ads:23.4.0")
     implementation("com.kizitonwose.calendar:view:2.5.0")
 
     implementation("androidx.activity:activity-ktx:1.9.2")
@@ -122,7 +123,7 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("com.google.android.material:material:1.12.0")
+    implementation("com.google.android.material:material:1.13.0")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")

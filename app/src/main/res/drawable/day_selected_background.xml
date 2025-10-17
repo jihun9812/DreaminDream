@@ -8,7 +8,7 @@
     <!-- 두께: dimen 참조 -->
     <stroke
         android:width="1dp"
-        android:color="#E4424242" />
+        android:color="#E4212121" />
 
     <!-- 지름: dimen 참조 -->
     <size

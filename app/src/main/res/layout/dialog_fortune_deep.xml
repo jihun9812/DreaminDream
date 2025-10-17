@@ -7,11 +7,12 @@
     android:layout_marginStart="0dp"
     android:layout_marginEnd="0dp"
     android:layout_marginTop="0dp"
+    android:layout_marginBottom="400dp"
     app:cardUseCompatPadding="true"
     app:cardCornerRadius="22dp"
-    app:cardBackgroundColor="#DC17153B"
-    app:strokeWidth="2dp"
-    app:strokeColor="#000000"
+    app:cardBackgroundColor="#EA17153B"
+    app:strokeWidth="1dp"
+    app:strokeColor="#1F07052C"
     android:padding="16dp">
 
     <androidx.core.widget.NestedScrollView
@@ -56,8 +57,9 @@
                         style="@style/Widget.Material3.Chip.Assist.Elevated"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:fontFamily="@font/pretendard_medium"
                         android:text="@string/fortune_deep_chip_time"
-                        app:chipBackgroundColor="#FDCA60"
+                        app:chipBackgroundColor="#FAFDCA60"
                         app:chipStrokeColor="#33FFFFFF"
                         app:chipStrokeWidth="1dp"
                         android:textColor="#212121"/>
@@ -67,6 +69,7 @@
                         style="@style/Widget.Material3.Chip.Assist.Elevated"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:fontFamily="@font/pretendard_medium"
                         android:text="@string/fortune_deep_chip_number"
                         app:chipBackgroundColor="#FDCA60"
                         app:chipStrokeColor="#33FFFFFF"
@@ -78,8 +81,9 @@
                         style="@style/Widget.Material3.Chip.Assist.Elevated"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:fontFamily="@font/pretendard_medium"
                         android:text="@string/fortune_deep_chip_color"
-                        app:chipBackgroundColor="#1AFFFFFF"
+                        app:chipBackgroundColor="#16F8F5F5"
                         app:chipStrokeColor="#33FFFFFF"
                         app:chipStrokeWidth="1dp"
                         android:textColor="#212121"/>
@@ -108,8 +112,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
+                android:fontFamily="@font/pretendard_medium"
                 android:textColor="#EAF2FA"
-                android:textSize="15sp"
+                android:textSize="13sp"
                 android:lineHeight="22sp"/>
 
             <TextView
@@ -157,10 +162,11 @@
                             android:id="@+id/tvPlanMorning"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:fontFamily="@font/pretendard_medium"
                             android:layout_marginTop="4dp"
                             android:lineHeight="22sp"
                             android:textColor="#FFFFFF"
-                            android:textSize="15sp" />
+                            android:textSize="13sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -194,7 +200,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:textColor="#FFFFFF"
-                            android:textSize="15sp"
+                            android:fontFamily="@font/pretendard_medium"
+                            android:textSize="13sp"
                             android:lineHeight="22sp"/>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -228,8 +235,10 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:textColor="#FFFFFF"
-                            android:textSize="15sp"
+                            android:fontFamily="@font/pretendard_medium"
+                            android:textSize="13sp"
                             android:lineHeight="22sp"/>
+
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
@@ -251,20 +260,22 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:textColor="#FFFFFF"
-                android:textSize="15sp"
+                android:fontFamily="@font/pretendard_medium"
+                android:textSize="13sp"
                 android:lineHeight="22sp"/>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDeepClose"
-                style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/close"
-                app:backgroundTint="#FDCA60"
-                android:fontFamily="@font/pretendard_medium"
+                style="@style/Widget.Material3.Button"
                 app:useMaterialThemeColors="false"
+                app:backgroundTint="#FDCA60"
+                app:cornerRadius="22dp"
                 android:textColor="#000000"/>
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </com.google.android.material.card.MaterialCardView>

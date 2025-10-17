@@ -12,7 +12,7 @@ object AdManager {
     private const val TAG = "AdManager"
 
     // ✅ 실제 보상형 광고 단위 ID
-    private const val REWARDED_ID = "ca-app-pub-1742201279182732/9046955585"
+    private const val REWARDED_ID = "ca-app-pub-1742201279182732/6656075788"
 
     private var rewardedAd: RewardedAd? = null
 

@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
@@ -12,11 +13,14 @@ import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import com.dreamindream.app.AdManager
+import android.content.res.Configuration
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
@@ -38,14 +42,27 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // ✅ Edge-to-Edge + 투명 시스템바
+        enableEdgeToEdge()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
+
+        // ✅ 아이콘 명암 설정 (하단 흰 띠 방지)
+        val isLight =
+            (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
+                    Configuration.UI_MODE_NIGHT_NO
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            isAppearanceLightStatusBars = isLight
+            // 네비게이션바는 항상 밝은 아이콘(=false)
+            isAppearanceLightNavigationBars = false
+        }
+
         // --- 최초 실행 시: 모든 로그인 상태 초기화(익명 포함) ---
         val prefsFirst = getSharedPreferences("first_run_check", Context.MODE_PRIVATE)
         if (prefsFirst.getBoolean("isFirstRun", true)) {
             try {
-                // 로그인 세션 초기화(중요)
                 FirebaseAuth.getInstance().signOut()
-
-                // SharedPreferences/로컬 파일 초기화(기존 로직 유지)
                 listOf("user_info", "user_prefs", "dream_history", "fortune", "fortune_result")
                     .forEach { getSharedPreferences(it, Context.MODE_PRIVATE).edit().clear().apply() }
                 filesDir?.listFiles()?.forEach { it.delete() }
@@ -53,7 +70,7 @@ class MainActivity : BaseActivity() {
             prefsFirst.edit().putBoolean("isFirstRun", false).apply()
         }
 
-        // --- 로그인 체크: 로그인 안돼 있으면 LoginActivity로 이동 ---
+        // --- 로그인 체크 ---
         val user = FirebaseAuth.getInstance().currentUser
         if (user == null) {
             val intent = Intent(this, LoginActivity::class.java).apply {
@@ -92,10 +109,6 @@ class MainActivity : BaseActivity() {
         } else onNotificationsReady()
 
         setContentView(R.layout.activity_main)
-
-        // 시스템 바 색
-        window.statusBarColor = ContextCompat.getColor(this, R.color.dark_background)
-        window.navigationBarColor = ContextCompat.getColor(this, R.color.dark_background)
 
         // 첫 진입: 홈을 루트로
         if (savedInstanceState == null) {

@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-
+    <!-- 콘텐츠 래퍼: 폭 퍼센트 제거, 전체폭 활용 -->
     <LinearLayout
         android:id="@+id/content_wrapper"
         android:layout_width="0dp"
@@ -33,51 +33,52 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintWidth_percent="0.95"
-        app:layout_constraintWidth_max="@dimen/max_phone_width">
+        app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- 타이틀 -->
+        <!-- 타이틀: 자동 글자크기 + 전체폭 -->
         <TextView
             android:id="@+id/home_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/title_margin_bottom"
-            android:ellipsize="end"
             android:fontFamily="@font/jalnan"
-            android:includeFontPadding="true"
+            android:includeFontPadding="false"
             android:maxLines="1"
-            android:paddingTop="2dp"
-            android:paddingBottom="2dp"
+            android:gravity="center_horizontal"
+            android:textAlignment="center"
+            android:text="@string/home_title"
+            android:textColor="#F8B227"
+            android:textSize="@dimen/home_title_size"
+            app:autoSizeTextType="uniform"
+            app:autoSizeMinTextSize="22sp"
+            app:autoSizeMaxTextSize="@dimen/home_title_size"
+            app:autoSizeStepGranularity="1sp"
             android:shadowColor="#FDCA60"
             android:shadowDx="2"
             android:shadowDy="4"
-            android:shadowRadius="2"
-            android:text="@string/home_title"
-            android:textColor="#F8B227"
-            android:textSize="@dimen/home_title_size" />
+            android:shadowRadius="2"/>
 
-        <!-- AI 리포트 카드 -->
+        <!-- AI 리포트 카드: match_parent + 코너 축소(디멘 수정과 연결) -->
         <androidx.cardview.widget.CardView
             android:id="@+id/ai_report_card"
-            android:layout_width="@dimen/home_card_width"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            app:cardBackgroundColor="#442A2597"
-            app:cardCornerRadius="18dp"
-            app:cardElevation="6dp">
+            android:layout_marginBottom="20dp"
+            app:cardBackgroundColor="#14D7D7DB"
+            app:cardCornerRadius="@dimen/ai_card_corner"
+            app:cardElevation="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="52dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="10dp">
+                android:paddingHorizontal="@dimen/card_pad"
+                android:paddingVertical="1dp">
 
                 <ImageView
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_marginEnd="8dp"
                     android:contentDescription="@string/ai_report"
                     android:src="@drawable/ic_ai_report" />
@@ -96,7 +97,7 @@
                         android:text="@string/home_ai_title"
                         android:textColor="#E4E2E2"
                         android:textSize="@dimen/ai_title"
-                        android:maxLines="1"
+                        android:maxLines="2"
                         android:ellipsize="end"
                         android:includeFontPadding="false"/>
 
@@ -108,45 +109,39 @@
                         android:fontFamily="@font/pretendard_medium"
                         android:text="@string/home_ai_sub"
                         android:textColor="#C6D4DF"
-
                         android:textSize="@dimen/ai_sub"
                         android:maxLines="1"
                         android:ellipsize="end"
-                        android:singleLine="true"
                         android:includeFontPadding="false"/>
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_ai_report"
                     android:layout_width="wrap_content"
-                    android:layout_height="@dimen/btn_height"
+                    android:layout_height="@dimen/report_btn_height"
                     android:minWidth="0dp"
                     android:minHeight="0dp"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
                     android:layout_marginStart="8dp"
                     android:fontFamily="@font/pretendard_medium"
-                    android:gravity="center"
                     android:includeFontPadding="false"
                     android:text="@string/ai_report_btn"
                     android:textColor="#17212B"
                     android:textSize="@dimen/btn_text"
-                    app:backgroundTint="@null"
                     android:background="@drawable/btn_gold_gloss_selector"
-
+                    app:backgroundTint="@null"
                     app:rippleColor="#33FFFFFF"
-                    app:cornerRadius="14dp"
-                    android:elevation="6dp"
-                    android:translationZ="2dp"/>
+                    app:cornerRadius="14dp" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
-        <!-- 데일리 메시지 : 한 문단, 절대 안 잘림 -->
+        <!-- 데일리 메시지 -->
         <LinearLayout
             android:id="@+id/character_bubble"
-            android:layout_width="@dimen/home_bubble_width"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="20dp"
             android:gravity="top"
             android:orientation="horizontal"
             android:background="@drawable/bg_bubble_glass"
@@ -155,6 +150,7 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:clipToPadding="false">
+
             <ImageView
                 android:id="@+id/ai_avatar"
                 android:layout_width="22dp"
@@ -177,86 +173,87 @@
                 android:textAlignment="viewStart"/>
         </LinearLayout>
 
-        <!-- 하단 버튼 3개 -->
+        <!-- 하단 버튼 3개: 균등분배 + inset 0 -->
         <LinearLayout
             android:id="@+id/button_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
             android:gravity="center"
             android:orientation="horizontal">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_dream"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="@dimen/btn_height"
+                android:layout_weight="0.8"
+                android:layout_marginEnd="@dimen/home_button_gap"
                 android:minWidth="0dp"
                 android:includeFontPadding="false"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:text="@string/btn_dream"
-                android:textColor="#17212B"
+                android:textColor="#C6D4DF"
                 android:textSize="@dimen/btn_text"
-                app:backgroundTint="@null"
                 android:fontFamily="@font/pretendard_medium"
                 android:background="@drawable/btn_gold_gloss_selector"
+                app:backgroundTint="@null"
                 app:cornerRadius="14dp"
-                app:rippleColor="#AFFFFFFF"
+                app:rippleColor="#00FFFFFF"
                 app:icon="@drawable/ic_dream"
                 app:iconGravity="textStart"
-                app:iconPadding="4dp"
+                app:iconPadding="7dp"
                 app:iconSize="@dimen/icon_btn"
-                app:iconTint="#17212B"/>
-
-            <Space
-                android:layout_width="@dimen/home_button_gap" android:layout_height="wrap_content" />
+                app:iconTint="#C6D4DF"
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_calendar"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="@dimen/btn_height"
-                android:minWidth="0dp"
-                android:includeFontPadding="false"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
-                android:text="@string/btn_calendar"
-                android:textColor="#17212B"
-                android:textSize="@dimen/btn_text"
-                android:fontFamily="@font/pretendard_medium"
-                app:backgroundTint="@null"
+                android:layout_marginEnd="@dimen/home_button_gap"
+                android:layout_weight="0.8"
                 android:background="@drawable/btn_gold_gloss_selector"
+                android:fontFamily="@font/pretendard_medium"
+                android:includeFontPadding="false"
+                android:minWidth="0dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:text="@string/btn_calendar"
+                android:textColor="#C6D4DF"
+                android:textSize="@dimen/btn_text"
+                app:backgroundTint="@null"
                 app:cornerRadius="14dp"
-                app:rippleColor="#33FFFFFF"
                 app:icon="@drawable/ic_calendar_moon"
                 app:iconGravity="textStart"
-                app:iconPadding="4dp"
+                app:iconPadding="7dp"
                 app:iconSize="@dimen/icon_btn"
-                app:iconTint="#17212B"/>
-
-            <Space
-                android:layout_width="@dimen/home_button_gap" android:layout_height="wrap_content" />
+                app:iconTint="#C6D4DF"
+                app:rippleColor="#33FFFFFF" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_fortune"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="@dimen/btn_height"
+                android:layout_weight="0.8"
+                android:layout_marginEnd="@dimen/home_button_gap"
                 android:minWidth="0dp"
                 android:includeFontPadding="false"
-                android:paddingStart="10dp"
-                android:paddingEnd="10dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:text="@string/btn_fortune"
-                android:textColor="#17212B"
+                android:textColor="#C6D4DF"
                 android:textSize="@dimen/btn_text"
                 android:fontFamily="@font/pretendard_medium"
-                app:backgroundTint="@null"
                 android:background="@drawable/btn_gold_gloss_selector"
-                app:cornerRadius="14dp"
+                app:backgroundTint="@null"
+                app:cornerRadius="12dp"
                 app:rippleColor="#33FFFFFF"
                 app:icon="@drawable/ic_fortune"
                 app:iconGravity="textStart"
                 app:iconPadding="4dp"
                 app:iconSize="@dimen/icon_btn"
-                app:iconTint="#17212B"/>
+                app:iconTint="#C6D4DF"
+                />
         </LinearLayout>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

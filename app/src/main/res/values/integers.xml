@@ -1,0 +1,4 @@
+<resources>
+    <integer name="dream_min_lines">9</integer>
+    <integer name="dream_max_lines">12</integer>
+</resources>

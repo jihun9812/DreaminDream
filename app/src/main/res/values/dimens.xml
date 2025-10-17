@@ -11,7 +11,9 @@
     <!-- ===== 공통 패딩 ===== -->
     <dimen name="content_side_padding">24dp</dimen>
     <dimen name="content_vertical_padding">32dp</dimen>
-
+<!-- aireport button -->
+    <dimen name ="ai_btn_height">38dp</dimen>
+    <dimen name ="report_btn_height">40dp</dimen>
     <!-- ===== 입력/버튼/카드 ===== -->
     <dimen name="input_min_height">48dp</dimen>
     <dimen name="input_pad_h">12dp</dimen>
@@ -31,6 +33,17 @@
     <!-- ===== 텍스트 규격 ===== -->
     <dimen name="home_title_size">38sp</dimen>
     <dimen name="title_margin_bottom">56dp</dimen>
+    <dimen name="dream_card_pad">16dp</dimen>
+
+    <!-- 해몽하기 버튼(Pill) -->
+    <dimen name="interpret_btn_pad_h">14dp</dimen>
+    <dimen name="interpret_btn_pad_v">6dp</dimen>
+    <dimen name="interpret_btn_radius">16dp</dimen>
+
+    <!-- 결과 카드(빈 상태) -->
+    <dimen name="result_min_height">36dp</dimen>
+    <dimen name="result_pad_h">12dp</dimen>
+    <dimen name="result_pad_v">8dp</dimen>
 
     <dimen name="text_md">14sp</dimen>
     <dimen name="text_sm">12sp</dimen>

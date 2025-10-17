@@ -4,7 +4,7 @@
     <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowBackground">#FAF0D4</item>
+        <item name="android:windowBackground">#00FAF0D4</item>
         <item name="android:fontFamily">@font/pretendard_medium</item>
 
     </style>
@@ -32,26 +32,23 @@
             <item name="cornerSize">50%</item>
         </style>
 
-
-
-
     <style name="Widget.DreamIn.Chip.Info" parent="Widget.Material3.Chip.Assist.Elevated">
-        <item name="chipBackgroundColor">#1AFFFFFF</item>
-        <item name="chipStrokeColor">#33FFFFFF</item>
+        <item name="chipBackgroundColor">#09E6E6E6</item>
+        <item name="chipStrokeColor">#00000F</item>
         <item name="chipStrokeWidth">1dp</item>
         <item name="chipCornerRadius">14dp</item>
         <item name="chipMinHeight">36dp</item>
         <item name="chipStartPadding">10dp</item>
         <item name="chipEndPadding">10dp</item>
-        <item name="rippleColor">#33FFFFFF</item>
+        <item name="rippleColor">#47FFFFFF</item>
         <item name="android:textColor">#E6FFFFFF</item>
-        <item name="elevation">0dp</item>
+        <item name="elevation">2dp</item>
     </style>
 
     <style name="Dialog_GlassM3" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowBackground">#15194B</item>
         <item name="android:windowAnimationStyle">@style/GlassDialogAnimation</item>
     </style>
 
@@ -77,17 +74,6 @@
     </style>
 
 
-    <!-- 버튼 -->
-    <style name="GlassButton">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">56dp</item>
-        <item name="android:textColor">@color/bubble_bg</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="android:padding">12dp</item>
-        <item name="android:textSize">17sp</item>
-        <item name="android:backgroundTint">#FFA07A</item>
-        <item name="android:fontFamily">@font/pretendard_medium</item>
-    </style>
 
     <!-- 말풍선 텍스트 -->
     <style name="BubbleText">
@@ -113,13 +99,13 @@
 
     <!-- ...기존 스타일들 위/아래로 유지... -->
 
-    <!-- 대기업 톤: 담백한 외곽선, 둥근 모서리, 가독 컬러 -->
+
     <style name="SettingsChip" parent="Widget.Material3.Chip.Assist">
-        <item name="chipBackgroundColor">#26FFFFFF</item>
-        <item name="chipStrokeColor">#40FFFFFF</item>
+        <item name="chipBackgroundColor">#12FFFFFF</item>
+        <item name="chipStrokeColor">#AF0C1040</item>
         <item name="chipStrokeWidth">1dp</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Chip.RoundedXL</item>
-        <item name="android:textColor">#FFFFFFFF</item>
+        <item name="android:textColor">#000000</item>
         <item name="android:textAllCaps">false</item>
         <item name="rippleColor">#22FFFFFF</item>
         <item name="checkedIconVisible">false</item>

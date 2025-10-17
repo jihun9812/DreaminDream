@@ -1,23 +1,36 @@
 <resources>
 
-    <!-- 앱 전체 테마 (상·하단 투명 + 연한 배경색) -->
+    <!-- 앱 전체 테마 (M3 DayNight, 상·하단 완전 투명) -->
     <style name="Theme.DreaminDream" parent="Theme.Material3.DayNight.NoActionBar">
-        <item name="android:colorBackground">#FFF9E5</item>
+        <!-- 앱 창 배경: 어두운 톤(하단 제스처 영역에 비쳐도 어둡게 보이게) -->
+        <item name="android:windowBackground">@color/dark_background</item>
+
+        <!-- Edge-to-Edge: 시스템 바 완전 투명 -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-        <item name="android:windowLightStatusBar">true</item> <!-- 상태바 아이콘 어둡게 -->
+        <item name="android:navigationBarDividerColor">@android:color/transparent</item>
+
+        <!-- 컷아웃 항상 허용 (폴더블/전체화면 안전) -->
+        <item name="android:windowLayoutInDisplayCutoutMode">always</item>
+
+        <!-- 강제 다크모드 비활성(디자인 보호) -->
+        <item name="android:forceDarkAllowed">false</item>
+
+        <!-- 상태바 아이콘: 라이트 테마에서만 어둡게(다크는 코드에서 전환) -->
+        <item name="android:windowLightStatusBar">true</item>
+
+        <!-- 폰트/액티브 컬러(필요 시 조정) -->
         <item name="android:fontFamily">@font/pretendard_medium</item>
         <item name="colorControlActivated">#7A55D3</item>
-
     </style>
 
-    <!-- SplashActivity 전용 테마 -->
-    <style name="Theme.DreaminDream.Splash" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowBackground">#FFF9E5</item>
-        <item name="android:windowFullscreen">true</item>
+    <!-- Splash 전용 테마 -->
+    <style name="Theme.DreaminDream.Splash" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/dark_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">always</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
-
 
 </resources>

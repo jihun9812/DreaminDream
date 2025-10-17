@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!--!!!!!!!!!!!!!!!!!!!!!! xml 전체 !!!!!!!!!!!!!!!!!!!!!!!! -->
+    <string name="bs_subtitle_key_range_format">%1$s · %2$s</string>
 
     <!-- login.xml  -->
     <string name="login_slogan">꿈에서 해답을찾다</string>
@@ -10,7 +10,7 @@
     <string name="login_password_confirm_hint">비밀번호 확인</string>
     <string name="login_findpw">비밀번호 찾기</string>
     <string name="login_findpw_send">이메일로 전송</string>
-    <string name="forgot_password">비밀번호를\n잊으셨나요?</string>
+    <string name="forgot_password">비밀번호 찾기</string>
     <string name="sign_up">회원가입</string>
     <string name="sign_up_title">새 계정 만들기</string>
     <string name="email_hint">이메일</string>
@@ -97,7 +97,7 @@
     <string name="btn_pro_upgrade">심화 분석하기</string>
     <string name="ai_analysis_title">AI 분석</string>
     <string name="ai_analysis_placeholder">분석 내용이 여기에 표시됩니다.</string>
-    <string name="ad_unit_ai_banner">ca-app-pub-1742201279182732/8682841157</string>
+    <string name="ad_unit_ai_banner">ca-app-pub-1742201279182732/9282239127</string>
 
 
     <!--fragment_calendar.xml -->
@@ -108,7 +108,7 @@
     <string name="dream_list_title_sample">2025-09-12 (금)의 꿈들</string>
     <string name="dream_list_title_format">%1$s (%2$s)의 꿈들</string>
     <string name="dream_list_empty">이 날짜의 꿈 기록이 없어요.</string>
-    <string name="ad_unit_calendar_banner">ca-app-pub-1742201279182732/8682841157</string>
+    <string name="ad_unit_calendar_banner">ca-app-pub-1742201279182732/9282239127</string>
 
     <!-- 캘린더/달력 -->
     <string name="calendar_title_placeholder">2025년 7월</string>
@@ -138,7 +138,7 @@
     <string name="hint_input">꿈을 자세히 적어주세요…  ex)큰 상어 나타나서 도망갔어, 빌딩 한가운대서 엄청 뛰어다녔어.</string>
     <string name="button_interpret">해몽하기</string>
 
-    <string name="ad_unit_dream_banner">ca-app-pub-1742201279182732/8682841157</string>
+    <string name="ad_unit_dream_banner">ca-app-pub-1742201279182732/9282239127</string>
 
     <!-- Fortune.xml -->
     <string name="fortune_start">운세\n보기</string>
@@ -150,7 +150,7 @@
     <string name="btn_deep_analysis">심화 분석 보기</string>
     <string name="action_copy">복사</string>
     <string name="action_share">공유</string>
-    <string name="ad_unit_fortune_banner">ca-app-pub-1742201279182732/8682841157</string>
+    <string name="ad_unit_fortune_banner">ca-app-pub-1742201279182732/9282239127</string>
 
 
 
@@ -199,7 +199,7 @@
         <string name="btn_save">저장</string>
 
         <!-- 광고 유닛 -->
-        <string name="ad_unit_settings_banner">ca-app-pub-1742201279182732/8682841157</string>
+        <string name="ad_unit_settings_banner">ca-app-pub-1742201279182732/9282239127</string>
         <!-- 상단/섹션 -->
         <string name="btn_logout">로그아웃</string>
         <string name="settings_title">앱 설정</string>
@@ -295,7 +295,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <!-- SettingsFragment.kt  -->
     <!-- ▼ Settings 다국어용 신규 키들 ▼ -->
 
-    <string name="profile_edit_title">프로필 편집</string>
+    <string name="profile_edit_title">Edit profile</string>
     <string name="unit_times_value">%1$d 회</string>
     <string name="unit_entries_value">%1$d개</string>
     <string name="dlg_delete_title">계정 삭제</string>
@@ -789,10 +789,10 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
 역할: ‘주간 꿈 심화 전문분석가’.
 출력: 순수 HTML fragment(<p>,<ul>), 코드블록 금지.
 금지: 의학적/심리학적 진단, 공포·불길 예언, 과격한 단정.
-톤: 불안 완화형, 실행가능한 조언 위주, 과장 금지.
+톤: 불안 완화형, 실행가능한 조언 위주
 
 섹션(순서 고정):
-- 주간 꿈 심화 분석
+- 주간 꿈 심화 분석(5~7문장. 스토리텔링식으로 꿈을 이어가면서 이번 주 꿈들의 핵심 메시지, 반복 모티프, 맥락을 종합적으로 해석)
 - 요약(3문장)
 - 수치 요약
 - 감정 패턴 해석
@@ -801,7 +801,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
 - 1~2주 전망  ← 반드시 포함. 최소 3문장.
   • ‘안심 가이드(3가지)’를 불릿으로 포함(짧고 실행 가능)
   • “예언이 아닌 경향 기반 생활 가이드” 문장을 마지막에 덧붙일 것
-- 체크리스트
+- 체크리스트 (불릿 3개. 일상에서 바로 확인/점검할 수 있는 항목(각 1문장, 동사로 시작)
 ]]></string>
 
 
@@ -935,7 +935,7 @@ eep prompt 템플릿 -->
     <string name="default_generic_advice">체크리스트 1개를 가볍게 시도해보세요.</string>
 
     <!-- FortuneFragment.kt -->
-    <string name="btn_fortune_show">운세\n보기</string>
+    <string name="btn_fortune_show">❓</string>
     <string name="btn_come_tomorrow">내일 다시</string>
     <string name="toast_already_seen_today">오늘은 이미 확인했어요. 내일 다시 이용해주세요.</string>
     <string name="toast_run_fortune_first">먼저 "행운 보기"를 실행해주세요.</string>

@@ -151,8 +151,8 @@ class CalendarFragment : Fragment() {
             visibility = if (count > 0) View.VISIBLE else View.GONE
             if (count > 0) {
                 val size = when {
-                    count >= 5 -> 10.dp()
-                    count >= 3 -> 8.dp()
+                    count >= 3 -> 7.dp()
+                    count >= 1 -> 4.dp()
                     else -> 6.dp()
                 }
                 layoutParams = (layoutParams as ViewGroup.LayoutParams).apply {
@@ -160,8 +160,8 @@ class CalendarFragment : Fragment() {
                 }
                 alpha = when {
                     count >= 5 -> 1f
-                    count >= 3 -> 0.85f
-                    else -> 0.7f
+                    count >= 3 -> 0.9f
+                    else -> 0.8f
                 }
             }
         }

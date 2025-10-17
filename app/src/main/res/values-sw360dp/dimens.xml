@@ -1,30 +1,49 @@
 <resources>
-    <!-- 고해상도에서 살짝 축소 -->
+
     <dimen name="ads_bottom_inset">96dp</dimen>
     <dimen name="hint_input">14sp</dimen>
 
     <!-- home -->
     <dimen name="max_phone_width">540dp</dimen>
-    <dimen name="home_title_size">38sp</dimen>
+    <dimen name="home_title_size">34sp</dimen>
     <dimen name="title_margin_bottom">56dp</dimen>
     <dimen name="ai_title">14sp</dimen>
     <dimen name="ai_sub">12sp</dimen>
     <dimen name="bubble_text">12sp</dimen>
-    <dimen name="btn_text">13sp</dimen>
-    <dimen name="btn_height">38dp</dimen>
+    <dimen name="btn_text">12sp</dimen>
+    <dimen name="btn_height">34dp</dimen>
     <dimen name="icon_btn">22dp</dimen>
     <dimen name="month_text">16sp</dimen>
     <dimen name="list_title">14sp</dimen>
+    <!-- Pixel 9 등도 35sp 고정 -->
 
-    <dimen name="card_pad">14dp</dimen>
+    <dimen name="card_pad">10dp</dimen>
     <dimen name="ai_card_corner">18dp</dimen>
     <dimen name="ai_card_elevation">2dp</dimen>
 
-        <!-- 텍스트 -->
 
-        <dimen name="text_md">15sp</dimen>
+
+    <dimen name ="report_btn_height">34dp</dimen>
+        <!-- ai report -->
+    <dimen name ="ai_btn_height">35dp</dimen>
+
+        <!-- 입력 카드 패딩(Glass) -->
+        <dimen name="dream_card_pad">16dp</dimen>
+
+        <!-- 해몽하기 버튼(Pill) -->
+        <dimen name="interpret_btn_pad_h">14dp</dimen>
+        <dimen name="interpret_btn_pad_v">4dp</dimen>
+        <dimen name="interpret_btn_radius">16dp</dimen>
+
+        <!-- 결과 카드(빈 상태) -->
+        <dimen name="result_min_height">41dp</dimen>
+        <dimen name="result_pad_h">12dp</dimen>
+        <dimen name="result_pad_v">8dp</dimen>
+
+
+        <dimen name="text_md">14sp</dimen>
         <dimen name="text_xs">12sp</dimen>
-    <dimen name="panel_box_width">380dp</dimen>
+    <dimen name="panel_box_width">340dp</dimen>
         <!-- 여백/버튼 -->
         <dimen name="calendar_side_margin">14dp</dimen>
         <dimen name="calendar_top_margin">8dp</dimen>
@@ -58,9 +77,9 @@
 
 
 
-    <!-- 홈  중간꺼 정렬 -->
-    <dimen name="home_card_width">350dp</dimen>
-    <dimen name="home_bubble_width">350dp</dimen>
+    <!-- 홈  리포트쪽 정렬 -->
+    <dimen name="home_card_width">280dp</dimen>
+    <dimen name="home_bubble_width">280dp</dimen>
 
         <dimen name="profile_button_width">180dp</dimen>
         <dimen name="profile_button_height">40dp</dimen>

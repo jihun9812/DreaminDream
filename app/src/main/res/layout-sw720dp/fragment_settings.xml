@@ -28,7 +28,7 @@
         android:text="@string/btn_logout"
         android:textAllCaps="false"
         android:textStyle="bold"
-        android:textColor="#FFFFFF"
+        android:textColor="#FFFFFFFF"
         app:backgroundTint="#00FDCA60"
         app:cornerRadius="16dp"
         app:layout_constraintBottom_toTopOf="@id/adView_settings"
@@ -66,7 +66,7 @@
                 android:orientation="vertical"
                 android:padding="14dp">
 
-                <!-- ===== (필요시 보이는) 프로필 편집 카드 ===== -->
+                <!-- ===== 프로필 편집 카드 (보일 때만) ===== -->
                 <LinearLayout
                     android:id="@+id/card_profile"
                     android:layout_width="match_parent"
@@ -81,8 +81,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/btn_profile_edit"
-                        android:textColor="#FDCA60"
-                        android:textStyle="bold"
+                        android:textColor="#FFFDCA60"
+                        android:fontFamily="@font/jalnan"
                         android:textSize="20sp"
                         android:letterSpacing="0.02"
                         android:paddingBottom="8dp"/>
@@ -104,7 +104,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/label_name"
-                            android:textColor="#FABE41"
+                            android:textColor="#FFFABE41"
                             android:textSize="12sp"
                             android:layout_marginTop="2dp"/>
 
@@ -114,7 +114,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8dp"
                             app:boxBackgroundMode="outline"
-                            app:boxStrokeColor="#FDCA60"
+                            app:boxStrokeColor="#FFFDCA60"
                             app:boxStrokeWidth="1dp"
                             app:boxStrokeWidthFocused="2dp"
                             app:boxCornerRadiusTopStart="8dp"
@@ -132,7 +132,7 @@
                                 android:hint="@string/hint_name_example"
                                 android:inputType="textPersonName|textCapWords"
                                 android:imeOptions="flagNoFullscreen|actionDone"
-                                android:textColor="#E8F1F8"
+                                android:textColor="#FFE8F1F8"
                                 android:textColorHint="#B3FFFFFF"
                                 android:textSize="16sp"/>
                         </com.google.android.material.textfield.TextInputLayout>
@@ -142,7 +142,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/label_birthdate"
-                            android:textColor="#FABE41"
+                            android:textColor="#FFFABE41"
                             android:textSize="12sp"/>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -151,7 +151,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="8dp"
                             app:boxBackgroundMode="outline"
-                            app:boxStrokeColor="#FDCA60"
+                            app:boxStrokeColor="#FFFDCA60"
                             app:boxStrokeWidth="1dp"
                             app:boxStrokeWidthFocused="2dp"
                             app:boxCornerRadiusTopStart="8dp"
@@ -169,7 +169,7 @@
                                 android:hint="@string/hint_birthdate_format"
                                 android:focusable="false"
                                 android:clickable="true"
-                                android:textColor="#E8F1F8"
+                                android:textColor="#FFE8F1F8"
                                 android:textColorHint="#B3FFFFFF"
                                 android:textSize="16sp"/>
                         </com.google.android.material.textfield.TextInputLayout>
@@ -179,7 +179,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/label_gender"
-                            android:textColor="#FABE41"
+                            android:textColor="#FFFABE41"
                             android:textSize="12sp"/>
 
                         <RadioGroup
@@ -194,8 +194,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/gender_male"
-                                android:textColor="#FABE41"
-                                android:buttonTint="#37C2D0"
+                                android:textColor="#FFFABE41"
+                                android:buttonTint="#FF37C2D0"
                                 android:textSize="16sp"
                                 android:layout_marginEnd="16dp"/>
 
@@ -204,8 +204,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="@string/gender_female"
-                                android:textColor="#FABE41"
-                                android:buttonTint="#37C2D0"
+                                android:textColor="#FFFABE41"
+                                android:buttonTint="#FF37C2D0"
                                 android:textSize="16sp"/>
                         </RadioGroup>
 
@@ -214,35 +214,60 @@
                             android:layout_height="1dp"
                             app:dividerColor="#44FDCA60"/>
 
-                        <!-- MBTI -->
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/label_mbti"
-                            android:textColor="#FABE41"
-                            android:textSize="12sp"/>
-
-                        <Spinner
-                            android:id="@+id/spinner_mbti"
+                        <!-- MBTI + 출생시간 : 2-Column -->
+                        <LinearLayout
+                            android:id="@+id/row_mbti_birthtime"
                             android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:layout_marginBottom="8dp"
-                            android:spinnerMode="dropdown"/>
-
-                        <!-- 출생시간 -->
-                        <TextView
-                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/label_birthtime"
-                            android:textColor="#FABE41"
-                            android:textSize="12sp"/>
+                            android:orientation="horizontal"
+                            android:weightSum="2"
+                            android:layout_marginTop="2dp"
+                            android:layout_marginBottom="8dp">
 
-                        <Spinner
-                            android:id="@+id/spinner_birthtime"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:layout_marginBottom="8dp"
-                            android:spinnerMode="dropdown"/>
+                            <!-- MBTI -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:paddingEnd="6dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/label_mbti"
+                                    android:textColor="#FFFABE41"
+                                    android:textSize="12sp"/>
+
+                                <Spinner
+                                    android:id="@+id/spinner_mbti"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="48dp"
+                                    android:spinnerMode="dropdown"/>
+                            </LinearLayout>
+
+                            <!-- Birth time -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical"
+                                android:paddingStart="6dp">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/label_birthtime"
+                                    android:textColor="#FFFABE41"
+                                    android:textSize="12sp"/>
+
+                                <Spinner
+                                    android:id="@+id/spinner_birthtime"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="48dp"
+                                    android:spinnerMode="dropdown"/>
+                            </LinearLayout>
+                        </LinearLayout>
 
                         <!-- 편집/저장 -->
                         <LinearLayout
@@ -259,10 +284,10 @@
                                 android:paddingHorizontal="14dp"
                                 android:text="@string/btn_cancel"
                                 android:textAllCaps="false"
-                                android:textColor="#212121"
+                                android:textColor="#FF212121"
                                 android:textSize="14sp"
                                 android:textStyle="bold"
-                                app:backgroundTint="#C7C7C7"
+                                app:backgroundTint="#FFC7C7C7"
                                 app:cornerRadius="16dp"/>
 
                             <com.google.android.material.button.MaterialButton
@@ -272,10 +297,10 @@
                                 android:paddingHorizontal="14dp"
                                 android:text="@string/btn_save"
                                 android:textAllCaps="false"
-                                android:textColor="#212121"
+                                android:textColor="#FF212121"
                                 android:textSize="14sp"
                                 android:textStyle="bold"
-                                app:backgroundTint="#EBBB57"
+                                app:backgroundTint="#FFEBBB57"
                                 app:cornerRadius="16dp"/>
                         </LinearLayout>
 
@@ -303,7 +328,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/settings_title"
-                        android:textColor="#FDCA60"
+                        android:textColor="#FFFDCA60"
+                        android:fontFamily="@font/jalnan"
                         android:textStyle="bold"
                         android:textSize="16sp"/>
 
@@ -327,7 +353,7 @@
                                 android:id="@+id/tvAppProfileSummary"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textColor="#FFFFFF"
+                                android:textColor="#FFFFFFFF"
                                 android:textSize="15sp"
                                 android:lineSpacingExtra="3dp"/>
                         </LinearLayout>
@@ -366,14 +392,14 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/gpt_usage_today"
-                                        android:textColor="#FFFFFF"
+                                        android:textColor="#FFFFFFFF"
                                         android:textSize="12sp"/>
                                     <TextView
                                         android:id="@+id/tvGptUsageValue"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/value_placeholder_dash"
-                                        android:textColor="#FFFFFF"
+                                        android:textColor="#FFFFFFFF"
                                         android:textStyle="bold"
                                         android:textSize="20sp"/>
                                 </LinearLayout>
@@ -391,14 +417,14 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/dream_count"
-                                        android:textColor="#FFFFFF"
+                                        android:textColor="#FFFFFFFF"
                                         android:textSize="12sp"/>
                                     <TextView
                                         android:id="@+id/tvDreamCountValue"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/value_placeholder_dash"
-                                        android:textColor="#FFFFFF"
+                                        android:textColor="#FFFFFFFF"
                                         android:textStyle="bold"
                                         android:textSize="20sp"/>
                                 </LinearLayout>
@@ -412,25 +438,26 @@
                         android:layout_marginTop="10dp"
                         app:dividerColor="#33FFFFFF"/>
 
-                    <!-- 설정 -->
+                    <!-- 설정 버튼들 -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="@string/settings_section"
-                        android:textColor="#EDDF90"
+                        android:textColor="#FFEDDF90"
                         android:textSize="12sp"/>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_profile_edit"
-                        android:layout_width="300dp"
-                        android:layout_height="44dp"
+                        android:layout_width="200dp"
+                        android:layout_height="40dp"
                         android:layout_marginTop="8dp"
                         android:text="@string/btn_profile_edit"
                         android:textAllCaps="false"
-                        android:textColor="#1D142E"
-                        app:backgroundTint="#F3EFBE58"
+                        android:textColor="#D32EF0EA"
+                        app:backgroundTint="#00EFBE58"
                         app:cornerRadius="16dp"
+                        android:fontFamily="@font/jalnan"
                         android:layout_gravity="center_horizontal"/>
 
                     <com.google.android.material.button.MaterialButton
@@ -440,7 +467,7 @@
                         android:layout_marginTop="4dp"
                         android:text="@string/btn_premium"
                         android:textAllCaps="false"
-                        android:textColor="#FFFFFF"
+                        android:textColor="#FFFFFFFF"
                         android:textSize="12sp"
                         app:backgroundTint="#00000000"/>
 
@@ -450,7 +477,7 @@
                         android:layout_height="40dp"
                         android:text="@string/btn_contact"
                         android:textAllCaps="false"
-                        android:textColor="#FFFFFF"
+                        android:textColor="#FFFFFFFF"
                         android:textSize="12sp"
                         app:backgroundTint="#00000000"/>
 
@@ -460,7 +487,7 @@
                         android:layout_height="40dp"
                         android:text="@string/btn_terms"
                         android:textAllCaps="false"
-                        android:textColor="#FFFFFF"
+                        android:textColor="#FFFFFFFF"
                         android:textSize="12sp"
                         app:backgroundTint="#00000000"/>
 
@@ -471,11 +498,9 @@
                         android:layout_marginTop="6dp"
                         android:text="@string/btn_delete_account"
                         android:textAllCaps="false"
-                        android:textColor="#CE3434"
+                        android:textColor="#FFCE3434"
                         android:textSize="12sp"
                         app:backgroundTint="#00000000"/>
-
-                    <!-- ── 언어 섹션 삭제됨 ── -->
 
                     <!-- 계정 통합 -->
                     <com.google.android.material.divider.MaterialDivider
@@ -489,7 +514,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="@string/label_account_link"
-                        android:textColor="#EDDF90"
+                        android:textColor="#FFEDDF90"
                         android:textSize="12sp"/>
 
                     <TextView
@@ -503,8 +528,8 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_link_google"
-                        android:layout_width="300dp"
-                        android:layout_height="48dp"
+                        android:layout_width="200dp"
+                        android:layout_height="44dp"
                         android:layout_marginTop="8dp"
                         android:text="@string/btn_google_link"
                         android:textAllCaps="false"

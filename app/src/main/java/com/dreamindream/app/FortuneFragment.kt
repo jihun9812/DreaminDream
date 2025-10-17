@@ -6,7 +6,7 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-
+import android.view.WindowManager
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -52,6 +52,10 @@ import org.json.JSONObject
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
+import androidx.core.content.res.ResourcesCompat
+import android.graphics.Typeface
+
+
 
 class FortuneFragment : Fragment() {
 
@@ -132,6 +136,26 @@ class FortuneFragment : Fragment() {
 
 
         btnDeep         = v.findViewById(R.id.btnDeep)
+        // --- 심화분석보기 버튼 스타일 통일 ---
+        val r = 18f * resources.displayMetrics.density
+        btnDeep.isAllCaps = false
+        btnDeep.setTextColor(Color.BLACK)
+        btnDeep.backgroundTintList = null
+        btnDeep.rippleColor = ColorStateList.valueOf(Color.parseColor("#33FFFFFF"))
+        btnDeep.background = GradientDrawable().apply {
+            cornerRadius = r
+            colors = intArrayOf(Color.parseColor("#FFFEDCA6"), Color.parseColor("#FF8BAAFF"))
+            orientation = GradientDrawable.Orientation.TL_BR
+            gradientType = GradientDrawable.LINEAR_GRADIENT
+            shape = GradientDrawable.RECTANGLE
+        }
+
+// Pretendard Medium 폰트 유지
+        ResourcesCompat.getFont(requireContext(), R.font.pretendard_medium)?.let { tf ->
+            btnDeep.typeface = Typeface.create(tf, Typeface.NORMAL)
+        }
+        btnDeep.textSize = 13f
+
         layoutChecklist = v.findViewById(R.id.layoutChecklist)
         sectionsContainer = v.findViewById(R.id.sectionsContainer)
 
@@ -513,9 +537,9 @@ class FortuneFragment : Fragment() {
         chips.removeAllViews()
         list.take(4).forEach { label ->
             val chip = Chip(requireContext()).apply {
-                text = label; isCheckable = false; isClickable = false
+                text = label; isCheckable = false; isClickable = true
                 setTextColor(Color.WHITE)
-                chipBackgroundColor = ColorStateList.valueOf(Color.parseColor("#334E68"))
+                chipBackgroundColor = ColorStateList.valueOf(Color.parseColor("#0A0F45"))
             }
             chips.addView(chip)
         }
@@ -528,7 +552,7 @@ class FortuneFragment : Fragment() {
         items.forEachIndexed { idx, text ->
             val cb = CheckBox(requireContext()).apply {
                 this.text = "• $text"
-                setTextColor(Color.parseColor("#F0F4F8")); textSize = 14f
+                setTextColor(Color.parseColor("#F0F4F8")); textSize = 13f
                 isChecked = prefs.getBoolean("fortune_check_${todayKey}_$idx", false)
                 setPadding(8, 10, 8, 10)
                 setOnCheckedChangeListener { _, checked ->
@@ -598,7 +622,7 @@ class FortuneFragment : Fragment() {
 
     private fun openSectionDialog(title: String, score: Int, text: String?, advice: String?) {
         val content = layoutInflater.inflate(R.layout.dialog_fortune_section, null)
-        val color = Color.parseColor("#A62A0D4E")
+        val color = Color.parseColor("#060D3500")
 
         val rootCard = content.findViewById<MaterialCardView>(R.id.dialogRoot)
         val tvTitle  = content.findViewById<TextView>(R.id.tvSectionDialogTitle)
@@ -613,11 +637,22 @@ class FortuneFragment : Fragment() {
         tvScore.background = GradientDrawable().apply { cornerRadius = dp(999).toFloat(); setColor(api.scoreColor(score)) }
         tvBody.text = api.buildSectionDetails(title, score, text, advice)
 
-        // ⬇️ 여기 부분: 스타일 파라미터 제거 (두 번째 인자 삭제)
+
         val dlg = MaterialAlertDialogBuilder(requireContext())
             .setView(content)
             .create()
-            .apply { window?.setBackgroundDrawable(ColorDrawable(Color.parseColor("#A62A0D4E"))) }
+            .apply {
+                window?.apply {
+                    setBackgroundDrawable(ColorDrawable(Color.parseColor("#060D3500")))
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                        setBackgroundBlurRadius(40)
+                        setDimAmount(0.6f)
+                    } else {
+                        addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+                        attributes = attributes.apply { dimAmount = 0.65f }
+                    }
+                }
+            }
 
         dlg.setOnShowListener {
             val dm = resources.displayMetrics

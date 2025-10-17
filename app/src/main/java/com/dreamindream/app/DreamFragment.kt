@@ -1,15 +1,22 @@
 package com.dreamindream.app
 
+
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.content.res.ColorStateList
+import androidx.core.content.res.ResourcesCompat
+import android.graphics.Typeface
 import android.content.Context
 import android.content.SharedPreferences
-import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.annotation.IdRes
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.core.content.edit                    // ✅ KTX: SharedPreferences.edit { }
+import androidx.core.graphics.toColorInt           // ✅ KTX: "#hex".toColorInt()
 import androidx.fragment.app.Fragment
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.gms.ads.*
@@ -30,6 +37,7 @@ import android.text.method.ScrollingMovementMethod
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.text.style.RelativeSizeSpan
+import android.widget.FrameLayout                    // ✅ inflate parent
 
 class DreamFragment : Fragment() {
 
@@ -47,6 +55,7 @@ class DreamFragment : Fragment() {
         "안녕","gpt","hello","how are you","what is","tell me","chatgpt","who are you","날씨","시간",
         "씨발","개새끼","병신","니애미","좆밥","씨발롬","애미","창녀"
     )
+    private var editWasScrolling = false
 
     // Views
     private lateinit var prefs: SharedPreferences
@@ -68,6 +77,9 @@ class DreamFragment : Fragment() {
             .build()
     }
 
+    // 이 프래그먼트에서 진행 중인 호출(이탈 시 취소)
+    private var ongoingCall: Call? = null
+
     // Firestore 트리거용 사용자 UID
     private var userId: String = ""
 
@@ -85,12 +97,19 @@ class DreamFragment : Fragment() {
         }
 
         // 보상형 초기화 & 프리로드
-        AdManager.initialize(requireContext())
-        AdManager.loadRewarded(requireContext())
+        context?.let {
+            AdManager.initialize(it)
+            AdManager.loadRewarded(it)
+        }
 
         // uid (익명 포함)
         userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
-        prefs = requireContext().getSharedPreferences("dream_history_$userId", Context.MODE_PRIVATE)
+        context?.let { ctx ->
+            prefs = ctx.getSharedPreferences("dream_history_$userId", Context.MODE_PRIVATE)
+        } ?: run {
+            // 이례적 상황: context 없으면 더 진행하지 않음
+            return v
+        }
 
         bindViews(v)
         initUi(v)
@@ -99,15 +118,22 @@ class DreamFragment : Fragment() {
 
     override fun onResume() { super.onResume(); bannerAdView?.resume() }
     override fun onPause() { bannerAdView?.pause(); super.onPause() }
-    override fun onDestroyView() { bannerAdView?.destroy(); bannerAdView = null; super.onDestroyView() }
 
-    // 필수 뷰
-    private fun <T: View> req(root: View, id: Int, name: String): T {
-        @Suppress("UNCHECKED_CAST")
-        return root.findViewById<T?>(id)
-            ?: throw IllegalStateException("fragment_dream.xml에 <$name> 뷰(id=$id)가 필요합니다.")
+    override fun onDestroyView() {
+        // 화면 이탈 시 진행 중 네트워크 취소 → 늦게 도착하는 콜백 차단
+        ongoingCall?.cancel()
+        ongoingCall = null
+
+        bannerAdView?.destroy()
+        bannerAdView = null
+        super.onDestroyView()
     }
 
+    // 필수 뷰
+    private fun <T : View> req(root: View, @IdRes id: Int, name: String): T {
+        return root.findViewById<T>(id)
+            ?: error("fragment_dream.xml에 <$name> 뷰(id=$id)가 필요합니다.")
+    }
     private fun bindViews(root: View) {
         dreamEditText   = req(root, R.id.dreamEditText, "EditText@dreamEditText")
         interpretButton = req(root, R.id.interpretButton, "Button@interpretButton")
@@ -116,31 +142,47 @@ class DreamFragment : Fragment() {
         lottieLoading   = root.findViewById(R.id.lottieLoading)
 
         // 안내 문구
-        resultTextView.text = getString(R.string.dream_result_placeholder)
-        resultTextView.setTextColor(Color.parseColor("#BFD0DC"))
+        resultTextView.text = context?.getString(R.string.dream_result_placeholder) ?: ""
+        resultTextView.setTextColor("#BFD0DC".toColorInt())        // ✅ KTX
     }
 
     private fun initUi(root: View) {
         updateUsageLabel()
 
-        // 입력칸 내부 스크롤 + 부모 ScrollView 제스처 충돌 방지
+
         dreamEditText.isVerticalScrollBarEnabled = true
         dreamEditText.movementMethod = ScrollingMovementMethod.getInstance()
+
         dreamEditText.setOnTouchListener { v, event ->
-            v.parent.requestDisallowInterceptTouchEvent(true)
-            if (event.action == MotionEvent.ACTION_UP || event.action == MotionEvent.ACTION_CANCEL) {
-                v.parent.requestDisallowInterceptTouchEvent(false)
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    editWasScrolling = false
+                    v.parent.requestDisallowInterceptTouchEvent(true)
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    editWasScrolling = true
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    v.parent.requestDisallowInterceptTouchEvent(false)
+                    // 클릭(스크롤 없이 손 뗀 경우)만 performClick 호출
+                    if (!editWasScrolling && event.actionMasked == MotionEvent.ACTION_UP) {
+                        v.performClick()
+                    }
+                }
             }
+            // false를 리턴해 기본 동작(텍스트 커서/선택/키보드)이 그대로 유지되도록 함
             false
         }
 
+
         // 결과칸은 바깥 스크롤만
         resultTextView.isVerticalScrollBarEnabled = false
-        resultTextView.setOnTouchListener(null)
         resultTextView.movementMethod = null
 
         interpretButton.setOnClickListener {
-            it.startAnimation(AnimationUtils.loadAnimation(requireContext(), R.anim.scale_up))
+            context ?: return@setOnClickListener
+
+            it.startAnimation(AnimationUtils.loadAnimation(context, R.anim.scale_up))
             hideKeyboardAndScrollToResult(root)
 
             val input = dreamEditText.text.toString().trim()
@@ -175,8 +217,10 @@ class DreamFragment : Fragment() {
 
     // --- 바텀시트 (광고 보기 / 취소) ---
     private fun showAdPrompt(onRewardEarnedProceed: () -> Unit) {
-        val bs = BottomSheetDialog(requireContext())
-        val view = layoutInflater.inflate(R.layout.dialog_ad_prompt, null)
+        val ctx = context ?: return
+        val bs = BottomSheetDialog(ctx)
+        val view = layoutInflater.inflate(R.layout.dialog_ad_prompt, null, false)
+
         val btnCancel = view.findViewById<Button>(R.id.btnCancel)
         val btnWatch  = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnWatchAd)
         val textStatus= view.findViewById<TextView>(R.id.textStatus)
@@ -186,25 +230,25 @@ class DreamFragment : Fragment() {
         btnWatch.setOnClickListener {
             btnWatch.isEnabled = false
             progress.visibility = View.VISIBLE
-            textStatus.text = getString(R.string.ad_preparing)
+            textStatus.text = context?.getString(R.string.ad_preparing) ?: ""
             AdManager.showRewarded(
                 activity = requireActivity(),
                 onRewardEarned = {
                     bs.dismiss()
                     onRewardEarnedProceed()
-                    AdManager.loadRewarded(requireContext())
+                    context?.let { AdManager.loadRewarded(it) }
                 },
                 onClosed = {
                     btnWatch.isEnabled = true
                     progress.visibility = View.GONE
-                    textStatus.text = getString(R.string.ad_closed_try_again)
-                    AdManager.loadRewarded(requireContext())
+                    textStatus.text = context?.getString(R.string.ad_closed_try_again) ?: ""
+                    context?.let { AdManager.loadRewarded(it) }
                 },
                 onFailed = { reason ->
                     btnWatch.isEnabled = true
                     progress.visibility = View.GONE
-                    textStatus.text = getString(R.string.ad_load_failed_fmt, reason)
-                    AdManager.loadRewarded(requireContext())
+                    textStatus.text = context?.getString(R.string.ad_load_failed_fmt, reason) ?: ""
+                    context?.let { AdManager.loadRewarded(it) }
                 }
             )
         }
@@ -221,15 +265,17 @@ class DreamFragment : Fragment() {
         return if (savedDate == today) count else 0
     }
     private fun increaseTodayCount(current: Int) {
-        prefs.edit()
-            .putString(prefKeyDate, todayKey())
-            .putInt(prefKeyCount, (current + 1).coerceAtMost(freeLimit + adLimit))
-            .apply()
-        updateUsageLabel()
+        prefs.edit {
+            putString(prefKeyDate, todayKey())                     // ✅ KTX edit{}
+            putInt(prefKeyCount, (current + 1).coerceAtMost(freeLimit + adLimit))
+        }
+        ui { updateUsageLabel() }
     }
     private fun updateUsageLabel() {
+        if (!isAdded) return
         val remain = (freeLimit + adLimit - getTodayCount()).coerceAtLeast(0)
-        usageTextView?.text = getString(R.string.dream_today_left, remain)
+        val txt = context?.getString(R.string.dream_today_left, remain) ?: return
+        usageTextView?.text = txt
     }
 
     // 입력 검증
@@ -238,8 +284,8 @@ class DreamFragment : Fragment() {
         val isMath = Regex("^\\s*\\d+\\s*[-+*/]\\s*\\d+\\s*$").containsMatchIn(input)
         val smallTalk = bannedStarters.any { lower.startsWith(it) }
         return when {
-            input.isBlank() -> { toast(getString(R.string.dream_input_empty)); false }
-            input.length < 10 || isMath || smallTalk -> { toast(getString(R.string.dream_input_not_meaningful)); false }
+            input.isBlank() -> { toast(context?.getString(R.string.dream_input_empty) ?: ""); false }
+            input.length < 10 || isMath || smallTalk -> { toast(context?.getString(R.string.dream_input_not_meaningful) ?: ""); false }
             else -> true
         }
     }
@@ -251,16 +297,18 @@ class DreamFragment : Fragment() {
         onFailure: (String) -> Unit = {},
         attempt: Int = 1
     ) {
+        if (!isAdded) return
         showLoading()
 
-        val content = getString(
+        val ctx = context ?: run { hideLoading(); return }
+        val content = ctx.getString(
             R.string.dream_prompt_template,
             prompt,
-            getString(R.string.dream_section_message),
-            getString(R.string.dream_section_symbols),
-            getString(R.string.dream_section_premonition),
-            getString(R.string.dream_section_tips_today),
-            getString(R.string.dream_section_actions_three)
+            ctx.getString(R.string.dream_section_message),
+            ctx.getString(R.string.dream_section_symbols),
+            ctx.getString(R.string.dream_section_premonition),
+            ctx.getString(R.string.dream_section_tips_today),
+            ctx.getString(R.string.dream_section_actions_three)
         )
 
         val messages = JSONArray().put(JSONObject().put("role", "user").put("content", content))
@@ -285,49 +333,59 @@ class DreamFragment : Fragment() {
                     startInterpret(prompt, onSuccess, onFailure, attempt = 2)
                 }, 800)
             } else {
-                ui { onResultArrived(getString(R.string.dream_network_error)) }
-                onFailure(getString(R.string.dream_network_error))
+                val msg = context?.getString(R.string.dream_network_error) ?: ""
+                ui {
+                    onResultArrived(msg)
+                    onFailure(msg)
+                }
             }
         }
 
-        http.newCall(req).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                Log.e(logTag, "GPT 요청 실패", e)
-                retryOrFail("fail", e)
-            }
-            override fun onResponse(call: Call, response: Response) {
-                response.use { resp ->
-                    if (!resp.isSuccessful) {
-                        Log.e(logTag, "GPT 응답 코드: ${resp.code}")
-                        retryOrFail(resp.code.toString(), null)
-                        return
-                    }
-
-                    val raw = resp.body?.string().orEmpty()
-                    val parsed = try {
-                        JSONObject(raw)
-                            .getJSONArray("choices")
-                            .getJSONObject(0)
-                            .getJSONObject("message")
-                            .getString("content")
-                            .trim()
-                    } catch (ex: Exception) {
-                        Log.e(logTag, "GPT 파싱 실패", ex)
-                        null
-                    }
-
-                    if (parsed.isNullOrBlank()) {
-                        retryOrFail("parse", null)
-                        return
-                    }
-
-                    // ✅ 성공 시에만 결과 표시/저장/차감
-                    ui { onResultArrived(parsed) }
-                    saveDream(prompt, parsed)
-                    onSuccess(parsed)
+        ongoingCall = http.newCall(req).also { call ->
+            call.enqueue(object : Callback {
+                override fun onFailure(call: Call, e: IOException) {
+                    if (call.isCanceled()) return  // 화면 이탈 등으로 취소됨
+                    Log.e(logTag, "GPT 요청 실패", e)
+                    retryOrFail("fail", e)
                 }
-            }
-        })
+                override fun onResponse(call: Call, response: Response) {
+                    if (call.isCanceled()) { response.close(); return }
+                    response.use { resp ->
+                        if (!resp.isSuccessful) {
+                            Log.e(logTag, "GPT 응답 코드: ${resp.code}")
+                            retryOrFail(resp.code.toString(), null)
+                            return
+                        }
+
+                        val raw = resp.body?.string().orEmpty()
+                        val parsed = try {
+                            JSONObject(raw)
+                                .getJSONArray("choices")
+                                .getJSONObject(0)
+                                .getJSONObject("message")
+                                .getString("content")
+                                .trim()
+                        } catch (ex: Exception) {
+                            Log.e(logTag, "GPT 파싱 실패", ex)
+                            null
+                        }
+
+                        if (parsed.isNullOrBlank()) {
+                            retryOrFail("parse", null)
+                            return
+                        }
+
+                        // ✅ 성공 시에만 결과 표시/저장/차감
+                        ui {
+                            if (!isAdded) return@ui
+                            onResultArrived(parsed)
+                            onSuccess(parsed)   // 반드시 UI 스레드에서 호출
+                        }
+                        saveDream(prompt, parsed)
+                    }
+                }
+            })
+        }
     }
 
     // 저장(성공 결과만)
@@ -338,15 +396,18 @@ class DreamFragment : Fragment() {
         val arr = try { JSONArray(prev) } catch (_: Exception) { JSONArray() }
         if (arr.length() >= 10) { try { arr.remove(0) } catch (_: Exception) {} }
         arr.put(JSONObject().put("dream", dream).put("result", result))
-        prefs.edit().putString(dayKey, arr.toString()).apply()
+        prefs.edit { putString(dayKey, arr.toString()) }          // ✅ KTX
 
         // Firestore 저장 (uid 있을 때만)
         if (userId.isNotBlank()) {
             try {
                 FirestoreManager.saveDream(userId, dream, result)
-                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                    ReportWarmup.warmUpThisWeek(requireContext().applicationContext, userId)
-                }, 800)
+                val appCtx = context?.applicationContext
+                if (appCtx != null) {
+                    android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                        ReportWarmup.warmUpThisWeek(appCtx, userId)
+                    }, 800)
+                }
             } catch (e: Exception) {
                 Log.e(logTag, "Firestore save failed: ${e.localizedMessage}")
             }
@@ -356,8 +417,9 @@ class DreamFragment : Fragment() {
     // ---- 결과 수신 후 처리
     private fun onResultArrived(text: String) {
         hideLoading()
-        resultTextView.setTextColor(Color.parseColor("#FFFFFF"))
-        resultTextView.text = styleResult(text.ifBlank { getString(R.string.dream_result_empty) })
+        resultTextView.setTextColor("#FFFFFF".toColorInt())        // ✅
+        val fallback = context?.getString(R.string.dream_result_empty) ?: ""
+        resultTextView.text = styleResult(text.ifBlank { fallback })
     }
 
     // 로딩 표시/해제
@@ -369,8 +431,8 @@ class DreamFragment : Fragment() {
             animate().alpha(1f).translationY(0f).scaleX(1f).scaleY(1f).setDuration(400).start()
             playAnimation()
         }
-        resultTextView.text = getString(R.string.dream_loading)
-        resultTextView.setTextColor(Color.parseColor("#BFD0DC"))
+        resultTextView.text = context?.getString(R.string.dream_loading) ?: ""
+        resultTextView.setTextColor("#BFD0DC".toColorInt())        // ✅
     }
     private fun hideLoading() {
         interpretButton.isEnabled = true
@@ -379,7 +441,7 @@ class DreamFragment : Fragment() {
 
     // 섹션별 색 적용 + 섹션 사이 한 줄 공백
     private fun styleResult(raw: String): CharSequence {
-        val text = raw.ifBlank { getString(R.string.dream_result_empty) }
+        val text = raw.ifBlank { context?.getString(R.string.dream_result_empty) ?: "" }
             .replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")
             .replace("**", "")
             .replace(Regex("`{1,3}"), "")
@@ -388,17 +450,18 @@ class DreamFragment : Fragment() {
 
         data class Sec(val key: Regex, val headerColor: Int, val bodyColor: Int)
 
+        val ctx = context
         val secs = listOf(
-            Sec(Regex("""^(?:\P{L}*)?\s*(${Regex.escape(getString(R.string.dream_section_message))})\s*:?\s*$""", RegexOption.IGNORE_CASE),
-                Color.parseColor("#9BE7FF"), Color.parseColor("#E6F7FF")),
-            Sec(Regex("""^(?:\P{L}*)?\s*(${Regex.escape(getString(R.string.dream_section_symbols))}|핵심\s*포인트)\s*:?\s*$""", RegexOption.IGNORE_CASE),
-                Color.parseColor("#FFB3C1"), Color.parseColor("#FFE6EC")),
-            Sec(Regex("""^(?:\P{L}*)?\s*(${Regex.escape(getString(R.string.dream_section_premonition))})\s*:?\s*$""", RegexOption.IGNORE_CASE),
-                Color.parseColor("#FFD166"), Color.parseColor("#FFF1CC")),
-            Sec(Regex("""^(?:\P{L}*)?\s*(${Regex.escape(getString(R.string.dream_section_tips_today))})\s*:?\s*$""", RegexOption.IGNORE_CASE),
-                Color.parseColor("#FFE082"), Color.parseColor("#FFF4D6")),
-            Sec(Regex("""^(?:\P{L}*)?\s*(${Regex.escape(getString(R.string.dream_section_actions_three))})\s*:?\s*$""", RegexOption.IGNORE_CASE),
-                Color.parseColor("#A5D6A7"), Color.parseColor("#E9F8ED"))
+            Sec(Regex("""^(?:\P{L}*)?\s*(${Regex.escape(ctx?.getString(R.string.dream_section_message) ?: "메시지")})\s*:?\s*$""", RegexOption.IGNORE_CASE),
+                "#9BE7FF".toColorInt(), "#E6F7FF".toColorInt()),
+            Sec(Regex("""^(?:\P{L}*)?\s*(${Regex.escape(ctx?.getString(R.string.dream_section_symbols) ?: "상징")}|핵심\s*포인트)\s*:?\s*$""", RegexOption.IGNORE_CASE),
+                "#FFB3C1".toColorInt(), "#FFE6EC".toColorInt()),
+            Sec(Regex("""^(?:\P{L}*)?\s*(${Regex.escape(ctx?.getString(R.string.dream_section_premonition) ?: "징조")})\s*:?\s*$""", RegexOption.IGNORE_CASE),
+                "#FFD166".toColorInt(), "#FFF1CC".toColorInt()),
+            Sec(Regex("""^(?:\P{L}*)?\s*(${Regex.escape(ctx?.getString(R.string.dream_section_tips_today) ?: "오늘의 팁")})\s*:?\s*$""", RegexOption.IGNORE_CASE),
+                "#FFE082".toColorInt(), "#FFF4D6".toColorInt()),
+            Sec(Regex("""^(?:\P{L}*)?\s*(${Regex.escape(ctx?.getString(R.string.dream_section_actions_three) ?: "실천 3가지")})\s*:?\s*$""", RegexOption.IGNORE_CASE),
+                "#A5D6A7".toColorInt(), "#E9F8ED".toColorInt())
         )
 
         fun matchHeader(line: String): Sec? = secs.firstOrNull { it.key.matches(line.trim()) }
@@ -444,7 +507,7 @@ class DreamFragment : Fragment() {
     }
 
     private fun hideKeyboardAndScrollToResult(root: View) {
-        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager ?: return
         dreamEditText.clearFocus()
         imm.hideSoftInputFromWindow(root.windowToken, 0)
         resultTextView.post {
@@ -458,26 +521,30 @@ class DreamFragment : Fragment() {
         }
     }
 
-    private fun toast(msg: String) = Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-    private fun ui(block: () -> Unit) { activity?.runOnUiThread { if (isAdded) block() } }
+    private fun toast(msg: String) {
+        val ctx = context ?: return
+        Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun ui(block: () -> Unit) {
+        activity?.runOnUiThread { if (isAdded) block() }
+    }
 
     private fun showLimitDialog() {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(getString(R.string.dream_quota_title))
-            .setMessage(getString(R.string.dream_quota_message))
-            .setPositiveButton(getString(R.string.ok), null)
+        val ctx = context ?: return
+        MaterialAlertDialogBuilder(ctx)
+            .setTitle(ctx.getString(R.string.dream_quota_title))
+            .setMessage(ctx.getString(R.string.dream_quota_message))
+            .setPositiveButton(ctx.getString(R.string.ok), null)
             .show()
     }
 
     companion object {
-        // DreamFragment.kt - companion object 안
         fun showResultDialog(context: Context, raw: String) {
             val v = View.inflate(context, R.layout.dream_result_dialog, null)
 
-            // 1) 섹션 컨테이너를 잡는다 (XML에서 바꿔놓은 id)
             val container = v.findViewById<LinearLayout>(R.id.sectionsContainer)
 
-            // 2) 섹션 파서
             data class Section(val title: String, val body: String)
 
             fun isHeader(line: String): Boolean {
@@ -497,7 +564,7 @@ class DreamFragment : Fragment() {
 
             fun parseSections(text: String): List<Section> {
                 val cleaned = text
-                    .replace(Regex("(?m)^\\s*#{1,4}\\s*"), "") // 헤딩 마크다운 제거
+                    .replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")
                     .replace("**", "")
                     .replace(Regex("`{1,3}"), "")
                     .replace(Regex("(?m)^\\s*[-*]\\s+"), "• ")
@@ -520,30 +587,27 @@ class DreamFragment : Fragment() {
                 return out
             }
 
-            // 3) 본문 가독성 보정 (줄간격/번호 강조)
             fun prettify(text: String): CharSequence {
                 val s = text
                     .replace("\n{3,}".toRegex(), "\n\n")
                     .replace("^[\\s•·-]+".toRegex(RegexOption.MULTILINE), "• ")
-                val ssb = android.text.SpannableStringBuilder(s)
+                val ssb = SpannableStringBuilder(s)                 // ✅ 불필요한 정규 수식어 제거
                 val rgx = "^(\\d{1,2}\\.)\\s".toRegex(RegexOption.MULTILINE)
                 rgx.findAll(s).forEach { m ->
-                    ssb.setSpan(android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
-                        m.range.first, m.range.last + 1, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    ssb.setSpan(StyleSpan(Typeface.BOLD),
+                        m.range.first, m.range.last + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
                 }
                 return ssb
             }
 
-            // 4) 섹션 카드 inflate
             val inflater = LayoutInflater.from(context)
             parseSections(raw.ifBlank { context.getString(R.string.dream_result_empty) }).forEach { sec ->
                 val card = inflater.inflate(R.layout.item_result_section, container, false)
-                card.findViewById<TextView>(R.id.tvTitle).text = sec.title.trim()
-                card.findViewById<TextView>(R.id.tvBody).text  = prettify(sec.body.trim())
+                (card.findViewById<TextView>(R.id.tvTitle)).text = sec.title.trim()
+                (card.findViewById<TextView>(R.id.tvBody)).text  = prettify(sec.body.trim())
                 container.addView(card)
             }
 
-            // 다이얼로그 공통 세팅 (기존과 동일)
             val dm = context.resources.displayMetrics
             val maxH = (dm.heightPixels * 0.80f).toInt()
             val scroll = v.findViewById<ScrollView>(R.id.scrollDialog)
@@ -559,6 +623,5 @@ class DreamFragment : Fragment() {
             dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
             dialog.show()
         }
-
     }
 }

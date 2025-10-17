@@ -1,10 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <gradient
-        android:angle="45"
-        android:startColor="#D5B92A"
-        android:endColor="#D3CFB4"
+        android:angle="50"
+        android:startColor="#2AFFFFFF"
+        android:endColor="#23FBFBFB"
         android:type="linear" />
-    <corners android:radius="20dp"/>
+    <corners android:radius="23dp"/>
+    <stroke
+        android:width="1dp"
+        android:color="#48FFFFFF" /> <!-- ✅ 은은한 하이라이트 테두리 -->
 </shape>

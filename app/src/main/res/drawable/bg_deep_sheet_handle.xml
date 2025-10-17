@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#802A2A2A"/>          <!-- 반투명 다크그레이 -->
+    <corners android:radius="999dp"/>           <!-- pill 모양 -->
+</shape>

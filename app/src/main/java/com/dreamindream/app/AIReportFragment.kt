@@ -496,7 +496,7 @@ class AIReportFragment : Fragment() {
         btnPro = v.findViewById(R.id.btn_pro_upgrade)
 
 // --- 스타일 통일 (Deep 분석 버튼과 동일) ---
-        val r = 13f * resources.displayMetrics.density
+        val r = 12f * resources.displayMetrics.density
         btnPro.isAllCaps = false
         btnPro.setTextColor(Color.BLACK)
         btnPro.backgroundTintList = null

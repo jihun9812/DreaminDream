@@ -41,7 +41,7 @@
         <dimen name="result_pad_v">8dp</dimen>
 
 
-        <dimen name="text_md">14sp</dimen>
+        <dimen name="text_md">13sp</dimen>
         <dimen name="text_xs">12sp</dimen>
     <dimen name="panel_box_width">340dp</dimen>
         <!-- 여백/버튼 -->

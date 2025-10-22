@@ -29,7 +29,7 @@ android {
         applicationId =  "com.dreamindream.app"
         minSdk = 28
         targetSdk = 35
-        versionCode = 7
+        versionCode = 8
         versionName = "1.07"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -106,7 +106,9 @@ dependencies {
     implementation("com.google.firebase:firebase-config-ktx:21.6.0")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-functions-ktx")
-
+    //Billing
+    implementation("com.android.billingclient:billing-ktx:6.2.1")
+    implementation("androidx.lifecycle:lifecycle-process:2.8.4")
     // ML Kit
     implementation("com.google.mlkit:translate:17.0.3")
 

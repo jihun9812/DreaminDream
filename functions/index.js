@@ -1,23 +1,31 @@
-// functions/index.js
+/* functions/index.js  — Dream in Dream (Enterprise Billing + Mail/FCM)
+   - Android Publisher Subscriptions v2 검증(verifyPlaySubscription)
+   - RTDN(Pub/Sub) 수신(onPlayRtdn)
+   - 매일 재동기화(reconcileSubscriptions)
+   - 기존 SMTP, FCM, 이메일 인증/패스워드 재설정/피드백 처리 포함
+*/
+
 require("dotenv").config();
 
 const functionsV1 = require("firebase-functions/v1");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
+const { google } = require("googleapis");
 
 admin.initializeApp();
+const db = admin.firestore();
 
-/* ───────── SMTP ───────── */
+/* ───────────────────────── SMTP ───────────────────────── */
 let cachedTransporter = null;
 function ensureTransporter() {
-  const pass = process.env.SMTP_PASS; // Secret 또는 .env
+  const pass = process.env.SMTP_PASS; // Secrets 권장: firebase functions:secrets:set SMTP_PASS
   const user = process.env.SMTP_USER || "dreamindream@dreamindream.app";
   const host = process.env.SMTP_HOST || "smtp.zoho.com";
   const port = Number(process.env.SMTP_PORT || 465);
 
   if (!pass) {
-    console.error("⛔ SMTP_PASS 미설정 (firebase functions:secrets:set SMTP_PASS 필요)");
+    console.error("⛔ SMTP_PASS 미설정");
     return null;
   }
   if (cachedTransporter) return cachedTransporter;
@@ -28,32 +36,157 @@ function ensureTransporter() {
   return cachedTransporter;
 }
 
-async function sendMail(to, subject, html) {
+async function sendMail(to, subject, html, replyTo) {
   const t = ensureTransporter();
   if (!t) return;
-  try {
-    await t.sendMail({
-      from: `DreamInDream <${process.env.SMTP_FROM || "dreamindream@dreamindream.app"}>`,
-      to, subject, html,
-    });
-    console.log(`📨 메일 전송 성공: ${to} (${subject})`);
-  } catch (e) {
-    console.error("❌ 메일 전송 실패:", e.message);
-    if (e.response) console.error("↪️ SMTP 응답:", e.response);
-  }
+  const from = process.env.SMTP_FROM || "Dream in Dream <dreamindream@dreamindream.app>";
+  await t.sendMail({ from, to, subject, html, replyTo });
 }
 
-/* HTML escape */
 function esc(s = "") {
   return String(s)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;")
     .replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-/* ───────── FCM 전송(버전 호환 래퍼) ───────── */
-const messaging = admin.messaging();
+/* ────────────────────── Android Publisher ────────────────────── */
+async function androidPublisher() {
+  const auth = await google.auth.getClient({
+    scopes: ["https://www.googleapis.com/auth/androidpublisher"],
+  });
+  google.options({ auth });
+  return google.androidpublisher("v3");
+}
 
-/** admin.messaging().sendAll이 없으면 개별 send로 폴백 */
+function normalizeSubState(v2Data) {
+  // subscriptionState: 0=EXPIRED,1=ACTIVE,2=PAUSED,3=IN_GRACE,4=ON_HOLD,5=CANCELED,6=REVOKED
+  const map = {
+    1: "ENTITLED",
+    3: "GRACE",
+    4: "HOLD",
+    2: "PAUSED",
+    5: "CANCELED",
+    0: "EXPIRED",
+    6: "REVOKED",
+  };
+  return map[Number(v2Data?.subscriptionState)] || "UNKNOWN";
+}
+
+async function getSubV2({ packageName, token }) {
+  const ap = await androidPublisher();
+  const res = await ap.purchases.subscriptionsv2.get({ packageName, token });
+  return res.data;
+}
+
+async function writeServerEntitlement({ uid, pkg, token, data }) {
+  const now = Date.now();
+  const state = normalizeSubState(data);
+  const li = data?.lineItems?.[0] || {};
+  const node = {
+    serverState: state,
+    packageName: pkg,
+    productId: li.productId || "",
+    basePlanId: li.offerDetails?.basePlanId || "",
+    offerId: li.offerDetails?.offerId || "",
+    purchaseToken: token,
+    expiryTimeMillis: Number(li.expiryTimeMillis || 0),
+    serverCheckedAt: now,
+  };
+  await db.doc(`users/${uid}/billing/state`).set(node, { merge: true });
+  return state;
+}
+
+/* ───────── 1) 구매 직후 검증 (Callable) ───────── */
+exports.verifyPlaySubscription = functionsV1
+  .runWith({ memory: "512MB", timeoutSeconds: 30, secrets: ["PLAY_PACKAGE"] })
+  .https.onCall(async (data, context) => {
+    if (!context.auth?.uid) {
+      throw new functionsV1.https.HttpsError("unauthenticated", "로그인이 필요합니다.");
+    }
+    const uid = context.auth.uid;
+    const token = String(data?.purchaseToken || "").trim();
+    const pkg = process.env.PLAY_PACKAGE || "com.dreamindream.app";
+
+    if (!token) {
+      throw new functionsV1.https.HttpsError("invalid-argument", "purchaseToken 누락");
+    }
+
+    try {
+      const info = await getSubV2({ packageName: pkg, token });
+      const state = await writeServerEntitlement({ uid, pkg, token, data: info });
+      return { ok: true, state, raw: { subscriptionState: info?.subscriptionState } };
+    } catch (e) {
+      console.error("verifyPlaySubscription error:", e?.message || e);
+      throw new functionsV1.https.HttpsError("internal", "구독 검증 실패");
+    }
+  });
+
+/* ───────── 2) RTDN (Real-Time Developer Notifications) ─────────
+   - Play Console → Pub/Sub 토픽(예: playstore-subscriptions) 연결 필요
+*/
+exports.onPlayRtdn = functionsV1.pubsub
+  .topic("playstore-subscriptions")
+  .onPublish(async (message) => {
+    try {
+      const data = JSON.parse(Buffer.from(message.data, "base64").toString("utf8")) || {};
+      const pkg = data.packageName || process.env.PLAY_PACKAGE || "com.dreamindream.app";
+
+      const token =
+        data?.subscriptionNotification?.purchaseToken ||
+        data?.oneTimeProductNotification?.purchaseToken ||
+        null;
+
+      if (!token) {
+        console.log("RTDN: token 없음(테스트 알림이거나 비구독):", data?.testNotification || data);
+        return;
+      }
+
+      // token ↔ uid 역조회: 기존 저장된 state 문서에서 추적
+      const q = await db.collectionGroup("state").where("purchaseToken", "==", token).get();
+      const uids = [];
+      q.forEach((d) => uids.push(d.ref.path.split("/")[1]));
+
+      const info = await getSubV2({ packageName: pkg, token });
+      if (uids.length === 0) {
+        console.log("RTDN: uid 미발견. 검증만 수행:", { tokenSuffix: String(token).slice(-8) });
+        return;
+      }
+      for (const uid of uids) {
+        await writeServerEntitlement({ uid, pkg, token, data: info });
+      }
+      console.log("RTDN 처리 완료:", { tokenSuffix: String(token).slice(-8), users: uids.length });
+    } catch (e) {
+      console.error("RTDN handler error:", e?.message || e);
+    }
+  });
+
+/* ───────── 3) 매일 재동기화 (서버 권한이 최종 권위) ───────── */
+exports.reconcileSubscriptions = onSchedule(
+  { schedule: "0 3 * * *", timeZone: "Asia/Seoul" }, // 매일 03:00 KST
+  async () => {
+    const pkg = process.env.PLAY_PACKAGE || "com.dreamindream.app";
+    const snap = await db.collectionGroup("state").get();
+    let ok = 0, fail = 0;
+
+    for (const doc of snap.docs) {
+      const uid = doc.ref.path.split("/")[1];
+      const token = doc.get("purchaseToken");
+      if (!token) continue;
+      try {
+        const info = await getSubV2({ packageName: pkg, token });
+        await writeServerEntitlement({ uid, pkg, token, data: info });
+        ok++;
+      } catch (e) {
+        console.warn("reconcile error:", uid, String(token).slice(-8), e?.message);
+        fail++;
+      }
+    }
+    console.log(`reconcile done: ok=${ok} fail=${fail} total=${snap.size}`);
+  }
+);
+
+/* ───────── FCM 전송 래퍼(기존 유지) ───────── */
+const messaging = admin.messaging();
 async function sendAllCompat(messages) {
   if (typeof messaging.sendAll === "function") {
     return await messaging.sendAll(messages);
@@ -70,14 +203,11 @@ async function sendAllCompat(messages) {
   };
 }
 
-/* ───────── 매일 한국시간 09:00 푸시 ───────── */
+/* ───────── 매일 한국시간 09:00 푸시 (기존 유지) ───────── */
 exports.sendDailyPush = onSchedule(
   { schedule: "0 9 * * *", timeZone: "Asia/Seoul" },
   async () => {
-    const db = admin.firestore();
     const snap = await db.collection("users").get();
-
-    // uid와 token 같이 보관 (죽은 토큰 정리용)
     const targets = [];
     snap.forEach(doc => {
       const u = doc.data();
@@ -94,59 +224,41 @@ exports.sendDailyPush = onSchedule(
     const channelId = "dreamin_channel";
 
     const chunk = 500;
-    let totalSent = 0, totalFail = 0, totalCleaned = 0;
-
     for (let i = 0; i < targets.length; i += chunk) {
       const slice = targets.slice(i, i + chunk);
-
       const messages = slice.map(({ token }) => ({
         token,
-        android: {
-          priority: "high",
-          notification: { channelId, title, body },
-        },
+        android: { priority: "high", notification: { channelId, title, body } },
         notification: { title, body },
         data: { navigateTo: "fortune", origin: "daily_9_kst" },
       }));
 
       const res = await sendAllCompat(messages);
-      totalSent += res.successCount;
-      totalFail += res.failureCount;
 
       // 죽은 토큰 정리
       const cleanups = [];
       res.responses.forEach((r, idx) => {
         if (!r.success) {
-          const errCode =
-            r.error?.errorInfo?.code || r.error?.code || r.error?.message || "";
           const { uid, token } = slice[idx];
-          console.warn("⚠️ send error:", errCode, "uid:", uid, "tokenSuffix:", token?.slice(-8));
-
+          const code = r.error?.errorInfo?.code || r.error?.code || "";
           const mustDelete =
-            errCode.includes("registration-token-not-registered") ||
-            errCode.includes("invalid-registration-token") ||
-            errCode.includes("NOT_FOUND");
-
+            code.includes("registration-token-not-registered") ||
+            code.includes("invalid-registration-token") ||
+            code.includes("NOT_FOUND");
           if (mustDelete) {
             cleanups.push(
               db.collection("users").doc(uid)
                 .update({ fcmToken: admin.firestore.FieldValue.delete() })
-                .then(() => { totalCleaned += 1; console.log("🧹 dead token 삭제 완료 uid:", uid); })
-                .catch(e => console.error("🧹 dead token 삭제 실패 uid:", uid, e.message))
             );
           }
         }
       });
       if (cleanups.length) await Promise.allSettled(cleanups);
-
-      console.log(`🧩 배치 ${i / chunk + 1}: 성공 ${res.successCount} / 실패 ${res.failureCount} / 정리 ${cleanups.length}`);
     }
-
-    console.log(`✅ 푸시 전송 완료: 성공 ${totalSent} / 실패 ${totalFail} / 정리 ${totalCleaned} / 총 대상 ${targets.length}`);
   }
 );
 
-/* ───────── 신규 가입: 이메일 인증 ───────── */
+/* ───────── 이메일 인증/패스워드 재설정/결과/피드백 (기존 유지) ───────── */
 exports.sendVerificationEmailOnSignup = functionsV1
   .runWith({ secrets: ["SMTP_PASS"] })
   .auth.user().onCreate(async (user) => {
@@ -165,7 +277,6 @@ exports.sendVerificationEmailOnSignup = functionsV1
     await sendMail(user.email, "DreamInDream - 이메일 인증 안내", html);
   });
 
-/* ───────── 비밀번호 재설정(Callable) ───────── */
 exports.sendCustomPasswordResetEmail = functionsV1
   .runWith({ secrets: ["SMTP_PASS"] })
   .https.onCall(async (data) => {
@@ -198,7 +309,6 @@ exports.sendCustomPasswordResetEmail = functionsV1
     }
   });
 
-/* ───────── 꿈 저장 시: 결과 메일 ───────── */
 exports.sendDreamResult = functionsV1
   .runWith({ secrets: ["SMTP_PASS"] })
   .firestore
@@ -212,49 +322,38 @@ exports.sendDreamResult = functionsV1
       const user = await admin.auth().getUser(uid);
       const email = user.email; if (!email) return;
 
-      const dreamHighlights = takeHighlights(String(dream || ""));
-      const resultHighlights = takeHighlights(String(result || ""));
+      const pre = (text = "") =>
+        `<pre style="white-space:pre-wrap;word-break:break-word;margin:0;line-height:1.6">${esc(text)}</pre>`;
 
-      const dreamCard = card({
-        heading: "당신의 꿈",
-        contentHtml: pre(dream || "작성된 내용이 없습니다."),
-        tone: "indigo",
-      });
-
-      const insightsCard = card({
-        heading: "AI 인사이트",
-        contentHtml: `
-          ${resultHighlights.length ? `
-            <div style="margin:0 0 10px 0;color:#E6E9F4">핵심 요약</div>
-            ${toBullets(resultHighlights)}
-            <div style="height:8px"></div>
-          ` : ""}
-          ${pre(result || "해석 내용이 없습니다.")}`,
-        tone: "cyan",
-      });
+      const card = ({ heading, contentHtml, tone }) => `
+        <section style="border:1px solid #2b2a50;border-radius:14px;padding:16px;margin:12px 0;background:${tone === "cyan" ? "#0E1630" : "#151233"};color:#E6E9F4">
+          <h3 style="margin:0 0 8px 0;font-size:16px;color:#C6A0FF">${esc(heading)}</h3>
+          <div style="font-size:14px">${contentHtml}</div>
+        </section>`;
 
       const bodyHtml = `
         ${title ? card({ heading: "제목", contentHtml: esc(title), tone: "rose" }) : ""}
-        ${dreamCard}
-        ${insightsCard}
+        ${card({ heading: "당신의 꿈", contentHtml: pre(dream || "작성된 내용이 없습니다."), tone: "indigo" })}
+        ${card({ heading: "AI 인사이트", contentHtml: pre(result || "해석 내용이 없습니다."), tone: "cyan" })}
       `;
 
       const deepLink = `dreamindream://dream?entryId=${encodeURIComponent(entryId)}&uid=${encodeURIComponent(uid)}`;
 
-      const html = shell({
-        title: "🔮 오늘의 꿈 해몽 결과",
-        subtitle: "가독성 향상 레이아웃 · 핵심 요약 포함",
-        bodyHtml,
-        ctaLabel: "앱에서 자세히 보기",
-        ctaHref: deepLink,
-      });
+      const html = `
+      <html><body style="font-family:Pretendard,system-ui,Segoe UI,Roboto,sans-serif;background:#0D0B1E;padding:30px;">
+        <div style="max-width:640px;margin:auto;background:rgba(29,27,58,0.7);backdrop-filter:blur(12px);border-radius:18px;padding:40px;color:#F3F8FC;">
+          <h2 style="color:#C6A0FF;margin-top:16px;">🔮 오늘의 꿈 해몽 결과</h2>
+          ${bodyHtml}
+          <a href="${deepLink}" style="display:inline-block;margin-top:12px;padding:12px 18px;border-radius:10px;background:#7A55D3;color:#fff;text-decoration:none;font-weight:700;">앱에서 자세히 보기</a>
+        </div>
+      </body></html>`;
 
       await sendMail(email, "DreamInDream - 오늘의 해몽 결과", html);
     } catch (e) {
       console.error("sendDreamResult error:", e);
     }
   });
-/* ───────── 문의/피드백 생성 시: 자동 메일 ───────── */
+
 exports.onFeedbackCreated = functionsV1
   .runWith({ secrets: ["SMTP_PASS"] })
   .firestore
@@ -265,44 +364,36 @@ exports.onFeedbackCreated = functionsV1
     const created = d.createdAtStr || "";
     const info = d.info || {};
 
-    const _esc = (typeof esc === "function")
-      ? esc
-      : (s = "") => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const pre = (text = "") =>
+      `<pre style="white-space:pre-wrap;word-break:break-word;margin:0;line-height:1.6">${esc(text)}</pre>`;
 
-    // ▶ 제목: 입력값 없으면 메시지 첫 줄로 보강
+    const section = (heading = "", innerHtml = "") => `
+      <section style="border:1px solid #dfe3ee;border-radius:12px;padding:14px 16px;margin:12px 0;background:#fafbff">
+        ${heading ? `<h3 style="margin:0 0 8px 0;font-size:15px;color:#374151">${esc(heading)}</h3>` : ""}
+        <div style="font-size:14px;color:#111827">${innerHtml || ""}</div>
+      </section>`;
+
     const rawTitle = (d.title || "").toString().trim();
     const msg = (d.message || "").toString();
     const fallbackTitle = (msg.split(/\r?\n/)[0] || "").slice(0, 60);
     const finalTitle = rawTitle || fallbackTitle || "제목 없음";
 
-    // 템플릿
-    const pre = (text = "") =>
-      `<pre style="white-space:pre-wrap;word-break:break-word;margin:0;line-height:1.6">${_esc(text)}</pre>`;
-
-    const section = (heading = "", innerHtml = "") => `
-      <section style="border:1px solid #dfe3ee;border-radius:12px;padding:14px 16px;margin:12px 0;background:#fafbff">
-        ${heading ? `<h3 style="margin:0 0 8px 0;font-size:15px;color:#374151">${_esc(heading)}</h3>` : ""}
-        <div style="font-size:14px;color:#111827">${innerHtml || ""}</div>
-      </section>`;
-
     const metaTable = `
       <table cellpadding="0" cellspacing="0" style="width:100%;font-size:13px;color:#111827">
-        <tr><td style="padding:6px 0;width:120px;opacity:.7">앱</td><td>${_esc(d.app || "DreamInDream")}</td></tr>
-        <tr><td style="padding:6px 0;opacity:.7">앱버전</td><td>${_esc(info.appVersion || "")}</td></tr>
-        <tr><td style="padding:6px 0;opacity:.7">OS</td><td>${_esc(info.os || "")} (SDK ${_esc(String(info.sdk || ""))})</td></tr>
-        <tr><td style="padding:6px 0;opacity:.7">디바이스</td><td>${_esc(info.device || "")}</td></tr>
-        <tr><td style="padding:6px 0;opacity:.7">유저ID</td><td>${_esc(info.userId || "")}</td></tr>
-        <tr><td style="padding:6px 0;opacity:.7">설치ID</td><td>${_esc(info.installId || "")}</td></tr>
+        <tr><td style="padding:6px 0;width:120px;opacity:.7">앱</td><td>${esc(d.app || "DreamInDream")}</td></tr>
+        <tr><td style="padding:6px 0;opacity:.7">앱버전</td><td>${esc(info.appVersion || "")}</td></tr>
+        <tr><td style="padding:6px 0;opacity:.7">OS</td><td>${esc(info.os || "")} (SDK ${esc(String(info.sdk || ""))})</td></tr>
+        <tr><td style="padding:6px 0;opacity:.7">디바이스</td><td>${esc(info.device || "")}</td></tr>
+        <tr><td style="padding:6px 0;opacity:.7">유저ID</td><td>${esc(info.userId || "")}</td></tr>
+        <tr><td style="padding:6px 0;opacity:.7">설치ID</td><td>${esc(info.installId || "")}</td></tr>
       </table>`;
 
-    // ▶ 본문 구성: 제목 추가, 연락처 없으면 섹션 숨김, 메시지는 헤더 없이 내용만
     const bodyHtml = `
-      ${section("제목", _esc(finalTitle))}
-      ${d.contact ? section("보낸이(연락처)", _esc(d.contact)) : ""}
+      ${section("제목", esc(finalTitle))}
+      ${d.contact ? section("보낸이(연락처)", esc(d.contact)) : ""}
       ${section("", pre(msg))}
       ${section("디바이스/앱 정보", metaTable)}
-      ${d.attachmentUrl ? section("첨부", `<a href="${_esc(d.attachmentUrl)}" style="color:#2563eb">첨부 보기</a>`) : ""}
-    `;
+      ${d.attachmentUrl ? section("첨부", `<a href="${esc(d.attachmentUrl)}" style="color:#2563eb">첨부 보기</a>`) : ""}`
 
     const html = `
       <html>
@@ -310,7 +401,7 @@ exports.onFeedbackCreated = functionsV1
           <div style="max-width:720px;margin:0 auto;background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:18px 20px">
             <header style="margin:0 0 12px 0">
               <h1 style="margin:0 0 4px 0;font-size:18px;color:#111827">📮 새 문의/피드백 도착</h1>
-              ${created ? `<div style="font-size:12px;color:#6b7280">${_esc(created)}</div>` : ""}
+              ${created ? `<div style="font-size:12px;color:#6b7280">${esc(created)}</div>` : ""}
             </header>
             ${bodyHtml}
             <footer style="margin-top:16px;font-size:12px;color:#6b7280;opacity:.8">
@@ -320,7 +411,6 @@ exports.onFeedbackCreated = functionsV1
         </body>
       </html>`;
 
-    // ▶ 메일 제목도 최종 제목으로
     const opts = {
       to,
       subject: `[DreamInDream] ${finalTitle}${created ? ` (${created})` : ""}`,
@@ -329,6 +419,5 @@ exports.onFeedbackCreated = functionsV1
     if (d.contact && String(d.contact).includes("@")) {
       opts.replyTo = d.contact;
     }
-
     await sendMail(opts.to, opts.subject, opts.html, opts.replyTo);
   });

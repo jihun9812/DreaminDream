@@ -1,6 +1,7 @@
 package com.dreamindream.app
 
 
+import android.graphics.drawable.RippleDrawable
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.content.res.ColorStateList
@@ -172,6 +173,55 @@ class DreamFragment : Fragment() {
             }
             // false를 리턴해 기본 동작(텍스트 커서/선택/키보드)이 그대로 유지되도록 함
             false
+        }
+// --- 스타일 통일 (aireport의 심화분석 버튼과 동일) ---
+        run {
+            val d = resources.displayMetrics.density
+            val r = 12f * d
+
+            // 현재 패딩/최소크기 보존 (배경 교체 시 무너지는 것 방지)
+            val pL = interpretButton.paddingLeft
+            val pT = interpretButton.paddingTop
+            val pR = interpretButton.paddingRight
+            val pB = interpretButton.paddingBottom
+            val minW = interpretButton.minWidth
+            val minH = interpretButton.minHeight
+
+            interpretButton.isAllCaps = false
+            interpretButton.setTextColor(Color.BLACK)
+            interpretButton.backgroundTintList = null
+
+            val gradient = GradientDrawable().apply {
+                cornerRadius = r
+                colors = intArrayOf(
+                    Color.parseColor("#FFFEDCA6"),  // 연한 골드
+                    Color.parseColor("#FF8BAAFF")   // 은은한 보라
+                )
+                orientation = GradientDrawable.Orientation.TL_BR
+                gradientType = GradientDrawable.LINEAR_GRADIENT
+                shape = GradientDrawable.RECTANGLE
+            }
+
+            val rippleCs = ColorStateList.valueOf(Color.parseColor("#33FFFFFF"))
+
+            // MaterialButton이라면 Material 방식 리플 우선
+            if (interpretButton is com.google.android.material.button.MaterialButton) {
+                val mb = interpretButton as com.google.android.material.button.MaterialButton
+                mb.rippleColor = rippleCs
+                mb.background = gradient
+                // 크기 유지
+                mb.setPadding(pL, pT, pR, pB)
+                mb.minWidth = minW
+                mb.minHeight = minH
+            } else {
+                // 일반 Button이면 RippleDrawable로 감싸기
+                val ripple = RippleDrawable(rippleCs, gradient, /* mask */ null)
+                interpretButton.background = ripple
+                // 크기 유지
+                interpretButton.setPadding(pL, pT, pR, pB)
+                interpretButton.minWidth = minW
+                interpretButton.minHeight = minH
+            }
         }
 
 

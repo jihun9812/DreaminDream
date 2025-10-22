@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
@@ -20,7 +21,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import android.content.res.Configuration
+import com.dreamindream.app.billing.SubscriptionManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
@@ -42,35 +43,21 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // ✅ Edge-to-Edge + 투명 시스템바
+        // Edge-to-Edge
         enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
 
-        // ✅ 아이콘 명암 설정 (하단 흰 띠 방지)
         val isLight =
             (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
                     Configuration.UI_MODE_NIGHT_NO
         WindowInsetsControllerCompat(window, window.decorView).apply {
             isAppearanceLightStatusBars = isLight
-            // 네비게이션바는 항상 밝은 아이콘(=false)
             isAppearanceLightNavigationBars = false
         }
 
-        // --- 최초 실행 시: 모든 로그인 상태 초기화(익명 포함) ---
-        val prefsFirst = getSharedPreferences("first_run_check", Context.MODE_PRIVATE)
-        if (prefsFirst.getBoolean("isFirstRun", true)) {
-            try {
-                FirebaseAuth.getInstance().signOut()
-                listOf("user_info", "user_prefs", "dream_history", "fortune", "fortune_result")
-                    .forEach { getSharedPreferences(it, Context.MODE_PRIVATE).edit().clear().apply() }
-                filesDir?.listFiles()?.forEach { it.delete() }
-            } catch (e: Exception) { Log.e("Init", "초기화 실패", e) }
-            prefsFirst.edit().putBoolean("isFirstRun", false).apply()
-        }
-
-        // --- 로그인 체크 ---
+        // 로그인 체크
         val user = FirebaseAuth.getInstance().currentUser
         if (user == null) {
             val intent = Intent(this, LoginActivity::class.java).apply {
@@ -80,22 +67,22 @@ class MainActivity : BaseActivity() {
             finish(); return
         }
 
-        // --- AdMob 초기화 + 테스트 디바이스 ---
-        if (BuildConfig.DEBUG) {
-            MobileAds.setRequestConfiguration(
-                RequestConfiguration.Builder()
-                    .setTestDeviceIds(
-                        listOf(
-                            AdRequest.DEVICE_ID_EMULATOR,
-                            "38F4242F488E9C927543337A4DCCD32C"
-                        )
-                    ).build()
-            )
+        // 광고 SDK 초기화: 비-프리미엄에서만
+        val isPremium = SubscriptionManager.isPremium(this)
+        if (!isPremium) {
+            if (BuildConfig.DEBUG) {
+                MobileAds.setRequestConfiguration(
+                    RequestConfiguration.Builder()
+                        .setTestDeviceIds(
+                            listOf(AdRequest.DEVICE_ID_EMULATOR, "38F4242F488E9C927543337A4DCCD32C")
+                        ).build()
+                )
+            }
+            MobileAds.initialize(this)
+            AdManager.initialize(this)
         }
-        MobileAds.initialize(this)
-        AdManager.initialize(this)
 
-        // --- 알림 권한 + (필요 시) FCM 토큰 저장 ---
+        // 알림 권한
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED
@@ -110,14 +97,22 @@ class MainActivity : BaseActivity() {
 
         setContentView(R.layout.activity_main)
 
-        // 첫 진입: 홈을 루트로
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, HomeFragment(), "Home")
                 .commit()
         }
 
-        // 뒤로가기 - 단일 파이프라인
+        // 다이얼로그/외부에서 설정창을 열라고 넘긴 경우 처리(선택)
+        intent?.let {
+            if (it.getBooleanExtra("open_settings", false)) {
+                openSettings(autolinkGoogle = it.getBooleanExtra("settings_autolink_google", false))
+                it.removeExtra("open_settings")
+                it.removeExtra("settings_autolink_google")
+            }
+        }
+
+        // 뒤로가기
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val now = SystemClock.elapsedRealtime()
@@ -138,10 +133,6 @@ class MainActivity : BaseActivity() {
 
                 if (current !is HomeFragment) {
                     fm.beginTransaction()
-                        .setCustomAnimations(
-                            R.anim.slide_in_left, R.anim.slide_out_right,
-                            R.anim.slide_in_right, R.anim.slide_out_left
-                        )
                         .replace(R.id.fragment_container, HomeFragment(), "Home")
                         .commit()
                     return
@@ -155,6 +146,19 @@ class MainActivity : BaseActivity() {
                 }
             }
         })
+    }
+
+    /** ✅ Settings 화면을 열고, 필요하면 구글 통합을 자동 실행 */
+    fun openSettings(autolinkGoogle: Boolean = false) {
+        val f = SettingsFragment().apply {
+            arguments = android.os.Bundle().apply {
+                putBoolean("autolink_google", autolinkGoogle)
+            }
+        }
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, f, "Settings")
+            .addToBackStack("Settings")
+            .commit()
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
@@ -211,22 +215,6 @@ class MainActivity : BaseActivity() {
             } else {
                 Log.e("FCM", "토큰 획득 실패", task.exception)
             }
-        }
-    }
-
-    @Suppress("unused")
-    private fun subscribeToDailyDream() {
-        val prefs = getSharedPreferences("fcm_topic_check", Context.MODE_PRIVATE)
-        if (!prefs.getBoolean("dailyDreamSubscribed", false)) {
-            FirebaseMessaging.getInstance().subscribeToTopic("dailyDream")
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        prefs.edit().putBoolean("dailyDreamSubscribed", true).apply()
-                        Log.d("FCM", "✅ dailyDream 토픽 구독 완료")
-                    } else {
-                        Log.e("FCM", "❌ 토픽 구독 실패", task.exception)
-                    }
-                }
         }
     }
 }

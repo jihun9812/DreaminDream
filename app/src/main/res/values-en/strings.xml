@@ -98,7 +98,6 @@
 <string name="btn_pro_upgrade">Deep analysis</string>
 <string name="ai_analysis_title">AI Analysis</string>
 <string name="ai_analysis_placeholder">Analysis will appear here.</string>
-<string name="ad_unit_ai_banner">ca-app-pub-1742201279182732/9282239127</string>
 
     <!-- fragment_calendar.xml -->
 <string name="prev_month">Previous</string>
@@ -108,7 +107,6 @@
 <string name="dream_list_title_sample">Dreams on 2025-09-12 (Fri)</string>
 <string name="dream_list_title_format">Dreams on %1$s (%2$s)</string>
 <string name="dream_list_empty">No dream logs for this date.</string>
-<string name="ad_unit_calendar_banner">ca-app-pub-1742201279182732/9282239127</string>
 
     <!-- Calendar -->
 <string name="calendar_title_placeholder">July 2025</string>
@@ -131,9 +129,8 @@
 <string name="dream_input_label">• Enter dream details</string>
 <string name="usage_left_default">Tries left today: 0</string>
 <string name="usage_left_format">Tries left today: %1$d</string>
-<string name="hint_input">Write your dream in detail… e.g., A big shark appeared and I ran away.</string>
+<string name="hint_input">Write your dream in detail! e.g., A big shark appeared and I ran away.</string>
 <string name="button_interpret">Interpret</string>
-<string name="ad_unit_dream_banner">ca-app-pub-1742201279182732/9282239127</string>
 
     <!-- Fortune.xml -->
     <string name="fortune_start">See
@@ -146,7 +143,13 @@ Fortune</string>
 <string name="btn_deep_analysis">Deep analysis</string>
 <string name="action_copy">Copy</string>
 <string name="action_share">Share</string>
-<string name="ad_unit_fortune_banner">ca-app-pub-1742201279182732/9282239127</string>
+
+    <!-- DreamPickerFragment -->
+    <string name="checked">Checked</string>
+    <string name="unchecked">Unchecked</string>
+    <string name="invalid_selection">Choose 2~4(MAX.4)</string>
+    <string name="analyzing">Analyzing</string>
+    <string name="analyzing_ellipsis">Analyzing</string>
 
     <!-- Base & navigation -->
 <string name="app_name">DreamInDream</string>
@@ -189,7 +192,6 @@ Keywords: %2$s</string>
     <!-- settings.xml -->
 <string name="btn_cancel">Cancel</string>
 <string name="btn_save">Save</string>
-<string name="ad_unit_settings_banner">ca-app-pub-1742201279182732/9282239127</string>
 <string name="btn_logout">Log out</string>
 <string name="settings_title">App Settings</string>
 <string name="settings_section">Settings</string>
@@ -376,11 +378,6 @@ If you log in again within 7 days, it will be restored. After 7 days, it will be
 <string name="sec_actions3">3 actions today</string>
 <string name="dream_result_empty">Result is empty.</string>
 
-    <!-- Ad status bottom sheet -->
-<string name="ad_preparing">Preparing ad…</string>
-<string name="ad_closed_try_again">Ad closed. Please try again.</string>
-<string name="ad_load_failed_fmt">Ad load failed (%1$s). Please try again later.</string>
-
     <!-- Feedback -->
 <string name="fb_title_need">Enter a title</string>
 <string name="fb_msg_need">Enter a message</string>
@@ -464,6 +461,28 @@ Evening (19–22)
 <string name="week_prompt_intro">Below are the user’s recent 1-week dream logs (up to 4, newest first) and each dream’s interpretation/analysis.</string>
 
     <string name="week_prompt_lang_line">Answer in <xliff:g id="lang">%1$s</xliff:g> only.</string>
+
+    <string-array name="keyword_catalog_ids">
+        <item>person_people</item><item>family</item><item>friend</item><item>partner</item><item>baby</item>
+        <item>child</item><item>teacher</item><item>boss</item><item>stranger</item><item>crowd</item>
+        <item>home_house</item><item>room</item><item>school</item><item>office</item><item>bathroom_toilet</item>
+        <item>kitchen</item><item>hospital</item><item>road</item><item>bridge</item><item>forest</item>
+        <item>mountain</item><item>sea_ocean</item><item>river</item><item>beach</item><item>sky</item>
+        <item>phone</item><item>message_text</item><item>money</item><item>key</item><item>door</item>
+        <item>window</item><item>stairs</item><item>elevator</item><item>car</item><item>bus</item>
+        <item>train</item><item>airplane</item><item>ship_boat</item><item>computer</item><item>book</item>
+        <item>mirror</item><item>teeth</item><item>hair</item><item>blood</item><item>ring</item>
+        <item>shoes</item><item>dog</item><item>cat</item><item>bird</item><item>fish</item>
+        <item>snake</item><item>spider</item><item>pig</item><item>shark</item><item>whale</item>
+        <item>insect</item><item>chase</item><item>fall</item><item>flying</item><item>late</item>
+        <item>exam_test</item><item>lost</item><item>escape</item><item>fight</item><item>death</item>
+        <item>wedding</item><item>funeral</item><item>pregnancy</item><item>birth</item><item>fire</item>
+        <item>poop</item>
+    </string-array>
+
+
+
+
     <string name="week_prompt_rules" formatted="false"><![CDATA[
 Role: Weekly dream deep analyst .
 Output: Pure HTML fragment (<p>,<ul>), no code blocks.
@@ -473,7 +492,6 @@ Tone: Anxiety-calming, practical, no exaggeration.
 Sections (fixed order):
 - Weekly dream deep analysis
 - Summary (3 sentences)
-- Quant summary
 - Emotion pattern analysis
 - Symbols & scenes
 - Myeongri view
@@ -799,6 +817,13 @@ Please wait.</string>
         <string name="daily_fallback_5">Trust your rhythm — its okay to go slowly.</string>
 
 
+        <!-- ⚠ Compatibility (Deprecated): restore legacy keys used by FortuneFragment -->
+        <string name="ad_preparing">Preparing ad…</string>
+        <string name="ad_closed_try_again">Ad closed. Reward not confirmed.</string>
+        <string name="ad_load_failed_fmt">Ad error(%1$s) — please try again.</string>
+
+
+    <string name="dream_input_min15">Please write at least 15 characters.</string>
     <!-- DreamFragment -->
 <string name="dream_input_empty">Please enter your dream.</string>
 <string name="dream_input_not_meaningful">Please write a meaningful dream description.</string>
@@ -1018,7 +1043,7 @@ You must call deep_fortune_analysis.
 <string name="default_generic_advice">Try one checklist item lightly.</string>
 
     <!-- FortuneFragment.kt -->
-    <string name="btn_fortune_show">❓</string>
+    <string name="btn_fortune_show">❔</string>
 <string name="btn_come_tomorrow">Come back tomorrow</string>
 <string name="toast_already_seen_today">You’ve already viewed today. Please try again tomorrow.</string>
 <string name="toast_run_fortune_first">Please tap “See Fortune” first.</string>
@@ -1031,6 +1056,53 @@ You must call deep_fortune_analysis.
 <string name="ad_failed_open_deep_now">Ad failed (%1$s) → Open deep analysis now</string>
 <string name="deep_generating_label">Generating…</string>
 <string name="deep_button_label">Open deep analysis</string>
+
+
+    <!--Subscribe way -->
+    <string name="sub_title">DreamInDream Premium</string>
+    <string name="sub_subtitle">Ad-free, faster experience</string>
+    <string name="sub_badge_active">ACTIVE</string>
+
+    <string name="sub_benefit_1">✅ No ads across AI Report &amp; OnSe deep analysis</string>
+    <string name="sub_benefit_2">🌙 Dream interpretation: 3 times a day, ad-free &amp; instant</string>
+    <string name="sub_benefit_3">🔒 Keep benefits on all devices when signed in</string>
+    <string name="sub_benefit_4">🛠️ Manage anytime in Settings &gt; Premium</string>
+
+    <string name="sub_label_plan">Choose a plan</string>
+    <string name="sub_chip_monthly">Monthly</string>
+    <string name="sub_chip_yearly">Yearly</string>
+    <string name="sub_toast_restore_ok">Previous purchase has been restored.</string>
+    <string name="sub_toast_restore_none">No purchasable items to restore.</string>
+
+        <string name="signin_required">Sign-in required.</string>
+        <string name="billing_err_connect">Billing service is initializing. Please try again in a moment.</string>
+        <string name="billing_err_product_info">Unable to retrieve product information. Please try again later.</string>
+        <string name="billing_err_offer_missing">This plan is currently unavailable.</string>
+        <string name="billing_err_plan_inactive">The selected plan is inactive.</string>
+
+
+    <!-- Keep KR currency here for now; replace via Play Billing localized price at runtime if needed -->
+
+    <string name="sub_btn_later">Later</string>
+    <string name="sub_btn_start">Start Premium</string>
+    <string name="sub_btn_restore">Restore purchases</string>
+    <string name="sub_price_format">%1$s per %2$s</string>
+    <string name="sub_unit_month">month</string>
+    <string name="sub_unit_year">year</string>
+    <string name="sub_price_monthly_amount">₩4,000</string>
+    <string name="sub_price_yearly_amount">₩40,000</string>
+    <string name="sub_price_monthly">₩4,000 per month</string>
+    <string name="sub_price_yearly">₩40,000 per year</string>
+
+    <!-- advertisement-->
+    <string name="ad_unit_ai_banner">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_unit_calendar_banner">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_unit_dream_banner">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_unit_fortune_banner">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_unit_settings_banner">ca-app-pub-3940256099942544/6300978111</string>
+
+
+
 
 
 </resources>

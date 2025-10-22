@@ -30,7 +30,7 @@
         android:maxWidth="380dp"
         app:cardCornerRadius="32dp"
         app:cardElevation="0dp"
-        app:cardBackgroundColor="#CCFFFFFF"
+        app:cardBackgroundColor="#B3282828"
         app:cardUseCompatPadding="true"
         app:layout_constraintWidth_percent="0.9"
         app:layout_constraintWidth_max="380dp"
@@ -78,23 +78,37 @@
                             style="@style/Widget.Material3.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            app:chipStrokeColor="#FDCA60"
+                            app:chipStrokeColor="#A00F0F0F"
+                            app:chipStrokeWidth="1dp"
+                            app:chipBackgroundColor="#EF313131"
                             android:text="@string/language_korean"
-                            app:checkedIconVisible="false"/>
+                            android:textColor="#F5F8D54C"
+                            android:textSize="12sp"
+                            android:checkable="true"
+                            app:checkedIconTint="#B6FA65"
+                            app:checkedIconVisible="true"/>
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chip_en"
                             style="@style/Widget.Material3.Chip.Filter"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            app:chipStrokeColor="#FDCA60"
+                            app:chipStrokeColor="#A00F0F0F"
+                            app:chipStrokeWidth="1dp"
+                            app:chipBackgroundColor="#EF313131"
+                            android:textColor="#F5F8D54C"
+                            android:textSize="12sp"
                             android:text="@string/language_english"
-                            app:checkedIconVisible="false"/>
+                            android:checkable="true"
+                            app:checkedIconTint="#B6FA65"
+                            app:checkedIconVisible="true"/>
+
                     </com.google.android.material.chip.ChipGroup>
                 </LinearLayout>
 
                 <!-- 타이틀 -->
                 <TextView
+                    android:id="@+id/login_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="6dp"
@@ -111,28 +125,29 @@
                     android:layout_marginBottom="20dp"
                     android:gravity="center"
                     android:text="@string/login_slogan"
-                    android:fontFamily="@font/pretendard_bold"
-                    android:textColor="#666666"
+                    android:fontFamily="@font/pretendard_medium"
+                    android:textColor="#F8F7F7"
                     android:textSize="14sp"/>
 
                 <!-- 이메일/비밀번호 -->
                 <EditText
                     android:id="@+id/input_email"
                     android:layout_width="match_parent"
-                    android:layout_height="43dp"
+                    android:layout_height="40dp"
                     android:layout_marginBottom="10dp"
                     android:autofillHints="emailAddress"
                     android:background="@drawable/edittext_bg_blur"
                     android:hint="@string/login_email_hint"
+                    android:textSize="16sp"
                     android:importantForAutofill="yes"
                     android:inputType="textEmailAddress"
                     android:textColor="#000000"
-                    android:textColorHint="#999999"/>
+                    android:textColorHint="#F7626262"/>
 
                 <EditText
                     android:id="@+id/input_password"
                     android:layout_width="match_parent"
-                    android:layout_height="43dp"
+                    android:layout_height="40dp"
                     android:layout_marginBottom="12dp"
                     android:autofillHints="password"
                     android:background="@drawable/edittext_bg_blur"
@@ -140,21 +155,21 @@
                     android:importantForAutofill="yes"
                     android:inputType="textPassword"
                     android:textColor="#000000"
-                    android:textColorHint="#999999"/>
+                    android:textSize="16sp"
+                    android:textColorHint="#F7626262"/>
 
                 <!-- 로그인 버튼 -->
                 <Button
                     android:id="@+id/btn_login"
-                    android:layout_width="140dp"
-                    android:layout_height="43dp"
+                    android:layout_width="100dp"
+                    android:layout_height="39dp"
                     android:layout_marginBottom="8dp"
-                    android:backgroundTint="#FDCA60"
+                    android:backgroundTint="#00A8A7A7"
                     android:minHeight="43dp"
                     android:text="@string/login_btn_login"
                     android:fontFamily="@font/pretendard_bold"
                     android:textAllCaps="false"
-                    android:textColor="@color/black"
-                    android:textStyle="bold"/>
+                    android:textColor="#FDC450" />
 
                 <!-- 링크 행: 왼쪽 두 줄 / 가운데 슬래시 / 오른쪽 한 줄 -->
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -169,7 +184,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=" / "
-                        android:textColor="#888"
+                        android:textColor="#C7C7C7"
                         android:textSize="14sp"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -187,8 +202,8 @@
                         android:padding="12dp"
                         android:text="@string/forgot_password"
                         android:fontFamily="@font/pretendard_medium"
-                        android:textColor="#888"
-                        android:textSize="14sp"
+                        android:textColor="#EDEDED"
+                        android:textSize="13sp"
                         android:maxLines="2"
                         android:ellipsize="end"
                         android:textAlignment="viewEnd"
@@ -210,8 +225,8 @@
                         android:padding="12dp"
                         android:text="@string/sign_up"
                         android:fontFamily="@font/pretendard_medium"
-                        android:textColor="#888"
-                        android:textSize="14sp"
+                        android:textColor="#EDEDED"
+                        android:textSize="13sp"
                         android:maxLines="1"
                         android:ellipsize="end"
                         android:textAlignment="viewStart"
@@ -227,7 +242,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="-20dp"
+                    android:layout_marginTop="-25dp"
                     android:layout_marginBottom="3dp"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
@@ -236,7 +251,7 @@
                         android:layout_width="0dp"
                         android:layout_height="1dp"
                         android:layout_weight="1"
-                        android:background="#888"/>
+                        android:background="#EDEDED"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -245,21 +260,24 @@
                         android:paddingEnd="14dp"
                         android:text="or"
                         android:fontFamily="@font/pretendard_medium"
-                        android:textColor="#888"
+                        android:textColor="#EDEDED"
                         android:textSize="16sp"/>
 
                     <View
                         android:layout_width="0dp"
                         android:layout_height="1dp"
                         android:layout_weight="1"
-                        android:background="#888"/>
+                        android:background="#EDEDED"/>
                 </LinearLayout>
 
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp" />
                 <!-- 구글 로그인 -->
                 <ImageButton
                     android:id="@+id/btn_google"
                     android:layout_width="189dp"
-                    android:layout_height="43dp"
+                    android:layout_height="50dp"
                     android:layout_gravity="center"
                     android:background="@android:color/transparent"
                     android:clickable="true"
@@ -273,16 +291,15 @@
                 <!-- 체험 -->
                 <Button
                     android:id="@+id/btn_skip_login"
-                    android:layout_width="140dp"
-                    android:layout_height="43dp"
+                    android:layout_width="80dp"
+                    android:layout_height="40dp"
                     android:layout_gravity="center"
                     android:layout_marginTop="10dp"
-                    android:backgroundTint="#FDCA60"
+                    android:backgroundTint="#00424141"
                     android:minHeight="43dp"
                     android:text="@string/login_btn_guest"
                     android:fontFamily="@font/pretendard_bold"
-                    android:textColor="@color/black"
-                    />
+                    android:textColor="#FDC450" />
             </LinearLayout>
 
             <!-- 회원가입 패널 -->

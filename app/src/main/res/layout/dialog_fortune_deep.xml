@@ -13,7 +13,7 @@
     app:cardBackgroundColor="#EA17153B"
     app:strokeWidth="1dp"
     app:strokeColor="#1F07052C"
-    android:padding="16dp">
+    android:padding="0dp">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -35,7 +35,9 @@
                 android:layout_height="wrap_content"
                 android:text="@string/fortune_deep_title"
                 android:textColor="#FFFFFF"
+                android:padding="2dp"
                 android:textSize="18sp"
+                android:fontFamily="@font/jalnan"
                 android:letterSpacing="0.02"/>
 
             <HorizontalScrollView
@@ -59,7 +61,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/pretendard_medium"
                         android:text="@string/fortune_deep_chip_time"
-                        app:chipBackgroundColor="#FAFDCA60"
+                        app:chipBackgroundColor="#B7FDCA60"
                         app:chipStrokeColor="#33FFFFFF"
                         app:chipStrokeWidth="1dp"
                         android:textColor="#212121"/>
@@ -71,7 +73,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/pretendard_medium"
                         android:text="@string/fortune_deep_chip_number"
-                        app:chipBackgroundColor="#FDCA60"
+                        app:chipBackgroundColor="#B7FDCA60"
                         app:chipStrokeColor="#33FFFFFF"
                         app:chipStrokeWidth="1dp"
                         android:textColor="#212121"/>

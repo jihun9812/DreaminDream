@@ -206,7 +206,7 @@ object FirestoreManager {
 
     private fun fullKeywords(list: List<String>): List<String> =
         list.asSequence().map { it.trim() }.filter { it.isNotEmpty() }.distinct().toList()
-    private fun top3(list: List<String>): List<String> =
+    private fun top1(list: List<String>): List<String> =
         list.asSequence().map { it.trim() }.filter { it.isNotEmpty() }.distinct().take(3).toList()
 
     fun saveDream(
@@ -280,7 +280,7 @@ object FirestoreManager {
                 }
 
                 val keywordsHome = (doc.get("keywords_home") as? List<*>)?.mapNotNull { it?.toString() }
-                    ?: ((doc.get("keywords") as? List<*>)?.mapNotNull { it?.toString() }?.let { top3(it) } ?: emptyList())
+                    ?: ((doc.get("keywords") as? List<*>)?.mapNotNull { it?.toString() }?.let { top1(it) } ?: emptyList())
 
                 val analysis = doc.getString("analysis").orEmpty()
                 val scoreSaved = (doc.getLong("score") ?: doc.getDoubleOrNull("score"))?.toInt()
@@ -577,7 +577,7 @@ object FirestoreManager {
         val save = mapOf(
             "feeling" to feelingTop,
             "keywords" to keywordsFull,
-            "keywords_home" to top3(keywordsFull),
+            "keywords_home" to top1(keywordsFull),
             "analysis" to analysis,
             "score" to score,
             "emotionLabels" to emoL,
@@ -607,7 +607,7 @@ object FirestoreManager {
                 mapOf(
                     "feeling" to feeling,
                     "keywords" to fullKeywords(keywords),
-                    "keywords_home" to top3(keywords),
+                    "keywords_home" to top1(keywords),
                     "analysis" to analysis,
                     "tier" to "pro",
                     "proAt" to now(),

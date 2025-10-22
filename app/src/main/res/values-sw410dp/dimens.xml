@@ -22,7 +22,7 @@
 
         <!-- 텍스트 -->
 
-        <dimen name="text_md">15sp</dimen>
+        <dimen name="text_md">13sp</dimen>
         <dimen name="text_xs">12sp</dimen>
     <dimen name="panel_box_width">380dp</dimen>
         <!-- 여백/버튼 -->

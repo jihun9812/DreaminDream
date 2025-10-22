@@ -202,11 +202,12 @@ class FortuneStorage(private val ctx: Context) {
         val arr = JSONArray(prefs.getString(key, "[]"))
         val list = mutableListOf<String>()
         for (i in 0 until arr.length()) list += arr.optString(i)
-        list += value
+        if (list.lastOrNull() != value) list += value
         prefs.edit()
             .putString(key, JSONArray(list.takeLast(10)).toString())
             .apply()
     }
+
 
     // ---------- Utils ----------
     fun ageOf(birthIso: String): Int = try {

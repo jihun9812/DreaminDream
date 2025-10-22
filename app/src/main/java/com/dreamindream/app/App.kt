@@ -5,13 +5,8 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import com.dreamindream.app.billing.SubscriptionManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class App : Application() {
-
-    private val appScope = CoroutineScope(Dispatchers.IO)
 
     override fun onCreate() {
         super.onCreate()
@@ -48,13 +43,6 @@ class App : Application() {
         // ✅ 프리미엄 상태 초기화
         SubscriptionManager.init(this)
 
-        // ✅ ML Kit Ko→En 번역 모델 선로딩 (Wi-Fi에서만 다운로드)
-        appScope.launch {
-            try {
-                HolidayTranslator.ensureModel(requireWifi = true)
-            } catch (_: Exception) {
-                // 네트워크/용량 이슈 등은 조용히 무시, UI에서는 원문으로 표시됨
-            }
-        }
+        // ✅ (삭제됨) HolidayTranslator.ensureModel 등 holiday 선로딩 전부 제거
     }
 }

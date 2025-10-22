@@ -7,20 +7,21 @@
     android:background="@drawable/main_ground"
     android:fitsSystemWindows="true">
 
+    <!-- 제목 -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/topAppBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:title="@string/feedbacktitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@android:drawable/ic_menu_close_clear_cancel"
         app:navigationIconTint="@android:color/white"
-        app:titleTextColor="@android:color/white"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:titleTextColor="@android:color/white" />
 
-    <!-- 제목 -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/titleLayout"
         style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense"
@@ -42,9 +43,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/title_hint"
+            android:backgroundTint="#EDD9D8D8"
             android:maxLines="1"
             android:textColor="@color/black"
-            android:textColorHint="#B3FFFFFF"/>
+            android:textColorHint="#B30D0D0D"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- 내용 -->
@@ -69,9 +71,10 @@
             android:layout_height="180dp"
             android:gravity="top"
             android:hint="@string/feedback_contents"
+            android:backgroundTint="#EDD9D8D8"
             android:inputType="textMultiLine"
             android:textColor="@color/black"
-            android:textColorHint="#B3FFFFFF"/>
+            android:textColorHint="#B3000000"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- 보내기 -->
@@ -84,8 +87,8 @@
         android:layout_marginTop="16dp"
         android:text="@string/send"
         android:textStyle="bold"
-        android:textColor="#212121"
-        app:backgroundTint="#EBBB57"
+        android:textColor="#FFFFFF"
+        app:backgroundTint="#2FFDFCFC"
         app:cornerRadius="12dp"
         app:layout_constraintTop_toBottomOf="@id/messageLayout"
         app:layout_constraintStart_toStartOf="parent"

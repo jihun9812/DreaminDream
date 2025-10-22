@@ -21,6 +21,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields
 import java.util.*
+import android.view.ViewGroup
 
 class WeeklyHistoryBottomSheet(
     private val currentWeekKey: String?,
@@ -46,13 +47,32 @@ class WeeklyHistoryBottomSheet(
     private val uid get() = FirebaseAuth.getInstance().currentUser?.uid
     private var keys: MutableList<String> = mutableListOf()
 
+    // sheet 뷰 참조를 보관해서 필요할 때 높이를 조절
+    private var sheetView: View? = null
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dlg = BottomSheetDialog(requireContext())
         dlg.setOnShowListener {
             val id = resources.getIdentifier("design_bottom_sheet","id","com.google.android.material")
             dlg.findViewById<View>(id)?.let { sheet ->
+                sheetView = sheet
+                // 배경 투명 유지
                 sheet.setBackgroundColor(Color.TRANSPARENT)
-                BottomSheetBehavior.from(sheet).isDraggable = true
+
+                // behavior 기본 설정
+                val behavior = BottomSheetBehavior.from(sheet)
+                behavior.isDraggable = true
+
+                // 기본 peekHeight(보이는 높이)는 화면의 35% 정도로 설정 (적당히 작게 시작)
+                val peek = (resources.displayMetrics.heightPixels * 0.35).toInt()
+                try {
+                    behavior.peekHeight = peek
+                } catch (_: Exception) { /* 안전하게 무시 */ }
+
+                // 기본적으로 wrap_content로 두어서 항목이 적으면 작게 보이도록 함
+                val lp = sheet.layoutParams
+                lp.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                sheet.layoutParams = lp
             }
         }
         return dlg
@@ -73,6 +93,7 @@ class WeeklyHistoryBottomSheet(
             dividerThickness  = (1  * resources.displayMetrics.density).toInt()
         })
 
+        // 로그인 필요 상태 처리
         val userId = uid ?: run {
             tvMeta.setText(R.string.bs_meta_login_required)
             rv.adapter = object : RecyclerView.Adapter<InfoVH>() {
@@ -97,8 +118,11 @@ class WeeklyHistoryBottomSheet(
                 onEmptyCta?.invoke()
                 return@listWeeklyReportKeys
             }
+
+            // 메타(총 주 수) 업데이트
             tvMeta.text = getString(R.string.bs_meta_total_weeks_format, keys.size)
 
+            // 어댑터 세팅
             rv.adapter = SimpleAdapter(
                 keys,
                 currentWeekKey,
@@ -128,6 +152,21 @@ class WeeklyHistoryBottomSheet(
                         .show()
                 }
             )
+
+            // --- 핵심: 항목 수에 따라 바텀시트 최대 높이 적용 ---
+            // 항목이 3개 이상이면 바텀시트 높이를 화면의 60%로 제한하여 RecyclerView가 내부 스크롤되도록 함.
+            v.post {
+                sheetView?.let { sheet ->
+                    val lp = sheet.layoutParams
+                    if (keys.size >= 3) {
+                        val maxHeight = (resources.displayMetrics.heightPixels * 0.60).toInt()
+                        lp.height = maxHeight
+                    } else {
+                        lp.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                    }
+                    sheet.layoutParams = lp
+                }
+            }
         }
         return v
     }

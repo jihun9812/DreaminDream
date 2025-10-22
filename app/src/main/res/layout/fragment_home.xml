@@ -77,8 +77,8 @@
                 android:paddingVertical="1dp">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:layout_marginEnd="8dp"
                     android:contentDescription="@string/ai_report"
                     android:src="@drawable/ic_ai_report" />

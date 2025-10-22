@@ -1,157 +1,235 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/transparent"
+    android:layout_margin="16dp"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="20dp"
+    android:background="@drawable/subscribe_bg_card"
+    android:clipToOutline="true">
 
-    <!-- 헤더 카드 (글라스 느낌) -->
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="4dp"
-        app:strokeColor="#33FFFFFF"
-        app:strokeWidth="1dp"
-        android:foreground="?attr/selectableItemBackground">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
-
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="DreamInDream Premium"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/white"/>
-
-            <TextView
-                android:id="@+id/subtitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="광고 없이, 더 빠르게"
-                android:textSize="14sp"
-                android:layout_marginTop="6dp"
-                android:textColor="#B3FFFFFF"/>
-
-            <TextView
-                android:id="@+id/premiumBadge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="● ACTIVE"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="4dp"
-                android:layout_marginTop="10dp"
-                android:background="@android:color/transparent"
-                android:textColor="#7CFC00"
-                android:visibility="gone"/>
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- 혜택 리스트 카드 -->
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="2dp"
-        app:strokeColor="#22FFFFFF"
-        app:strokeWidth="1dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="18dp">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="프리미엄 혜택"
-                android:textColor="@android:color/white"
-                android:textStyle="bold"
-                android:textSize="16sp"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="✅ AI 리포트·운세 심화분석 전면 무광고"
-                android:textColor="#E6FFFFFF"
-                android:layout_marginTop="10dp"
-                android:textSize="14sp"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="🌙 꿈 해몽: 광고 없이 1일 3회 바로 해석"
-                android:textColor="#E6FFFFFF"
-                android:layout_marginTop="6dp"
-                android:textSize="14sp"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="🔒 계정 연동 시 모든 기기에서 혜택 유지"
-                android:textColor="#E6FFFFFF"
-                android:layout_marginTop="6dp"
-                android:textSize="14sp"/>
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="🛠️ 설정 &gt; 프리미엄에서 언제든지 관리"
-                android:textColor="#E6FFFFFF"
-                android:layout_marginTop="6dp"
-                android:textSize="14sp"/>
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- CTA 버튼들 -->
+    <!-- 헤더 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/sub_title"
+                android:textColor="#FDCA60"
+                android:textSize="20sp"
+                android:fontFamily="@font/jalnan"
+                android:includeFontPadding="false" />
+
+            <TextView
+                android:id="@+id/tvSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/sub_subtitle"
+                android:textColor="#ECEBF2"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif"
+                android:includeFontPadding="false" />
+        </LinearLayout>
+
+        <!-- PREMIUM 활성화 배지 -->
+        <TextView
+            android:id="@+id/premiumBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:text="@string/sub_badge_active"
+            android:textSize="12sp"
+            android:textColor="#17153B"
+            android:background="@drawable/subscribe_bg_badge"
+            android:fontFamily="@font/pretendard_bold"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- 혜택 카드 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:orientation="vertical"
+        android:background="@drawable/subscribe_bg_price_row"
+        android:padding="16dp"
+        android:clipToOutline="true">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sub_benefit_1"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/sub_benefit_2"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/sub_benefit_3"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="@string/sub_benefit_4"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif" />
+    </LinearLayout>
+
+    <!-- 플랜 선택 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="14dp"
+        android:text="@string/sub_label_plan"
+        android:textColor="#B3FFFFFF"
+        android:textSize="12sp"
+        android:fontFamily="sans-serif" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <TextView
+            android:id="@+id/chipMonthly"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/sub_chip_monthly"
+            android:textSize="14sp"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/pretendard_medium"
+            android:background="@drawable/subscribe_bg_chip_selected"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="1dp" />
+
+        <TextView
+            android:id="@+id/chipYearly"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/sub_chip_yearly"
+            android:textSize="14sp"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/pretendard_medium"
+            android:background="@drawable/subscribe_bg_chip_unselected"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp" />
+    </LinearLayout>
+
+    <!-- 가격 표시 (초기값: 월 구독) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/subscribe_bg_price_row"
+        android:padding="16dp"
+        android:clipToOutline="true">
+
+        <TextView
+            android:id="@+id/tvPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sub_price_monthly"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:fontFamily="@font/pretendard_bold" />
+    </LinearLayout>
+
+    <!-- 버튼 2개 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnClose"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="0dp"
             android:layout_height="48dp"
             android:layout_weight="1"
-            android:text="나중에"
-            app:cornerRadius="14dp"/>
+            android:text="@string/sub_btn_later"
+            android:textColor="#FDCA60"
+            android:backgroundTint="#1E1B3C"
+            app:cornerRadius="16dp" />
 
         <Space
             android:layout_width="10dp"
-            android:layout_height="1dp"/>
+            android:layout_height="1dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSubscribe"
-            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="39dp"
             android:layout_weight="1"
-            android:text="프리미엄 시작하기"
-            app:cornerRadius="14dp"/>
+            android:text="@string/sub_btn_start"
+            android:textColor="#17153B"
+            android:background="@drawable/subscribe_btn"
+            android:backgroundTint="@null"
+            app:backgroundTint="@null"
+            app:useMaterialThemeColors="false"
+            android:stateListAnimator="@null"
+            android:fontFamily="@font/pretendard_medium"
+            android:paddingHorizontal="12dp"
+            android:gravity="center"
+            android:translationZ="0dp"
+            android:elevation="0dp"
+            android:clipToOutline="true"
+            android:outlineProvider="background" />
     </LinearLayout>
 
+    <!-- 구매 복원 -->
     <TextView
         android:id="@+id/btnRestore"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="구매 복원"
-        android:textColor="#B3FFFFFF"
-        android:textSize="12sp"
-        android:layout_gravity="center_horizontal"
         android:layout_marginTop="10dp"
-        android:padding="4dp"/>
+        android:layout_gravity="center"
+        android:text="@string/sub_btn_restore"
+        android:textColor="#E4FFFFFF"
+        android:textStyle="bold"
+        android:fontFamily="sans-serif" />
 </LinearLayout>

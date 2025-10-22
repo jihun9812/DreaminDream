@@ -28,7 +28,6 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
-import java.util.concurrent.ConcurrentHashMap
 
 class CalendarFragment : Fragment() {
 
@@ -36,9 +35,6 @@ class CalendarFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var selectedDate: LocalDate? = null
-
-    /** 휴일 캐시 (스레드 세이프) */
-    private val holidayMap = ConcurrentHashMap<LocalDate, String>()
 
     /** 앱 현재 언어 로케일 */
     private val appLocale: Locale
@@ -89,7 +85,6 @@ class CalendarFragment : Fragment() {
         // Calendar
         binding.calendarView.monthScrollListener = { month ->
             updateMonthText(month.yearMonth)
-            clearHolidayBanner()
             binding.textViewMonthYear.alpha = 0f
             binding.textViewMonthYear.animate().alpha(1f).setDuration(200).start()
         }
@@ -101,7 +96,6 @@ class CalendarFragment : Fragment() {
 
         setupCalendar(currentMonth, daysOfWeek)
         setupEventListeners()
-        loadHolidays2030()
         updateMonthText(currentMonth)
         setupAds(view)
 
@@ -143,7 +137,6 @@ class CalendarFragment : Fragment() {
         container.textView.text = day.date.dayOfMonth.toString()
         val isSelected = selectedDate == day.date
         val isToday = day.date == LocalDate.now()
-        val holidayName = holidayMap[day.date]
 
         // 기록 도트(강도)
         val count = getDreamCount(day.date)
@@ -166,7 +159,7 @@ class CalendarFragment : Fragment() {
             }
         }
 
-        container.view.setOnClickListener { handleDayClick(day.date, holidayName) }
+        container.view.setOnClickListener { handleDayClick(day.date) }
 
         when {
             isSelected -> {
@@ -184,10 +177,9 @@ class CalendarFragment : Fragment() {
             else -> {
                 container.textView.setBackgroundResource(android.R.color.transparent)
                 container.textView.setTextColor(
-                    when {
-                        holidayName != null -> colSun
-                        day.date.dayOfWeek == DayOfWeek.SUNDAY -> colSun
-                        day.date.dayOfWeek == DayOfWeek.SATURDAY -> colSat
+                    when (day.date.dayOfWeek) {
+                        DayOfWeek.SUNDAY -> colSun
+                        DayOfWeek.SATURDAY -> colSat
                         else -> colText
                     }
                 )
@@ -195,89 +187,28 @@ class CalendarFragment : Fragment() {
         }
     }
 
-    private fun handleDayClick(date: LocalDate, holidayName: String?) {
+    private fun handleDayClick(date: LocalDate) {
         val oldDate = selectedDate
         selectedDate = date
         oldDate?.let { binding.calendarView.notifyDateChanged(it) }
         binding.calendarView.notifyDateChanged(date)
 
         updateMonthText(YearMonth.from(date))
-
-        if (holidayName != null) {
-            binding.holidayTextView.text = holidayName
-            binding.holidayTextView.visibility = View.VISIBLE
-        } else {
-            clearHolidayBanner()
-        }
-
         refreshInlineListFor(date)
     }
 
     private fun setupEventListeners() {
         binding.buttonPreviousMonth.setOnClickListener {
-            clearHolidayBanner()
             binding.calendarView.findFirstVisibleMonth()?.yearMonth?.minusMonths(1)?.let {
                 binding.calendarView.smoothScrollToMonth(it)
                 updateMonthText(it)
             }
         }
         binding.buttonNextMonth.setOnClickListener {
-            clearHolidayBanner()
             binding.calendarView.findFirstVisibleMonth()?.yearMonth?.plusMonths(1)?.let {
                 binding.calendarView.smoothScrollToMonth(it)
                 updateMonthText(it)
             }
-        }
-    }
-
-    /** 상단 휴일 라벨 숨김 */
-    private fun clearHolidayBanner() {
-        binding.holidayTextView.text = ""
-        binding.holidayTextView.visibility = View.GONE
-    }
-
-    /** 2024~2030 휴일: 캐시 → 누락 연도만 프리패치 */
-    private fun loadHolidays2030() {
-        try {
-            holidayMap.clear()
-
-            // 1) 캐시 (영문 UI면 이미 영문화된 이름으로 들어옴)
-            val cached = HolidayStorage.loadHolidaysRange(requireContext(), CAL_START_YEAR, CAL_END_YEAR)
-            for (h in cached) holidayMap[h.date] = h.name
-            binding.calendarView.notifyCalendarChanged()
-
-            // 2) 누락 연도만 API
-            val missingYears = (CAL_START_YEAR..CAL_END_YEAR).filter { year ->
-                HolidayStorage.loadHolidays(requireContext(), year).isEmpty()
-            }
-            if (missingYears.isEmpty()) return
-
-            fun fetchNext(idx: Int) {
-                if (idx >= missingYears.size) return
-                val y = missingYears[idx]
-                HolidayApi.fetchHolidays(
-                    y,
-                    onSuccess = { list ->
-                        // (a) 원문(ko) 그대로 저장 → 다음 실행 때 캐시 사용
-                        HolidayStorage.saveHolidays(requireContext(), y, list)
-                        // (b) UI에는 언어에 맞춰 영문화 후 반영
-                        val locale = appLocale
-                        for (h in list) {
-                            val display = HolidayTranslator.localizeForUiQuick(h.name, locale)
-                            holidayMap[h.date] = display
-                        }
-                        binding.calendarView.notifyCalendarChanged()
-                        fetchNext(idx + 1)
-                    },
-                    onError = {
-                        it.printStackTrace()
-                        fetchNext(idx + 1)
-                    }
-                )
-            }
-            fetchNext(0)
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 

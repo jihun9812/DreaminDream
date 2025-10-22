@@ -466,8 +466,9 @@
                             app:boxCornerRadiusTopEnd="8dp"
                             app:boxCornerRadiusTopStart="8dp"
                             app:boxStrokeColor="#FAFDCA60"
-                            app:boxStrokeWidth="0.5dp"
-                            app:boxStrokeWidthFocused="1dp">
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            >
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/edit_nickname"
@@ -503,7 +504,7 @@
                             app:boxCornerRadiusTopEnd="8dp"
                             app:boxCornerRadiusTopStart="8dp"
                             app:boxStrokeColor="#FFFDCA60"
-                            app:boxStrokeWidth="0.5dp"
+                            app:boxStrokeWidth="1dp"
                             app:boxStrokeWidthFocused="1dp">
 
                             <com.google.android.material.textfield.TextInputEditText

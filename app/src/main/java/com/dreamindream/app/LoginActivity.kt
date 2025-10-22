@@ -21,6 +21,11 @@ import com.google.android.material.chip.ChipGroup
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
+import android.graphics.LinearGradient
+import android.graphics.Shader
+import android.widget.TextView
+import android.text.Editable
+import android.text.TextWatcher
 
 class LoginActivity : BaseActivity() {
 
@@ -40,6 +45,24 @@ class LoginActivity : BaseActivity() {
         setContentView(R.layout.activity_login)
         auth = FirebaseAuth.getInstance()
 
+        // 🔹 로그인 타이틀 텍스트 그라디언트 (F9B84A → 7B61FF)
+        findViewById<TextView>(R.id.login_title)?.let { tv ->
+            // 측정 끝난 뒤 1회 적용
+            tv.post { applyGradientTitle(tv) }
+            // 크기/레이아웃 변동 시 재적용 (언어 바꿈, 회전 등)
+            tv.addOnLayoutChangeListener { _, l, t, r, b, ol, ot, or_, ob ->
+                val w = r - l; val h = b - t
+                val ow = or_ - ol; val oh = ob - ot
+                if (w != ow || h != oh) applyGradientTitle(tv)
+            }
+            // 텍스트 바뀌면 재적용 (setText() 등)
+            tv.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable?) { applyGradientTitle(tv) }
+            })
+        }
+
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(getString(R.string.default_web_client_id))
             .requestEmail()
@@ -53,7 +76,7 @@ class LoginActivity : BaseActivity() {
                     // 홈 페이드인 예약
                     markPendingHomeFade()
                     saveUserInfoToFirestore()
-                    showCardLoadingAndDownloadHolidays()
+                    navigateToMain() // ✅ holiday 준비 없이 바로 메인
                 }
                 .addOnFailureListener {
                     Toast.makeText(
@@ -128,7 +151,7 @@ class LoginActivity : BaseActivity() {
                         val uid = auth.currentUser?.uid ?: return@addOnSuccessListener
                         checkReactivation(uid) {
                             markPendingHomeFade()
-                            showCardLoadingAndDownloadHolidays()
+                            navigateToMain() // ✅ holiday 제거
                         }
                     } else {
                         Toast.makeText(
@@ -260,7 +283,7 @@ class LoginActivity : BaseActivity() {
                     val uid = auth.currentUser?.uid ?: return@addOnSuccessListener
                     checkReactivation(uid) {
                         markPendingHomeFade()
-                        showCardLoadingAndDownloadHolidays()
+                        navigateToMain() // ✅ holiday 제거
                     }
                 }
                 .addOnFailureListener {
@@ -308,55 +331,12 @@ class LoginActivity : BaseActivity() {
             .addOnFailureListener { onContinue() }
     }
 
-    private fun showCardLoadingAndDownloadHolidays() {
-        loginCardContent.removeAllViews()
-        val loadingLayout = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER
-            setPadding(40, 120, 40, 120)
-        }
-        val loadingBar = ProgressBar(this).apply { isIndeterminate = true }
-        val loadingText = TextView(this).apply {
-            text = getString(R.string.loading_calendar_prep)
-            textSize = 17f
-            setTextColor(0xFF7A55D3.toInt())
-            setPadding(0, 22, 0, 0)
-            gravity = Gravity.CENTER
-        }
-        loadingLayout.addView(loadingBar)
-        loadingLayout.addView(loadingText)
-        loginCardContent.addView(loadingLayout)
-
-        val launchMain = {
-            startActivity(Intent(this, MainActivity::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            })
-            finish()
-        }
-
-        val targetYears = listOf(2025, 2026)
-        val holidays = mutableListOf<Holiday>()
-        var doneCount = 0
-        targetYears.forEach { year ->
-            HolidayApi.fetchHolidays(
-                year,
-                onSuccess = { list ->
-                    holidays.addAll(list)
-                    doneCount++
-                    if (doneCount == targetYears.size) {
-                        HolidayStorage.saveHolidays(this, holidays)
-                        launchMain()
-                    }
-                },
-                onError = {
-                    doneCount++
-                    if (doneCount == targetYears.size) {
-                        HolidayStorage.saveHolidays(this, holidays)
-                        launchMain()
-                    }
-                }
-            )
-        }
+    // ✅ holiday 다운로드/저장 단계 없이 즉시 메인으로 이동
+    private fun navigateToMain() {
+        startActivity(Intent(this, MainActivity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        })
+        finish()
     }
 
     /** 홈 첫 진입에서 페이드인을 실행시키도록 사용자별 프리퍼런스에 예약 표시 */
@@ -495,5 +475,26 @@ class LoginActivity : BaseActivity() {
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
         }
         recreate()
+    }
+
+    // === Helper: 타이틀에 텍스트 그라디언트 적용 ===
+    private fun applyGradientTitle(tv: TextView) {
+        val text = tv.text?.toString().orEmpty()
+        if (text.isEmpty()) return
+        // 일부 기기에서 하드웨어 가속과 텍스트 셰이더가 충돌할 수 있어 소프트웨어 레이어로 강제
+        tv.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+
+        val width = tv.paint.measureText(text)
+        val shader = LinearGradient(
+            0f, 0f, width, tv.textSize,
+            intArrayOf(
+                Color.parseColor("#F9B84A"), // 연한 골드
+                Color.parseColor("#7B61FF")  // 은은한 보라
+            ),
+            null,
+            Shader.TileMode.CLAMP
+        )
+        tv.paint.shader = shader
+        tv.invalidate()
     }
 }

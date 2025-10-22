@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_scroll"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipToPadding="false"
+    android:paddingBottom="0dp">
+
+    <LinearLayout
+        android:id="@+id/root_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <!-- Header -->
+        <LinearLayout
+            android:id="@+id/header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="18dp"
+            android:paddingTop="14dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="6dp">
+
+            <LinearLayout
+                android:id="@+id/title_col"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                >
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/txt_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/whd_title"
+                    android:textColor="#1F2234"
+                    android:textSize="18sp" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/txt_meta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    android:text="@string/whd_generation_rule"
+                    android:textColor="#5B5F6A"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btn_close"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/whd_close"
+                android:src="@android:drawable/ic_menu_close_clear_cancel" />
+        </LinearLayout>
+
+        <!-- Hero -->
+        <LinearLayout
+            android:id="@+id/hero"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/bg_hero_gradient"
+            android:orientation="horizontal"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/hero_icon"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/bg_badge_circle"
+                android:gravity="center"
+                android:text="✨"
+                android:textColor="#FFFFFFFF"
+                android:textSize="22sp" />
+
+            <LinearLayout
+                android:id="@+id/hero_col"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/txt_hero_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/whd_hero_title"
+                    android:textColor="#FFE9F2"
+                    android:textSize="16sp" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/txt_hero_sub"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="4dp"
+                    android:text="@string/whd_hero_sub"
+                    android:textColor="#BFE1FF"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Chips -->
+        <LinearLayout
+            android:id="@+id/chip_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="18dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/chip_instant"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_chip_soft"
+                android:paddingStart="12dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="6dp"
+                android:text="@string/whd_chip_instant"
+                android:textColor="#1F2234"
+                android:textSize="12sp" />
+
+            <Space
+                android:layout_width="6dp"
+                android:layout_height="1dp" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/chip_week_range"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_chip_soft"
+                android:paddingStart="12dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="6dp"
+                android:text="@string/whd_chip_week_range"
+                android:textColor="#1F2234"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Pro 안내 -->
+        <LinearLayout
+            android:id="@+id/pro_info"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginStart="18dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="18dp"
+            android:background="@drawable/bg_pro_info"
+            android:orientation="horizontal"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/pro_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="2dp"
+                android:paddingEnd="10dp"
+                android:text="🎬"
+                android:textColor="#1F2234"
+                android:textSize="16sp" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/txt_pro"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="top"
+                android:lineSpacingMultiplier="1.1"
+                android:text="@string/whd_pro_text"
+                android:textColor="#3A3D4A"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- CTA -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="20dp"
+            android:insetTop="10dp"
+            android:insetBottom="10dp"
+            android:text="@string/whd_cta_go_record"
+            android:textAllCaps="false"
+            android:textColor="#1F2234"
+            app:backgroundTint="#FFF3C079"
+            android:fontFamily="@font/pretendard_medium"
+            app:cornerRadius="16dp"
+            app:rippleColor="#332A355C"
+            app:strokeColor="#332A355C"
+            app:strokeWidth="1dp" />
+
+    </LinearLayout>
+</ScrollView>

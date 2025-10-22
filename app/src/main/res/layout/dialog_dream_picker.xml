@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="18dp">
+
+    <TextView
+        android:id="@+id/dp_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="주간 리포트 만들기"
+        android:textStyle="bold"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/dp_sub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="이번 주 리포트에 포함할 꿈을 2~4개 선택하세요." />
+
+    <TextView
+        android:id="@+id/dp_badge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="0 / 4"
+        android:textStyle="bold" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="240dp"
+        android:layout_marginTop="10dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/dp_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ProgressBar
+            android:id="@+id/dp_progress"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/dp_empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:text="이번 주에 기록된 꿈이 없습니다" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/dp_cancel"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="취소" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="1dp" />
+
+        <Button
+            android:id="@+id/dp_ok"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="리포트 만들기"
+            android:enabled="false" />
+    </LinearLayout>
+</LinearLayout>

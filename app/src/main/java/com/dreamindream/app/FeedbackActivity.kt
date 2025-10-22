@@ -18,6 +18,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+// ▼ 추가: 버튼 스타일 통일용 import
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.RippleDrawable
+
 class FeedbackActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityFeedbackBinding
@@ -31,6 +37,52 @@ class FeedbackActivity : AppCompatActivity() {
         setSupportActionBar(binding.topAppBar)
         binding.topAppBar.setNavigationOnClickListener { finish() }
 
+        // --- 스타일 통일 (aireport의 심화분석 버튼과 동일) ---
+        run {
+            val d = resources.displayMetrics.density
+            val r = 12f * d
+            val btn = binding.btnSend
+
+            // 배경 교체 시 크기/패딩 보존
+            val pL = btn.paddingLeft
+            val pT = btn.paddingTop
+            val pR = btn.paddingRight
+            val pB = btn.paddingBottom
+            val minW = btn.minWidth
+            val minH = btn.minHeight
+
+            btn.isAllCaps = false
+            btn.setTextColor(Color.BLACK)
+            btn.backgroundTintList = null
+
+            val gradient = GradientDrawable().apply {
+                cornerRadius = r
+                colors = intArrayOf(
+                    Color.parseColor("#FFFEDCA6"),  // 연한 골드
+                    Color.parseColor("#FF8BAAFF")   // 은은한 보라
+                )
+                orientation = GradientDrawable.Orientation.TL_BR
+                gradientType = GradientDrawable.LINEAR_GRADIENT
+                shape = GradientDrawable.RECTANGLE
+            }
+
+            val rippleCs = ColorStateList.valueOf(Color.parseColor("#33FFFFFF"))
+
+            if (btn is com.google.android.material.button.MaterialButton) {
+                btn.rippleColor = rippleCs
+                btn.background = gradient
+                btn.setPadding(pL, pT, pR, pB)
+                btn.minWidth = minW
+                btn.minHeight = minH
+            } else {
+                btn.background = RippleDrawable(rippleCs, gradient, null)
+                btn.setPadding(pL, pT, pR, pB)
+                btn.minWidth = minW
+                btn.minHeight = minH
+            }
+        }
+
+        // 클릭 리스너는 스타일 적용 뒤에
         binding.btnSend.setOnClickListener { submit() }
     }
 

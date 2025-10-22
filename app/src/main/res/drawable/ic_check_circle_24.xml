@@ -1,0 +1,14 @@
+<!-- res/drawable/ic_check_circle_24.xml -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <!-- 동그라미 -->
+    <path android:fillColor="#CCFF90"
+        android:pathData="M12,2a10,10 0 1,0 0,20a10,10 0 1,0 0,-20z"/>
+    <!-- 테두리 -->
+    <path android:fillColor="#090909"
+        android:pathData="M12,0a12,12 0 1,0 0,24a12,12 0 1,0 0,-24zM12,2a10,10 0 1,1 0,20a10,10 0 1,1 0,-20z"/>
+    <!-- 체크 -->
+    <path android:fillColor="#1F2234"
+        android:pathData="M10.0,15.2 L6.6,11.8 L5.2,13.2 L10.0,18.0 L19.0,9.0 L17.6,7.6z"/>
+</vector>

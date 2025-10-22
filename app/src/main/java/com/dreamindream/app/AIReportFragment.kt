@@ -859,12 +859,22 @@ class AIReportFragment : Fragment() {
         val emoLocalized = emoLabels.map { lab -> parseEmoLabel(lab)?.let { emoLabelLocal(it) } ?: lab }
         val themeLocalized = themeLabels.map { lab -> parseThemeLabel(lab)?.let { themeLabelLocal(it) } ?: lab }
 
-        // (1) 상단 키워드: 명사 3개로 요약
+        // (1) 상단 키워드: 명사 1개로 요약!!ㅅㅂ
+        // (1) 상단 키워드: HOME과 동일 규칙(원본 keywords에서 1개만, 공백/중복 제거)
         run {
-            val kw3 = reduceKeywordsForDisplay(keywords)
-            keywordsText.text = getString(R.string.keywords_format, feelingLocalized, kw3.joinToString(", "))
+            val kw1 = keywords.asSequence()
+                .filter { it.isNotBlank() }
+                .map { it.trim() }
+                .distinct()
+                .take(1)
+                .toList()
+            keywordsText.text = getString(
+                R.string.keywords_format,
+                feelingLocalized,
+                kw1.joinToString(", ")
+            )
         }
-        recomputeKeywordsFromDreamsAsync(weekKey, feelingLocalized)
+
 
 
         // (2) 본문

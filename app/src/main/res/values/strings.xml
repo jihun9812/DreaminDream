@@ -1,10 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources
-    xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <!--!!!!!!!!!!!!!!!!!!!!!! xml 전체 !!!!!!!!!!!!!!!!!!!!!!!! -->
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:ns0="urn:oasis:names:tc:xliff:document:1.2">
+    
     <string name="bs_subtitle_key_range_format">%1$s · %2$s</string>
 
-    <!-- login.xml  -->
+    
     <string name="login_slogan">꿈에서 해답을찾다</string>
     <string name="dreamin_slogan1"> </string>
     <string name="login_password_confirm_hint">비밀번호 확인</string>
@@ -30,27 +29,27 @@
     <string name="privacy_and_version" translatable="false">v1.07 Dream in Dream | 개인정보처리방침</string>
     <string name="brand_logo_desc">Dream in Dream </string>
 
-    <!--activity_feedback.xml -->
-    <string name ="feedbacktitle">문의 · 피드백</string>
-    <string name ="title_hint">제목</string>
-    <string name = "feedback_contents">문의/피드백 내용을 적어주세요</string>
-    <string name = "send">보내기</string>
+    
+    <string name="feedbacktitle">문의 · 피드백</string>
+    <string name="title_hint">제목</string>
+    <string name="feedback_contents">문의/피드백 내용을 적어주세요</string>
+    <string name="send">보내기</string>
 
-    <!-- activity_terms.xml -->
+    
         <string name="title_terms_privacy">약관 · 개인정보 처리방침</string>
         <string name="tab_terms">이용약관</string>
         <string name="tab_privacy">개인정보 처리방침</string>
 
-    <!-- dialog_ad_prompt.xml -->
+    
     <string name="ad_prompt_title">맞춤 해몽을 준비 중이에요</string>
     <string name="ad_prompt_status">잠시만요! 광고를 보고나면 심화 해석이 열려요.</string>
     <string name="ad_prompt_cancel">취소</string>
     <string name="ad_prompt_watch_ad">광고 보기</string>
 
-    <!-- dialog_dream_list.xml -->
-    <string name = "day_dream">이 날의 꿈들</string>
+    
+    <string name="day_dream">이 날의 꿈들</string>
 
-    <!-- dialog_fortune_deep.xml-->
+    
     <string name="fortune_deep_title">심화 분석</string>
     <string name="fortune_deep_chip_time">오후 3시~4시</string>
     <string name="fortune_deep_chip_number">숫자 56</string>
@@ -63,12 +62,12 @@
     <string name="fortune_deep_tomorrow_label">내일 준비</string>
 
 
-    <!--dialog_fortune_section.xml-->
+    
     <string name="fortune_section_title_total">총운</string>
     <string name="fortune_section_score_sample">80점</string>
 
 
-    <!--example_month_header.xml-->
+    
     <string name="weekday_sun">일</string>
     <string name="weekday_mon">월</string>
     <string name="weekday_tue">화</string>
@@ -79,8 +78,8 @@
 
     <string name="tutorial_lang_tip">언어는 여기에서 바꿀 수 있어요. 누르면 한국어/English 전환됩니다.</string>
 
-    <!-- fragment_ai_report.xml -->
-    <string name="empty_string"></string>
+    
+    <string name="empty_string" />
     <string name="ai_report_empty">분석할 데이터가 없습니다.</string>
     <string name="ai_report_week_label_default">이번 주 분석 리포트\n0건 · -</string>
     <string name="ai_report_week_label_format">이번 주 분석 리포트\n%1$d건 · %2$s</string>
@@ -97,10 +96,8 @@
     <string name="btn_pro_upgrade">심화 분석하기</string>
     <string name="ai_analysis_title">AI 분석</string>
     <string name="ai_analysis_placeholder">분석 내용이 여기에 표시됩니다.</string>
-    <string name="ad_unit_ai_banner">ca-app-pub-1742201279182732/9282239127</string>
 
 
-    <!--fragment_calendar.xml -->
     <string name="prev_month">이전 달</string>
     <string name="next_month">다음 달</string>
     <string name="calendar_month_year_sample">2025년 9월</string>
@@ -108,9 +105,9 @@
     <string name="dream_list_title_sample">2025-09-12 (금)의 꿈들</string>
     <string name="dream_list_title_format">%1$s (%2$s)의 꿈들</string>
     <string name="dream_list_empty">이 날짜의 꿈 기록이 없어요.</string>
-    <string name="ad_unit_calendar_banner">ca-app-pub-1742201279182732/9282239127</string>
 
-    <!-- 캘린더/달력 -->
+
+
     <string name="calendar_title_placeholder">2025년 7월</string>
     <string name="dream_list_label">🌙 오늘의 꿈 기록</string>
     <string name="calendar_dream_list_title">선택한 날짜의 꿈 목록:</string>
@@ -124,23 +121,32 @@
 
 
 
-    <!-- 공통 -->
-    <!-- Dialog buttons (referenced by fortune dialogs) -->
+    
+    
     <string name="close">닫기</string>
     <string name="ok">확인</string>
     <string name="placeholder_dash">-</string>
-    <string name="percent_placeholder">0%%</string> <!-- 코드에서 포맷 setText(getString(..., n)) 써도 OK -->
+    <string name="percent_placeholder">0%%</string> 
 
-    <!-- Dream.xml -->
+    
     <string name="dream_input_label">• 꿈 내용 입력</string>
     <string name="usage_left_default">오늘 남은 횟수 : 0회</string>
     <string name="usage_left_format">오늘 남은 횟수 : %1$d회</string>
-    <string name="hint_input">꿈을 자세히 적어주세요…  ex)큰 상어 나타나서 도망갔어, 빌딩 한가운대서 엄청 뛰어다녔어.</string>
+    <string name="hint_input">꿈을 자세하게 적어주세요! ex)큰 상어 내 앞에 나타나서 도망갔어, 빌딩 한가운대서 엄청 뛰어다녔어.</string>
     <string name="button_interpret">해몽하기</string>
 
-    <string name="ad_unit_dream_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="dream_input_empty">꿈 내용을 입력해주세요.</string>
+    <string name="dream_input_not_meaningful">의미 있는 꿈 내용을 구체적으로 입력해주세요.</string>
 
-    <!-- Fortune.xml -->
+    <string name="dream_network_error">해몽 결과를 받아올 수 없습니다. 네트워크를 확인하고 다시 시도해 주세요.</string>
+
+    <string name="dream_request_failed">해몽 요청 실패 (%1$d)</string>
+
+
+    <string name="dream_quota_title">오늘 기회 소진</string>
+    <string name="dream_quota_message">오늘의 사용 한도가 모두 소진됐습니다.</string>
+
+    
     <string name="fortune_start">운세\n보기</string>
     <string name="fortune_lucky_color">행운색</string>
     <string name="fortune_lucky_number">행운 숫자</string>
@@ -150,11 +156,12 @@
     <string name="btn_deep_analysis">심화 분석 보기</string>
     <string name="action_copy">복사</string>
     <string name="action_share">공유</string>
-    <string name="ad_unit_fortune_banner">ca-app-pub-1742201279182732/9282239127</string>
+
+    <string name="checked">선택됨</string>
+    <string name="unchecked">선택 해제</string>
 
 
-
-    <!-- 기본 & 네비게이션 -->
+    
     <string name="app_name">DreamInDream</string>
 
     <string name="back_button">뒤로가기</string>
@@ -165,7 +172,7 @@
     <string name="desc_prev_month">Previous month</string>
     <string name="desc_next_month">Next month</string>
 
-    <!--Home Fragment.xml -->
+    
     <string name="settings">설정</string>
     <string name="home_ai_title">주간 꿈 분석</string>
     <string name="ai_report">AI 리포트</string>
@@ -192,15 +199,13 @@
     <string name="ai_msg_loading">✨ 오늘의 해몽 메시지를 불러오는 중이에요...</string>
     <string name="ai_emotion_keywords_simple">감정: %1$s\n키워드: %2$s</string>
 
-    <!--settings.xml -->
+    
 
 
         <string name="btn_cancel">취소</string>
         <string name="btn_save">저장</string>
 
-        <!-- 광고 유닛 -->
-        <string name="ad_unit_settings_banner">ca-app-pub-1742201279182732/9282239127</string>
-        <!-- 상단/섹션 -->
+
         <string name="btn_logout">로그아웃</string>
         <string name="settings_title">앱 설정</string>
         <string name="settings_section">설정</string>
@@ -229,7 +234,7 @@
 
 
 
-    <!-- 설정/프로필/정보 -->
+    
     <string name="default_web_client_id">886944015637-96pcphpcqug6pga1v9aogdcg4bfr7mav.apps.googleusercontent.com</string>
 
 
@@ -237,7 +242,7 @@
 
 
 
-    <!--약관-->
+    
     <string name="terms_privacy_text">
 DreamInDream 이용약관
 
@@ -291,16 +296,17 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     </string>
 
 
-    <!-- kt 파일들 모음. -->
-    <!-- SettingsFragment.kt  -->
-    <!-- ▼ Settings 다국어용 신규 키들 ▼ -->
+    
+    
+    
 
     <string name="profile_edit_title">Edit profile</string>
     <string name="unit_times_value">%1$d 회</string>
     <string name="unit_entries_value">%1$d개</string>
     <string name="dlg_delete_title">계정 삭제</string>
     <string name="dlg_delete_need_login_msg" formatted="false">
-    계정 삭제는 Google/이메일로 로그인된 계정에서만 가능합니다.&#10;‘Google 계정 연결’을 먼저 진행해주세요.
+    계정 삭제는 Google/이메일로 로그인된 계정에서만 가능합니다.
+‘Google 계정 연결’을 먼저 진행해주세요.
 </string>
 
     <string name="dlg_delete_soft_msg">계정이 즉시 비활성화됩니다.
@@ -383,36 +389,36 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
 
 
 
-        <!-- 공통 -->
+        
         <string name="common_ok">확인</string>
         <string name="common_cancel">취소</string>
         <string name="common_delete">삭제</string>
 
-        <!-- 날짜/포맷 -->
+        
         <string name="fmt_month_year">yyyy년 M월</string>
         <string name="dream_list_title">%1$s (%2$s)의 꿈들</string>
 
-        <!-- 캘린더 삭제 다이얼로그 -->
+        
         <string name="cal_delete_title">삭제하시겠습니까?</string>
         <string name="cal_delete_message">이 꿈 기록을 삭제하면 되돌릴 수 없습니다.</string>
 
-        <!-- 차트 -->
+        
 
         <string name="chart_cd_top">최고치: %1$s %2$d%%</string>
 
-        <!-- 꿈 해몽 화면 -->
+        
         <string name="dream_result_placeholder">여기에 해몽 결과가 표시됩니다.</string>
         <string name="dream_loading">해석 중입니다…</string>
         <string name="dream_today_left">오늘 남은 횟수 : %1$d회</string>
         <string name="dream_need_input">꿈 내용을 입력해주세요.</string>
         <string name="dream_need_meaningful">의미 있는 꿈 내용을 구체적으로 입력해주세요.</string>
         <string name="dream_limit_title">오늘 기회 소진</string>
-        <string name="dream_limit_message">오늘은 해몽 가능 횟수(무료 1회 + 광고 2회)를 모두 사용했어요. 내일 다시 시도해 주세요.</string>
+        <string name="dream_limit_message">오늘은 해몽 가능 횟수(총 3회)를 모두 사용했어요. 내일 다시 시도해 주세요.</string>
         <string name="dream_network_fail">해몽 결과를 받아올 수 없습니다. 네트워크를 확인하고 다시 시도해 주세요.</string>
         <string name="dream_parse_error">결과 파싱 오류가 발생했어요.</string>
         <string name="dream_request_fail_fmt">해몽 요청 실패 (%1$s)</string>
 
-        <!-- 해몽 결과 섹션 라벨 -->
+        
         <string name="sec_message">꿈이 전하는 메시지</string>
         <string name="sec_symbols">핵심 상징 해석</string>
         <string name="sec_foresight">예지 포인트</string>
@@ -420,12 +426,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <string name="sec_actions3">오늘의 행동 3가지</string>
         <string name="dream_result_empty">해몽 결과가 비어있습니다.</string>
 
-        <!-- 광고 상태 바텀시트 -->
-        <string name="ad_preparing">광고 준비 중…</string>
-        <string name="ad_closed_try_again">광고가 닫혔어요. 다시 시도해 주세요.</string>
-        <string name="ad_load_failed_fmt">광고 로드 실패 (%1$s). 잠시 후 다시 시도해 주세요.</string>
-
-        <!-- 피드백 화면 -->
+        
         <string name="fb_title_need">제목을 입력해주세요</string>
         <string name="fb_msg_need">내용을 입력해주세요</string>
         <string name="fb_sent_title">전송 완료</string>
@@ -433,7 +434,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <string name="fb_send_fail_title">안내</string>
         <string name="fb_send_fail_fmt">전송에 실패했습니다. 잠시 후 다시 시도해주세요.\n\n%1$s</string>
 
-        <!-- Fortune / 심화 -->
+        
         <string name="fortune_overall">총운</string>
         <string name="fortune_love">연애운</string>
         <string name="fortune_study">학업운</string>
@@ -447,7 +448,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <string name="deep_chip_color">색상  %1$s</string>
         <string name="fortune_default_section_body">오늘의 흐름을 간결히 정리했어요.</string>
 
-        <!-- Fortune 에러 매핑 -->
+        
         <string name="err_auth_fmt">인증 오류가 발생했어요. 설정의 API 키를 확인해주세요. (%1$s)</string>
         <string name="err_forbidden_fmt">접근이 거부되었어요. 권한/결제 상태를 확인해주세요. (%1$s)</string>
         <string name="err_not_found_fmt">서버 주소를 찾지 못했어요. 잠시 후 다시 시도해주세요. (%1$s)</string>
@@ -455,14 +456,14 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <string name="err_timeout_fmt">네트워크가 지연되고 있어요. 연결 상태를 확인한 뒤 다시 시도해주세요. (%1$s)</string>
         <string name="err_network_fmt">네트워크 오류가 발생했어요. (%1$s)</string>
 
-        <!-- DailyMessageManager 기본 문구(백업) -->
+        
         <string name="daily_fallback_1">오늘은 마음의 속도를 잠시 늦춰 보세요.</string>
         <string name="daily_fallback_2">완벽함보다 한 걸음이 더 중요해요.</string>
         <string name="daily_fallback_3">걱정은 내려놓고 할 수 있는 일부터 시작해요.</string>
         <string name="daily_fallback_4">오늘의 선택이 내일의 나를 만듭니다.</string>
         <string name="daily_fallback_5">당신의 리듬을 믿고 천천히 가도 괜찮아요.</string>
 
-    <!-- AI REPORT.KT  -->
+    
     <string name="retry">다시 시도</string>
     <string name="please_try_again">잠시 후 다시 시도</string>
 
@@ -500,7 +501,10 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="pro_result_unparsable">심화 분석 결과를 이해하지 못했어요.</string>
     <string name="ad_closed_no_reward">광고가 닫혔어요. 보상이 확인되지 않았습니다.</string>
     <string name="ad_error_with_reason">광고 오류(%1$s) - 잠시 후 다시 시도해주세요.</string>
+    <string name="analyzing">분석중</string>
+    <string name="analyzing_ellipsis">분석중</string>
 
+    <string name="invalid_selection">2~4개를 선택해 주세요 (최대 4개)</string>
     <string name="preparing_analysis">분석 준비 중…</string>
     <string name="preparing_ad">광고 준비 중…</string>
     <string name="reward_confirmed">보상 확인됨</string>
@@ -568,43 +572,28 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="time_hours_suffix" translatable="false">시간</string>
     <string name="time_days_suffix">일</string>
 
-    <!--Chartstyler.kt -->
+    
     <string name="chart_no_data">데이터가 없습니다</string>
     <string name="chart_accessibility_top">최고치: %1$s %2$d</string>
 
 
 
-    <!-- DailyMessageManager.kt: 날짜 포맷/프롬프트 템플릿 -->
+    
     <string name="daily_date_format">yyyy년 M월 d일</string>
     <string name="daily_prompt_template">
         설명과 서사 없이, 전문 꿈해몽가의 톤으로 오늘(%1$s)의 조언을 한 문장 존댓말로만 작성해주세요.</string>
-
-
-
-    <!-- DreamFragment.kt: 입력 검증/로딩/오류 -->
-    <string name="dream_input_empty">꿈 내용을 입력해주세요.</string>
-    <string name="dream_input_not_meaningful">의미 있는 꿈 내용을 구체적으로 입력해주세요.</string>
-
-    <string name="dream_network_error">해몽 결과를 받아올 수 없습니다. 네트워크를 확인하고 다시 시도해 주세요.</string>
-
-    <string name="dream_request_failed">해몽 요청 실패 (%1$d)</string>
-
-
-    <string name="dream_quota_title">오늘 기회 소진</string>
-    <string name="dream_quota_message">오늘의 사용 한도가 모두 소진됐습니다.</string>
-
 
 
     <string name="dream_prompt_template">
     너는 예지몽을 알려주는 꿈해몽 전문분석가야.
         아래 꿈 내용을 바탕으로 현실적이고 신뢰감 있게 해석해.
     구조:
-    - <xliff:g id="msg">%2$s</xliff:g>
-    - <xliff:g id="sym">%3$s</xliff:g>
-    - <xliff:g id="pre">%4$s</xliff:g>
-    - <xliff:g id="tip">%5$s</xliff:g>
-    - <xliff:g id="act">%6$s</xliff:g>
-    [꿈 내용] "<xliff:g id="dream">%1$s</xliff:g>"
+    - <ns0:g id="msg">%2$s</ns0:g>
+    - <ns0:g id="sym">%3$s</ns0:g>
+    - <ns0:g id="pre">%4$s</ns0:g>
+    - <ns0:g id="tip">%5$s</ns0:g>
+    - <ns0:g id="act">%6$s</ns0:g>
+    [꿈 내용] "<ns0:g id="dream">%1$s</ns0:g>"
 </string>
 
     <string name="dream_section_message">💭 꿈이 전하는 메시지</string>
@@ -613,7 +602,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="dream_section_tips_today">☀️ 오늘의 활용 팁</string>
     <string name="dream_section_actions_three">🎯 오늘의 행동 3가지</string>
 
-    <!-- EmotionAnalyzer.kt: 사전(감정) -->
+    
         <string-array name="emotion_dict_positive">
             <item>기쁨</item><item>행복</item><item>감사</item><item>희망</item><item>설렘</item>
             <item>사랑</item><item>만족</item><item>즐거움</item><item>뿌듯</item><item>성취감</item>
@@ -634,7 +623,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <string-array name="emotion_dict_neutral">
              <item>보통</item><item>무난</item><item>일상</item><item>평범</item><item>중립</item>
         </string-array>
-    <!-- 증거기반 엔진: 강부정/공포 마커 -->
+    
     <string-array name="evidence_neg_strong_markers">
         <item>악몽</item><item>끔찍</item><item>무서운</item><item>공포</item><item>패닉</item><item>비명</item>
         <item>쫓기</item><item>살해</item><item>죽음</item><item>피</item><item>칼</item><item>총</item>
@@ -642,14 +631,14 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <item>폭발</item><item>화재</item>
     </string-array>
 
-    <!-- 부정 장면/상황(불안·우울 가중) -->
+    
     <string-array name="evidence_scene_negative">
         <item>쫓기</item><item>추락</item><item>익사</item><item>질식</item><item>갇힘</item><item>미로</item>
         <item>폭풍</item><item>홍수</item><item>지진</item><item>전쟁</item><item>싸움</item><item>다툼</item>
         <item>시험</item><item>마감</item><item>늦음</item><item>해고</item><item>사고</item><item>괴물</item><item>피</item>
     </string-array>
 
-    <!-- 긍정 장면/상황(긍정·평온 가중) -->
+    
     <string-array name="evidence_scene_positive">
         <item>선물</item><item>돈</item><item>환급</item><item>합격</item><item>승진</item>
         <item>포옹</item><item>웃음</item><item>여행</item><item>정리</item><item>청소</item>
@@ -667,7 +656,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
             <item>우울</item><item>슬픔</item><item>피곤</item><item>지침</item><item>무기력</item><item>권태</item><item>허무</item><item>외로움</item><item>좌절</item>
         </string-array>
 
-        <!-- EmotionAnalyzer: 사전(테마) -->
+        
         <string-array name="theme_dict_rel">
             <item>가족</item><item>부모</item><item>형제</item><item>친구</item><item>연인</item><item>동료</item><item>상사</item><item>팀</item>
             <item>모임</item><item>대화</item><item>신뢰</item><item>갈등</item><item>협력</item>
@@ -685,7 +674,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
             <item>실패</item><item>늦음</item><item>분실</item><item>추락</item><item>추격</item><item>사고</item>
         </string-array>
 
-        <!-- EmotionAnalyzer: 조사/불용어/어미 -->
+        
         <string-array name="josa_ko">
             <item>은</item><item>는</item><item>이</item><item>가</item><item>을</item><item>를</item><item>에</item><item>에서</item>
             <item>에게</item><item>께</item><item>한테</item><item>으로</item><item>로</item><item>과</item><item>와</item><item>도</item>
@@ -710,7 +699,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
             <item>같다</item><item>같이</item><item>처럼</item><item>뿐</item><item>들</item><item>들의</item><item>적</item><item>적임</item><item>성</item>
         </string-array>
 
-        <!-- EmotionAnalyzer: 내러티브 구성 텍스트 -->
+        
         <string name="ea_heading_summary">요약</string>
         <string name="ea_heading_link">상징 연결</string>
         <string name="ea_heading_emotion_theme">감정/테마</string>
@@ -720,24 +709,24 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <string name="ea_arrow_delim"> → </string>
         <string name="ea_summary_suffix">으로 이어집니다.</string>
 
-        <!-- 요약 파트 문구 -->
+        
         <string name="ea_part_clear_blockage">막혀 있던 것을 비우고 정리하는 장면</string>
         <string name="ea_part_fortune_enters">복과 재물의 상징이 생활권 안으로 들어오는 장면</string>
         <string name="ea_part_home_foundation">가정/내면 기반을 확인하는 장면</string>
         <string name="ea_part_boundary_opening">내 영역과 바깥의 경계가 열리는 장면</string>
         <string name="ea_part_default_flow">두 꿈이 ‘정리 후 유입’의 흐름을 잇는 장면</string>
 
-        <!-- 상징 연결 문구 -->
+        
         <string name="ea_link_clear_then_fortune">불필요한 것을 비운 뒤(정화) 복이 들어오니, ‘정리 후 유입’의 전형적인 서사입니다.</string>
         <string name="ea_link_fortune_with_home">복(돼지)이 집/가정과 결합해 실생활 재정·가족 이슈에 긍정 흐름을 암시합니다.</string>
         <string name="ea_link_hands_on">스스로 손을 써 해결하는 장면은 주도권 회복을 뜻합니다.</string>
         <string name="ea_link_default">두 꿈이 ‘닫힘→열림’의 전환을 만들어 내고 있습니다.</string>
 
-        <!-- 감정/테마 문구 -->
+        
         <string name="ea_emotion_theme_with">현재 정서는 ‘%1$s’ 쪽으로 기울며, 테마는 %2$s 중심으로 전개됩니다.</string>
         <string name="ea_emotion_theme_only">현재 정서는 ‘%1$s’ 성향이 도드라집니다.</string>
 
-        <!-- 전망/체크리스트/결론 -->
+        
         <string name="ea_outlook_cash_inbound">작은 수입/선물/제안이 문턱까지 들어옵니다. 생활권 가까운 곳에서 기회가 포착됩니다.</string>
         <string name="ea_outlook_small_gain">재정·물질적 이득의 신호가 약하게나마 잡힙니다. 주변의 ‘작은 호의’가 단서가 됩니다.</string>
         <string name="ea_outlook_unblock_one">막혀 있던 일 하나가 깔끔히 정리되면서 다음 단계로 넘어갑니다.</string>
@@ -749,7 +738,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
 
         <string name="ea_conclusion">‘정리 후 유입’의 서사: 비운 만큼 채워지는 주간입니다.</string>
 
-        <!-- 키워드 탐지용(본문 내 포함 여부 판단) -->
+        
         <string name="ea_kw_toilet1">화장실</string>
         <string name="ea_kw_toilet2">변기</string>
         <string name="ea_kw_poop1">똥</string>
@@ -768,59 +757,76 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="ea_trend_up"> ↑</string>
 
 
-    <!-- FeedbackActivity.kt -->
+    
     <string name="common_notice">안내</string>
     <string name="fb_date_format">yyyy-MM-dd HH:mm:ss</string>
 
-    <!-- 심화분석: 언어 라인 -->
-    <string name="week_prompt_lang_line"><xliff:g id="lang">%1$s</xliff:g>로만 답변해 주세요.</string>
+    
+    <string name="week_prompt_lang_line"><ns0:g id="lang">%1$s</ns0:g>로만 답변해 주세요.</string>
 
-    <!-- 심화분석 메타 라벨 -->
+    
     <string name="pro_meta_emotion_label">감정</string>
     <string name="pro_meta_keywords_label">키워드</string>
     <string name="pro_meta_score_label">점수</string>
     <string name="pro_meta_ai_label">AI 분석</string>
 
-    <!-- 주간 집계 프롬프트(한 줄, 특수문자 엔티티 처리) -->
+    
     <string name="week_prompt_intro">아래는 사용자의 최근 1주 꿈 기록(최대 4개, 최신순)과 각 꿈에 대한 해몽/분석 텍스트입니다.</string>
-    <!-- REPLACE THIS ITEM -->
-    <!-- 형식 문자열 아님: 안전하게 formatted="false" -->
-    <string name="week_prompt_rules" formatted="false"><![CDATA[
+
+    <string-array name="keyword_catalog_ids">
+        <item>person_people</item><item>family</item><item>friend</item><item>partner</item><item>baby</item>
+        <item>child</item><item>teacher</item><item>boss</item><item>stranger</item><item>crowd</item>
+        <item>home_house</item><item>room</item><item>school</item><item>office</item><item>bathroom_toilet</item>
+        <item>kitchen</item><item>hospital</item><item>road</item><item>bridge</item><item>forest</item>
+        <item>mountain</item><item>sea_ocean</item><item>river</item><item>beach</item><item>sky</item>
+        <item>phone</item><item>message_text</item><item>money</item><item>key</item><item>door</item>
+        <item>window</item><item>stairs</item><item>elevator</item><item>car</item><item>bus</item>
+        <item>train</item><item>airplane</item><item>ship_boat</item><item>computer</item><item>book</item>
+        <item>mirror</item><item>teeth</item><item>hair</item><item>blood</item><item>ring</item>
+        <item>shoes</item><item>dog</item><item>cat</item><item>bird</item><item>fish</item>
+        <item>snake</item><item>spider</item><item>pig</item><item>shark</item><item>whale</item>
+        <item>insect</item><item>chase</item><item>fall</item><item>flying</item><item>late</item>
+        <item>exam_test</item><item>lost</item><item>escape</item><item>fight</item><item>death</item>
+        <item>wedding</item><item>funeral</item><item>pregnancy</item><item>birth</item><item>fire</item>
+        <item>poop</item>
+    </string-array>
+
+
+
+    <string name="week_prompt_rules" formatted="false">
 역할: ‘주간 꿈 심화 전문분석가’.
-출력: 순수 HTML fragment(<p>,<ul>), 코드블록 금지.
+출력: 순수 HTML fragment(&lt;p&gt;,&lt;ul&gt;), 코드블록 금지.
 금지: 의학적/심리학적 진단, 공포·불길 예언, 과격한 단정.
 톤: 불안 완화형, 실행가능한 조언 위주
 
 섹션(순서 고정):
 - 주간 꿈 심화 분석(5~7문장. 스토리텔링식으로 꿈을 이어가면서 이번 주 꿈들의 핵심 메시지, 반복 모티프, 맥락을 종합적으로 해석)
 - 요약(3문장)
-- 수치 요약
 - 감정 패턴 해석
 - 상징·장면 해석
 - 명리 관점
 - 1~2주 전망  ← 반드시 포함. 최소 3문장.
-  • ‘안심 가이드(3가지)’를 불릿으로 포함(짧고 실행 가능)
   • “예언이 아닌 경향 기반 생활 가이드” 문장을 마지막에 덧붙일 것
 - 체크리스트 (불릿 3개. 일상에서 바로 확인/점검할 수 있는 항목(각 1문장, 동사로 시작)
-]]></string>
+</string>
 
 
-    <!--firestoremanager.kt -->
+    
 
     <string name="week_prompt_header_note">[형식 규칙] 감정/테마 라벨은 앱이 고정 제공하니, 라벨은 만들지 말고 분포 값(emotionDist/themeDist)만 채워주세요. 키워드는 핵심을 충분히 제시하세요.</string>
     <string name="tag_dream_original">[꿈 원문 %1$d]</string>
     <string name="tag_interpret_text">[해몽 텍스트 %1$d]</string>
 
 
-    <!--FortuneAPi.kt-->
-    <!-- FortuneApi: Dialog/labels -->
+    
+    
     <string name="deep_dialog_title">심화 분석</string>
     <string name="chip_lucky_time">시간  %1$s</string>
     <string name="chip_lucky_number">숫자  %1$d</string>
     <string name="chip_lucky_color">색상  %1$s</string>
     <string name="fallback_highlights">• 오늘의 흐름을 간결히 정리했어요.</string>
 
-    <!-- Sections / headers -->
+    
     <string name="section_overall">총운</string>
     <string name="section_love">연애운</string>
     <string name="section_study">학업운</string>
@@ -833,17 +839,17 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="score_points">%1$d점</string>
     <string name="section_body_fallback">오늘 흐름과 실행 팁을 확인해보세요.</string>
 
-    <!-- Default base/advice and extras -->
+    
     <string name="daily_summary_base">오늘의 흐름을 간결히 정리했어요.</string>
     <string name="bullet_with_text">• %1$s</string>
 
-    <!-- mood 문구(점수대별) -->
+    
     <string name="mood_high">상승세가 뚜렷합니다.</string>
     <string name="mood_good">흐름이 안정적입니다.</string>
     <string name="mood_fair">기복이 있으니 속도를 조절해도 좋습니다.</string>
     <string name="mood_low">기대치보다 낮아 기본을 단단히 하기 좋은 날입니다.</string>
 
-    <!-- 섹션 본문/조언(섹션×점수대) -->
+    
     <string name="sec_love_text">관계에서는 %1$s 말보다 태도가 신뢰를 만듭니다. 감정선을 과장하지 말고, 편안한 주제로 속도를 맞춰보세요.</string>
     <string name="sec_study_text">학습 집중도는 %1$s 분량을 줄여도 꾸준함을 유지하면 성과가 납니다. 핵심 키워드를 먼저 붙잡아 보세요.</string>
     <string name="sec_work_text">업무 흐름은 %1$s 목표를 하나로 좁히면 효율이 올라갑니다. 산만함을 줄이고 우선순위를 재정렬해 보세요.</string>
@@ -856,13 +862,13 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="sec_overall_advice">무리하지 말고 확실한 한 가지에 몰입해도 좋아요.</string>
     <string name="sec_lotto_tip">• 참고: 오락 범위를 넘지 않도록 상한선을 정해두면 좋아요.</string>
 
-    <!-- 기본 체크리스트(3종) -->
+    
     <string name="essential_check_1">핵심 작업 1개 완료</string>
     <string name="essential_check_2">알림·메모 3분 정리</string>
     <string name="essential_check_3">가벼운 스트레칭 5분</string>
 
-    <!-- 내일 계획 템플릿/보조 -->
-    <string name="tomorrow_plan_template"><![CDATA[
+    
+    <string name="tomorrow_plan_template">
 • 오늘 흐름을 간결히 돌아봤어요.
 
 아침(09~12)
@@ -876,15 +882,15 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
 저녁(19~22)
  - 오늘 좋았던 점 1가지, 배운 점 1줄을 남겨도 충분해요.
  - 내일 첫 10분에 착수할 작업만 선택해 두면 마음이 가벼워집니다.
-]]></string>
+</string>
     <string name="tomorrow_extra_fallback">• 내일 아침 첫 10분은 오늘의 핵심 1개만 이어가도 좋아요.</string>
 
-    <!-- 시각/시간 포맷 -->
+    
     <string name="label_am">오전</string>
     <string name="label_pm">오후</string>
     <string name="label_hour_suffix">시</string>
 
-    <!-- 에러 메시지 -->
+    
     <string name="err_auth">인증 오류가 발생했어요. 설정의 API 키를 확인해주세요. (%1$s)</string>
     <string name="err_forbidden">접근이 거부되었어요. 권한/결제 상태를 확인해주세요. (%1$s)</string>
     <string name="err_not_found">서버 주소를 찾지 못했어요. 잠시 후 다시 시도해주세요. (%1$s)</string>
@@ -892,8 +898,8 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="err_timeout">네트워크가 지연되고 있어요. 연결 상태를 확인한 뒤 다시 시도해주세요. (%1$s)</string>
     <string name="err_network_generic">네트워크 오류가 발생했어요. (%1$s)</string>
 
-eep prompt 템플릿 -->
-    <string name="fortune_deep_prompt_template"><![CDATA[
+eep prompt 템플릿 --&gt;
+    <string name="fortune_deep_prompt_template">
 [컨텍스트]
 - 사용자: nickname="%1$s", mbti="%2$s", birthdate="%3$s", gender="%4$s", birth_time="%5$s"
 - 날짜: %6$s, tone="%7$s", seed=%8$s
@@ -914,13 +920,13 @@ eep prompt 템플릿 -->
 - tomorrowPrep: 최저점 영역(worstKey) 보완 중심의 한 문단(제안 톤).
 
 반드시 deep_fortune_analysis를 호출하세요.
-]]></string>
+</string>
 
-    <!-- FortuneApi: system prompts (모델용 가이드) -->
+    
     <string name="fortune_system_daily">당신은 프리미엄 라이프 코치이자 운세 분석가입니다. 항상 function 호출만으로 JSON을 반환하세요.</string>
     <string name="fortune_system_deep">당신은 프리미엄 라이프 코치이자 운세 분석가입니다. 도구 호출로 JSON만 반환하세요.</string>
 
-    <!-- FortuneApi: 정규화/치환에 쓰이는 출력 어휘 (i18n 대응) -->
+    
     <string name="replace_meeting">상담/정리</string>
     <string name="replace_email">알림/메모</string>
     <string name="replace_report">노트 정리</string>
@@ -928,14 +934,59 @@ eep prompt 템플릿 -->
     <string name="replace_messenger">연락</string>
     <string name="contact_sanitized">알림 1건 정리</string>
 
-    <!-- 색상명 미상 fallback -->
+    
     <string name="color_name_fallback">행운색</string>
 
-    <!-- 범용 조언 fallback -->
+    
     <string name="default_generic_advice">체크리스트 1개를 가볍게 시도해보세요.</string>
 
-    <!-- FortuneFragment.kt -->
-    <string name="btn_fortune_show">❓</string>
+
+
+    
+
+    <string name="sub_title">DreamInDream Premium</string>
+    <string name="sub_subtitle">광고 없이, 더 빠르게</string>
+    <string name="sub_badge_active">ACTIVE</string>
+
+    <string name="sub_benefit_1">✅ AI 리포트·온세 심화분석 전면 무광고</string>
+    <string name="sub_benefit_2">🌙 꿈 해몽: 광고 없이 1일 3회 바로 해석</string>
+    <string name="sub_benefit_3">🔒 계정 연동 시 모든 기기에서 혜택 유지</string>
+    <string name="sub_benefit_4">🛠️ 설정 &gt; 프리미엄에서 언제든지 관리</string>
+
+    <string name="sub_label_plan">플랜 선택</string>
+    <string name="sub_chip_monthly">월 구독</string>
+    <string name="sub_chip_yearly">연 구독</string>
+
+    
+    <string name="sub_price_monthly_amount">₩4,000</string>
+    <string name="sub_price_yearly_amount">₩40,000</string>
+
+    <string name="sub_btn_later">나중에</string>
+    <string name="sub_btn_start">프리미엄 시작</string>
+    <string name="sub_btn_restore">구매 복원</string>
+    <string name="sub_toast_restore_ok">이전 구매가 복원되었습니다.</string>
+    <string name="sub_toast_restore_none">복원 가능한 구매가 없습니다.</string>
+
+    
+    e<string name="signin_required">로그인이 필요합니다.</string>
+
+    <string name="billing_err_connect">결제 서비스를 초기화하는 중입니다. 잠시 후 다시 시도하세요.</string>
+    <string name="billing_err_product_info">상품 정보를 불러올 수 없습니다. 잠시 후 다시 시도하세요.</string>
+    <string name="billing_err_offer_missing">이 요금제는 현재 이용할 수 없습니다.</string>
+    <string name="billing_err_plan_inactive">선택한 요금제가 비활성 상태입니다.</string>
+
+    <string name="sub_price_format">%1$s / %2$s</string>
+    <string name="sub_unit_month">월</string>
+    <string name="sub_unit_year">년</string>
+    <string name="sub_price_monthly">₩4,000 / 월</string>
+    <string name="sub_price_yearly">₩40,000 / 년</string>
+
+
+
+
+
+    
+    <string name="btn_fortune_show">❔</string>
     <string name="btn_come_tomorrow">내일 다시</string>
     <string name="toast_already_seen_today">오늘은 이미 확인했어요. 내일 다시 이용해주세요.</string>
     <string name="toast_run_fortune_first">먼저 "행운 보기"를 실행해주세요.</string>
@@ -948,9 +999,9 @@ eep prompt 템플릿 -->
     <string name="deep_generating_label">생성 중…</string>
     <string name="deep_button_label">심화 분석 보기</string>
 
-    <!-- 섹션 카드 타이틀 재사용(위 섹션 라벨 사용) -->
+    
 
-    <!-- Trait titles (칩 골드 적용용) -->
+    
     <string-array name="trait_titles">
         <item>창의성</item>
         <item>소통</item>
@@ -958,23 +1009,23 @@ eep prompt 템플릿 -->
         <item>결단력</item>
     </string-array>
 
-    <!-- FortuneStorage.kt -->
+    
     <string name="birth_time_not_selected">선택안함</string>
     <string name="guest_prefix">guest-</string>
     <string name="device_fallback">device</string>
 
-    <!-- HomeFragment.kt -->
-    <!-- HomeFragment: 안내 토스트 -->
+    
+    
     <string name="toast_need_two_dreams">이번 주 꿈을 2개 이상 기록하면 AI 리포트를 볼 수 있어요.</string>
 
 
-    <!-- LoginActivity.kt -->
+    
     <string name="toast_fill_email_password">이메일/비밀번호를 입력하세요.</string>
     <string name="toast_fill_all_fields">모든 항목을 입력하세요.</string>
     <string name="toast_password_mismatch">비밀번호가 일치하지 않습니다.</string>
     <string name="toast_enter_email">이메일을 입력하세요.</string>
 
-    <!-- LoginActivity: 로그인/회원가입/비번찾기 -->
+    
     <string name="toast_login_failed_fmt">로그인 실패: %1$s</string>
     <string name="toast_email_verify_first">이메일 인증 후 로그인하세요.</string>
     <string name="toast_signup_success">회원가입 성공! 인증 메일이 발송되었습니다. 메일을 확인하고 로그인하세요.</string>
@@ -982,12 +1033,12 @@ eep prompt 템플릿 -->
     <string name="toast_reset_sent">비밀번호 재설정 메일을 보냈습니다.</string>
     <string name="toast_reset_failed_fmt">메일 발송 실패: %1$s</string>
 
-    <!-- LoginActivity: 구글/익명 -->
+    
     <string name="toast_google_login_failed_fmt">구글 로그인 실패: %1$s</string>
     <string name="toast_google_login_error_fmt">구글 로그인 오류: %1$s</string>
     <string name="toast_anonymous_failed_fmt">비로그인 실패: %1$s</string>
 
-    <!-- LoginActivity: 비활성화 계정 복구 다이얼로그 -->
+    
     <string name="dialog_reactivate_title">계정 복구</string>
     <string name="dialog_reactivate_message">이 계정은 비활성화된 상태입니다.\n복구하시겠습니까?</string>
     <string name="dialog_reactivate_positive">복구</string>
@@ -995,18 +1046,18 @@ eep prompt 템플릿 -->
     <string name="toast_reactivate_failed_fmt">복구 실패: %1$s</string>
     <string name="toast_account_deleted">계정이 영구 삭제되었습니다.</string>
 
-    <!-- LoginActivity: 로딩 문구 -->
+    
     <string name="loading_calendar_prep">달력 데이터를 준비중입니다.\n잠시만 기다려주세요.</string>
 
-    <!-- LoginActivity: 기본 이름 -->
+    
     <string name="name_guest_default">익명 사용자</string>
     <string name="name_anonymous_default">익명</string>
 
 
 
-    <!-- TermActivity -->
+    
 
-    <!-- TermsActivity 약관 -->
+    
     <string name="terms_title">DreamInDream 이용약관</string>
     <string name="terms_section1">1. 목적</string>
     <string name="terms_section1_body">본 약관은 DreamInDream(이하 “서비스”) 이용과 관련하여 사용자와 운영자 사이의 권리·의무를 규정합니다.</string>
@@ -1040,7 +1091,7 @@ eep prompt 템플릿 -->
     <string name="terms_section7">7. 약관 변경</string>
     <string name="terms_section7_body">중요 변경 시 앱 내 고지합니다.</string>
 
-    <!-- 개인정보 처리방침 -->
+    
     <string name="privacy_title">개인정보 처리방침</string>
     <string name="privacy_intro">콘텐츠 등급은 전체이용가이나, 13세 미만 아동의 개인정보가 수집된 사실이 확인되면 즉시 삭제합니다.</string>
 
@@ -1073,7 +1124,7 @@ eep prompt 템플릿 -->
         <item>HTTPS 통신, 접근권한 최소화, 접근기록 관리 등</item>
     </string-array>
 
-    <!--WeeklyHistoryBottomSheeet.kt -->
+    
 
     <string name="weekly_history_title">분석 기록</string>
     <string name="weekly_history_login_needed">로그인 필요</string>
@@ -1097,7 +1148,7 @@ eep prompt 템플릿 -->
     <string name="chevron_right">›</string>
     <string name="weekly_history_item_subtitle">%1$s · %2$s</string>
 
-    <!-- WeeklyHistoryBottomSheet -->
+    
     <string name="bs_title_history">분석 기록</string>
     <string name="bs_meta_login_required">로그인 필요</string>
     <string name="bs_login_required_msg">로그인이 필요합니다.</string>
@@ -1108,7 +1159,7 @@ eep prompt 템플릿 -->
 
     <string name="chip_current">현재</string>
 
-    <!-- WeeklyHistoryDialogFragment -->
+    
     <string name="whd_title">분석 안내</string>
     <string name="whd_generation_rule">리포트 생성 기준: 이번 주 꿈이 2개 이상이면 즉시 AI 리포트를 생성합니다. (주간 기준: 월~일)</string>
     <string name="whd_hero_title">아직 생성된 리포트가 없어요</string>
@@ -1120,9 +1171,15 @@ eep prompt 템플릿 -->
     <string name="whd_cta_go_record">꿈 기록하러 가기</string>
 
 
+        <!-- ⚠ 호환용(Deprecated): FortuneFragment가 참조하는 구 키들 복원 -->
+    <string name="ad_preparing">광고 준비 중…</string>
+    <string name="ad_closed_try_again">광고가 닫혔어요. 보상이 확인되지 않았습니다.</string>
+    <string name="ad_load_failed_fmt">광고 오류(%1$s) - 잠시 후 다시 시도해주세요.</string>
 
 
-    <!-- Language onboarding (default/ko) -->
+    <string name="dream_input_min15">15자 이상으로 자세히 적어주세요.</string>
+
+    
     <string name="choose_language">언어를 선택하세요</string>
     <string name="language_korean">한국어</string>
     <string name="language_english">English</string>
@@ -1130,5 +1187,12 @@ eep prompt 템플릿 -->
     <string name="language">언어</string>
     <string name="language_changed">언어가 업데이트되었습니다.</string>
     <string name="recommended">추천</string>
+
+    <!--Advertisement -->
+    <string name="ad_unit_ai_banner">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_unit_calendar_banner">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_unit_dream_banner">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_unit_fortune_banner">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_unit_settings_banner">ca-app-pub-3940256099942544/6300978111</string>
 
 </resources>

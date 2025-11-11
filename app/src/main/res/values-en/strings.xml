@@ -734,6 +734,9 @@ Please wait.</string>
     <string-array name="privacy_section6_items">
         <item>HTTPS, least-privilege access, access logs</item>
     </string-array>
+    <string name="press_back_again_to_exit">Press back again to exit.</string>
+    <string name="label_emotion">Emotion</string>
+    <string name="label_keywords">Keywords</string>
 
     <!-- WeeklyHistoryBottomSheet.kt -->
 <string name="weekly_history_title">Analysis history</string>

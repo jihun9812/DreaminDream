@@ -6,22 +6,25 @@ import androidx.core.os.LocaleListCompat
 
 object LocaleKit {
 
-    /** "한국어" / "English" 라벨 → BCP47 언어 태그 */
-    fun toLangTag(label: String): String = when (label) {
+    /** 라벨 → BCP47 태그 매핑(방어적으로 다국어 표기 허용) */
+    fun toLangTag(label: String): String = when (label.trim()) {
+        "한국어", "Korean" -> "ko"
         "English" -> "en"
-        else -> "ko"
+        "हिन्दी", "हिंदी", "Hindi" -> "hi"
+        "العربية", "Arabic" -> "ar"
+        "中文", "简体中文", "繁體中文", "Chinese" -> "zh"
+        else -> "en"
     }
 
     /** 언어 태그 직접 적용 */
     fun apply(langTag: String) {
-        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(langTag))
+        AppCompatDelegate.setApplicationLocales(
+            if (langTag == "system") LocaleListCompat.getEmptyLocaleList()
+            else LocaleListCompat.forLanguageTags(langTag)
+        )
     }
 
-    /**
-     * 가벼운 페이드 아웃 모션 후 언어 적용 → 액티비티 재생성
-     * @param surface 모션을 줄 뷰(예: settings의 패널 박스)
-     * @param label   스피너 라벨(한국어/English)
-     * */
+    /** 페이드아웃 후 적용(옵션) */
     fun applyWithMotion(surface: View, label: String, onEnd: (() -> Unit)? = null) {
         val tag = toLangTag(label)
         surface.animate()
@@ -29,7 +32,6 @@ object LocaleKit {
             .setDuration(180L)
             .withEndAction {
                 apply(tag)
-                // recreate를 호출하면 새 locale로 UI가 다시 그려짐
                 surface.post {
                     surface.alpha = 1f
                     (surface.context as? androidx.fragment.app.FragmentActivity)?.recreate()

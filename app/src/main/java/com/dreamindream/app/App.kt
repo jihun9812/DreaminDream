@@ -16,19 +16,32 @@ class App : Application() {
         // 1) 최신 키(태그) 우선
         var tag = sp.getString("app_lang_tag", null)
 
-        // 2) 레거시 라벨("English"/"한국어")만 있다면 태그로 승격
+        // 2) 레거시 라벨 승격
         if (tag.isNullOrBlank()) {
             val legacyLabel = sp.getString("app_lang", null)
             if (!legacyLabel.isNullOrBlank()) {
-                tag = if (legacyLabel == "English") "en" else "ko"
-                sp.edit().putString("app_lang_tag", tag).apply()
+                tag = when (legacyLabel) {
+                    "English" -> "en"
+                    "한국어" -> "ko"
+                    "हिन्दी", "हिंदी" -> "hi"
+                    "العربية" -> "ar"
+                    "中文" -> "zh"
+                    else -> null
+                }
+                if (tag != null) sp.edit().putString("app_lang_tag", tag).apply()
             }
         }
 
-        // 3) 그래도 없으면 시스템 언어 기준 기본값(ko 우선)
+        // 3) 없으면 시스템 언어 추론
         if (tag.isNullOrBlank()) {
-            val sys = resources.configuration.locales[0].language
-            tag = if (sys.startsWith("ko")) "ko" else "en"
+            val sys = resources.configuration.locales[0].language // e.g., ko, en, hi, ar, zh
+            tag = when {
+                sys.startsWith("ko") -> "ko"
+                sys.startsWith("hi") -> "hi"
+                sys.startsWith("ar") -> "ar"
+                sys.startsWith("zh") -> "zh"
+                else -> "en"
+            }
             sp.edit().putString("app_lang_tag", tag).apply()
         }
 
@@ -40,9 +53,6 @@ class App : Application() {
         }
         AppCompatDelegate.setApplicationLocales(locales)
 
-        // ✅ 프리미엄 상태 초기화
         SubscriptionManager.init(this)
-
-        // ✅ (삭제됨) HolidayTranslator.ensureModel 등 holiday 선로딩 전부 제거
     }
 }

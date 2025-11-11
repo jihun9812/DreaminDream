@@ -26,6 +26,7 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
+import android.view.MotionEvent
 
 class HomeFragment : Fragment() {
 
@@ -48,6 +49,32 @@ class HomeFragment : Fragment() {
 
     // ---------- Edge-to-Edge: 시스템바 패딩(상/하) 적용 ----------
     private data class InitialPadding(val left: Int, val top: Int, val right: Int, val bottom: Int)
+
+    /** 설정 아이콘: 효과 + 네비게이션 (축소→복원) */
+    private fun ImageButton.effectsAndNavigate(onClick: () -> Unit) {
+        setOnTouchListener { v, e ->
+            when (e.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    v.animate().scaleX(1.4f).scaleY(1.4f).setDuration(80).start()
+                    true
+                }
+                MotionEvent.ACTION_UP -> {
+                    v.animate().scaleX(1f).scaleY(1f).setDuration(120).start()
+                    // 손 뗀 좌표가 버튼 내부면 클릭 처리
+                    if (e.x in 0f..v.width.toFloat() && e.y in 0f..v.height.toFloat()) {
+                        v.performClick()
+                    }
+                    true
+                }
+                MotionEvent.ACTION_CANCEL -> {
+                    v.animate().scaleX(1f).scaleY(1f).setDuration(120).start()
+                    true
+                }
+                else -> false
+            }
+        }
+        setOnClickListener { onClick() }
+    }
 
     private fun View.recordInitialPadding() =
         InitialPadding(paddingLeft, paddingTop, paddingRight, paddingBottom)
@@ -105,10 +132,14 @@ class HomeFragment : Fragment() {
             ?.joinToString(", ")
             .orEmpty()
 
+        val emoLabel = getString(R.string.label_emotion)
+        val kwLabel  = getString(R.string.label_keywords)
+
         return when {
-            emo.isNotEmpty() && kw.isNotEmpty() -> "감정: $emo • 키워드: $kw"
-            emo.isNotEmpty() -> "감정: $emo"
-            kw.isNotEmpty() -> "키워드: $kw"
+            emo.isNotEmpty() && kw.isNotEmpty() ->
+                "$emoLabel: $emo • $kwLabel: $kw"
+            emo.isNotEmpty() -> "$emoLabel: $emo"
+            kw.isNotEmpty() -> "$kwLabel: $kw"
             else -> getString(R.string.home_ai_sub)
         }
     }
@@ -240,7 +271,11 @@ class HomeFragment : Fragment() {
         v.findViewById<Button>(R.id.btn_dream).applyScaleClick { navigateTo(DreamFragment()) }
         v.findViewById<Button>(R.id.btn_calendar).applyScaleClick { navigateTo(CalendarFragment()) }
         v.findViewById<Button>(R.id.btn_fortune).applyScaleClick { navigateTo(FortuneFragment()) }
-        v.findViewById<ImageButton>(R.id.btn_settings).applyScaleClick { navigateTo(SettingsFragment()) }
+
+        // 설정 아이콘: 축소 효과 + 설정 화면 이동
+        v.findViewById<ImageButton>(R.id.btn_settings)?.effectsAndNavigate {
+            navigateTo(SettingsFragment())
+        }
 
         v.applySystemBarsPadding(top = true, bottom = true)
         return v

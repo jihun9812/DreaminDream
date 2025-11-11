@@ -21,12 +21,12 @@
     <string name="send_reset_email">재설정 메일 보내기</string>
     <string name="text_divider"> / </string>
     <string name="login_email_hint">이메일</string>
-    <string name="login_password_hint" translatable="false">비밀번호</string>
-    <string name="login_btn_login" translatable="false">로그인</string>
-    <string name="login_btn_signup" translatable="false">회원가입</string>
-    <string name="login_btn_google" translatable="false">구글 로그인</string>
-    <string name="login_btn_guest" translatable="false">체험</string>
-    <string name="privacy_and_version" translatable="false">v1.07 Dream in Dream | 개인정보처리방침</string>
+    <string name="login_password_hint" >비밀번호</string>
+    <string name="login_btn_login" >로그인</string>
+    <string name="login_btn_signup">회원가입</string>
+    <string name="login_btn_google" >구글 로그인</string>
+    <string name="login_btn_guest">체험</string>
+    <string name="privacy_and_version" >v1.07 Dream in Dream | 개인정보처리방침</string>
     <string name="brand_logo_desc">Dream in Dream </string>
 
     
@@ -199,10 +199,12 @@
     <string name="ai_msg_loading">✨ 오늘의 해몽 메시지를 불러오는 중이에요...</string>
     <string name="ai_emotion_keywords_simple">감정: %1$s\n키워드: %2$s</string>
 
-    
+    <string name="label_emotion">감정</string>
+    <string name="label_keywords">키워드</string>
 
 
-        <string name="btn_cancel">취소</string>
+
+    <string name="btn_cancel">취소</string>
         <string name="btn_save">저장</string>
 
 
@@ -295,10 +297,6 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
 문의: support@dreamindream.app
     </string>
 
-
-    
-    
-    
 
     <string name="profile_edit_title">Edit profile</string>
     <string name="unit_times_value">%1$d 회</string>
@@ -401,12 +399,11 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         
         <string name="cal_delete_title">삭제하시겠습니까?</string>
         <string name="cal_delete_message">이 꿈 기록을 삭제하면 되돌릴 수 없습니다.</string>
-
-        
-
         <string name="chart_cd_top">최고치: %1$s %2$d%%</string>
 
-        
+
+
+
         <string name="dream_result_placeholder">여기에 해몽 결과가 표시됩니다.</string>
         <string name="dream_loading">해석 중입니다…</string>
         <string name="dream_today_left">오늘 남은 횟수 : %1$d회</string>
@@ -418,7 +415,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <string name="dream_parse_error">결과 파싱 오류가 발생했어요.</string>
         <string name="dream_request_fail_fmt">해몽 요청 실패 (%1$s)</string>
 
-        
+
         <string name="sec_message">꿈이 전하는 메시지</string>
         <string name="sec_symbols">핵심 상징 해석</string>
         <string name="sec_foresight">예지 포인트</string>
@@ -426,7 +423,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <string name="sec_actions3">오늘의 행동 3가지</string>
         <string name="dream_result_empty">해몽 결과가 비어있습니다.</string>
 
-        
+
         <string name="fb_title_need">제목을 입력해주세요</string>
         <string name="fb_msg_need">내용을 입력해주세요</string>
         <string name="fb_sent_title">전송 완료</string>
@@ -434,7 +431,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <string name="fb_send_fail_title">안내</string>
         <string name="fb_send_fail_fmt">전송에 실패했습니다. 잠시 후 다시 시도해주세요.\n\n%1$s</string>
 
-        
+
         <string name="fortune_overall">총운</string>
         <string name="fortune_love">연애운</string>
         <string name="fortune_study">학업운</string>
@@ -448,7 +445,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <string name="deep_chip_color">색상  %1$s</string>
         <string name="fortune_default_section_body">오늘의 흐름을 간결히 정리했어요.</string>
 
-        
+
         <string name="err_auth_fmt">인증 오류가 발생했어요. 설정의 API 키를 확인해주세요. (%1$s)</string>
         <string name="err_forbidden_fmt">접근이 거부되었어요. 권한/결제 상태를 확인해주세요. (%1$s)</string>
         <string name="err_not_found_fmt">서버 주소를 찾지 못했어요. 잠시 후 다시 시도해주세요. (%1$s)</string>
@@ -456,14 +453,14 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <string name="err_timeout_fmt">네트워크가 지연되고 있어요. 연결 상태를 확인한 뒤 다시 시도해주세요. (%1$s)</string>
         <string name="err_network_fmt">네트워크 오류가 발생했어요. (%1$s)</string>
 
-        
+
         <string name="daily_fallback_1">오늘은 마음의 속도를 잠시 늦춰 보세요.</string>
         <string name="daily_fallback_2">완벽함보다 한 걸음이 더 중요해요.</string>
         <string name="daily_fallback_3">걱정은 내려놓고 할 수 있는 일부터 시작해요.</string>
         <string name="daily_fallback_4">오늘의 선택이 내일의 나를 만듭니다.</string>
         <string name="daily_fallback_5">당신의 리듬을 믿고 천천히 가도 괜찮아요.</string>
 
-    
+
     <string name="retry">다시 시도</string>
     <string name="please_try_again">잠시 후 다시 시도</string>
 
@@ -540,6 +537,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="emo_depression">우울</string>
     <string name="emo_fatigue">피로</string>
 
+
     <string-array name="emo_labels_default">
         <item>@string/emo_positive</item>
         <item>@string/emo_calm</item>
@@ -568,20 +566,22 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
 
     <string name="time_seconds_suffix">초</string>
 
-    <string name="time_minutes_suffix" translatable="false">분</string>
-    <string name="time_hours_suffix" translatable="false">시간</string>
+    <string name="time_minutes_suffix" >분</string>
+    <string name="time_hours_suffix" >시간</string>
     <string name="time_days_suffix">일</string>
 
-    
+
     <string name="chart_no_data">데이터가 없습니다</string>
     <string name="chart_accessibility_top">최고치: %1$s %2$d</string>
 
 
 
-    
+
     <string name="daily_date_format">yyyy년 M월 d일</string>
     <string name="daily_prompt_template">
         설명과 서사 없이, 전문 꿈해몽가의 톤으로 오늘(%1$s)의 조언을 한 문장 존댓말로만 작성해주세요.</string>
+
+
 
 
     <string name="dream_prompt_template">
@@ -602,7 +602,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="dream_section_tips_today">☀️ 오늘의 활용 팁</string>
     <string name="dream_section_actions_three">🎯 오늘의 행동 3가지</string>
 
-    
+
         <string-array name="emotion_dict_positive">
             <item>기쁨</item><item>행복</item><item>감사</item><item>희망</item><item>설렘</item>
             <item>사랑</item><item>만족</item><item>즐거움</item><item>뿌듯</item><item>성취감</item>
@@ -623,7 +623,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <string-array name="emotion_dict_neutral">
              <item>보통</item><item>무난</item><item>일상</item><item>평범</item><item>중립</item>
         </string-array>
-    
+
     <string-array name="evidence_neg_strong_markers">
         <item>악몽</item><item>끔찍</item><item>무서운</item><item>공포</item><item>패닉</item><item>비명</item>
         <item>쫓기</item><item>살해</item><item>죽음</item><item>피</item><item>칼</item><item>총</item>
@@ -631,14 +631,14 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <item>폭발</item><item>화재</item>
     </string-array>
 
-    
+
     <string-array name="evidence_scene_negative">
         <item>쫓기</item><item>추락</item><item>익사</item><item>질식</item><item>갇힘</item><item>미로</item>
         <item>폭풍</item><item>홍수</item><item>지진</item><item>전쟁</item><item>싸움</item><item>다툼</item>
         <item>시험</item><item>마감</item><item>늦음</item><item>해고</item><item>사고</item><item>괴물</item><item>피</item>
     </string-array>
 
-    
+
     <string-array name="evidence_scene_positive">
         <item>선물</item><item>돈</item><item>환급</item><item>합격</item><item>승진</item>
         <item>포옹</item><item>웃음</item><item>여행</item><item>정리</item><item>청소</item>
@@ -656,7 +656,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
             <item>우울</item><item>슬픔</item><item>피곤</item><item>지침</item><item>무기력</item><item>권태</item><item>허무</item><item>외로움</item><item>좌절</item>
         </string-array>
 
-        
+
         <string-array name="theme_dict_rel">
             <item>가족</item><item>부모</item><item>형제</item><item>친구</item><item>연인</item><item>동료</item><item>상사</item><item>팀</item>
             <item>모임</item><item>대화</item><item>신뢰</item><item>갈등</item><item>협력</item>
@@ -674,7 +674,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
             <item>실패</item><item>늦음</item><item>분실</item><item>추락</item><item>추격</item><item>사고</item>
         </string-array>
 
-        
+
         <string-array name="josa_ko">
             <item>은</item><item>는</item><item>이</item><item>가</item><item>을</item><item>를</item><item>에</item><item>에서</item>
             <item>에게</item><item>께</item><item>한테</item><item>으로</item><item>로</item><item>과</item><item>와</item><item>도</item>
@@ -699,7 +699,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
             <item>같다</item><item>같이</item><item>처럼</item><item>뿐</item><item>들</item><item>들의</item><item>적</item><item>적임</item><item>성</item>
         </string-array>
 
-        
+
         <string name="ea_heading_summary">요약</string>
         <string name="ea_heading_link">상징 연결</string>
         <string name="ea_heading_emotion_theme">감정/테마</string>
@@ -709,24 +709,24 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <string name="ea_arrow_delim"> → </string>
         <string name="ea_summary_suffix">으로 이어집니다.</string>
 
-        
+
         <string name="ea_part_clear_blockage">막혀 있던 것을 비우고 정리하는 장면</string>
         <string name="ea_part_fortune_enters">복과 재물의 상징이 생활권 안으로 들어오는 장면</string>
         <string name="ea_part_home_foundation">가정/내면 기반을 확인하는 장면</string>
         <string name="ea_part_boundary_opening">내 영역과 바깥의 경계가 열리는 장면</string>
         <string name="ea_part_default_flow">두 꿈이 ‘정리 후 유입’의 흐름을 잇는 장면</string>
 
-        
+
         <string name="ea_link_clear_then_fortune">불필요한 것을 비운 뒤(정화) 복이 들어오니, ‘정리 후 유입’의 전형적인 서사입니다.</string>
         <string name="ea_link_fortune_with_home">복(돼지)이 집/가정과 결합해 실생활 재정·가족 이슈에 긍정 흐름을 암시합니다.</string>
         <string name="ea_link_hands_on">스스로 손을 써 해결하는 장면은 주도권 회복을 뜻합니다.</string>
         <string name="ea_link_default">두 꿈이 ‘닫힘→열림’의 전환을 만들어 내고 있습니다.</string>
 
-        
+
         <string name="ea_emotion_theme_with">현재 정서는 ‘%1$s’ 쪽으로 기울며, 테마는 %2$s 중심으로 전개됩니다.</string>
         <string name="ea_emotion_theme_only">현재 정서는 ‘%1$s’ 성향이 도드라집니다.</string>
 
-        
+
         <string name="ea_outlook_cash_inbound">작은 수입/선물/제안이 문턱까지 들어옵니다. 생활권 가까운 곳에서 기회가 포착됩니다.</string>
         <string name="ea_outlook_small_gain">재정·물질적 이득의 신호가 약하게나마 잡힙니다. 주변의 ‘작은 호의’가 단서가 됩니다.</string>
         <string name="ea_outlook_unblock_one">막혀 있던 일 하나가 깔끔히 정리되면서 다음 단계로 넘어갑니다.</string>
@@ -738,7 +738,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
 
         <string name="ea_conclusion">‘정리 후 유입’의 서사: 비운 만큼 채워지는 주간입니다.</string>
 
-        
+
         <string name="ea_kw_toilet1">화장실</string>
         <string name="ea_kw_toilet2">변기</string>
         <string name="ea_kw_poop1">똥</string>
@@ -757,20 +757,20 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="ea_trend_up"> ↑</string>
 
 
-    
+
     <string name="common_notice">안내</string>
     <string name="fb_date_format">yyyy-MM-dd HH:mm:ss</string>
 
-    
+
     <string name="week_prompt_lang_line"><ns0:g id="lang">%1$s</ns0:g>로만 답변해 주세요.</string>
 
-    
+
     <string name="pro_meta_emotion_label">감정</string>
     <string name="pro_meta_keywords_label">키워드</string>
     <string name="pro_meta_score_label">점수</string>
     <string name="pro_meta_ai_label">AI 분석</string>
 
-    
+
     <string name="week_prompt_intro">아래는 사용자의 최근 1주 꿈 기록(최대 4개, 최신순)과 각 꿈에 대한 해몽/분석 텍스트입니다.</string>
 
     <string-array name="keyword_catalog_ids">
@@ -811,22 +811,22 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
 </string>
 
 
-    
+
 
     <string name="week_prompt_header_note">[형식 규칙] 감정/테마 라벨은 앱이 고정 제공하니, 라벨은 만들지 말고 분포 값(emotionDist/themeDist)만 채워주세요. 키워드는 핵심을 충분히 제시하세요.</string>
     <string name="tag_dream_original">[꿈 원문 %1$d]</string>
     <string name="tag_interpret_text">[해몽 텍스트 %1$d]</string>
 
 
-    
-    
+
+
     <string name="deep_dialog_title">심화 분석</string>
     <string name="chip_lucky_time">시간  %1$s</string>
     <string name="chip_lucky_number">숫자  %1$d</string>
     <string name="chip_lucky_color">색상  %1$s</string>
     <string name="fallback_highlights">• 오늘의 흐름을 간결히 정리했어요.</string>
 
-    
+
     <string name="section_overall">총운</string>
     <string name="section_love">연애운</string>
     <string name="section_study">학업운</string>
@@ -839,7 +839,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="score_points">%1$d점</string>
     <string name="section_body_fallback">오늘 흐름과 실행 팁을 확인해보세요.</string>
 
-    
+
     <string name="daily_summary_base">오늘의 흐름을 간결히 정리했어요.</string>
     <string name="bullet_with_text">• %1$s</string>
 
@@ -1159,7 +1159,8 @@ eep prompt 템플릿 --&gt;
 
     <string name="chip_current">현재</string>
 
-    
+    <string name="press_back_again_to_exit">한 번 더 누르면 앱이 종료됩니다.</string>
+
     <string name="whd_title">분석 안내</string>
     <string name="whd_generation_rule">리포트 생성 기준: 이번 주 꿈이 2개 이상이면 즉시 AI 리포트를 생성합니다. (주간 기준: 월~일)</string>
     <string name="whd_hero_title">아직 생성된 리포트가 없어요</string>

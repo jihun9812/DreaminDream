@@ -2,7 +2,8 @@ package com.dreamindream.app
 
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
+import android.graphics.LinearGradient
+import android.graphics.Shader
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.Gravity
@@ -13,17 +14,14 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.widget.ListPopupWindow
 import androidx.core.view.isVisible
 import com.google.android.gms.auth.api.signin.*
 import com.google.android.gms.common.api.ApiException
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
+import android.view.MotionEvent
 import com.google.firebase.auth.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import android.graphics.LinearGradient
-import android.graphics.Shader
-import android.widget.TextView
 import android.text.Editable
 import android.text.TextWatcher
 
@@ -33,10 +31,8 @@ class LoginActivity : BaseActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var loginCardContent: FrameLayout
 
-    // 앱 전역 설정(언어 등)
     private val appPrefs by lazy { getSharedPreferences("app", MODE_PRIVATE) }
 
-    // 로그인 화면에서 “두 번 눌러 종료”
     private var lastBackPressedAt = 0L
     private val BACK_INTERVAL_MS = 1500L
 
@@ -45,17 +41,12 @@ class LoginActivity : BaseActivity() {
         setContentView(R.layout.activity_login)
         auth = FirebaseAuth.getInstance()
 
-        // 🔹 로그인 타이틀 텍스트 그라디언트 (F9B84A → 7B61FF)
+        // 타이틀 그라디언트
         findViewById<TextView>(R.id.login_title)?.let { tv ->
-            // 측정 끝난 뒤 1회 적용
             tv.post { applyGradientTitle(tv) }
-            // 크기/레이아웃 변동 시 재적용 (언어 바꿈, 회전 등)
             tv.addOnLayoutChangeListener { _, l, t, r, b, ol, ot, or_, ob ->
-                val w = r - l; val h = b - t
-                val ow = or_ - ol; val oh = ob - ot
-                if (w != ow || h != oh) applyGradientTitle(tv)
+                if ((r - l) != (or_ - ol) || (b - t) != (ob - ot)) applyGradientTitle(tv)
             }
-            // 텍스트 바뀌면 재적용 (setText() 등)
             tv.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -73,10 +64,9 @@ class LoginActivity : BaseActivity() {
         skipLoginButton.applyPressEffect {
             auth.signInAnonymously()
                 .addOnSuccessListener {
-                    // 홈 페이드인 예약
                     markPendingHomeFade()
                     saveUserInfoToFirestore()
-                    navigateToMain() // ✅ holiday 준비 없이 바로 메인
+                    navigateToMain()
                 }
                 .addOnFailureListener {
                     Toast.makeText(
@@ -151,7 +141,7 @@ class LoginActivity : BaseActivity() {
                         val uid = auth.currentUser?.uid ?: return@addOnSuccessListener
                         checkReactivation(uid) {
                             markPendingHomeFade()
-                            navigateToMain() // ✅ holiday 제거
+                            navigateToMain()
                         }
                     } else {
                         Toast.makeText(
@@ -177,30 +167,6 @@ class LoginActivity : BaseActivity() {
             googleSignInLauncher.launch(signInIntent)
         }
 
-        // 회원가입 처리
-        signupBtn.applyPressEffect {
-            val email = signupEmail.text.toString().trim()
-            val pw = signupPw.text.toString()
-            val pw2 = signupPwConfirm.text.toString()
-            if (email.isBlank() || pw.isBlank() || pw2.isBlank()) {
-                Toast.makeText(this, getString(R.string.toast_fill_all_fields), Toast.LENGTH_SHORT).show()
-                return@applyPressEffect
-            }
-            if (pw != pw2) {
-                Toast.makeText(this, getString(R.string.toast_password_mismatch), Toast.LENGTH_SHORT).show()
-                return@applyPressEffect
-            }
-            auth.createUserWithEmailAndPassword(email, pw)
-                .addOnSuccessListener {
-                    Toast.makeText(this, getString(R.string.toast_signup_success), Toast.LENGTH_LONG).show()
-                    signupPanel.visibility = View.GONE
-                    loginPanel.visibility = View.VISIBLE
-                }
-                .addOnFailureListener {
-                    Toast.makeText(this, getString(R.string.toast_signup_failed_fmt, it.message ?: "-"), Toast.LENGTH_SHORT).show()
-                }
-        }
-
         // 비밀번호 재설정
         findPwBtn.applyPressEffect {
             val email = findPwEmail.text.toString().trim()
@@ -219,44 +185,37 @@ class LoginActivity : BaseActivity() {
                 }
         }
 
-        // ====== 시스템 뒤로가기 처리 ======
+        // 언어 팝업(🌐 버튼)
+        setupGlobeLanguageMenu()
+
+        // 시스템 뒤로가기
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // 1) 키보드 닫기
                 currentFocus?.let { v ->
                     val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                     imm.hideSoftInputFromWindow(v.windowToken, 0)
                 }
-
-                // 2) 보이는 패널 기준 분기
                 when {
                     signupPanel.isVisible || findPwPanel.isVisible -> {
-                        // 회원가입/비번재설정 → 로그인으로 복귀
                         signupPanel.visibility = View.GONE
                         findPwPanel.visibility = View.GONE
                         loginPanel.visibility = View.VISIBLE
                     }
                     loginPanel.isVisible -> {
-                        // 로그인 화면 → 두 번 눌러 종료
                         val now = System.currentTimeMillis()
                         if (now - lastBackPressedAt <= BACK_INTERVAL_MS) {
-                            // 기본 뒤로가기(액티비티 종료) 위임
                             isEnabled = false
                             onBackPressedDispatcher.onBackPressed()
                         } else {
                             lastBackPressedAt = now
-                            val resId = resources.getIdentifier(
-                                "press_back_again_to_exit", "string", packageName
-                            )
-                            val msg = if (resId != 0)
-                                getString(resId)
-                            else
-                                "한 번 더 누르면 앱이 종료됩니다."
-                            Toast.makeText(this@LoginActivity, msg, Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                this@LoginActivity,
+                                getString(R.string.press_back_again_to_exit),
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                     else -> {
-                        // 예외 케이스는 기본 동작
                         isEnabled = false
                         onBackPressedDispatcher.onBackPressed()
                     }
@@ -264,8 +223,7 @@ class LoginActivity : BaseActivity() {
             }
         })
 
-        // ===== 언어 칩 & 코치마크 =====
-        setupLanguageChips()
+        // (예전 드롭다운 초기화는 삭제)
         showLanguageCoachmarkIfNeeded()
     }
 
@@ -283,7 +241,7 @@ class LoginActivity : BaseActivity() {
                     val uid = auth.currentUser?.uid ?: return@addOnSuccessListener
                     checkReactivation(uid) {
                         markPendingHomeFade()
-                        navigateToMain() // ✅ holiday 제거
+                        navigateToMain()
                     }
                 }
                 .addOnFailureListener {
@@ -331,15 +289,42 @@ class LoginActivity : BaseActivity() {
             .addOnFailureListener { onContinue() }
     }
 
-    // ✅ holiday 다운로드/저장 단계 없이 즉시 메인으로 이동
+
     private fun navigateToMain() {
         startActivity(Intent(this, MainActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         })
         finish()
     }
+    private fun setupLoginButtonEffects() {
+        val scaleDown = 0.93f
+        val duration = 80L
 
-    /** 홈 첫 진입에서 페이드인을 실행시키도록 사용자별 프리퍼런스에 예약 표시 */
+        // 눌림 효과 줄 버튼들 지정
+        val buttons = listOf<View>(
+            findViewById<Button>(R.id.btn_login),
+            findViewById<Button>(R.id.btn_skip_login)
+        )
+
+        buttons.forEach { btn ->
+            btn.setOnTouchListener { v, event ->
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> v.animate()
+                        .scaleX(scaleDown)
+                        .scaleY(scaleDown)
+                        .setDuration(duration)
+                        .start()
+
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> v.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(duration)
+                        .start()
+                }
+                false
+            }
+        }
+    }
     private fun markPendingHomeFade() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         getSharedPreferences("dream_history_$uid", MODE_PRIVATE)
@@ -367,61 +352,82 @@ class LoginActivity : BaseActivity() {
             val anim = ScaleAnimation(
                 1f, scale, 1f, scale,
                 (this.width / 2).toFloat(), (this.height / 2).toFloat()
-            ).apply {
-                this.duration = duration
-                fillAfter = true
-            }
+            ).apply { this.duration = duration; fillAfter = true }
             this.startAnimation(anim)
-            this.postDelayed({
-                this.clearAnimation()
-                action()
-            }, duration)
+            this.postDelayed({ this.clearAnimation(); action() }, duration)
         }
     }
 
-    /* ===== 언어: 칩만 사용, 첫 실행 코치마크 ===== */
-    private fun setupLanguageChips() {
-        val chips = findViewById<ChipGroup?>(R.id.chips_language) ?: return
-        val chipKo = findViewById<Chip?>(R.id.chip_ko) ?: return
-        val chipEn = findViewById<Chip?>(R.id.chip_en) ?: return
+    /** 🌐 언어 팝업: 왼쪽 정렬 + 배경 D0BFBFBF + 텍스트 #222 안내 */
+    private fun setupGlobeLanguageMenu() {
+        val btn = findViewById<ImageButton?>(R.id.btn_lang) ?: return
 
-        val savedTag = appPrefs.getString("app_lang_tag", null)
-        when (savedTag) {
-            "en" -> chips.check(chipEn.id)
-            "ko" -> chips.check(chipKo.id)
-            else -> {
-                if (resources.configuration.locales.get(0).language.startsWith("en")) chips.check(chipEn.id)
-                else chips.check(chipKo.id)
+        data class Lang(val label: String, val tag: String)
+        val langs = listOf(
+            Lang("한국어", "ko"),
+            Lang("English", "en"),
+            Lang("हिन्दी", "hi"),
+            Lang("العربية", "ar"),
+            Lang("中文", "zh")
+        )
+        val labels = langs.map { it.label }
+
+        val popup = ListPopupWindow(this).apply {
+            anchorView = btn
+            width = dp(180)
+            isModal = true
+            // 배경색을 연회색(#D0BFBFBF)으로
+// 변경 코드
+            setBackgroundDrawable(
+                android.graphics.drawable.GradientDrawable().apply {
+                    cornerRadius = dp(12).toFloat()
+                    setColor(Color.parseColor("#FBFBFBFF"))
+                }
+            )
+
+            setAdapter(object : ArrayAdapter<String>(this@LoginActivity, android.R.layout.simple_list_item_1, labels) {
+                private fun style(tv: TextView) {
+                    tv.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                    tv.gravity = Gravity.START
+                    tv.textAlignment = View.TEXT_ALIGNMENT_VIEW_START
+                    tv.textDirection = View.TEXT_DIRECTION_LTR
+                    tv.setPadding(dp(14), dp(12), dp(14), dp(12))
+                    // 항목 글자색: 진회색(배경과 대비)
+                    tv.setTextColor(Color.parseColor("#222222"))
+                }
+                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                    val v = super.getView(position, convertView, parent) as TextView
+                    style(v); return v
+                }
+                override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                    val v = super.getDropDownView(position, convertView, parent) as TextView
+                    style(v); return v
+                }
+            })
+            setOnItemClickListener { _, _, position, _ ->
+                setLanguage(langs[position].tag, showToast = true)
+                dismiss()
             }
         }
 
-        chipKo.setOnClickListener { setLanguage("ko", showToast = true) }
-        chipEn.setOnClickListener { setLanguage("en", showToast = true) }
+        btn.setOnClickListener { popup.show() }
     }
 
-    // 버튼 옆 코치마크(한 번만)
+    // 코치마크 (그대로 유지)
     private fun showLanguageCoachmarkIfNeeded() {
         if (appPrefs.getBoolean("coach_lang_done", false)) return
-        val anchor = findViewById<View?>(R.id.chips_language) ?: return
+        val anchor = findViewById<View?>(R.id.loginPanel) ?: return
         val container = findViewById<ViewGroup>(android.R.id.content)
 
         val tip = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             setPadding(dp(12), dp(10), dp(12), dp(10))
-            background = GradientDrawable().apply {
-                shape = GradientDrawable.RECTANGLE
-                cornerRadius = dp(12).toFloat()
-                setColor(Color.parseColor("#BF000000"))
-            }
+            setBackgroundColor(Color.parseColor("#BF000000"))
             elevation = 10f
         }
 
         val icon = ImageView(this).apply { setImageResource(android.R.drawable.ic_dialog_info) }
-
-        val resId = resources.getIdentifier("tutorial_lang_tip", "string", packageName)
-        val tipText = if (resId != 0) getString(resId)
-        else " 한국어/English Button"
-
+        val tipText = getString(R.string.tutorial_lang_tip)
         val msg = TextView(this).apply {
             text = tipText
             setTextColor(Color.WHITE)
@@ -441,19 +447,8 @@ class LoginActivity : BaseActivity() {
 
         val lp = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
-        ).apply { gravity = Gravity.TOP or Gravity.START }
+        ).apply { gravity = Gravity.TOP or Gravity.END }
         container.addView(tip, lp)
-
-        container.post {
-            val anchorWin = IntArray(2)
-            val contWin = IntArray(2)
-            anchor.getLocationInWindow(anchorWin)
-            container.getLocationInWindow(contWin)
-
-            val x = (anchorWin[0] - contWin[0]) + anchor.width / 2f - tip.width / 2f
-            val y = (anchorWin[1] - contWin[1]).toFloat() + anchor.height.toFloat() + dp(8).toFloat()
-            tip.x = x; tip.y = y
-        }
 
         tip.postDelayed({
             if (tip.parent != null) {
@@ -468,29 +463,21 @@ class LoginActivity : BaseActivity() {
 
     private fun setLanguage(tag: String, showToast: Boolean) {
         appPrefs.edit().putString("app_lang_tag", tag).apply()
-        LocaleKit.apply(tag)
+        LocaleKit.apply(tag) // hi / ar / zh 지원
         if (showToast) {
-            val resId = resources.getIdentifier("language_changed", "string", packageName)
-            val msg = if (resId != 0) getString(resId) else "Language changed."
-            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.language_changed), Toast.LENGTH_SHORT).show()
         }
         recreate()
     }
 
-    // === Helper: 타이틀에 텍스트 그라디언트 적용 ===
     private fun applyGradientTitle(tv: TextView) {
         val text = tv.text?.toString().orEmpty()
         if (text.isEmpty()) return
-        // 일부 기기에서 하드웨어 가속과 텍스트 셰이더가 충돌할 수 있어 소프트웨어 레이어로 강제
         tv.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
-
         val width = tv.paint.measureText(text)
         val shader = LinearGradient(
             0f, 0f, width, tv.textSize,
-            intArrayOf(
-                Color.parseColor("#F9B84A"), // 연한 골드
-                Color.parseColor("#7B61FF")  // 은은한 보라
-            ),
+            intArrayOf(Color.parseColor("#F9B84A"), Color.parseColor("#7B61FF")),
             null,
             Shader.TileMode.CLAMP
         )

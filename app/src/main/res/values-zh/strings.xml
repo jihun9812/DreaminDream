@@ -1,0 +1,1057 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:ns0="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="bs_subtitle_key_range_format">%1$s · %2$s</string>
+
+    <string name="login_slogan">在梦中找到答案</string>
+    <string name="dreamin_slogan1"> </string>
+    <string name="login_password_confirm_hint">确认密码</string>
+    <string name="login_findpw">找回密码</string>
+    <string name="login_findpw_send">发送到邮箱</string>
+    <string name="forgot_password">找回密码</string>
+    <string name="sign_up">注册</string>
+    <string name="sign_up_title">创建新账号</string>
+    <string name="email_hint">邮箱</string>
+    <string name="password_hint">密码</string>
+    <string name="password_confirm_hint">确认密码</string>
+    <string name="sign_up_button">注册</string>
+    <string name="cancel">取消</string>
+    <string name="password_reset_title">重置密码</string>
+    <string name="send_reset_email">发送重置邮件</string>
+    <string name="text_divider"> / </string>
+    <string name="login_email_hint">邮箱</string>
+    <string name="login_password_hint">密码</string>
+    <string name="login_btn_login">登录</string>
+    <string name="login_btn_signup">注册</string>
+    <string name="login_btn_google">Google 登录</string>
+    <string name="login_btn_guest">体验</string>
+    <string name="privacy_and_version">v1.07 Dream in Dream | 隐私政策</string>
+    <string name="brand_logo_desc">Dream in Dream</string>
+
+    <string name="feedbacktitle">咨询 · 反馈</string>
+    <string name="title_hint">标题</string>
+    <string name="feedback_contents">请填写您的咨询/反馈内容</string>
+    <string name="send">发送</string>
+
+    <string name="title_terms_privacy">条款 · 隐私政策</string>
+    <string name="tab_terms">服务条款</string>
+    <string name="tab_privacy">隐私政策</string>
+
+    <string name="ad_prompt_title">正在准备您的专属解梦</string>
+    <string name="ad_prompt_status">稍等！看完广告即可解锁深度解析。</string>
+    <string name="ad_prompt_cancel">取消</string>
+    <string name="ad_prompt_watch_ad">观看广告</string>
+
+    <string name="day_dream">这一天的梦</string>
+
+    <string name="fortune_deep_title">深度分析</string>
+    <string name="fortune_deep_chip_time">下午 3点~4点</string>
+    <string name="fortune_deep_chip_number">数字 56</string>
+    <string name="fortune_deep_chip_color">颜色 蓝色</string>
+    <string name="fortune_deep_highlights_label">今日亮点</string>
+    <string name="fortune_deep_plan_label">行动计划</string>
+    <string name="fortune_deep_plan_morning">上午 09~12时</string>
+    <string name="fortune_deep_plan_afternoon">下午 13~17时</string>
+    <string name="fortune_deep_plan_evening">晚上 19~22时</string>
+    <string name="fortune_deep_tomorrow_label">明日准备</string>
+
+    <string name="fortune_section_title_total">总运</string>
+    <string name="fortune_section_score_sample">80分</string>
+
+    <string name="weekday_sun">日</string>
+    <string name="weekday_mon">一</string>
+    <string name="weekday_tue">二</string>
+    <string name="weekday_wed">三</string>
+    <string name="weekday_thu">四</string>
+    <string name="weekday_fri">五</string>
+    <string name="weekday_sat">六</string>
+
+    <string name="tutorial_lang_tip">韩语/英语 按钮</string>
+
+    <string name="empty_string" />
+    <string name="ai_report_empty">没有可供分析的数据。</string>
+    <string name="ai_report_week_label_default">本周分析报告\n0条 · -</string>
+    <string name="ai_report_week_label_format">本周分析报告\n%1$d条 · %2$s</string>
+    <string name="ai_report_history">分析记录 ▼</string>
+    <string name="kpi_positive">积极</string>
+    <string name="kpi_neutral">中立</string>
+    <string name="kpi_negative">消极</string>
+    <string name="value_placeholder_dash">-</string>
+    <string name="chart_emotion_balance">情绪平衡</string>
+    <string name="chart_info_desc">说明</string>
+    <string name="chart_theme">主要主题</string>
+    <string name="chart_caption">基于本周全部梦境的自动摘要</string>
+    <string name="chart_keywords_placeholder">情绪/关键词将显示在此。</string>
+    <string name="btn_pro_upgrade">进行深度分析</string>
+    <string name="ai_analysis_title">AI 分析</string>
+    <string name="ai_analysis_placeholder">分析内容将显示在此。</string>
+
+    <string name="prev_month">上个月</string>
+    <string name="next_month">下个月</string>
+    <string name="calendar_month_year_sample">2025年9月</string>
+    <string name="calendar_month_year_format">%1$d年 %2$d月</string>
+    <string name="dream_list_title_sample">2025-09-12（周五）的梦</string>
+    <string name="dream_list_title_format">%1$s（%2$s）的梦</string>
+    <string name="dream_list_empty">这一天没有梦境记录。</string>
+
+    <string name="calendar_title_placeholder">2025年7月</string>
+    <string name="dream_list_label">🌙 今日梦境记录</string>
+    <string name="calendar_dream_list_title">所选日期的梦境列表：</string>
+    <string name="selected_date_default">日期</string>
+    <string name="selected_date_placeholder">已选择日期</string>
+
+    <string name="desc_calendar">日历</string>
+    <string name="desc_dream_scroll">梦境记录滚动</string>
+    <string name="dream_usage_count">💭 可解梦次数：%1$d次</string>
+
+    <string name="close">关闭</string>
+    <string name="ok">确认</string>
+    <string name="placeholder_dash">-</string>
+    <string name="percent_placeholder">0%%</string>
+
+    <string name="dream_input_label">• 输入梦境内容</string>
+    <string name="usage_left_default">今天剩余次数：0次</string>
+    <string name="usage_left_format">今天剩余次数：%1$d次</string>
+    <string name="hint_input">请详细描述你的梦！例：一条大鲨鱼突然出现在我面前我就逃跑了；我在大楼中间疯狂奔跑。</string>
+    <string name="button_interpret">解梦</string>
+
+    <string name="dream_input_empty">请输入梦境内容。</string>
+    <string name="dream_input_not_meaningful">请具体输入有意义的梦境内容。</string>
+
+    <string name="dream_network_error">无法获取解梦结果。请检查网络后重试。</string>
+
+    <string name="dream_request_failed">解梦请求失败（%1$d）</string>
+
+    <string name="dream_quota_title">今日次数已用尽</string>
+    <string name="dream_quota_message">今日使用配额已全部用完。</string>
+
+    <string name="fortune_start">运势\n查看</string>
+    <string name="fortune_lucky_color">幸运色</string>
+    <string name="fortune_lucky_number">幸运数字</string>
+    <string name="fortune_good_time">顺时段</string>
+    <string name="fortune_today_check_toggle">今日检查 ▾</string>
+    <string name="fortune_today_check">今日检查</string>
+    <string name="btn_deep_analysis">查看深度分析</string>
+    <string name="action_copy">复制</string>
+    <string name="action_share">分享</string>
+
+    <string name="checked">已选择</string>
+    <string name="unchecked">取消选择</string>
+
+    <string name="app_name">DreamInDream</string>
+
+    <string name="back_button">返回</string>
+    <string name="app_logo_description">应用徽标</string>
+    <string name="back_arrow">←</string>
+    <string name="left_arrow">←</string>
+    <string name="right_arrow">→</string>
+    <string name="desc_prev_month">上一月</string>
+    <string name="desc_next_month">下一月</string>
+
+    <string name="settings">设置</string>
+    <string name="home_ai_title">每周梦境分析</string>
+    <string name="ai_report">AI 报告</string>
+    <string name="ai_report_btn">AI 报告</string>
+    <string name="ai_avatar">AI 头像</string>
+    <string name="home_title">Dream In Dream</string>
+    <string name="home_daily_message_sample">今日消息将显示在此。</string>
+    <string name="btn_dream">查看解梦</string>
+    <string name="btn_calendar">查看日历</string>
+    <string name="btn_fortune">查看运势</string>
+
+    <string name="home_ai_sub">汇总本周的梦并展示主题</string>
+    <string name="ai_no_dream">还没有梦境记录</string>
+    <string name="ai_report_guide">每周 AI 梦境分析</string>
+    <string name="ai_not_enough_data">分析数据不足</string>
+    <string name="ai_need_more">分析需要更多梦境记录。</string>
+    <string name="ai_loading">AI 正在进行每周梦境分析...</string>
+    <string name="ai_loading2">AI 正在生成每周梦境分析。</string>
+    <string name="ai_report_fail">AI 分析失败</string>
+    <string name="ai_retry">请稍后重试。</string>
+    <string name="ai_report_summary">本周梦境分析摘要</string>
+    <string name="ai_emotion_keywords_ai">情绪: %1$s\n关键词: %2$s\nAI: %3$s</string>
+
+    <string name="ai_msg_loading">✨ 正在加载今日解梦消息...</string>
+    <string name="ai_emotion_keywords_simple">情绪: %1$s\n关键词: %2$s</string>
+
+    <string name="btn_cancel">取消</string>
+    <string name="btn_save">保存</string>
+
+    <string name="btn_logout">登出</string>
+    <string name="settings_title">应用设置</string>
+    <string name="settings_section">设置</string>
+    <string name="gpt_usage_today">今日解梦</string>
+    <string name="dream_count">梦境记录</string>
+    <string name="btn_profile_edit">编辑资料</string>
+    <string name="btn_premium">高级版 · 去广告</string>
+    <string name="btn_contact">咨询·反馈</string>
+    <string name="btn_terms">条款 · 隐私政策</string>
+    <string name="btn_delete_account">删除账号</string>
+    <string name="label_language">语言</string>
+    <string name="label_account_link">账号合并</string>
+    <string name="account_status_default">状态:  -</string>
+    <string name="btn_google_link">用 Google 合并账号</string>
+    <string name="account_link_note">* 体验（匿名）数据在连接 Google 账号时将保留。</string>
+
+    <string name="label_name">姓名</string>
+    <string name="hint_name_example">例：洪吉童</string>
+    <string name="label_birthdate">出生日期</string>
+    <string name="hint_birthdate_format">YYYY-MM-DD</string>
+    <string name="label_gender">性别</string>
+    <string name="gender_male">男性</string>
+    <string name="gender_female">女性</string>
+    <string name="label_mbti">MBTI</string>
+    <string name="label_birthtime">出生时间</string>
+
+    <string name="default_web_client_id">886944015637-96pcphpcqug6pga1v9aogdcg4bfr7mav.apps.googleusercontent.com</string>
+
+    <string name="terms_privacy_text">
+DreamInDream 服务条款
+
+1. 目的
+本条款用于规定用户与运营者之间关于使用 DreamInDream（下称“服务”）的权利与义务。
+
+2. 账号与使用
+- 面向所有年龄段用户。
+- 用户应保持账号信息的准确性。
+- 服务功能可能在未事先通知的情况下变更或中止。
+
+3. 付费功能与广告
+- 高级版（去广告等）功能遵循另行政策。
+- 可能包含广告展示。
+
+4. 禁止行为
+发布违法/有害信息、自动化抓取、反编译/篡改等。
+
+5. 知识产权
+服务及所提供内容的权利归运营者或相关权利人所有。
+
+6. 免责声明
+不保证解读/运势结果的准确性与效用。
+
+7. 条款变更
+重要变更将于应用内告知。
+
+隐私政策
+
+1. 收集项目
+必填：邮箱（或匿名标识）、昵称、出生日期/性别、使用日志
+可选：MBTI、出生时间、头像
+自动收集：设备/应用版本、广告标识符、FCM 令牌
+
+2. 使用目的
+提供梦境记录/分析、推送发送、质量改进、客服响应、防止滥用
+
+3. 保存期限
+注销后及时销毁，依法需保存的除外
+
+4. 处理委托/跨境传输
+可能委托/跨境传输至云服务提供商。
+
+5. 用户权利
+可请求查阅、更正、删除、停止处理
+
+6. 安全措施
+HTTPS、最小化权限、访问记录管理等
+
+联系：support@dreamindream.app
+    </string>
+
+    <string name="profile_edit_title">编辑资料</string>
+    <string name="unit_times_value">%1$d 次</string>
+    <string name="unit_entries_value">%1$d个</string>
+    <string name="dlg_delete_title">删除账号</string>
+    <string name="dlg_delete_need_login_msg" formatted="false">
+    仅限使用 Google/邮箱登录的账号才能删除。
+请先完成“连接 Google 账号”。
+</string>
+
+    <string name="dlg_delete_soft_msg">账号将立即停用。7天内重新登录可恢复，超过7天将永久删除。</string>
+
+    <string name="toast_deactivated">账号已停用。7天内可恢复。</string>
+
+    <string name="status_prefix">状态: </string>
+    <string name="status_logged_out">已登出</string>
+    <string name="status_guest">|体验|</string>
+    <string name="status_google">Google 登录</string>
+    <string name="status_email">邮箱登录</string>
+    <string name="btn_google_login">使用 Google 登录</string>
+    <string name="btn_google_merge">用 Google 合并账号</string>
+    <string name="btn_google_connected">已连接 Google</string>
+    <string name="btn_google_connect">连接 Google 账号</string>
+
+    <string name="toast_merge_partial">账号合并（部分）完成：%1$s</string>
+    <string name="toast_link_failed">连接失败：%1$s</string>
+    <string name="toast_login_cancel_failed_code">登录取消/失败：%1$d</string>
+    <string name="toast_error_with_reason">错误：%1$s</string>
+    <string name="toast_google_signin_start_failed">Google 登录启动失败：%1$s</string>
+    <string name="toast_process_failed_with_reason">处理失败：%1$s</string>
+    <string name="toast_local_migration_failed">本地数据迁移失败：%1$s</string>
+
+    <string name="dlg_save_title">要保存吗？</string>
+    <string name="dlg_save_msg">将按输入信息保存资料。</string>
+
+    <string name="summary_birth_prefix">生日:</string>
+    <string name="summary_gender_prefix">性别:</string>
+    <string name="summary_mbti_prefix">MBTI:</string>
+    <string name="summary_age_prefix">年龄:</string>
+    <string name="summary_age_value">%1$d岁</string>
+
+    <string name="summary_wz_prefix">%1$s星座:</string>
+    <string name="summary_birthtime_prefix"> 出生时间:</string>
+
+    <string name="select_none">不选择</string>
+    <string name="birthtime_none">不选择</string>
+
+    <string name="err_enter_name">请输入姓名。</string>
+    <string name="err_select_birthdate">请选择出生日期。</string>
+    <string name="err_select_gender">请选择性别。</string>
+
+    <string name="dlg_birthdate_title">🌙 选择出生日期</string>
+
+    <string name="cz_unknown">生肖 -</string>
+    <string name="cz_rat">鼠</string>
+    <string name="cz_ox">牛</string>
+    <string name="cz_tiger">虎</string>
+    <string name="cz_rabbit">兔</string>
+    <string name="cz_dragon">龙</string>
+    <string name="cz_snake">蛇</string>
+    <string name="cz_horse">马</string>
+    <string name="cz_goat">羊</string>
+    <string name="cz_monkey">猴</string>
+    <string name="cz_rooster">鸡</string>
+    <string name="cz_dog">狗</string>
+    <string name="cz_pig">猪</string>
+    <string name="cz_format">%1$s生肖</string>
+
+    <string name="dlg_premium_title">正在准备上线</string>
+    <string name="dlg_premium_msg">高级版（去广告）正在准备上线。</string>
+
+    <string name="deactivate">停用</string>
+
+    <string name="dlg_logout_title">登出</string>
+    <string name="dlg_logout_msg">将返回登录界面。是否继续？</string>
+    <string name="logout">登出</string>
+
+    <string name="toast_google_linked">已连接 Google 账号</string>
+    <string name="toast_google_signed_in">已使用该 Google 账号登录。</string>
+    <string name="toast_google_login_failed">Google 登录失败：%1$s</string>
+    <string name="toast_merge_done">账号合并完成</string>
+    <string name="toast_saved">已保存！</string>
+
+    <string name="common_ok">确认</string>
+    <string name="common_cancel">取消</string>
+    <string name="common_delete">删除</string>
+
+    <string name="fmt_month_year">yyyy年 M月</string>
+    <string name="dream_list_title">%1$s（%2$s）的梦</string>
+
+    <string name="cal_delete_title">要删除吗？</string>
+    <string name="cal_delete_message">删除此梦境记录后将无法恢复。</string>
+    <string name="chart_cd_top">最高值: %1$s %2$d%%</string>
+
+    <string name="dream_result_placeholder">这里将显示解梦结果。</string>
+    <string name="dream_loading">正在解析中…</string>
+    <string name="dream_today_left">今日剩余次数：%1$d次</string>
+    <string name="dream_need_input">请输入梦境内容。</string>
+    <string name="dream_need_meaningful">请具体输入有意义的梦境内容。</string>
+    <string name="dream_limit_title">今日机会已用尽</string>
+    <string name="dream_limit_message">今天可解梦次数（共 3 次）已全部用完。请明天再试。</string>
+    <string name="dream_network_fail">无法获取解梦结果。请检查网络后重试。</string>
+    <string name="dream_parse_error">结果解析时发生错误。</string>
+    <string name="dream_request_fail_fmt">解梦请求失败（%1$s）</string>
+
+    <string name="sec_message">梦传达的信息</string>
+    <string name="sec_symbols">核心象征解析</string>
+    <string name="sec_foresight">预知要点</string>
+    <string name="sec_tips_today">今日应用提示</string>
+    <string name="sec_actions3">今日三项行动</string>
+    <string name="dream_result_empty">解梦结果为空。</string>
+
+    <string name="fb_title_need">请输入标题</string>
+    <string name="fb_msg_need">请输入内容</string>
+    <string name="fb_sent_title">发送完成</string>
+    <string name="fb_sent_body">已收到，我们会尽快查阅。</string>
+    <string name="fb_send_fail_title">提示</string>
+    <string name="fb_send_fail_fmt">发送失败。请稍后重试。\n\n%1$s</string>
+
+    <string name="fortune_overall">总运</string>
+    <string name="fortune_love">恋爱运</string>
+    <string name="fortune_study">学业运</string>
+    <string name="fortune_work">职场运</string>
+    <string name="fortune_money">财运</string>
+    <string name="fortune_lotto">彩票运</string>
+    <string name="fortune_number_label">号码</string>
+    <string name="deep_title">深度分析</string>
+    <string name="deep_chip_time">时间  %1$s</string>
+    <string name="deep_chip_number">数字  %1$d</string>
+    <string name="deep_chip_color">颜色  %1$s</string>
+    <string name="fortune_default_section_body">已为你简要整理今日的整体走势。</string>
+
+    <string name="err_auth_fmt">发生认证错误。请在设置中检查 API 密钥。（%1$s）</string>
+    <string name="err_forbidden_fmt">访问被拒绝。请检查权限/支付状态。（%1$s）</string>
+    <string name="err_not_found_fmt">找不到服务器地址。请稍后重试。（%1$s）</string>
+    <string name="err_rate_fmt">调用次数超限。请稍后重试。（%1$s）</string>
+    <string name="err_timeout_fmt">网络延迟中。请检查连接状态后再试。（%1$s）</string>
+    <string name="err_network_fmt">发生网络错误。（%1$s）</string>
+
+    <string name="daily_fallback_1">今天不妨稍稍放慢节奏。</string>
+    <string name="daily_fallback_2">迈出一步比追求完美更重要。</string>
+    <string name="daily_fallback_3">放下担心，从能做的事开始。</string>
+    <string name="daily_fallback_4">今天的选择塑造明天的自己。</string>
+    <string name="daily_fallback_5">相信你的节奏，慢一点也没关系。</string>
+
+    <string name="retry">再试一次</string>
+    <string name="please_try_again">稍后再试</string>
+
+    <string name="report_title_this_week">本周分析报告</string>
+    <string name="report_title_prev_week">上周分析报告</string>
+    <string name="report_switched_due_to_lack">本周记录不足，已自动切换</string>
+    <string name="report_meta_format">%1$d条 · %2$s</string>
+
+    <string name="chart_info_title">图表说明</string>
+    <string name="chart_info_message">
+    • 本周梦境达到 %1$d 条及以上时，将立即生成报告。
+    \n• 生成后观看 1 次广告即可使用“深度分析”。
+    \n• 周内梦境总数达到 %2$d 条时将刷新报告（最多 %3$d 条），
+    \n  观看 1 次广告即可再次运行深度分析。
+    \n• 柱状条表示 8 种情绪、5 个主题在本周的占比(%%)。
+    \n• 周期：周一~周日（上周报告请在“分析记录”查看）
+</string>
+
+    <string name="pro_cta">深度分析</string>
+    <string name="pro_completed">深度分析完成</string>
+    <string name="pro_refresh">深度分析（刷新）</string>
+    <string name="pro_limited_range">深度分析限制（%1$d~%2$d 个）</string>
+    <string name="pro_in_progress">深度分析进行中…</string>
+    <string name="ai_basic_title">AI 分析</string>
+    <string name="ai_pro_title">AI 深度分析</string>
+    <string name="refresh_hint_count_limited">本周梦境 %1$d 条 · 仅分析 %2$d~%3$d 条。</string>
+
+    <string name="login_required">需要登录。</string>
+    <string name="api_key_missing">未设置 API 密钥。请联系管理员。</string>
+    <string name="pro_requires_min">深度分析需本周梦境不少于 %1$d 条。</string>
+    <string name="pro_too_many_entries">本周梦境过多。深度分析仅支持 %1$d~%2$d 条。</string>
+    <string name="network_error_pro">因网络错误，深度分析失败。</string>
+    <string name="server_response_error">服务器响应错误（%1$d）：%2$s</string>
+    <string name="pro_timeout">深度分析超时。请检查网络后重试。</string>
+    <string name="pro_applied">已应用深度分析。</string>
+    <string name="pro_result_unparsable">无法理解深度分析结果。</string>
+    <string name="ad_closed_no_reward">广告已关闭。未确认到奖励。</string>
+    <string name="ad_error_with_reason">广告错误（%1$s）— 请稍后再试。</string>
+    <string name="analyzing">分析中</string>
+    <string name="analyzing_ellipsis">分析中</string>
+
+    <string name="invalid_selection">请选择 2~4 个（最多 4 个）</string>
+    <string name="preparing_analysis">正在准备分析…</string>
+    <string name="preparing_ad">正在准备广告…</string>
+    <string name="reward_confirmed">奖励已确认</string>
+    <string name="updating_ellipsis">正在更新…</string>
+
+    <string name="keywords_format">情绪：%1$s • 关键词：%2$s</string>
+
+    <string name="section_title_weekly_deep_main">每周梦境深度分析</string>
+    <string name="section_title_deep">深度分析</string>
+    <string name="section_title_ai_pro">AI 深度分析</string>
+    <string name="section_title_summary3">摘要（3句）</string>
+    <string name="section_title_quant">数值摘要</string>
+    <string name="section_title_emotion_pattern">情绪模式解析</string>
+    <string name="section_title_symbols">象征·场景解析</string>
+    <string name="section_title_myeongri">命理视角</string>
+    <string name="section_title_outlook">1~2周展望</string>
+    <string name="section_title_checklist">清单</string>
+    <string name="section_title_emotion_percent">情绪分布(%%)</string>
+    <string name="section_title_emotion">情绪分布</string>
+    <string name="section_title_theme_percent">主题占比(%%)</string>
+    <string name="section_title_theme">主题占比</string>
+    <string name="section_title_key_summary">关键摘要</string>
+    <string name="section_title_insights">洞见</string>
+
+    <string name="emo_positive">积极</string>
+    <string name="emo_calm">平静</string>
+    <string name="emo_vitality">活力</string>
+    <string name="emo_flow">沉浸</string>
+    <string name="emo_neutral">中立</string>
+    <string name="emo_confusion">困惑</string>
+    <string name="emo_anxiety">焦虑</string>
+    <string name="emo_depression_fatigue">忧郁/疲惫</string>
+    <string name="emo_depression">忧郁</string>
+    <string name="emo_fatigue">疲惫</string>
+
+    <string-array name="emo_labels_default">
+        <item>@string/emo_positive</item>
+        <item>@string/emo_calm</item>
+        <item>@string/emo_vitality</item>
+        <item>@string/emo_flow</item>
+        <item>@string/emo_neutral</item>
+        <item>@string/emo_confusion</item>
+        <item>@string/emo_anxiety</item>
+        <item>@string/emo_depression_fatigue</item>
+    </string-array>
+
+    <string name="theme_rel">关系</string>
+    <string name="theme_achieve">成就</string>
+    <string name="theme_change">变化</string>
+    <string name="theme_risk">风险因素</string>
+    <string name="theme_growth">自我成长</string>
+    <string name="theme_other">其他</string>
+
+    <string-array name="theme_labels_default">
+        <item>@string/theme_rel</item>
+        <item>@string/theme_achieve</item>
+        <item>@string/theme_change</item>
+        <item>@string/theme_risk</item>
+        <item>@string/theme_growth</item>
+    </string-array>
+
+    <string name="time_seconds_suffix">秒</string>
+    <string name="time_minutes_suffix">分</string>
+    <string name="time_hours_suffix">小时</string>
+    <string name="time_days_suffix">天</string>
+
+    <string name="chart_no_data">无数据</string>
+    <string name="chart_accessibility_top">最高值：%1$s %2$d</string>
+
+    <string name="daily_date_format">yyyy年 M月 d日</string>
+    <string name="daily_prompt_template">不带说明或叙事，请以专业解梦师的口吻，仅用一句话写出今天（%1$s）的建议。</string>
+
+    <string name="dream_prompt_template">
+你是擅长提示预知梦的专业解梦分析师。
+基于下方的梦境内容，给出现实、可信的解析。
+结构:
+- <ns0:g id="msg">%2$s</ns0:g>
+- <ns0:g id="sym">%3$s</ns0:g>
+- <ns0:g id="pre">%4$s</ns0:g>
+- <ns0:g id="tip">%5$s</ns0:g>
+- <ns0:g id="act">%6$s</ns0:g>
+[梦境内容] "<ns0:g id="dream">%1$s</ns0:g>"
+</string>
+
+    <string name="dream_section_message">💭 梦传达的信息</string>
+    <string name="dream_section_symbols">🧠 核心象征解析</string>
+    <string name="dream_section_premonition">📌 预知要点</string>
+    <string name="dream_section_tips_today">☀️ 今日应用提示</string>
+    <string name="dream_section_actions_three">🎯 今日三项行动</string>
+
+    <string-array name="emotion_dict_positive">
+        <item>喜悦</item><item>幸福</item><item>感谢</item><item>希望</item><item>心动</item>
+        <item>爱</item><item>满足</item><item>快乐</item><item>自豪</item><item>成就感</item>
+        <item>安心</item><item>自信</item>
+    </string-array>
+    <string-array name="emotion_dict_calm">
+        <item>平静</item><item>稳定</item><item>沉着</item><item>舒适</item><item>休息</item>
+        <item>寂静</item><item>悠闲</item><item>从容</item>
+    </string-array>
+    <string-array name="emotion_dict_vitality">
+        <item>活力</item><item>能量</item><item>专注力</item><item>动机</item><item>意志</item>
+        <item>生机</item><item>力量</item><item>推动力</item><item>热情</item>
+    </string-array>
+    <string-array name="emotion_dict_flow">
+        <item>沉浸</item><item>专注</item><item>深度</item><item>深入</item><item>心流</item>
+        <item>热衷</item><item>沉迷</item>
+    </string-array>
+    <string-array name="emotion_dict_neutral">
+        <item>普通</item><item>一般</item><item>日常</item><item>平凡</item><item>中立</item>
+    </string-array>
+
+    <string-array name="evidence_neg_strong_markers">
+        <item>噩梦</item><item>可怕</item><item>恐怖</item><item>恐惧</item><item>惊恐</item><item>尖叫</item>
+        <item>追赶</item><item>杀害</item><item>死亡</item><item>血</item><item>刀</item><item>枪</item>
+        <item>坠落</item><item>溺水</item><item>窒息</item><item>怪物</item><item>幽灵</item><item>鬼</item>
+        <item>爆炸</item><item>火灾</item>
+    </string-array>
+
+    <string-array name="evidence_scene_negative">
+        <item>追赶</item><item>坠落</item><item>溺水</item><item>窒息</item><item>被困</item><item>迷宫</item>
+        <item>风暴</item><item>洪水</item><item>地震</item><item>战争</item><item>打斗</item><item>争执</item>
+        <item>考试</item><item>截止</item><item>迟到</item><item>解雇</item><item>事故</item><item>怪物</item><item>血</item>
+    </string-array>
+
+    <string-array name="evidence_scene_positive">
+        <item>礼物</item><item>钱</item><item>退款</item><item>合格</item><item>升职</item>
+        <item>拥抱</item><item>笑</item><item>旅行</item><item>整理</item><item>打扫</item>
+        <item>房子</item><item>院子</item><item>大门</item><item>玄关</item><item>猪</item>
+    </string-array>
+
+    <string-array name="emotion_dict_confusion">
+        <item>困惑</item><item>矛盾</item><item>含糊</item><item>踌躇</item><item>犹豫</item><item>复杂</item><item>交织</item><item>搞混</item>
+    </string-array>
+    <string-array name="emotion_dict_anxiety">
+        <item>焦虑</item><item>心慌</item><item>担心</item><item>紧张</item><item>压迫</item><item>压力</item><item>恐惧</item><item>害怕</item><item>迫促</item>
+    </string-array>
+    <string-array name="emotion_dict_depression_fatigue">
+        <item>忧郁</item><item>悲伤</item><item>疲倦</item><item>疲惫</item><item>无力</item><item>倦怠</item><item>虚无</item><item>孤独</item><item>挫折</item>
+    </string-array>
+
+    <string-array name="theme_dict_rel">
+        <item>家庭</item><item>父母</item><item>兄弟</item><item>朋友</item><item>恋人</item><item>同事</item><item>上司</item><item>团队</item>
+        <item>聚会</item><item>对话</item><item>信任</item><item>冲突</item><item>协作</item>
+    </string-array>
+    <string-array name="theme_dict_achieve">
+        <item>考试</item><item>成功</item><item>晋升</item><item>成果</item><item>目标</item><item>练习</item><item>挑战</item><item>完成</item>
+        <item>完结</item><item>发表</item><item>面试</item><item>准备</item><item>达成</item>
+    </string-array>
+    <string-array name="theme_dict_change">
+        <item>搬家</item><item>跳槽</item><item>转换</item><item>旅行</item><item>新的</item><item>开始</item><item>变化</item><item>整理</item>
+        <item>截止</item><item>计划</item><item>决定</item><item>移动</item>
+    </string-array>
+    <string-array name="theme_dict_risk">
+        <item>截止</item><item>金钱</item><item>钱</item><item>健康</item><item>疾病</item><item>失误</item><item>评价</item><item>压力</item>
+        <item>失败</item><item>迟到</item><item>丢失</item><item>坠落</item><item>追赶</item><item>事故</item>
+    </string-array>
+
+    <!-- 以下三组为韩语处理所用，保留韩文原样 -->
+    <string-array name="josa_ko">
+        <item>은</item><item>는</item><item>이</item><item>가</item><item>을</item><item>를</item><item>에</item><item>에서</item>
+        <item>에게</item><item>께</item><item>한테</item><item>으로</item><item>로</item><item>과</item><item>와</item><item>도</item>
+        <item>만</item><item>처럼</item><item>같이</item><item>까지</item><item>부터</item><item>마다</item><item>뿐</item><item>조차</item>
+        <item>이나</item><item>나</item><item>라서</item><item>보다</item><item>만큼</item><item>마저</item><item>밖에</item><item>및</item>
+        <item>등</item><item>에게서</item><item>하고</item><item>랑</item><item>이랑</item>
+    </string-array>
+
+    <string-array name="stopwords_ko">
+        <item>그리고</item><item>그래서</item><item>그러나</item><item>하지만</item><item>및</item><item>또는</item><item>혹은</item>
+        <item>하다</item><item>했다</item><item>되는</item><item>되어</item><item>됐다</item><item>되다</item><item>하는</item><item>하며</item><item>하고</item><item>했다가</item><item>한다</item>
+        <item>것</item><item>수</item><item>좀</item><item>매우</item><item>너무</item><item>정말</item><item>모든</item><item>전체</item>
+        <item>내용</item><item>경향</item><item>의미</item><item>상황</item><item>이야기</item><item>부분</item><item>측면</item><item>전반</item>
+        <item>오늘</item><item>오늘의</item><item>이번</item><item>저번</item><item>주간</item><item>기록</item><item>분석</item><item>요약</item><item>핵심</item><item>포인트</item><item>중요</item><item>체크</item><item>체크리스트</item>
+        <item>문제</item><item>기회</item><item>풍요</item><item>요소</item><item>상태</item><item>관점</item><item>가이드</item><item>조언</item><item>유형</item><item>예측</item><item>현실</item><item>사건</item><item>해결</item><item>정화</item><item>안정</item><item>추구</item>
+        <item>꿈</item><item>해몽</item><item>텍스트</item><item>문장</item><item>표현</item><item>감정</item><item>테마</item><item>키워드</item>
+    </string-array>
+
+    <string-array name="token_tails_ko">
+        <item>하다</item><item>되다</item><item>스럽다</item><item>답다</item><item>하니</item><item>하며</item><item>하는</item>
+        <item>했다</item><item>했고</item><item>하게</item><item>적인</item><item>적으로</item><item>스러움</item><item>스러워</item>
+        <item>같다</item><item>같이</item><item>처럼</item><item>뿐</item><item>들</item><item>들의</item><item>적</item><item>적임</item><item>성</item>
+    </string-array>
+
+    <string name="ea_heading_summary">摘要</string>
+    <string name="ea_heading_link">象征关联</string>
+    <string name="ea_heading_emotion_theme">情绪/主题</string>
+    <string name="ea_heading_outlook">未来展望（1~2周）</string>
+    <string name="ea_heading_conclusion">结论</string>
+
+    <string name="ea_arrow_delim"> → </string>
+    <string name="ea_summary_suffix">接续而下。</string>
+
+    <string name="ea_part_clear_blockage">清空并整理阻塞之物的场景</string>
+    <string name="ea_part_fortune_enters">象征福气与财物的事物进入生活圈的场景</string>
+    <string name="ea_part_home_foundation">确认家庭/内在基础的场景</string>
+    <string name="ea_part_boundary_opening">自我领域与外部边界被打开的场景</string>
+    <string name="ea_part_default_flow">两个梦连接起“整理后流入”的走向</string>
+
+    <string name="ea_link_clear_then_fortune">清理（净化）不必要之物后福气进入，这是“整理后流入”的典型叙事。</string>
+    <string name="ea_link_fortune_with_home">福（猪）与家/家庭结合，暗示在现实的财务·家事议题上出现积极走势。</string>
+    <string name="ea_link_hands_on">亲自动手解决意味着夺回主导权。</string>
+    <string name="ea_link_default">两个梦正在创造“关闭→开启”的转折。</string>
+
+    <string name="ea_emotion_theme_with">当前情绪倾向于“%1$s”，主题围绕 %2$s 展开。</string>
+    <string name="ea_emotion_theme_only">当前情绪以“%1$s”倾向为主。</string>
+
+    <string name="ea_outlook_cash_inbound">小的收入/礼物/提议来到门口。机会在生活圈附近被捕捉到。</string>
+    <string name="ea_outlook_small_gain">财务·物质收益的信号虽弱但可察。周围的“小善意”是线索。</string>
+    <string name="ea_outlook_unblock_one">一件卡住的事被干净利落地整理，进入下一阶段。</string>
+    <string name="ea_outlook_slow_open">关闭的流程逐渐打开，开始出现实际变化的线索。</string>
+
+    <string name="ea_tip_cash_signals">不要错过小提议/礼物/退款等“现金性”信号。</string>
+    <string name="ea_tip_home_cleanup">在生活/家庭领域选一项需要整理的事务并收尾。</string>
+    <string name="ea_tip_take_action">若亲自着手（整理资料、联系、申请等），速度会加快。</string>
+
+    <string name="ea_conclusion">“整理后流入”的叙事：清空多少，就填满多少的一周。</string>
+
+    <string name="ea_kw_toilet1">厕所</string>
+    <string name="ea_kw_toilet2">马桶</string>
+    <string name="ea_kw_poop1">屎</string>
+    <string name="ea_kw_poop2">大便</string>
+    <string name="ea_kw_pig">猪</string>
+    <string name="ea_kw_house">房子</string>
+    <string name="ea_kw_yard1">院子</string>
+    <string name="ea_kw_yard2">大门</string>
+    <string name="ea_kw_yard3">玄关</string>
+    <string name="ea_kw_hand1">手</string>
+    <string name="ea_kw_hand2">用手</string>
+    <string name="ea_kw_hand3">擦</string>
+
+    <string name="ea_heading_sep"> — </string>
+    <string name="ea_bullet_delim">·</string>
+    <string name="ea_trend_up"> ↑</string>
+
+    <string name="common_notice">提示</string>
+    <string name="fb_date_format">yyyy-MM-dd HH:mm:ss</string>
+
+    <string name="week_prompt_lang_line">请仅用 <ns0:g id="lang">%1$s</ns0:g> 作答。</string>
+
+    <string name="pro_meta_emotion_label">情绪</string>
+    <string name="pro_meta_keywords_label">关键词</string>
+    <string name="pro_meta_score_label">分数</string>
+    <string name="pro_meta_ai_label">AI 分析</string>
+
+    <string name="week_prompt_intro">以下为用户最近 1 周的梦境记录（最多 4 条，按时间倒序）及其对应的解梦/分析文本。</string>
+
+    <string-array name="keyword_catalog_ids">
+        <item>person_people</item><item>family</item><item>friend</item><item>partner</item><item>baby</item>
+        <item>child</item><item>teacher</item><item>boss</item><item>stranger</item><item>crowd</item>
+        <item>home_house</item><item>room</item><item>school</item><item>office</item><item>bathroom_toilet</item>
+        <item>kitchen</item><item>hospital</item><item>road</item><item>bridge</item><item>forest</item>
+        <item>mountain</item><item>sea_ocean</item><item>river</item><item>beach</item><item>sky</item>
+        <item>phone</item><item>message_text</item><item>money</item><item>key</item><item>door</item>
+        <item>window</item><item>stairs</item><item>elevator</item><item>car</item><item>bus</item>
+        <item>train</item><item>airplane</item><item>ship_boat</item><item>computer</item><item>book</item>
+        <item>mirror</item><item>teeth</item><item>hair</item><item>blood</item><item>ring</item>
+        <item>shoes</item><item>dog</item><item>cat</item><item>bird</item><item>fish</item>
+        <item>snake</item><item>spider</item><item>pig</item><item>shark</item><item>whale</item>
+        <item>insect</item><item>chase</item><item>fall</item><item>flying</item><item>late</item>
+        <item>exam_test</item><item>lost</item><item>escape</item><item>fight</item><item>death</item>
+        <item>wedding</item><item>funeral</item><item>pregnancy</item><item>birth</item><item>fire</item>
+        <item>poop</item>
+    </string-array>
+
+    <string name="week_prompt_rules" formatted="false">
+角色：“每周梦境深度分析师”。
+输出：纯 HTML 片段(&lt;p&gt;,&lt;ul&gt;)，禁止代码块。
+禁止：医学/心理诊断、恐吓/不祥预言、过度武断。
+语气：缓解不安，侧重可执行建议。
+
+章节（顺序固定）：
+- 每周梦境深度分析（5~7 句。以叙事串联梦境，综合解析本周的核心信息、重复母题、脉络）
+- 摘要（3 句）
+- 情绪模式解析
+- 象征·场景解析
+- 命理视角
+- 1~2 周展望 ← 必须包含，至少 3 句。
+  • 末尾附加一句“基于趋势的生活指引，而非预言”
+- 清单（3 个要点。可在日常立即检查/确认的事项，每项 1 句，以动词开头）
+</string>
+
+    <string name="week_prompt_header_note">【格式规则】情绪/主题标签由应用固定提供，请只填写分布值（emotionDist/themeDist），不要新建标签。关键词请充分提炼核心。</string>
+    <string name="tag_dream_original">[梦原文 %1$d]</string>
+    <string name="tag_interpret_text">[解梦文本 %1$d]</string>
+
+    <string name="deep_dialog_title">深度分析</string>
+    <string name="chip_lucky_time">时间  %1$s</string>
+    <string name="chip_lucky_number">数字  %1$d</string>
+    <string name="chip_lucky_color">颜色  %1$s</string>
+    <string name="fallback_highlights">• 已为你简要整理今日的整体走势。</string>
+
+    <string name="section_overall">总运</string>
+    <string name="section_love">恋爱运</string>
+    <string name="section_study">学业运</string>
+    <string name="section_work">职场运</string>
+    <string name="section_money">财运</string>
+    <string name="section_lotto">彩票运</string>
+    <string name="section_header_with_score">%1$s（%2$d分）</string>
+    <string name="label_lotto_numbers">号码：%1$s</string>
+    <string name="label_lotto_numbers_dash">号码：-</string>
+    <string name="score_points">%1$d分</string>
+    <string name="section_body_fallback">查看今日走势与执行提示。</string>
+
+
+    <string name="daily_summary_base">今天的整体走势已为你简要整理。</string>
+    <string name="bullet_with_text">• %1$s</string>
+
+    <string name="mood_high">上升势头明显。</string>
+    <string name="mood_good">走势稳定。</string>
+    <string name="mood_fair">有起伏，放慢节奏也不错。</string>
+    <string name="mood_low">低于预期，适合把基础打牢。</string>
+
+    <string name="sec_love_text">在人际/感情中，%1$s 态度比言语更能建立信任。别夸大情绪，用轻松的话题对齐节奏。</string>
+    <string name="sec_study_text">学习专注度为 %1$s；即使减少学习量，只要保持稳定也会见效。先抓住关键关键词。</string>
+    <string name="sec_work_text">工作节奏为 %1$s；把目标收敛为一个会更高效。减少分散，重排优先级。</string>
+    <string name="sec_money_text">财运为 %1$s；减少即兴消费，只检查 1 笔支出也能守住平衡。</string>
+    <string name="sec_overall_text">今日整体为 %1$s；适合一点一滴累积小成就。放下贪心，守住基本作息会更安定。</string>
+    <string name="sec_love_advice">建议以舒适话题代替刺激性话题。</string>
+    <string name="sec_study_advice">用“短时沉浸”先完成 1 个核心。</string>
+    <string name="sec_work_advice">专注于一件事，结果会更清晰。</string>
+    <string name="sec_money_advice">只保留必要支出，今天检查 1 项就足够。</string>
+    <string name="sec_overall_advice">别逞强，专注于一个确定事项也很好。</string>
+    <string name="sec_lotto_tip">• 参考：为娱乐设定上限，避免超出范围。</string>
+
+    <string name="essential_check_1">完成 1 个核心任务</string>
+    <string name="essential_check_2">用 3 分钟整理提醒/备忘</string>
+    <string name="essential_check_3">轻度拉伸 5 分钟</string>
+
+    <string name="tomorrow_plan_template">
+• 今天的走势已简要回顾。
+
+上午(09~12)
+ - 先暖身，梳理今日方向即可。
+ - 从负担较低的事开始，先“扣好第一粒扣子”。
+
+下午(13~17)
+ - 减少干扰，用一次短时沉浸挑战 1 次小完结。
+ - 有余力时，以轻度拉伸重置。
+
+晚上(19~22)
+ - 记录 1 个做得好的点、1 句学到的事就足够了。
+ - 只选好明天开头 10 分钟要着手的任务，心情会更轻松。
+</string>
+    <string name="tomorrow_extra_fallback">• 明天早上前 10 分钟，只延续今天的一个核心也很好。</string>
+
+    <string name="label_am">上午</string>
+    <string name="label_pm">下午</string>
+    <string name="label_hour_suffix">时</string>
+
+    <string name="err_auth">发生认证错误。请在设置中检查 API 密钥。( %1$s )</string>
+    <string name="err_forbidden">访问被拒绝。请检查权限/支付状态。( %1$s )</string>
+    <string name="err_not_found">找不到服务器地址。请稍后重试。( %1$s )</string>
+    <string name="err_rate_limit">已超出调用限额。请稍后重试。( %1$s )</string>
+    <string name="err_timeout">网络延迟中。请检查连接后再次尝试。( %1$s )</string>
+    <string name="err_network_generic">发生网络错误。( %1$s )</string>
+
+    <!-- eep prompt 템플릿 -->
+    <string name="fortune_deep_prompt_template">
+[上下文]
+- 用户：nickname="%1$s", mbti="%2$s", birthdate="%3$s", gender="%4$s", birth_time="%5$s"
+- 日期：%6$s, tone="%7$s", seed=%8$s
+- 每日运势(JSON)：%9$s
+
+[请求]
+只调用下方 schema 的 function。请仅返回 function 的参数(JSON)，不要输出自由文本正文。
+
+[撰写规则(语气)]
+- highlights：抓住今日走势的 3~6 个要点（短而有力）。
+- plan：上午/下午/晚上各 2~3 行，用“建议/可考虑”的语气（如“……也可以”“……为佳”“……可考虑”），而非命令句。
+- 禁用“学生/学校/联系”类指令词。用“回顾”，禁用“review”。禁用“25 分钟×2”类表述（替代为“短时沉浸”）。
+- tips：3~6 条，今天即可尝试的建议。
+- checklistAdjusted：对 daily.checklist 做现实化调整或替代（最多 3~5 条）。
+- luckyColorName：用 sanitizeColorName("", luckyHex) 等方式产出中文色名。
+- luckyTime：humanizeLuckyTime(luckyTime) 或明确的时间段。
+- luckyNumber：尽量保持 luckyNum。
+- tomorrowPrep：围绕最低分领域(worstKey)给出一段明日准备建议（建议口吻）。
+
+务必调用 deep_fortune_analysis。
+</string>
+
+    <string name="fortune_system_daily">你是高级生活教练与运势分析师。始终只通过 function 调用返回 JSON。</string>
+    <string name="fortune_system_deep">你是高级生活教练与运势分析师。仅通过工具调用返回 JSON。</string>
+
+    <string name="replace_meeting">咨询/整理</string>
+    <string name="replace_email">提醒/备忘</string>
+    <string name="replace_report">笔记整理</string>
+    <string name="replace_approval">确认</string>
+    <string name="replace_messenger">联系</string>
+    <string name="contact_sanitized">已整理 1 条提醒</string>
+
+    <string name="color_name_fallback">幸运色</string>
+
+    <string name="default_generic_advice">尝试轻松完成 1 个清单项。</string>
+
+    <string name="sub_title">DreamInDream Premium</string>
+    <string name="sub_subtitle">无广告，更迅速</string>
+    <string name="sub_badge_active">ACTIVE</string>
+
+    <string name="sub_benefit_1">✅ AI 报告·运势深度分析全程无广告</string>
+    <string name="sub_benefit_2">🌙 梦境解读：每日 3 次免广告即时解读</string>
+    <string name="sub_benefit_3">🔒 账号联动后在所有设备保持权益</string>
+    <string name="sub_benefit_4">🛠️ 可随时在 设置 &gt; Premium 中管理</string>
+
+    <string name="sub_label_plan">选择方案</string>
+    <string name="sub_chip_monthly">月订阅</string>
+    <string name="sub_chip_yearly">年订阅</string>
+
+    <string name="sub_price_monthly_amount">₩4,000</string>
+    <string name="sub_price_yearly_amount">₩40,000</string>
+
+    <string name="sub_btn_later">稍后</string>
+    <string name="sub_btn_start">开始使用 Premium</string>
+    <string name="sub_btn_restore">恢复购买</string>
+    <string name="sub_toast_restore_ok">已恢复以往购买。</string>
+    <string name="sub_toast_restore_none">没有可恢复的购买记录。</string>
+
+    <string name="signin_required">需要登录。</string>
+
+    <string name="billing_err_connect">正在初始化结算服务。请稍后再试。</string>
+    <string name="billing_err_product_info">无法获取商品信息。请稍后再试。</string>
+    <string name="billing_err_offer_missing">当前无法使用该资费方案。</string>
+    <string name="billing_err_plan_inactive">所选资费方案处于未启用状态。</string>
+
+    <string name="sub_price_format">%1$s / %2$s</string>
+    <string name="sub_unit_month">月</string>
+    <string name="sub_unit_year">年</string>
+    <string name="sub_price_monthly">₩4,000 / 月</string>
+    <string name="sub_price_yearly">₩40,000 / 年</string>
+
+    <string name="btn_fortune_show">❔</string>
+    <string name="btn_come_tomorrow">明天再来</string>
+    <string name="toast_already_seen_today">今天已查看。请明天再使用。</string>
+    <string name="toast_run_fortune_first">请先运行“查看幸运”。</string>
+    <string name="toast_copied">已复制</string>
+    <string name="share_chooser_title">分享</string>
+    <string name="dialog_profile_title">需要设置</string>
+    <string name="dialog_profile_message">只需保存昵称·生日·性别即可查看定制运势。\n（出生时间·MBTI 为可选）</string>
+    <string name="dialog_ok">确认</string>
+    <string name="ad_failed_open_deep_now">广告失败(%1$s) → 直接打开深度分析</string>
+    <string name="deep_generating_label">生成中…</string>
+    <string name="deep_button_label">查看深度分析</string>
+
+    <string-array name="trait_titles">
+        <item>创造力</item>
+        <item>沟通</item>
+        <item>适应力</item>
+        <item>决断力</item>
+    </string-array>
+
+    <string name="birth_time_not_selected">未选择</string>
+    <string name="guest_prefix">guest-</string>
+    <string name="device_fallback">device</string>
+
+    <string name="toast_need_two_dreams">本周记录 2 个以上梦境即可查看 AI 报告。</string>
+
+    <string name="toast_fill_email_password">请输入邮箱/密码。</string>
+    <string name="toast_fill_all_fields">请填写所有项目。</string>
+    <string name="toast_password_mismatch">两次密码不一致。</string>
+    <string name="toast_enter_email">请输入邮箱。</string>
+
+    <string name="toast_login_failed_fmt">登录失败：%1$s</string>
+    <string name="toast_email_verify_first">邮箱验证后再登录。</string>
+    <string name="toast_signup_success">注册成功！验证邮件已发送。请查收后登录。</string>
+    <string name="toast_signup_failed_fmt">注册失败：%1$s</string>
+    <string name="toast_reset_sent">已发送重置密码邮件。</string>
+    <string name="toast_reset_failed_fmt">邮件发送失败：%1$s</string>
+
+    <string name="toast_google_login_failed_fmt">Google 登录失败：%1$s</string>
+    <string name="toast_google_login_error_fmt">Google 登录错误：%1$s</string>
+    <string name="toast_anonymous_failed_fmt">匿名登录失败：%1$s</string>
+
+    <string name="dialog_reactivate_title">账户恢复</string>
+    <string name="dialog_reactivate_message">此账户处于停用状态。\n是否要恢复？</string>
+    <string name="dialog_reactivate_positive">恢复</string>
+    <string name="dialog_reactivate_negative">取消</string>
+    <string name="toast_reactivate_failed_fmt">恢复失败：%1$s</string>
+    <string name="toast_account_deleted">账户已被永久删除。</string>
+
+    <string name="loading_calendar_prep">正在准备日历数据。\n请稍候。</string>
+
+    <string name="name_guest_default">匿名用户</string>
+    <string name="name_anonymous_default">匿名</string>
+
+    <string name="terms_title">DreamInDream 使用条款</string>
+    <string name="terms_section1">1. 目的</string>
+    <string name="terms_section1_body">本条款规定了用户与运营者之间关于使用 DreamInDream（下称“服务”）的权利与义务。</string>
+
+    <string name="terms_section2">2. 账户与使用</string>
+    <string-array name="terms_section2_items">
+        <item>内容分级为面向所有人，但为遵守隐私及相关政策，服务的目标用户为年满 13 周岁。</item>
+        <item>用户需保持账户信息的准确性。</item>
+        <item>服务可在不事先通知的情况下变更或中止功能。</item>
+    </string-array>
+
+    <string name="terms_section3">3. 付费功能与广告</string>
+    <string-array name="terms_section3_items">
+        <item>Premium（去广告等）功能遵循单独政策。</item>
+        <item>可能包含广告展示。</item>
+    </string-array>
+
+    <string name="terms_section4">4. 禁止行为</string>
+    <string-array name="terms_section4_items">
+        <item>发布非法/有害信息及侵害他人权利</item>
+        <item>自动化收集、爬取、反编译/篡改等异常使用</item>
+    </string-array>
+
+    <string name="terms_section5">5. 知识产权</string>
+    <string name="terms_section5_body">服务及所提供内容的权利归运营者或合法权利人所有。</string>
+
+    <string name="terms_section6">6. 免责声明</string>
+    <string name="terms_section6_body">不保证梦境解读/运势结果的准确性与效用。</string>
+
+    <string name="terms_section7">7. 条款变更</string>
+    <string name="terms_section7_body">重大变更将于应用内告知。</string>
+
+    <string name="privacy_title">隐私政策</string>
+    <string name="privacy_intro">内容分级面向所有人；若确认收集到 13 岁以下儿童的个人信息，将立即删除。</string>
+
+    <string name="privacy_section1">1. 收集项目</string>
+    <string-array name="privacy_section1_items">
+        <item>必填：邮箱（或匿名标识）、昵称、生日/性别、使用日志</item>
+        <item>可选：MBTI、出生时间、头像</item>
+        <item>自动收集：设备/应用版本、广告标识(AAID)、FCM 令牌、诊断/崩溃日志</item>
+        <item>内容数据：梦境文本/关键词/撰写时间等</item>
+    </string-array>
+
+    <string name="privacy_section2">2. 使用目的</string>
+    <string-array name="privacy_section2_items">
+        <item>提供梦境记录/分析与通知发送</item>
+        <item>质量改进、客户咨询应对、防止不当使用</item>
+    </string-array>
+
+    <string name="privacy_section3">3. 保存期限</string>
+    <string name="privacy_section3_body">在注销或目的达成时立即销毁，并遵守法律规定的例外保存。</string>
+
+    <string name="privacy_section4">4. 处理委托/跨境传输</string>
+    <string name="privacy_section4_body">可能仅限于 OpenAI·AdMob·Firebase 等云/分析·广告服务进行委托或跨境传输。</string>
+
+    <string name="privacy_section5">5. 用户权利</string>
+    <string name="privacy_section5_body">可要求查阅/更正/删除/停止处理并撤回同意。\n咨询：dreamindream@dreamindream.app</string>
+    <string name="privacy_section6">6. 安全性保障措施</string>
+    <string-array name="privacy_section6_items">
+        <item>HTTPS 通信、最小化访问权限、访问记录管理等</item>
+    </string-array>
+
+    <string name="weekly_history_title">分析记录</string>
+    <string name="weekly_history_login_needed">需要登录</string>
+    <string name="weekly_history_login_message">需要登录。</string>
+    <string name="weekly_history_empty_meta">如欲生成首个报告，请在本周记录至少 2 个梦境。</string>
+    <string name="weekly_history_empty_title">尚无生成的报告</string>
+    <string name="weekly_history_empty_sub">本周记录满 2 个梦境后，我们会自动生成每周摘要。</string>
+    <string name="weekly_history_chip_2plus">本周 2 个以上</string>
+    <string name="weekly_history_chip_keywords">填写关键词</string>
+    <string name="weekly_history_chip_emotion">选择情绪</string>
+    <string name="cta_go_record_dream">前往记录梦境</string>
+    <string name="weekly_history_meta_count">共 %1$d 周 · 按最新排序</string>
+    <string name="weekly_history_delete_restrict">仅可删除最近一周。</string>
+    <string name="weekly_history_delete_title">删除报告</string>
+    <string name="weekly_history_delete_message">要删除‘%1$s’报告吗？</string>
+    <string name="weekly_history_delete_positive">删除</string>
+    <string name="weekly_history_delete_negative">取消</string>
+    <string name="weekly_history_chip_current">当前</string>
+    <string name="weekly_history_content_desc_delete">删除</string>
+    <string name="icon_sparkles">✨</string>
+    <string name="chevron_right">›</string>
+    <string name="weekly_history_item_subtitle">%1$s · %2$s</string>
+
+    <string name="bs_title_history">分析记录</string>
+    <string name="bs_meta_login_required">需要登录</string>
+    <string name="bs_login_required_msg">需要登录。</string>
+    <string name="bs_meta_total_weeks_format">共 %1$d 周 · 按最新排序</string>
+    <string name="bs_toast_delete_only_latest">仅可删除最近一周。</string>
+    <string name="bs_dialog_delete_title">删除报告</string>
+    <string name="bs_dialog_delete_msg_format">要删除‘%1$s’报告吗？</string>
+
+    <string name="chip_current">当前</string>
+
+    <string name="whd_title">分析说明</string>
+    <string name="whd_generation_rule">报告生成规则：本周梦境达到 2 个及以上即刻生成 AI 报告。（周起止：周一~周日）</string>
+    <string name="whd_hero_title">尚无生成的报告</string>
+    <string name="whd_hero_sub">本周请自由记录梦境。累计 2 个及以上后，我们会立即为你生成 AI 报告。</string>
+    <string name="whd_chip_instant">本周满 2 个即刻生成</string>
+    <string name="whd_chip_week_range">周起止：周一~周日</string>
+    <string name="whd_pro_text">AI 深度分析可在报告生成的当周，观看广告后使用。</string>
+    <string name="whd_close">关闭</string>
+    <string name="whd_cta_go_record">前往记录梦境</string>
+
+    <!-- ⚠ 兼容用(已弃用)：恢复 FortuneFragment 引用的旧键 -->
+    <string name="ad_preparing">广告准备中…</string>
+    <string name="ad_closed_try_again">广告已关闭，未确认到奖励。</string>
+    <string name="ad_load_failed_fmt">广告错误(%1$s) - 请稍后再试。</string>
+
+    <string name="dream_input_min15">请不少于 15 个字并尽量详细。</string>
+
+    <string name="choose_language">请选择语言</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_english">English</string>
+    <string name="save_and_continue">保存并继续</string>
+    <string name="language">语言</string>
+    <string name="language_changed">语言已更新。</string>
+    <string name="recommended">推荐</string>
+    <string name="press_back_again_to_exit">再次按下即可退出。</string>
+    <string name="label_emotion">情感</string>
+    <string name="label_keywords">关键词</string>
+
+    <!-- Advertisement -->
+    <string name="ad_unit_fortune_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_dream_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_calendar_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_ai_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_settings_banner">ca-app-pub-1742201279182732/9282239127</string>
+
+</resources>

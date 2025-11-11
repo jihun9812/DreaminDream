@@ -1,0 +1,1093 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:ns0="urn:oasis:names:tc:xliff:document:1.2">
+
+    <string name="bs_subtitle_key_range_format">%1$s · %2$s</string>
+
+
+    <string name="login_slogan">सपनों में समाधान खोजें</string>
+    <string name="dreamin_slogan1"> </string>
+    <string name="login_password_confirm_hint">पासवर्ड की पुष्टि</string>
+    <string name="login_findpw">पासवर्ड खोजें</string>
+    <string name="login_findpw_send">ईमेल पर भेजें</string>
+    <string name="forgot_password">पासवर्ड खोजें</string>
+    <string name="sign_up">साइन अप</string>
+    <string name="sign_up_title">नया खाता बनाएँ</string>
+    <string name="email_hint">ईमेल</string>
+    <string name="password_hint">पासवर्ड</string>
+    <string name="password_confirm_hint">पासवर्ड की पुष्टि</string>
+    <string name="sign_up_button">शामिल हों</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="password_reset_title">पासवर्ड रीसेट</string>
+    <string name="send_reset_email">रीसेट ईमेल भेजें</string>
+    <string name="text_divider"> / </string>
+    <string name="login_email_hint">ईमेल</string>
+    <string name="login_password_hint" translatable="false">पासवर्ड</string>
+    <string name="login_btn_login" translatable="false">लॉग इन</string>
+    <string name="login_btn_signup" translatable="false">साइन अप</string>
+    <string name="login_btn_google" translatable="false">Google से लॉग इन</string>
+    <string name="login_btn_guest" translatable="false">मेहमान</string>
+    <string name="privacy_and_version" translatable="false">v1.07 Dream in Dream | 개인정보처리방침</string>
+    <string name="brand_logo_desc">Dream in Dream </string>
+
+
+    <string name="feedbacktitle">प्रश्न · फीडबैक</string>
+    <string name="title_hint">शीर्षक</string>
+    <string name="feedback_contents">कृपया अपना प्रश्न/फीडबैक लिखें</string>
+    <string name="send">भेजें</string>
+
+
+    <string name="title_terms_privacy">नियम · गोपनीयता नीति</string>
+    <string name="tab_terms">उपयोग की शर्तें</string>
+    <string name="tab_privacy">गोपनीयता नीति</string>
+
+
+    <string name="ad_prompt_title">व्यक्तिगत व्याख्या तैयार हो रही है</string>
+    <string name="ad_prompt_status">ज़रा ठहरिए! विज्ञापन देखने के बाद उन्नत व्याख्या खुल जाएगी।</string>
+    <string name="ad_prompt_cancel">रद्द करें</string>
+    <string name="ad_prompt_watch_ad">विज्ञापन देखें</string>
+
+
+    <string name="day_dream">इस दिन के सपने</string>
+
+
+    <string name="fortune_deep_title">गहन विश्लेषण</string>
+    <string name="fortune_deep_chip_time">दोपहर 3~4 बजे</string>
+    <string name="fortune_deep_chip_number">संख्या 56</string>
+    <string name="fortune_deep_chip_color">रंग नीला</string>
+    <string name="fortune_deep_highlights_label">आज की मुख्य बातें</string>
+    <string name="fortune_deep_plan_label">कार्रवाई योजना</string>
+    <string name="fortune_deep_plan_morning">सुबह 09~12 बजे</string>
+    <string name="fortune_deep_plan_afternoon">दोपहर 13~17 बजे</string>
+    <string name="fortune_deep_plan_evening">शाम 19~22 बजे</string>
+    <string name="fortune_deep_tomorrow_label">कल की तैयारी</string>
+
+
+
+    <string name="fortune_section_title_total">समग्र भाग्य</string>
+    <string name="fortune_section_score_sample">80 अंक</string>
+
+
+
+    <string name="weekday_sun">रवि</string>
+    <string name="weekday_mon">सोम</string>
+    <string name="weekday_tue">मंगल</string>
+    <string name="weekday_wed">बुध</string>
+    <string name="weekday_thu">गुरु</string>
+    <string name="weekday_fri">शुक्र</string>
+    <string name="weekday_sat">शनि</string>
+
+    <string name="tutorial_lang_tip">한국어/English बटन</string>
+
+
+    <string name="empty_string" />
+    <string name="ai_report_empty">विश्लेषण के लिए डेटा उपलब्ध नहीं है।</string>
+    <string name="ai_report_week_label_default">इस सप्ताह का विश्लेषण रिपोर्ट\n0 प्रविष्टि · -</string>
+    <string name="ai_report_week_label_format">इस सप्ताह का विश्लेषण रिपोर्ट\n%1$d प्रविष्टि · %2$s</string>
+    <string name="ai_report_history">विश्लेषण इतिहास ▼</string>
+    <string name="kpi_positive">सकारात्मक</string>
+    <string name="kpi_neutral">तटस्थ</string>
+    <string name="kpi_negative">नकारात्मक</string>
+    <string name="value_placeholder_dash">-</string>
+    <string name="chart_emotion_balance">भावनात्मक संतुलन</string>
+    <string name="chart_info_desc">विवरण</string>
+    <string name="chart_theme">मुख्य थीम</string>
+    <string name="chart_caption">साप्ताहिक सभी सपनों पर आधारित स्वचालित सारांश</string>
+    <string name="chart_keywords_placeholder">यहाँ भावनाएँ/कीवर्ड दिखेंगे।</string>
+    <string name="btn_pro_upgrade">गहन विश्लेषण करें</string>
+    <string name="ai_analysis_title">AI विश्लेषण</string>
+    <string name="ai_analysis_placeholder">विश्लेषण सामग्री यहाँ प्रदर्शित होगी।</string>
+
+
+    <string name="prev_month">पिछला माह</string>
+    <string name="next_month">अगला माह</string>
+    <string name="calendar_month_year_sample">2025 वर्ष 9 माह</string>
+    <string name="calendar_month_year_format">%1$d वर्ष %2$d माह</string>
+    <string name="dream_list_title_sample">2025-09-12 (शुक्र) के सपने</string>
+    <string name="dream_list_title_format">%1$s (%2$s) के सपने</string>
+    <string name="dream_list_empty">इस तारीख पर कोई सपना रिकॉर्ड नहीं है।</string>
+
+
+
+    <string name="calendar_title_placeholder">2025 वर्ष 7 माह</string>
+    <string name="dream_list_label">🌙 आज के सपनों का रिकॉर्ड</string>
+    <string name="calendar_dream_list_title">चयनित तिथि के सपनों की सूची:</string>
+    <string name="selected_date_default">तिथि</string>
+    <string name="selected_date_placeholder">तिथि चयनित</string>
+
+    <string name="desc_calendar">कैलेंडर</string>
+    <string name="desc_dream_scroll">सपना रिकॉर्ड स्क्रॉल</string>
+    <string name="dream_usage_count">💭 व्याख्या उपलब्ध: %1$d बार</string>
+
+
+
+
+
+
+    <string name="close">बंद करें</string>
+    <string name="ok">ठीक है</string>
+    <string name="placeholder_dash">-</string>
+    <string name="percent_placeholder">0%%</string>
+
+
+    <string name="dream_input_label">• सपने की सामग्री दर्ज करें</string>
+    <string name="usage_left_default">आज शेष : 0 बार</string>
+    <string name="usage_left_format">आज शेष : %1$d बार</string>
+    <string name="hint_input">कृपया अपना सपना विस्तार से लिखें! उदा) एक बड़ा शार्क मेरे सामने आया और मैं भाग गया, मैं एक बिल्डिंग के बीचोंबीच बहुत दौड़ रहा था।</string>
+    <string name="button_interpret">व्याख्या करें</string>
+
+    <string name="dream_input_empty">कृपया सपने की सामग्री दर्ज करें।</string>
+    <string name="dream_input_not_meaningful">कृपया अर्थपूर्ण सपना सामग्री विस्तार से दर्ज करें।</string>
+
+    <string name="dream_network_error">स्वप्न व्याख्या परिणाम प्राप्त नहीं हो सके। नेटवर्क जाँचें और पुनः प्रयास करें।</string>
+
+    <string name="dream_request_failed">स्वप्न अनुरोध विफल (%1$d)</string>
+
+
+    <string name="dream_quota_title">आज का अवसर समाप्त</string>
+    <string name="dream_quota_message">आज की उपयोग सीमा समाप्त हो गई है।</string>
+
+
+    <string name="fortune_start">राशिफल\nदेखें</string>
+    <string name="fortune_lucky_color">भाग्यशाली रंग</string>
+    <string name="fortune_lucky_number">भाग्यशाली संख्या</string>
+    <string name="fortune_good_time">अच्छा समय</string>
+    <string name="fortune_today_check_toggle">आज की जाँच ▾</string>
+    <string name="fortune_today_check">आज की जाँच</string>
+    <string name="btn_deep_analysis">गहन विश्लेषण देखें</string>
+    <string name="action_copy">कॉपी</string>
+    <string name="action_share">साझा करें</string>
+
+    <string name="checked">चयनित</string>
+    <string name="unchecked">चयन रद्द</string>
+
+
+
+    <string name="app_name">DreamInDream</string>
+
+    <string name="back_button">पीछे</string>
+    <string name="app_logo_description">ऐप लोगो</string>
+    <string name="back_arrow">←</string>
+    <string name="left_arrow">←</string>
+    <string name="right_arrow">→</string>
+    <string name="desc_prev_month">पिछला महीना</string>
+    <string name="desc_next_month">अगला महीना</string>
+
+
+    <string name="settings">सेटिंग्स</string>
+    <string name="home_ai_title">साप्ताहिक सपना विश्लेषण</string>
+    <string name="ai_report">AI रिपोर्ट</string>
+    <string name="ai_report_btn">AI रिपोर्ट</string>
+    <string name="ai_avatar">AI अवतार</string>
+    <string name="home_title">Dream In Dream</string>
+    <string name="home_daily_message_sample">आज का संदेश यहाँ प्रदर्शित होगा।</string>
+    <string name="btn_dream">स्वप्न देखें</string>
+    <string name="btn_calendar">कैलेंडर देखें</string>
+    <string name="btn_fortune">भाग्य देखें</string>
+
+    <string name="home_ai_sub">यह इस सप्ताह के सपनों का सारांश और थीम दिखाता है</string>
+    <string name="ai_no_dream">अभी कोई सपना रिकॉर्ड नहीं है</string>
+    <string name="ai_report_guide">साप्ताहिक AI सपना विश्लेषण</string>
+    <string name="ai_not_enough_data">विश्लेषण डेटा अपर्याप्त</string>
+    <string name="ai_need_more">विश्लेषण के लिए और सपना रिकॉर्ड आवश्यक हैं।</string>
+    <string name="ai_loading">AI साप्ताहिक सपना विश्लेषण चल रहा है...</string>
+    <string name="ai_loading2">AI साप्ताहिक सपना विश्लेषण बना रहा है।</string>
+    <string name="ai_report_fail">AI विश्लेषण विफल</string>
+    <string name="ai_retry">कृपया कुछ देर बाद पुनः प्रयास करें।</string>
+    <string name="ai_report_summary">साप्ताहिक सपना सारांश</string>
+    <string name="ai_emotion_keywords_ai">भावनाएँ: %1$s\nकीवर्ड: %2$s\nAI: %3$s</string>
+
+    <string name="ai_msg_loading">✨ आज का स्वप्न-संदेश लोड हो रहा है...</string>
+    <string name="ai_emotion_keywords_simple">भावनाएँ: %1$s\nकीवर्ड: %2$s</string>
+
+
+    <string name="btn_cancel">रद्द करें</string>
+    <string name="btn_save">सहेजें</string>
+
+
+    <string name="btn_logout">लॉग आउट</string>
+    <string name="settings_title">ऐप सेटिंग्स</string>
+    <string name="settings_section">सेटिंग्स</string>
+    <string name="gpt_usage_today">आज का स्वप्न-विवेचन</string>
+    <string name="dream_count">सपना रिकॉर्ड</string>
+    <string name="btn_profile_edit">प्रोफ़ाइल संपादित करें</string>
+    <string name="btn_premium">प्रीमियम · विज्ञापन हटाएँ</string>
+    <string name="btn_contact">प्रश्न·फीडबैक भेजें</string>
+    <string name="btn_terms">नियम · गोपनीयता नीति</string>
+    <string name="btn_delete_account">खाता हटाएँ</string>
+    <string name="label_language">भाषा</string>
+    <string name="label_account_link">खाता एकीकरण</string>
+    <string name="account_status_default">स्थिति:  -</string>
+    <string name="btn_google_link">Google से खाता लिंक करें</string>
+    <string name="account_link_note">* अतिथि (अनाम) डेटा Google खाता लिंक करने पर भी बना रहेगा।</string>
+
+    <string name="label_name">नाम</string>
+    <string name="hint_name_example">उदा: 홍길동</string>
+    <string name="label_birthdate">जन्मतिथि</string>
+    <string name="hint_birthdate_format">YYYY-MM-DD</string>
+    <string name="label_gender">लिंग</string>
+    <string name="gender_male">पुरुष</string>
+    <string name="gender_female">महिला</string>
+    <string name="label_mbti">MBTI</string>
+    <string name="label_birthtime">जन्म समय</string>
+
+
+
+
+    <string name="default_web_client_id">886944015637-96pcphpcqug6pga1v9aogdcg4bfr7mav.apps.googleusercontent.com</string>
+
+
+
+
+
+
+
+    <string name="terms_privacy_text">
+DreamInDream उपयोग की शर्तें
+
+1. उद्देश्य
+ये शर्तें DreamInDream (आगे “सेवा”) के उपयोग के संबंध में उपयोगकर्ता और संचालक के बीच अधिकारों और दायित्वों को विनियमित करती हैं।
+
+2. खाता और उपयोग
+- सभी आयु वर्ग के लिए उपलब्ध।
+- उपयोगकर्ता को अपने खाता विवरण सटीक रखने होंगे।
+- सेवा बिना पूर्व सूचना के सुविधाओं में परिवर्तन/बंद कर सकती है।
+
+3. सशुल्क सुविधाएँ और विज्ञापन
+- प्रीमियम (विज्ञापन हटाना आदि) सुविधाएँ अलग नीति के अधीन हैं।
+- विज्ञापन प्रदर्शित किए जा सकते हैं।
+
+4. निषिद्ध गतिविधियाँ
+गैरकानूनी/हानिकारक जानकारी पोस्ट करना, स्वचालित स्क्रैपिंग, रिवर्स-इंजीनियरिंग/परिवर्तन आदि।
+
+5. बौद्धिक संपदा अधिकार
+सेवा और प्रदत्त सामग्री के अधिकार संचालक या संबंधित अधिकारधारक के पास हैं।
+
+6. अस्वीकरण
+व्याख्या/राशिफल परिणामों की शुद्धता और उपयोगिता की कोई गारंटी नहीं है।
+
+7. शर्तों में परिवर्तन
+महत्वपूर्ण परिवर्तन होने पर ऐप के भीतर सूचना दी जाएगी।
+
+गोपनीयता नीति
+
+1. एकत्रित जानकारी
+आवश्यक: ईमेल (या अनाम पहचानकर्ता), उपनाम, जन्मतिथि/लिंग, उपयोग लॉग
+वैकल्पिक: MBTI, जन्म समय, प्रोफ़ाइल छवि
+स्वतः-संग्रहित: डिवाइस/ऐप संस्करण, विज्ञापन पहचानकर्ता, FCM टोकन
+
+2. उपयोग उद्देश्य
+सपना रिकॉर्ड/विश्लेषण प्रदान करना, पुश भेजना, गुणवत्ता सुधार, ग्राहक प्रश्नों का समाधान, दुरुपयोग रोकथाम
+
+3. संग्रहन अवधि
+खाता हटाने पर शीघ्र नष्ट; क़ानूनन आवश्यक अपवादों का पालन
+
+4. प्रसंस्करण-आउटसोर्सिंग/विदेश स्थानांतरण
+क्लाउड प्रदाताओं तक सीमित आउटसोर्सिंग/विदेश स्थानांतरण हो सकता है।
+
+5. उपयोगकर्ता अधिकार
+अवलोकन, संशोधन, हटाने, और प्रसंस्करण-निरोध का अनुरोध कर सकते हैं।
+
+6. सुरक्षा उपाय
+HTTPS, न्यूनतम एक्सेस अधिकार, एक्सेस लॉग प्रबंधन आदि।
+
+संपर्क: support@dreamindream.app
+    </string>
+
+    <string name="profile_edit_title">प्रोफ़ाइल संपादित करें</string>
+    <string name="unit_times_value">%1$d बार</string>
+    <string name="unit_entries_value">%1$d आइटम</string>
+    <string name="dlg_delete_title">खाता 삭제</string>
+    <string name="dlg_delete_need_login_msg" formatted="false">
+    खाता हटाना केवल Google/ईमेल से लॉगिन किए गए खातों पर संभव है।
+‘Google 계정 연결’ को पहले पूरा करें।
+</string>
+
+    <string name="dlg_delete_soft_msg">खाता तुरंत निष्क्रिय हो जाएगा।
+यदि 7 दिनों के भीतर दोबारा लॉगिन करते हैं तो पुनर्प्राप्त होगा, 7 दिन बीतने पर स्थायी रूप से 삭제 होगा।</string>
+
+    <string name="toast_deactivated">खाता निष्क्रिय कर दिया गया है। 7 दिनों के भीतर पुनर्प्राप्त किया जा सकता है।</string>
+
+    <string name="status_prefix">स्थिति: </string>
+    <string name="status_logged_out">लॉगआउट</string>
+    <string name="status_guest">|अतिथि|</string>
+    <string name="status_google">Google 로그인</string>
+    <string name="status_email">ईमेल 로그인</string>
+    <string name="btn_google_login">Google से लॉगिन</string>
+    <string name="btn_google_merge">Google से खाता एकीकृत करें</string>
+    <string name="btn_google_connected">Google 연결됨</string>
+    <string name="btn_google_connect">Google 계정 연결</string>
+
+    <string name="toast_merge_partial">खाता मर्ज (आंशिक) पूरा: %1$s</string>
+    <string name="toast_link_failed">लिंक विफल: %1$s</string>
+    <string name="toast_login_cancel_failed_code">लॉगिन रद्द/विफल: %1$d</string>
+    <string name="toast_error_with_reason">त्रुटि: %1$s</string>
+    <string name="toast_google_signin_start_failed">Google लॉगिन प्रारंभ विफल: %1$s</string>
+    <string name="toast_process_failed_with_reason">प्रक्रिया विफल: %1$s</string>
+    <string name="toast_local_migration_failed">स्थानीय डेटा माइग्रेशन विफल: %1$s</string>
+
+    <string name="dlg_save_title">सहेजना चाहेंगे?</string>
+    <string name="dlg_save_msg">दर्ज की गई जानकारी से प्रोफ़ाइल सहेजी जाएगी।</string>
+
+    <string name="summary_birth_prefix">जन्मदिन:</string>
+    <string name="summary_gender_prefix">लिंग:</string>
+    <string name="summary_mbti_prefix">MBTI:</string>
+    <string name="summary_age_prefix">आयु:</string>
+    <string name="summary_age_value">%1$d वर्ष</string>
+
+    <string name="summary_wz_prefix">%1$s राशि:</string>
+    <string name="summary_birthtime_prefix"> जन्म समय:</string>
+
+    <string name="select_none">चयन न करें</string>
+    <string name="birthtime_none">चयन न करें</string>
+
+    <string name="err_enter_name">कृपया नाम दर्ज करें।</string>
+    <string name="err_select_birthdate">कृपया जन्मतिथि चुनें।</string>
+    <string name="err_select_gender">कृपया लिंग चुनें।</string>
+
+    <string name="dlg_birthdate_title">🌙 जन्मतिथि चुनें</string>
+
+    <string name="cz_unknown">राशि -</string>
+    <string name="cz_rat">चूहा</string>
+    <string name="cz_ox">बैल</string>
+    <string name="cz_tiger">बाघ</string>
+    <string name="cz_rabbit">खरगोश</string>
+    <string name="cz_dragon">ड्रैगन</string>
+    <string name="cz_snake">साँप</string>
+    <string name="cz_horse">घोड़ा</string>
+    <string name="cz_goat">बकरी</string>
+    <string name="cz_monkey">बंदर</string>
+    <string name="cz_rooster">मुर्गा</string>
+    <string name="cz_dog">कुत्ता</string>
+    <string name="cz_pig">सूअर</string>
+    <string name="cz_format">%1$s राशि</string>
+
+    <string name="dlg_premium_title">लॉन्च की तैयारी में</string>
+    <string name="dlg_premium_msg">प्रीमियम (विज्ञापन हटाना) लॉन्च की तैयारी में है।</string>
+
+    <string name="deactivate">निष्क्रिय करें</string>
+
+    <string name="dlg_logout_title">लॉगआउट</string>
+    <string name="dlg_logout_msg">लॉगिन स्क्रीन पर ले जाया जाएगा। आगे बढ़ें?</string>
+    <string name="logout">लॉगआउट</string>
+
+    <string name="toast_google_linked">Google खाता लिंक पूरा</string>
+    <string name="toast_google_signed_in">उस Google खाते से लॉगिन किया गया।</string>
+    <string name="toast_google_login_failed">Google लॉगिन विफल: %1$s</string>
+    <string name="toast_merge_done">खाता मर्ज पूरा</string>
+    <string name="toast_saved">सहेजा गया!</string>
+
+    <string name="common_ok">ठीक है</string>
+    <string name="common_cancel">रद्द करें</string>
+    <string name="common_delete">हटाएँ</string>
+
+    <string name="fmt_month_year">yyyy वर्ष M माह</string>
+    <string name="dream_list_title">%1$s (%2$s) के सपने</string>
+
+    <string name="cal_delete_title">हटाना चाहेंगे?</string>
+    <string name="cal_delete_message">इस सपना रिकॉर्ड को हटाने पर इसे वापस नहीं लाया जा सकता।</string>
+
+    <string name="chart_cd_top">सर्वोच्च: %1$s %2$d%%</string>
+
+    <string name="dream_result_placeholder">यहाँ स्वप्न-व्याख्या का परिणाम दिखेगा।</string>
+    <string name="dream_loading">व्याख्या हो रही है…</string>
+    <string name="dream_today_left">आज शेष : %1$d बार</string>
+    <string name="dream_need_input">कृपया सपने की सामग्री दर्ज करें।</string>
+    <string name="dream_need_meaningful">कृपया अर्थपूर्ण सपना सामग्री विस्तार से दर्ज करें।</string>
+    <string name="dream_limit_title">आज का अवसर समाप्त</string>
+    <string name="dream_limit_message">आज स्वप्न-व्याख्या की उपलब्ध 3 कोशिशें उपयोग हो चुकी हैं। कृपया कल फिर प्रयास करें।</string>
+    <string name="dream_network_fail">स्वप्न-व्याख्या परिणाम प्राप्त नहीं हो सके। नेटवर्क जाँचें और पुनः प्रयास करें।</string>
+    <string name="dream_parse_error">परिणाम पार्स करते समय त्रुटि हुई।</string>
+    <string name="dream_request_fail_fmt">स्वप्न अनुरोध विफल (%1$s)</string>
+
+    <string name="sec_message">सपना जो संदेश देता है</string>
+    <string name="sec_symbols">मुख्य प्रतीकों की व्याख्या</string>
+    <string name="sec_foresight">पूर्वानुमान बिंदु</string>
+    <string name="sec_tips_today">आज के उपयोगी सुझाव</string>
+    <string name="sec_actions3">आज की 3 क्रियाएँ</string>
+    <string name="dream_result_empty">स्वप्न-व्याख्या परिणाम खाली है।</string>
+
+    <string name="fb_title_need">कृपया शीर्षक दर्ज करें</string>
+    <string name="fb_msg_need">कृपया सामग्री दर्ज करें</string>
+    <string name="fb_sent_title">भेजना पूरा</string>
+    <string name="fb_sent_body">प्राप्त हुआ। शीघ्र जाँच करेंगे।</string>
+    <string name="fb_send_fail_title">सूचना</string>
+    <string name="fb_send_fail_fmt">भेजने में विफल। कृपया थोड़ी देर बाद पुनः प्रयास करें।\n\n%1$s</string>
+
+    <string name="fortune_overall">समग्र भाग्य</string>
+    <string name="fortune_love">प्रेम भाग्य</string>
+    <string name="fortune_study">अध्ययन भाग्य</string>
+    <string name="fortune_work">कार्य भाग्य</string>
+    <string name="fortune_money">धन भाग्य</string>
+    <string name="fortune_lotto">लॉटरी भाग्य</string>
+    <string name="fortune_number_label">संख्या</string>
+    <string name="deep_title">गहन विश्लेषण</string>
+    <string name="deep_chip_time">समय  %1$s</string>
+    <string name="deep_chip_number">संख्या  %1$d</string>
+    <string name="deep_chip_color">रंग  %1$s</string>
+    <string name="fortune_default_section_body">आज की प्रवृत्ति का संक्षिप्त सार प्रस्तुत है।</string>
+
+    <string name="err_auth_fmt">प्रमाणीकरण त्रुटि हुई। सेटिंग्स में API कुंजी जाँचें। (%1$s)</string>
+    <string name="err_forbidden_fmt">पहुँच अस्वीकृत। कृपया अधिकार/भुगतान स्थिति जाँचें। (%1$s)</string>
+    <string name="err_not_found_fmt">सर्वर पता नहीं मिला। कृपया बाद में पुनः प्रयास करें। (%1$s)</string>
+    <string name="err_rate_fmt">कॉल सीमा पार हो गई। कृपया थोड़ी देर बाद पुनः प्रयास करें। (%1$s)</string>
+    <string name="err_timeout_fmt">नेटवर्क धीमा है। कनेक्शन जाँचकर पुनः प्रयास करें। (%1$s)</string>
+    <string name="err_network_fmt">नेटवर्क त्रुटि हुई। (%1$s)</string>
+
+    <string name="daily_fallback_1">आज मन की गति थोड़ी धीमी रखें।</string>
+    <string name="daily_fallback_2">पूर्णता से अधिक एक कदम महत्वपूर्ण है।</string>
+    <string name="daily_fallback_3">चिंता छोड़ें और जो संभव है उससे शुरू करें।</string>
+    <string name="daily_fallback_4">आज की पसंद कल का “मैं” बनाती है।</string>
+    <string name="daily_fallback_5">अपनी लय पर भरोसा रखें—धीरे चलना भी ठीक है।</string>
+
+    <string name="retry">पुनः प्रयास</string>
+    <string name="please_try_again">कृपया थोड़ी देर बाद पुनः प्रयास करें</string>
+
+    <string name="report_title_this_week">इस सप्ताह की विश्लेषण रिपोर्ट</string>
+    <string name="report_title_prev_week">पिछले सप्ताह की विश्लेषण रिपोर्ट</string>
+    <string name="report_switched_due_to_lack">इस सप्ताह के रिकॉर्ड की कमी के कारण स्वतः स्विच किया गया</string>
+    <string name="report_meta_format">%1$d प्रविष्टियाँ · %2$s</string>
+
+    <string name="chart_info_title">चार्ट 안내</string>
+    <string name="chart_info_message">
+    • यदि इस सप्ताह सपने %1$d या अधिक हैं, तो रिपोर्ट तुरंत बनती है।
+    \n• निर्माण के बाद 1 विज्ञापन देखने पर ‘गहन विश्लेषण’ उपलब्ध होता है।
+    \n• सप्ताह के दौरान सपनों की कुल संख्या %2$d या अधिक होने पर रिपोर्ट रीफ़्रेश होगी (अधिकतम %3$d),
+    \n  और 1 विज्ञापन देखने पर फिर से गहन विश्लेषण चला सकते हैं।
+    \n• बारें 8 भावनाओं और 5 थीम की साप्ताहिक हिस्सेदारी (%%) दर्शाती हैं।
+    \n• साप्ताहिक मानदंड: सोम~रवि (पिछले सप्ताह की रिपोर्ट ‘विश्लेषण इतिहास’ में देखें)
+</string>
+    <string name="pro_cta">गहन विश्लेषण</string>
+    <string name="pro_completed">गहन विश्लेषण पूर्ण</string>
+    <string name="pro_refresh">गहन विश्लेषण (रीफ़्रेश)</string>
+    <string name="pro_limited_range">गहन विश्लेषण सीमा (%1$d~%2$d आइटम)</string>
+    <string name="pro_in_progress">गहन विश्लेषण जारी…</string>
+    <string name="ai_basic_title">AI विश्लेषण</string>
+    <string name="ai_pro_title">AI गहन विश्लेषण</string>
+    <string name="refresh_hint_count_limited">इस सप्ताह के सपने %1$d · केवल %2$d~%3$d तक का विश्लेषण किया जाएगा।</string>
+
+    <string name="login_required">लॉगिन आवश्यक है।</string>
+    <string name="api_key_missing">API कुंजी सेट नहीं है। कृपया व्यवस्थापक से संपर्क करें।</string>
+    <string name="pro_requires_min">गहन विश्लेषण इस सप्ताह कम से कम %1$d सपने होने पर उपलब्ध है।</string>
+    <string name="pro_too_many_entries">इस सप्ताह सपने अधिक हैं। गहन विश्लेषण केवल %1$d~%2$d तक समर्थित है।</string>
+    <string name="network_error_pro">नेटवर्क त्रुटि के कारण गहन विश्लेषण विफल हुआ।</string>
+    <string name="server_response_error">सर्वर प्रतिक्रिया त्रुटि(%1$d): %2$s</string>
+    <string name="pro_timeout">गहन विश्लेषण समय सीमा से बाहर हो गया। नेटवर्क जाँचकर पुनः प्रयास करें।</string>
+    <string name="pro_applied">गहन विश्लेषण लागू किया गया।</string>
+    <string name="pro_result_unparsable">गहन विश्लेषण परिणाम को समझ नहीं पाए।</string>
+    <string name="ad_closed_no_reward">विज्ञापन बंद हो गया। पुरस्कार की पुष्टि नहीं हुई।</string>
+    <string name="ad_error_with_reason">विज्ञापन त्रुटि(%1$s) - कृपया थोड़ी देर बाद पुनः प्रयास करें।</string>
+    <string name="analyzing">विश्लेषण जारी है</string>
+    <string name="analyzing_ellipsis">विश्लेषण जारी है</string>
+
+    <string name="invalid_selection">कृपया 2~4 चुनें (अधिकतम 4)</string>
+    <string name="preparing_analysis">विश्लेषण की तैयारी…</string>
+    <string name="preparing_ad">विज्ञापन तैयार हो रहा है…</string>
+    <string name="reward_confirmed">पुरस्कार की पुष्टि हुई</string>
+    <string name="updating_ellipsis">अपडेट हो रहा है…</string>
+
+    <string name="keywords_format">भावनाएँ: %1$s • कीवर्ड: %2$s</string>
+
+    <string name="section_title_weekly_deep_main">साप्ताहिक सपनों का गहन विश्लेषण</string>
+    <string name="section_title_deep">गहन विश्लेषण</string>
+    <string name="section_title_ai_pro">AI गहन विश्लेषण</string>
+    <string name="section_title_summary3">सार (3 वाक्य)</string>
+    <string name="section_title_quant">संख्यात्मक सार</string>
+    <string name="section_title_emotion_pattern">भावना पैटर्न व्याख्या</string>
+    <string name="section_title_symbols">प्रतीक·दृश्य व्याख्या</string>
+    <string name="section_title_myeongri">म्योंगरी दृष्टिकोण</string>
+    <string name="section_title_outlook">1~2 सप्ताह परिदृश्य</string>
+    <string name="section_title_checklist">चेकलिस्ट</string>
+    <string name="section_title_emotion_percent">भावनाओं का वितरण(%%)</string>
+    <string name="section_title_emotion">भावनाओं का वितरण</string>
+    <string name="section_title_theme_percent">थीम अनुपात(%%)</string>
+    <string name="section_title_theme">थीम अनुपात</string>
+    <string name="section_title_key_summary">मुख्य सार</string>
+    <string name="section_title_insights">अंतर्दृष्टियाँ</string>
+
+    <string name="emo_positive">सकारात्मक</string>
+    <string name="emo_calm">शांत</string>
+    <string name="emo_vitality">ऊर्जा</string>
+    <string name="emo_flow">तल्लीनता</string>
+    <string name="emo_neutral">तटस्थ</string>
+    <string name="emo_confusion">भ्रम</string>
+    <string name="emo_anxiety">चिंता</string>
+    <string name="emo_depression_fatigue">उदासी/थकान</string>
+    <string name="emo_depression">उदासी</string>
+    <string name="emo_fatigue">थकान</string>
+
+    <string-array name="emo_labels_default">
+        <item>@string/emo_positive</item>
+        <item>@string/emo_calm</item>
+        <item>@string/emo_vitality</item>
+        <item>@string/emo_flow</item>
+        <item>@string/emo_neutral</item>
+        <item>@string/emo_confusion</item>
+        <item>@string/emo_anxiety</item>
+        <item>@string/emo_depression_fatigue</item>
+    </string-array>
+
+    <string name="theme_rel">संबंध</string>
+    <string name="theme_achieve">उपलब्धि</string>
+    <string name="theme_change">परिवर्तन</string>
+    <string name="theme_risk">जोखिम कारक</string>
+    <string name="theme_growth">स्व-विकास</string>
+    <string name="theme_other">अन्य</string>
+
+    <string-array name="theme_labels_default">
+        <item>@string/theme_rel</item>
+        <item>@string/theme_achieve</item>
+        <item>@string/theme_change</item>
+        <item>@string/theme_risk</item>
+        <item>@string/theme_growth</item>
+    </string-array>
+
+    <string name="time_seconds_suffix">सेकंड</string>
+    <string name="time_minutes_suffix" translatable="false">분</string>
+    <string name="time_hours_suffix" translatable="false">시간</string>
+    <string name="time_days_suffix">दिन</string>
+
+    <string name="chart_no_data">डेटा उपलब्ध नहीं है</string>
+    <string name="chart_accessibility_top">सर्वोच्च: %1$s %2$d</string>
+
+    <string name="daily_date_format">yyyy वर्ष M माह d दिन</string>
+    <string name="daily_prompt_template">
+        बिना विवरण और कथा के, एक पेशेवर स्वप्न-व्याख्याता के लहजे में आज (%1$s) के लिए सलाह केवल एक वाक्य, आदरसूचक शैली में लिखें।</string>
+    <string name="dream_prompt_template">
+    आप पूर्वसूचक सपनों के संकेत बताने वाले स्वप्न-व्याख्या विशेषज्ञ विश्लेषक हैं.
+        नीचे दिए गए सपने के आधार पर यथार्थवादी और भरोसेमंद तरीके से व्याख्या करें।
+    संरचना:
+    - <ns0:g id="msg">%2$s</ns0:g>
+    - <ns0:g id="sym">%3$s</ns0:g>
+    - <ns0:g id="pre">%4$s</ns0:g>
+    - <ns0:g id="tip">%5$s</ns0:g>
+    - <ns0:g id="act">%6$s</ns0:g>
+    [सपने की सामग्री] "<ns0:g id="dream">%1$s</ns0:g>"
+</string>
+
+    <string name="dream_section_message">💭 सपना जो संदेश देता है</string>
+    <string name="dream_section_symbols">🧠 मुख्य प्रतीकों की व्याख्या</string>
+    <string name="dream_section_premonition">📌 पूर्वानुमान बिंदु</string>
+    <string name="dream_section_tips_today">☀️ आज के उपयोगी सुझाव</string>
+    <string name="dream_section_actions_three">🎯 आज की 3 क्रियाएँ</string>
+
+    <string-array name="emotion_dict_positive">
+        <item>आनंद</item><item>खुशी</item><item>कृतज्ञता</item><item>आशा</item><item>उत्सुकता</item>
+        <item>प्रेम</item><item>संतोष</item><item>प्रसन्नता</item><item>गर्व</item><item>उपलब्धि-भाव</item>
+        <item>राहत</item><item>आत्मविश्वास</item>
+    </string-array>
+    <string-array name="emotion_dict_calm">
+        <item>शांति</item><item>स्थिरता</item><item>संयत</item><item>आराम</item><item>विश्राम</item>
+        <item>निस्तब्धता</item><item>निःशंक</item><item>फुर्सत</item>
+    </string-array>
+    <string-array name="emotion_dict_vitality">
+        <item>स्फूर्ति</item><item>ऊर्जा</item><item>एकाग्रता</item><item>प्रेरणा</item><item>उत्साह</item>
+        <item>जीवंतता</item><item>बल</item><item>पुश-शक्ति</item><item>जुनून</item>
+    </string-array>
+    <string-array name="emotion_dict_flow">
+        <item>तल्लीनता</item><item>एकाग्र</item><item>गहराई</item><item>गहनता</item><item>फ़्लो</item>
+        <item>मग्नता</item><item>डूब जाना</item>
+    </string-array>
+    <string-array name="emotion_dict_neutral">
+        <item>सामान्य</item><item>ठीक-ठाक</item><item>दिनचर्या</item><item>साधारण</item><item>तटस्थ</item>
+    </string-array>
+
+    <string-array name="evidence_neg_strong_markers">
+        <item>दुःस्वप्न</item><item>भयानक</item><item>डरावना</item><item>भय</item><item>घबराहट</item><item>चीख</item>
+        <item>पीछा</item><item>हत्या</item><item>मृत्यु</item><item>खून</item><item>चाकू</item><item>बंदूक</item>
+        <item>गिरना</item><item>डूबकर मरना</item><item>घुटन</item><item>राक्षस</item><item>भूत</item><item>प्रेत</item>
+        <item>विस्फोट</item><item>आग</item>
+    </string-array>
+
+    <string-array name="evidence_scene_negative">
+        <item>पीछा</item><item>गिरना</item><item>डूबना</item><item>घुटन</item><item>फँसना</item><item>भूलभुलैया</item>
+        <item>तूफान</item><item>बाढ़</item><item>भूकंप</item><item>युद्ध</item><item>लड़ाई</item><item>झगड़ा</item>
+        <item>परीक्षा</item><item>डेडलाइन</item><item>देर</item><item>बर्खास्तगी</item><item>दुर्घटना</item><item>राक्षस</item><item>खून</item>
+    </string-array>
+
+    <string-array name="evidence_scene_positive">
+        <item>उपहार</item><item>पैसा</item><item>रिफंड</item><item>उत्तीर्ण</item><item>पदोन्नति</item>
+        <item>आलिंगन</item><item>हँसी</item><item>यात्रा</item><item>व्यवस्था</item><item>सफाई</item>
+        <item>घर</item><item>आँगन</item><item>मुख्य द्वार</item><item>प्रवेश-द्वार</item><item>सुअर</item>
+    </string-array>
+
+    <string-array name="emotion_dict_confusion">
+        <item>भ्रम</item><item>टकराव</item><item>अस्पष्टता</item><item>हिचक</item><item>दुविधा</item><item>जटिलता</item><item>मिश्रण</item><item>उलझन</item>
+    </string-array>
+    <string-array name="emotion_dict_anxiety">
+        <item>चिंता</item><item>बेचैनी</item><item>फिक्र</item><item>तनाव</item><item>दबाव</item><item>स्ट्रेस</item><item>भय</item><item>डर</item><item>तात्कालिकता</item>
+    </string-array>
+    <string-array name="emotion_dict_depression_fatigue">
+        <item>उदासी</item><item>शोक</item><item>थकान</item><item>क्लांति</item><item>निष्क्रियता</item><item>ऊब</item><item>शून्यता</item><item>एकाकीपन</item><item>हतोत्साह</item>
+    </string-array>
+
+    <string-array name="theme_dict_rel">
+        <item>परिवार</item><item>माता-पिता</item><item>भाई-बहन</item><item>दोस्त</item><item>प्रेमी/साथी</item><item>सहकर्मी</item><item>बॉस</item><item>टीम</item>
+        <item>बैठक</item><item>संवाद</item><item>विश्वास</item><item>टकराव</item><item>सहयोग</item>
+    </string-array>
+    <string-array name="theme_dict_achieve">
+        <item>परीक्षा</item><item>सफलता</item><item>पदोन्नति</item><item>परिणाम</item><item>लक्ष्य</item><item>अभ्यास</item><item>चुनौती</item><item>पूरा करना</item>
+        <item>समाप्ति</item><item>प्रस्तुति</item><item>साक्षात्कार</item><item>तैयारी</item><item>उपलब्धि</item>
+    </string-array>
+    <string-array name="theme_dict_change">
+        <item>घर बदलना</item><item>नौकरी बदलना</item><item>परिवर्तन</item><item>यात्रा</item><item>नया</item><item>शुरुआत</item><item>बदलाव</item><item>व्यवस्था</item>
+        <item>समापन</item><item>योजना</item><item>निर्णय</item><item>स्थानांतरण</item>
+    </string-array>
+    <string-array name="theme_dict_risk">
+        <item>डेडलाइन</item><item>वित्त</item><item>पैसा</item><item>स्वास्थ्य</item><item>बीमारी</item><item>गलती</item><item>मूल्यांकन</item><item>दबाव</item>
+        <item>असफलता</item><item>देर</item><item>खोना</item><item>गिरावट</item><item>पीछा</item><item>दुर्घटना</item>
+    </string-array>
+
+    <!-- 한국어 전용 형태소/불용어: 그대로 유지 -->
+    <string-array name="josa_ko">
+        <item>은</item><item>는</item><item>이</item><item>가</item><item>을</item><item>를</item><item>에</item><item>에서</item>
+        <item>에게</item><item>께</item><item>한테</item><item>으로</item><item>로</item><item>과</item><item>와</item><item>도</item>
+        <item>만</item><item>처럼</item><item>같이</item><item>까지</item><item>부터</item><item>마다</item><item>뿐</item><item>조차</item>
+        <item>이나</item><item>나</item><item>라서</item><item>보다</item><item>만큼</item><item>마저</item><item>밖에</item><item>및</item>
+        <item>등</item><item>에게서</item><item>하고</item><item>랑</item><item>이랑</item>
+    </string-array>
+
+    <string-array name="stopwords_ko">
+        <item>그리고</item><item>그래서</item><item>그러나</item><item>하지만</item><item>및</item><item>또는</item><item>혹은</item>
+        <item>하다</item><item>했다</item><item>되는</item><item>되어</item><item>됐다</item><item>되다</item><item>하는</item><item>하며</item><item>하고</item><item>했다가</item><item>한다</item>
+        <item>것</item><item>수</item><item>좀</item><item>매우</item><item>너무</item><item>정말</item><item>모든</item><item>전체</item>
+        <item>내용</item><item>경향</item><item>의미</item><item>상황</item><item>이야기</item><item>부분</item><item>측면</item><item>전반</item>
+        <item>오늘</item><item>오늘의</item><item>이번</item><item>저번</item><item>주간</item><item>기록</item><item>분석</item><item>요약</item><item>핵심</item><item>포인트</item><item>중요</item><item>체크</item><item>체크리스트</item>
+        <item>문제</item><item>기회</item><item>풍요</item><item>요소</item><item>상태</item><item>관점</item><item>가이드</item><item>조언</item><item>유형</item><item>예측</item><item>현실</item><item>사건</item><item>해결</item><item>정화</item><item>안정</item><item>추구</item>
+        <item>꿈</item><item>해몽</item><item>텍스트</item><item>문장</item><item>표현</item><item>감정</item><item>테마</item><item>키워드</item>
+    </string-array>
+
+    <string-array name="token_tails_ko">
+        <item>하다</item><item>되다</item><item>스럽다</item><item>답다</item><item>하니</item><item>하며</item><item>하는</item>
+        <item>했다</item><item>했고</item><item>하게</item><item>적인</item><item>적으로</item><item>스러움</item><item>스러워</item>
+        <item>같다</item><item>같이</item><item>처럼</item><item>뿐</item><item>들</item><item>들의</item><item>적</item><item>적임</item><item>성</item>
+    </string-array>
+
+    <string name="ea_heading_summary">सार</string>
+    <string name="ea_heading_link">प्रतीक-कनेक्शन</string>
+    <string name="ea_heading_emotion_theme">भावना/थीम</string>
+    <string name="ea_heading_outlook">भविष्य परिदृश्य (1~2 सप्ताह)</string>
+    <string name="ea_heading_conclusion">निष्कर्ष</string>
+
+    <string name="ea_arrow_delim"> → </string>
+    <string name="ea_summary_suffix">तक जुड़ता है।</string>
+
+    <string name="ea_part_clear_blockage">अटके हुए को खाली कर व्यवस्थित करने का दृश्य</string>
+    <string name="ea_part_fortune_enters">समृद्धि/धन का प्रतीक जीवन-क्षेत्र में प्रवेश करता हुआ दृश्य</string>
+    <string name="ea_part_home_foundation">घर/आंतरिक आधार की पुष्टि करने का दृश्य</string>
+    <string name="ea_part_boundary_opening">मेरे क्षेत्र और बाहर की सीमा खुलने का दृश्य</string>
+    <string name="ea_part_default_flow">दोनों सपने ‘सफाई के बाद प्रवाह’ की धारा को जोड़ते हैं</string>
+
+    <string name="ea_link_clear_then_fortune">अनावश्यक को खाली करने (शुद्धि) के बाद सौभाग्य प्रवेश करता है—यह ‘सफाई के बाद प्रवाह’ की आदर्श कथा है।</string>
+    <string name="ea_link_fortune_with_home">सौभाग्य (सुअर) का घर/परिवार से जुड़ना, वास्तविक वित्त/परिवार मुद्दों में सकारात्मक प्रवाह का संकेत है।</string>
+    <string name="ea_link_hands_on">खुद हाथ से हल करना नियंत्रण-वापसी का द्योतक है।</string>
+    <string name="ea_link_default">दो सपने ‘बंद → खुला’ का परिवर्तन रचते हैं।</string>
+
+    <string name="ea_emotion_theme_with">वर्तमान मनोदशा ‘%1$s’ की ओर झुकती है और थीम %2$s के इर्द-गिर्द चलती है।</string>
+    <string name="ea_emotion_theme_only">वर्तमान मनोदशा में ‘%1$s’ प्रवृत्ति प्रमुख दिखती है।</string>
+
+    <string name="ea_outlook_cash_inbound">छोटी आय/उपहार/प्रस्ताव दहलीज तक आ पहुँचता है। जीवन-क्षेत्र के पास अवसर दिखते हैं।</string>
+    <string name="ea_outlook_small_gain">वित्त/भौतिक लाभ के संकेत हल्के रूप में पकड़े जाते हैं। आसपास की ‘छोटी कृपा’ सुराग बनेगी।</string>
+    <string name="ea_outlook_unblock_one">अटका हुआ एक काम सुघड़ता से सुलझकर अगले चरण में जाता है।</string>
+    <string name="ea_outlook_slow_open">बंद प्रवाह धीरे-धीरे खुलता है और वास्तविक परिवर्तन के सुराग दिखने लगते हैं।</string>
+
+    <string name="ea_tip_cash_signals">छोटे प्रस्ताव/उपहार/रिफंड जैसे ‘कैश संकेत’ न चूकें।</string>
+    <string name="ea_tip_home_cleanup">घर/जीवन क्षेत्र से एक चीज़ चुनकर आज ही समेटें।</string>
+    <string name="ea_tip_take_action">खुद हाथ लगाने पर (दस्तावेज़, संपर्क, क्लेम आदि) गति मिलती है।</string>
+
+    <string name="ea_conclusion">‘सफाई के बाद प्रवाह’—जितना खाली करेंगे, उतना भरता जाएगा।</string>
+
+    <string name="ea_kw_toilet1">शौचालय</string>
+    <string name="ea_kw_toilet2">कमोड</string>
+    <string name="ea_kw_poop1">मल</string>
+    <string name="ea_kw_poop2">मल</string>
+    <string name="ea_kw_pig">सुअर</string>
+    <string name="ea_kw_house">घर</string>
+    <string name="ea_kw_yard1">आँगन</string>
+    <string name="ea_kw_yard2">मुख्य द्वार</string>
+    <string name="ea_kw_yard3">प्रवेश-द्वार</string>
+    <string name="ea_kw_hand1">हाथ</string>
+    <string name="ea_kw_hand2">हाथ से</string>
+    <string name="ea_kw_hand3">पोंछना</string>
+
+    <string name="ea_heading_sep"> — </string>
+    <string name="ea_bullet_delim">·</string>
+    <string name="ea_trend_up"> ↑</string>
+
+    <string name="common_notice">सूचना</string>
+    <string name="fb_date_format">yyyy-MM-dd HH:mm:ss</string>
+
+    <string name="week_prompt_lang_line">कृपया केवल <ns0:g id="lang">%1$s</ns0:g> में ही उत्तर दें।</string>
+
+    <string name="pro_meta_emotion_label">भावनाएँ</string>
+    <string name="pro_meta_keywords_label">कीवर्ड</string>
+    <string name="pro_meta_score_label">स्कोर</string>
+    <string name="pro_meta_ai_label">AI विश्लेषण</string>
+
+    <string name="week_prompt_intro">नीचे उपयोगकर्ता के पिछले 1 सप्ताह के सपनों का रिकॉर्ड (अधिकतम 4, नवीनतम क्रम) और प्रत्येक सपने की व्याख्या/विश्लेषण पाठ दिया है।</string>
+
+    <string-array name="keyword_catalog_ids">
+        <item>person_people</item><item>family</item><item>friend</item><item>partner</item><item>baby</item>
+        <item>child</item><item>teacher</item><item>boss</item><item>stranger</item><item>crowd</item>
+        <item>home_house</item><item>room</item><item>school</item><item>office</item><item>bathroom_toilet</item>
+        <item>kitchen</item><item>hospital</item><item>road</item><item>bridge</item><item>forest</item>
+        <item>mountain</item><item>sea_ocean</item><item>river</item><item>beach</item><item>sky</item>
+        <item>phone</item><item>message_text</item><item>money</item><item>key</item><item>door</item>
+        <item>window</item><item>stairs</item><item>elevator</item><item>car</item><item>bus</item>
+        <item>train</item><item>airplane</item><item>ship_boat</item><item>computer</item><item>book</item>
+        <item>mirror</item><item>teeth</item><item>hair</item><item>blood</item><item>ring</item>
+        <item>shoes</item><item>dog</item><item>cat</item><item>bird</item><item>fish</item>
+        <item>snake</item><item>spider</item><item>pig</item><item>shark</item><item>whale</item>
+        <item>insect</item><item>chase</item><item>fall</item><item>flying</item><item>late</item>
+        <item>exam_test</item><item>lost</item><item>escape</item><item>fight</item><item>death</item>
+        <item>wedding</item><item>funeral</item><item>pregnancy</item><item>birth</item><item>fire</item>
+        <item>poop</item>
+    </string-array>
+
+    <string name="week_prompt_rules" formatted="false">
+भूमिका: ‘साप्ताहिक सपनों का गहन विशेषज्ञ-विश्लेषक’।
+आउटपुट: शुद्ध HTML फ्रैगमेंट (&lt;p&gt;,&lt;ul&gt;), कोड ब्लॉक निषिद्ध।
+निषिद्ध: चिकित्सीय/मनोवैज्ञानिक निदान, भयावह/अशुभ भविष्यवाणी, कट्टर निष्कर्ष।
+टोन: चिंता-शमन शैली, क्रियात्मक सलाह केंद्रित
+
+सेक्शन (क्रम स्थिर):
+- साप्ताहिक सपनों का गहन विश्लेषण (5~7 वाक्य; कहानी-शैली में सपनों को जोड़ते हुए इस सप्ताह के मुख्य संदेश, दोहराए मोटिफ़, संदर्भ का समेकित अर्थ)
+- सार (3 वाक्य)
+- भावना पैटर्न व्याख्या
+- प्रतीक·दृश्य व्याख्या
+- म्योंगरी दृष्टिकोण
+- 1~2 सप्ताह परिदृश्य  ← अवश्य शामिल करें। कम से कम 3 वाक्य।
+  • अंत में “भविष्यवाणी नहीं, प्रवृत्ति-आधारित जीवन-मार्गदर्शक” वाक्य जोड़ें
+- चेकलिस्ट (3 बुलेट; दैनिक जीवन में तुरंत जाँची/किए जा सकने वाले मद—हर एक 1 वाक्य, क्रिया से शुरू)
+</string>
+
+    <string name="week_prompt_header_note">[फॉर्मेट नियम] भावना/थीम लेबल ऐप द्वारा फिक्स दिए जाते हैं, अतः नए लेबल न बनाएँ—सिर्फ वितरण मान (emotionDist/themeDist) भरें। कीवर्ड पर्याप्त और सारगर्भित दें।</string>
+    <string name="tag_dream_original">[सपना मूल %1$d]</string>
+    <string name="tag_interpret_text">[व्याख्या पाठ %1$d]</string>
+
+    <string name="deep_dialog_title">गहन विश्लेषण</string>
+    <string name="chip_lucky_time">समय  %1$s</string>
+    <string name="chip_lucky_number">संख्या  %1$d</string>
+    <string name="chip_lucky_color">रंग  %1$s</string>
+    <string name="fallback_highlights">• आज के प्रवाह का संक्षिप्त सार दिया है।</string>
+
+    <string name="section_overall">समग्र भाग्य</string>
+    <string name="section_love">प्रेम भाग्य</string>
+    <string name="section_study">अध्ययन भाग्य</string>
+    <string name="section_work">कार्य भाग्य</string>
+    <string name="section_money">धन भाग्य</string>
+    <string name="section_lotto">लॉटरी भाग्य</string>
+    <string name="section_header_with_score">%1$s (%2$d अंक)</string>
+    <string name="label_lotto_numbers">संख्या: %1$s</string>
+    <string name="label_lotto_numbers_dash">संख्या: -</string>
+    <string name="score_points">%1$d अंक</string>
+    <string name="section_body_fallback">आज का प्रवाह और कार्य-सुझाव देख लें।</string>
+
+    <string name="daily_summary_base">आज के प्रवाह का संक्षिप्त सार दिया है।</string>
+    <string name="bullet_with_text">• %1$s</string>
+
+    <string name="mood_high">उत्थान स्पष्ट है।</string>
+    <string name="mood_good">प्रवाह स्थिर है।</string>
+    <string name="mood_fair">उतार-चढ़ाव संभव—गति नियंत्रित करना उचित।</string>
+    <string name="mood_low">अपेक्षा से कम—आधार मजबूत करने के लिए उपयुक्त दिन।</string>
+
+    <string name="sec_love_text">संबंधों में %1$s बातों से अधिक व्यवहार भरोसा बनाता है। भावनात्मक रेखा को न बढ़ाएँ, सहज विषयों से ताल मिलाएँ।</string>
+    <string name="sec_study_text">अध्ययन में %1$s मात्रा घटाकर भी निरंतरता रखेंगे तो परिणाम आएगा। पहले मुख्य कीवर्ड थामें।</string>
+    <string name="sec_work_text">कार्य-प्रवाह %1$s लक्ष्य को एक पर सीमित करने से दक्षता बढ़ेगी। बिखराव घटाकर प्राथमिकताएँ पुनः सजाएँ।</string>
+    <string name="sec_money_text">वित्त में %1$s आकस्मिक खर्च घटाएँ और सिर्फ 1 व्यय जाँच लें—संतुलन बना रहेगा।</string>
+    <string name="sec_overall_text">आज कुल मिलाकर %1$s छोटी-छोटी उपलब्धियाँ जोड़ने को उपयुक्त है। लोभ घटाएँ, मूल दिनचर्या निभाएँ—स्थिरता बढ़ेगी।</string>
+    <string name="sec_love_advice">उत्तेजक विषयों के बजाय सहज बातचीत सुझाई जाती है।</string>
+    <string name="sec_study_advice">“छोटी तल्लीनता” से सिर्फ 1 मुख्य कार्य पूरा करें।</string>
+    <string name="sec_work_advice">एक चीज़ पर ध्यान देंगे तो परिणाम स्पष्ट होगा।</string>
+    <string name="sec_money_advice">ज़रूरी खर्च रखें; आज 1 मद जाँचना पर्याप्त है।</string>
+    <string name="sec_overall_advice">अत्यधिक न करें; एक निश्चित कार्य पर तल्लीन होना भी अच्छा है।</string>
+    <string name="sec_lotto_tip">• संदर्भ: मनोरंजन सीमा न लाँघें—पहले से ऊपरी सीमा निर्धारित करें।</string>
+
+    <string name="essential_check_1">मुख्य कार्य 1 पूरा</string>
+    <string name="essential_check_2">अलर्ट·नोट 3 मिनट व्यवस्थित</string>
+    <string name="essential_check_3">हल्का स्ट्रेच 5 मिनट</string>
+
+    <string name="tomorrow_plan_template">
+• आज के प्रवाह को संक्षेप में देखा।
+
+सुबह (09~12)
+ - शरीर को हल्का गरम करें और आज की दिशा भर तय कर लें।
+ - कम बोझ वाले काम से “पहला बटन” ही लगाकर शुरू करें।
+
+दोपहर (13~17)
+ - व्यवधान घटाएँ; एक छोटी तल्लीनता से छोटी पूर्णता 1 बार आज़माएँ।
+ - अवसर हो तो हल्के स्ट्रेच से रीसेट करें।
+
+शाम (19~22)
+ - आज की 1 अच्छी बात, सीख की 1 पंक्ति लिखना पर्याप्त है।
+ - कल की पहली 10 मिनट में शुरू होने वाला काम चुनकर रखें—मन हल्का होगा।
+</string>
+    <string name="tomorrow_extra_fallback">• कल सुबह की पहली 10 मिनट में आज का वही 1 मुख्य कार्य आगे बढ़ाना भी ठीक है।</string>
+
+    <string name="label_am">पूर्वाह्न</string>
+    <string name="label_pm">अपराह्न</string>
+    <string name="label_hour_suffix">बजे</string>
+
+    <string name="err_auth">प्रमाणीकरण त्रुटि हुई। सेटिंग्स में API कुंजी जाँचें। (%1$s)</string>
+    <string name="err_forbidden">पहुँच अस्वीकृत। अधिकार/भुगतान स्थिति जाँचें। (%1$s)</string>
+    <string name="err_not_found">सर्वर पता नहीं मिला। कृपया बाद में पुनः प्रयास करें। (%1$s)</string>
+    <string name="err_rate_limit">कॉल सीमा पार। कृपया थोड़ी देर बाद पुनः प्रयास करें। (%1$s)</string>
+    <string name="err_timeout">नेटवर्क धीमा है। कनेक्शन जाँचकर पुनः प्रयास करें। (%1$s)</string>
+    <string name="err_network_generic">नेटवर्क त्रुटि हुई। (%1$s)</string>
+
+    <string name="fortune_deep_prompt_template">
+[संदर्भ]
+- उपयोगकर्ता: nickname="%1$s", mbti="%2$s", birthdate="%3$s", gender="%4$s", birth_time="%5$s"
+- तिथि: %6$s, tone="%7$s", seed=%8$s
+- दैनिक भाग्य (JSON): %9$s
+
+[अनुरोध]
+नीचे दी गई स्कीमा की function ही कॉल करें। मुख्य पाठ के बजाय केवल function के आर्ग्युमेंट (JSON) ही लौटाएँ।
+
+[लेखन नियम (टोन)]
+- highlights: आज के प्रवाह के 3~6 मुख्य बिंदु (छोटे और प्रभावी)।
+- plan: सुबह/दोपहर/शाम—प्रत्येक 2~3 पंक्तियाँ, सभी के लिए सरल “आदेश” नहीं, “सुझाव/अनुशंसा” शैली (जैसे: “~करना ठीक है”, “~की अनुशंसा”, “~पर विचार”).
+- छात्र/स्कूल/संपर्क जैसी निर्देश-शब्दावली निषिद्ध। “री뷰” निषिद्ध—केवल “रिव्यू/‘돌아보기’” का प्रयोग। “25 मिनट फोकस 2 बार” प्रकार निषिद्ध (विकल्प: “छोटी तल्लीनता”).
+- tips: 3~6, जो आज ही आज़माए जा सकें ऐसे सुझाव।
+- checklistAdjusted: daily.checklist को यथार्थपरक ढंग से सँवारें या बदलें (अधिकतम 3~5)।
+- luckyColorName: sanitizeColorName("", luckyHex) आदि से हिंदी रंग-नाम।
+- luckyTime: humanizeLuckyTime(luckyTime) या स्पष्ट समय-खंड।
+- luckyNumber: संभव हो तो luckyNum बनाए रखें।
+- tomorrowPrep: न्यूनतम क्षेत्र (worstKey) की पूर्ति पर केंद्रित एक अनुच्छेद (सुझाव-टोन)।
+
+अनिवार्य रूप से deep_fortune_analysis को कॉल करें।
+</string>
+
+    <string name="fortune_system_daily">आप प्रीमियम लाइफ़ कोच और राशिफल विश्लेषक हैं। हमेशा केवल फ़ंक्शन कॉल द्वारा JSON लौटाएँ।</string>
+    <string name="fortune_system_deep">आप प्रीमियम लाइफ़ कोच और राशिफल विश्लेषक हैं। केवल टूल कॉल के माध्यम से JSON ही लौटाएँ।</string>
+
+    <string name="replace_meeting">परामर्श/व्यवस्थित करना</string>
+    <string name="replace_email">अलर्ट/नोट</string>
+    <string name="replace_report">नोट व्यवस्थित</string>
+    <string name="replace_approval">पुष्टि</string>
+    <string name="replace_messenger">संपर्क</string>
+    <string name="contact_sanitized">1 अलर्ट व्यवस्थित</string>
+
+    <string name="color_name_fallback">भाग्यशाली रंग</string>
+
+    <string name="default_generic_advice">चेकलिस्ट की 1 वस्तु हल्के से आज़माएँ।</string>
+
+    <string name="sub_title">DreamInDream Premium</string>
+    <string name="sub_subtitle">बिना विज्ञापनों, और तेज़</string>
+    <string name="sub_badge_active">सक्रिय</string>
+
+    <string name="sub_benefit_1">✅ AI रिपोर्ट·राशिफल गहन विश्लेषण — पूरी तरह बिना विज्ञापन</string>
+    <string name="sub_benefit_2">🌙 स्वप्न-व्याख्या: बिना विज्ञापन, प्रतिदिन 3 बार तुरंत व्याख्या</string>
+    <string name="sub_benefit_3">🔒 खाता लिंक होने पर सभी उपकरणों पर लाभ बना रहता है</string>
+    <string name="sub_benefit_4">🛠️ सेटिंग्स &gt; प्रीमियम में कभी भी प्रबंधन करें</string>
+
+    <string name="sub_label_plan">प्लान चुनें</string>
+    <string name="sub_chip_monthly">मासिक सदस्यता</string>
+    <string name="sub_chip_yearly">वार्षिक सदस्यता</string>
+
+    <string name="sub_price_monthly_amount">₩4,000</string>
+    <string name="sub_price_yearly_amount">₩40,000</string>
+
+    <string name="sub_btn_later">बाद में</string>
+    <string name="sub_btn_start">प्रीमियम शुरू करें</string>
+    <string name="sub_btn_restore">खरीद पुनर्स्थापित करें</string>
+    <string name="sub_toast_restore_ok">पिछली खरीद पुनर्स्थापित कर दी गई।</string>
+    <string name="sub_toast_restore_none">पुनर्स्थापित करने योग्य कोई खरीद नहीं।</string>
+
+    <string name="signin_required">लॉगिन आवश्यक है।</string>
+
+    <string name="billing_err_connect">भुगतान सेवा आरंभ की जा रही है। कृपया थोड़ी देर बाद पुनः प्रयास करें।</string>
+    <string name="billing_err_product_info">उत्पाद जानकारी लोड नहीं हो सकी। कृपया थोड़ी देर बाद पुनः प्रयास करें।</string>
+    <string name="billing_err_offer_missing">यह प्लान वर्तमान में उपलब्ध नहीं है।</string>
+    <string name="billing_err_plan_inactive">चयनित प्लान निष्क्रिय है।</string>
+
+    <string name="sub_price_format">%1$s / %2$s</string>
+    <string name="sub_unit_month">माह</string>
+    <string name="sub_unit_year">वर्ष</string>
+    <string name="sub_price_monthly">₩4,000 / माह</string>
+    <string name="sub_price_yearly">₩40,000 / वर्ष</string>
+
+    <string name="btn_fortune_show">❔</string>
+    <string name="btn_come_tomorrow">कल फिर से</string>
+    <string name="toast_already_seen_today">आज पहले ही देख लिया है। कृपया कल फिर उपयोग करें।</string>
+    <string name="toast_run_fortune_first">कृपया पहले “भाग्य देखें” चलाएँ।</string>
+    <string name="toast_copied">कॉपी किया गया</string>
+    <string name="share_chooser_title">साझा करें</string>
+    <string name="dialog_profile_title">सेटिंग आवश्यक है</string>
+    <string name="dialog_profile_message">सिर्फ उपनाम·जन्मतिथि·लिंग सहेजेंगे तो आप अनुकूलित राशिफल देख सकते हैं।\n(जन्म समय·MBTI वैकल्पिक)</string>
+    <string name="dialog_ok">ठीक है</string>
+    <string name="ad_failed_open_deep_now">विज्ञापन विफल(%1$s) → गहन विश्लेषण तुरंत खोलें</string>
+    <string name="deep_generating_label">जनरेट हो रहा है…</string>
+    <string name="deep_button_label">गहन विश्लेषण देखें</string>
+
+    <string-array name="trait_titles">
+        <item>रचनात्मकता</item>
+        <item>संचार</item>
+        <item>अनुकूलनशीलता</item>
+        <item>निर्णय क्षमता</item>
+    </string-array>
+
+    <string name="birth_time_not_selected">चयन न करें</string>
+    <string name="guest_prefix">guest-</string>
+    <string name="device_fallback">device</string>
+
+    <string name="toast_need_two_dreams">इस सप्ताह 2 या अधिक सपने रिकॉर्ड करने पर आप AI रिपोर्ट देख सकेंगे।</string>
+
+    <string name="toast_fill_email_password">ईमेल/पासवर्ड दर्ज करें।</string>
+    <string name="toast_fill_all_fields">सभी फ़ील्ड भरें।</string>
+    <string name="toast_password_mismatch">पासवर्ड मेल नहीं खाता।</string>
+    <string name="toast_enter_email">ईमेल दर्ज करें।</string>
+
+    <string name="toast_login_failed_fmt">लॉगिन विफल: %1$s</string>
+    <string name="toast_email_verify_first">ईमेल सत्यापन के बाद लॉगिन करें।</string>
+    <string name="toast_signup_success">साइन-अप सफल! सत्यापन ईमेल भेजा गया है। मेल जाँचें और लॉगिन करें।</string>
+    <string name="toast_signup_failed_fmt">साइन-अप विफल: %1$s</string>
+    <string name="toast_reset_sent">पासवर्ड रीसेट ईमेल भेज दिया।</string>
+    <string name="toast_reset_failed_fmt">ईमेल भेजने में विफल: %1$s</string>
+
+    <string name="toast_google_login_failed_fmt">गूगल लॉगिन विफल: %1$s</string>
+    <string name="toast_google_login_error_fmt">गूगल लॉगिन त्रुटि: %1$s</string>
+    <string name="toast_anonymous_failed_fmt">अनाम लॉगिन विफल: %1$s</string>
+
+    <string name="dialog_reactivate_title">खाता पुनर्प्राप्ति</string>
+    <string name="dialog_reactivate_message">यह खाता निष्क्रिय है।\nक्या पुनर्प्राप्त करना चाहेंगे?</string>
+    <string name="dialog_reactivate_positive">पुनर्प्राप्त करें</string>
+    <string name="dialog_reactivate_negative">रद्द करें</string>
+    <string name="toast_reactivate_failed_fmt">पुनर्प्राप्ति विफल: %1$s</string>
+    <string name="toast_account_deleted">खाता स्थायी रूप से हटा दिया गया है।</string>
+
+    <string name="loading_calendar_prep">कैलेंडर डेटा तैयार किया जा रहा है।\nकृपया थोड़ी प्रतीक्षा करें।</string>
+
+    <string name="name_guest_default">अनाम उपयोगकर्ता</string>
+    <string name="name_anonymous_default">अनाम</string>
+
+    <string name="terms_title">DreamInDream उपयोग की शर्तें</string>
+    <string name="terms_section1">1. उद्देश्य</string>
+    <string name="terms_section1_body">यह शर्तें DreamInDream(आगे “सेवा”) के उपयोग के संबंध में उपयोगकर्ता और संचालक के बीच अधिकारों व दायित्वों को नियत करती हैं।</string>
+
+    <string name="terms_section2">2. खाता और उपयोग</string>
+    <string-array name="terms_section2_items">
+        <item>सामग्री रेटिंग सभी-आयु के लिए है; पर गोपनीयता व नीतियों के अनुपालन हेतु लक्षित उपयोगकर्ता 13 वर्ष या उससे अधिक हैं।</item>
+        <item>उपयोगकर्ता अपने खाता विवरण की शुद्धता बनाए रखें।</item>
+        <item>सेवा बिना पूर्व सूचना के सुविधाएँ बदल या बंद कर सकती है।</item>
+    </string-array>
+
+    <string name="terms_section3">3. सशुल्क सुविधाएँ और विज्ञापन</string>
+    <string-array name="terms_section3_items">
+        <item>प्रीमियम (विज्ञापन हटाने आदि) सुविधाएँ अलग नीति के अधीन हैं।</item>
+        <item>विज्ञापन दिखाए जा सकते हैं।</item>
+    </string-array>
+
+    <string name="terms_section4">4. निषिद्ध गतिविधियाँ</string>
+    <string-array name="terms_section4_items">
+        <item>अवैध/हानिकारक जानकारी पोस्ट करना और दूसरों के अधिकारों का उल्लंघन</item>
+        <item>स्वचालित संग्रह, क्रॉलिंग, रिवर्स-इंजीनियरिंग/परिवर्तन आदि असामान्य उपयोग</item>
+    </string-array>
+
+    <string name="terms_section5">5. बौद्धिक संपदा अधिकार</string>
+    <string name="terms_section5_body">सेवा व प्रदत्त सामग्री के अधिकार संचालक या विधिसम्मत अधिकारधारक के पास हैं।</string>
+
+    <string name="terms_section6">6. अस्वीकरण</string>
+    <string name="terms_section6_body">स्वप्न-व्याख्या/राशिफल परिणामों की शुद्धता और उपयोगिता की गारंटी नहीं है।</string>
+
+    <string name="terms_section7">7. शर्तों में परिवर्तन</string>
+    <string name="terms_section7_body">महत्वपूर्ण परिवर्तनों पर ऐप में सूचना दी जाएगी।</string>
+
+    <string name="privacy_title">गोपनीयता नीति</string>
+    <string name="privacy_intro">सामग्री रेटिंग सभी-आयु के लिए है; 13 वर्ष से कम आयु के बच्चों का डेटा एकत्रित पाया जाने पर उसे तुरंत हटाया जाएगा।</string>
+
+    <string name="privacy_section1">1. एकत्रित मद</string>
+    <string-array name="privacy_section1_items">
+        <item>आवश्यक: ईमेल (या अनाम पहचानकर्ता), उपनाम, जन्मतिथि/लिंग, उपयोग लॉग</item>
+        <item>वैकल्पिक: MBTI, जन्म समय, प्रोफ़ाइल छवि</item>
+        <item>स्वतः-संग्रह: डिवाइस/ऐप संस्करण, विज्ञापन पहचानकर्ता(AAID), FCM टोकन, डायग्नोस्टिक/क्रैश लॉग</item>
+        <item>सामग्री डेटा: सपना रिकॉर्ड टेक्स्ट/कीवर्ड/लिखने का समय आदि</item>
+    </string-array>
+
+    <string name="privacy_section2">2. उपयोग उद्देश्य</string>
+    <string-array name="privacy_section2_items">
+        <item>सपना रिकॉर्ड/विश्लेषण प्रदान करना और सूचनाएँ भेजना</item>
+        <item>गुणवत्ता सुधार, ग्राहक-प्रश्नों का समाधान, दुरुपयोग रोकथाम</item>
+    </string-array>
+
+    <string name="privacy_section3">3. भंडारण अवधि</string>
+    <string name="privacy_section3_body">खाता हटने या उद्देश्य पूर्ण होने पर विलंब बिना नष्ट; क़ानूनी अपवादों का पालन।</string>
+
+    <string name="privacy_section4">4. प्रसंस्करण-आउटसोर्सिंग/विदेश स्थानांतरण</string>
+    <string name="privacy_section4_body">OpenAI·AdMob·Firebase आदि क्लाउड/एनालिटिक्स·विज्ञापन सेवाओं तक सीमित रूप से आउटसोर्सिंग/विदेश स्थानांतरण हो सकता है।</string>
+
+    <string name="privacy_section5">5. उपयोगकर्ता अधिकार</string>
+    <string name="privacy_section5_body">व्यक्तिगत डेटा का अवलोकन·संशोधन·हटाना·प्रसंस्करण-निरोध व सहमति वापसी संभव है।\nसंपर्क: dreamindream@dreamindream.app</string>
+
+    <string name="privacy_section6">6. सुरक्षा उपाय</string>
+    <string-array name="privacy_section6_items">
+        <item>HTTPS संचार, न्यूनतम पहुँच-अधिकार, पहुँच-रिकॉर्ड प्रबंधन आदि</item>
+    </string-array>
+
+    <string name="weekly_history_title">विश्लेषण इतिहास</string>
+    <string name="weekly_history_login_needed">लॉगिन आवश्यक</string>
+    <string name="weekly_history_login_message">लॉगिन आवश्यक है।</string>
+    <string name="weekly_history_empty_meta">पहली रिपोर्ट बनाने के लिए इस सप्ताह 2 या अधिक सपने रिकॉर्ड करें।</string>
+    <string name="weekly_history_empty_title">अभी कोई रिपोर्ट बनी नहीं है</string>
+    <string name="weekly_history_empty_sub">इस सप्ताह कम से कम 2 सपने रिकॉर्ड होने पर हम स्वतः साप्ताहिक सारांश बनाएँगे।</string>
+    <string name="weekly_history_chip_2plus">इस सप्ताह 2 या अधिक</string>
+    <string name="weekly_history_chip_keywords">कीवर्ड लिखना</string>
+    <string name="weekly_history_chip_emotion">भावना चुनना</string>
+    <string name="cta_go_record_dream">सपना रिकॉर्ड करने जाएँ</string>
+    <string name="weekly_history_meta_count">कुल %1$d सप्ताह · नवीनतम पहले</string>
+    <string name="weekly_history_delete_restrict">केवल सबसे हाल का सप्ताह हटाया जा सकता है।</string>
+    <string name="weekly_history_delete_title">रिपोर्ट हटाएँ</string>
+    <string name="weekly_history_delete_message">‘%1$s’ रिपोर्ट हटाएँ?</string>
+    <string name="weekly_history_delete_positive">हटाएँ</string>
+    <string name="weekly_history_delete_negative">रद्द करें</string>
+    <string name="weekly_history_chip_current">वर्तमान</string>
+    <string name="weekly_history_content_desc_delete">हटाएँ</string>
+    <string name="icon_sparkles">✨</string>
+    <string name="chevron_right">›</string>
+    <string name="weekly_history_item_subtitle">%1$s · %2$s</string>
+
+    <string name="bs_title_history">विश्लेषण इतिहास</string>
+    <string name="bs_meta_login_required">लॉगिन आवश्यक</string>
+    <string name="bs_login_required_msg">लॉगिन आवश्यक है।</string>
+    <string name="bs_meta_total_weeks_format">कुल %1$d सप्ताह · नवीनतम पहले</string>
+    <string name="bs_toast_delete_only_latest">केवल सबसे हाल का सप्ताह हटाया जा सकता है।</string>
+    <string name="bs_dialog_delete_title">रिपोर्ट हटाएँ</string>
+    <string name="bs_dialog_delete_msg_format">‘%1$s’ रिपोर्ट हटाएँ?</string>
+    <string name="press_back_again_to_exit">बाहर निकलने के लिए फिर से दबाएँ।</string>
+
+    <string name="chip_current">वर्तमान</string>
+    <string name="label_emotion">भावना</string>
+    <string name="label_keywords">कीवर्ड</string>
+
+    <string name="whd_title">विश्लेषण निर्देश</string>
+    <string name="whd_generation_rule">रिपोर्ट निर्माण नियम: इस सप्ताह सपने 2 या अधिक हों तो तुरंत AI रिपोर्ट बनती है। (साप्ताहिक मानदंड: सोम~रवि)</string>
+    <string name="whd_hero_title">अभी कोई रिपोर्ट बनी नहीं है</string>
+    <string name="whd_hero_sub">इस सप्ताह सपनों को स्वतंत्र रूप से रिकॉर्ड करें। 2 या अधिक होते ही हम AI रिपोर्ट बना देंगे।</string>
+    <string name="whd_chip_instant">इस सप्ताह 2 या अधिक — तुरंत निर्माण</string>
+    <string name="whd_chip_week_range">साप्ताहिक मानदंड: सोम~रवि</string>
+    <string name="whd_pro_text">AI गहन विश्लेषण—रिपोर्ट बने उसी सप्ताह में, विज्ञापन देखने के बाद उपयोग योग्य।</string>
+    <string name="whd_close">बंद करें</string>
+    <string name="whd_cta_go_record">सपना रिकॉर्ड करने जाएँ</string>
+
+    <!-- Deprecated compatibility keys -->
+    <string name="ad_preparing">विज्ञापन तैयार हो रहा है…</string>
+    <string name="ad_closed_try_again">विज्ञापन बंद हो गया। पुरस्कार की पुष्टि नहीं हुई।</string>
+    <string name="ad_load_failed_fmt">विज्ञापन त्रुटि(%1$s) - कृपया थोड़ी देर बाद पुनः प्रयास करें।</string>
+
+    <string name="dream_input_min15">कृपया 15 अक्षरों से अधिक विस्तार से लिखें।</string>
+
+    <string name="choose_language">भाषा चुनें</string>
+    <string name="language_korean">कोरियाई</string>
+    <string name="language_english">अंग्रेज़ी</string>
+    <string name="save_and_continue">सहेजें और जारी रखें</string>
+    <string name="language">भाषा</string>
+    <string name="language_changed">भाषा अपडेट कर दी गई है।</string>
+    <string name="recommended">अनुशंसित</string>
+
+    <!-- Advertisement -->
+    <string name="ad_unit_fortune_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_dream_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_calendar_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_ai_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_settings_banner">ca-app-pub-1742201279182732/9282239127</string>
+
+</resources>

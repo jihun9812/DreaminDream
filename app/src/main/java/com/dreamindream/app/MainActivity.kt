@@ -36,7 +36,7 @@ class MainActivity : BaseActivity() {
     private val exitGapMs = 1800L
 
     private var lastBackHandledAt = 0L
-    private val minBackGapMs = 300L   // 연타 디바운스
+    private val minBackGapMs = 300L
 
     private val REQ_NOTI = 1001
 
@@ -67,7 +67,7 @@ class MainActivity : BaseActivity() {
             finish(); return
         }
 
-        // 광고 SDK 초기화: 비-프리미엄에서만
+
         val isPremium = SubscriptionManager.isPremium(this)
         if (!isPremium) {
             if (BuildConfig.DEBUG) {
@@ -82,7 +82,7 @@ class MainActivity : BaseActivity() {
             AdManager.initialize(this)
         }
 
-        // 알림 권한
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED
@@ -103,7 +103,7 @@ class MainActivity : BaseActivity() {
                 .commit()
         }
 
-        // 다이얼로그/외부에서 설정창을 열라고 넘긴 경우 처리(선택)
+
         intent?.let {
             if (it.getBooleanExtra("open_settings", false)) {
                 openSettings(autolinkGoogle = it.getBooleanExtra("settings_autolink_google", false))
@@ -112,7 +112,7 @@ class MainActivity : BaseActivity() {
             }
         }
 
-        // 뒤로가기
+
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val now = SystemClock.elapsedRealtime()
@@ -142,13 +142,13 @@ class MainActivity : BaseActivity() {
                     finish()
                 } else {
                     lastBackPressedAt = SystemClock.elapsedRealtime()
-                    Toast.makeText(this@MainActivity, "한 번 더 누르면 종료됩니다", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, "한 번 더 누르면 종료됩니다!", Toast.LENGTH_SHORT).show()
                 }
             }
         })
     }
 
-    /** ✅ Settings 화면을 열고, 필요하면 구글 통합을 자동 실행 */
+
     fun openSettings(autolinkGoogle: Boolean = false) {
         val f = SettingsFragment().apply {
             arguments = android.os.Bundle().apply {

@@ -76,7 +76,7 @@
     <string name="weekday_fri">금</string>
     <string name="weekday_sat">토</string>
 
-    <string name="tutorial_lang_tip">언어는 여기에서 바꿀 수 있어요. 누르면 한국어/English 전환됩니다.</string>
+    <string name="tutorial_lang_tip">한국어/English Button</string>
 
     
     <string name="empty_string" />
@@ -316,7 +316,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
 
     <string name="status_prefix">상태: </string>
     <string name="status_logged_out">로그아웃</string>
-    <string name="status_guest">체험</string>
+    <string name="status_guest">|체험|</string>
     <string name="status_google">구글 로그인</string>
     <string name="status_email">이메일 로그인</string>
     <string name="btn_google_login">Google로 로그인</string>
@@ -1189,10 +1189,10 @@ eep prompt 템플릿 --&gt;
     <string name="recommended">추천</string>
 
     <!--Advertisement -->
-    <string name="ad_unit_ai_banner">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="ad_unit_calendar_banner">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="ad_unit_dream_banner">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="ad_unit_fortune_banner">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="ad_unit_settings_banner">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="ad_unit_fortune_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_dream_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_calendar_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_ai_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_settings_banner">ca-app-pub-1742201279182732/9282239127</string>
 
 </resources>

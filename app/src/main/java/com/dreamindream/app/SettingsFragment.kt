@@ -72,7 +72,7 @@ class SettingsFragment : Fragment() {
         timeZone = TimeZone.getTimeZone("UTC")
     }
 
-    // ───────── Birth-time slots (KO/EN) ─────────
+
     private data class BirthSlot(val code: String, val ko: String, val en: String)
     private fun isKo() = resources.configuration.locales[0].language.startsWith("ko")
     private fun birthSlots(): List<BirthSlot> = listOf(
@@ -298,7 +298,7 @@ class SettingsFragment : Fragment() {
                     }.apply()
 
                     loadUserIntoEditor()
-                    updateAppProfileSummary() // 헤더/요약 동시 갱신
+                    updateAppProfileSummary()
                     refreshQuickStatus()
                     enterCorrectMode()
                 }
@@ -315,7 +315,7 @@ class SettingsFragment : Fragment() {
         return nn.isBlank() || bd.isBlank() || gd.isBlank()
     }
 
-    // === 스크롤 헬퍼(ScrollView/NestedScrollView 모두 지원) ===
+
     private fun Int.dp(): Int =
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), resources.displayMetrics).toInt()
 

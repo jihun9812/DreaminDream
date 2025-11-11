@@ -67,7 +67,7 @@
 <string name="fortune_section_title_total">Overall</string>
 <string name="fortune_section_score_sample">80 pts</string>
 
-    <string name="tutorial_lang_tip">언어는 여기에서 바꿀 수 있어요. 누르면 한국어/English 전환됩니다.</string>
+    <string name="tutorial_lang_tip">한국어/English Button</string>
 
     <!-- example_month_header.xml -->
 <string name="weekday_sun">Sun</string>
@@ -286,7 +286,7 @@ If you log in again within 7 days, it will be restored. After 7 days, it will be
 <string name="toast_deactivated">Your account has been deactivated. You can restore it within 7 days.</string>
 <string name="status_prefix">Status: </string>
 <string name="status_logged_out">Logged out</string>
-<string name="status_guest">Guest</string>
+<string name="status_guest">|Guest|</string>
 <string name="status_google">Google login</string>
 <string name="status_email">Email login</string>
 <string name="btn_google_login">Log in with Google</string>
@@ -1032,7 +1032,7 @@ You must call deep_fortune_analysis.
 <string name="fortune_system_daily">You are a premium life coach and fortune analyst. Always return JSON via function calls only.</string>
 <string name="fortune_system_deep">You are a premium life coach and fortune analyst. Return JSON via tool calls only.</string>
 
-    <!-- FortuneApi normalization terms -->
+
 <string name="replace_meeting">Review/Organize</string>
 <string name="replace_email">Note/Reminder</string>
 <string name="replace_report">Summarize notes</string>
@@ -1081,8 +1081,6 @@ You must call deep_fortune_analysis.
         <string name="billing_err_plan_inactive">The selected plan is inactive.</string>
 
 
-    <!-- Keep KR currency here for now; replace via Play Billing localized price at runtime if needed -->
-
     <string name="sub_btn_later">Later</string>
     <string name="sub_btn_start">Start Premium</string>
     <string name="sub_btn_restore">Restore purchases</string>
@@ -1095,14 +1093,10 @@ You must call deep_fortune_analysis.
     <string name="sub_price_yearly">₩40,000 per year</string>
 
     <!-- advertisement-->
-    <string name="ad_unit_ai_banner">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="ad_unit_calendar_banner">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="ad_unit_dream_banner">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="ad_unit_fortune_banner">ca-app-pub-3940256099942544/6300978111</string>
-    <string name="ad_unit_settings_banner">ca-app-pub-3940256099942544/6300978111</string>
-
-
-
-
+    <string name="ad_unit_fortune_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_dream_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_calendar_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_ai_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_settings_banner">ca-app-pub-1742201279182732/9282239127</string>
 
 </resources>

@@ -420,7 +420,7 @@ class LoginActivity : BaseActivity() {
 
         val resId = resources.getIdentifier("tutorial_lang_tip", "string", packageName)
         val tipText = if (resId != 0) getString(resId)
-        else "언어는 여기에서 바꿀 수 있어요. 누르면 한국어/English 전환됩니다."
+        else " 한국어/English Button"
 
         val msg = TextView(this).apply {
             text = tipText

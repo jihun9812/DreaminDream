@@ -16,20 +16,20 @@ class SplashActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // ✅ Edge-to-Edge + 투명 시스템바
+
         enableEdgeToEdge()
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
 
-        // ✅ 아이콘 명암 설정 (하단 흰 띠 방지)
+
         val isLight =
             (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
                     Configuration.UI_MODE_NIGHT_NO
         WindowInsetsControllerCompat(window, window.decorView).apply {
-            // 상태바: 라이트/다크에 맞춰 자동
+
             isAppearanceLightStatusBars = isLight
-            // 네비게이션바: 항상 밝은 아이콘(=false) → 대비 스크림 방지
+
             isAppearanceLightNavigationBars = false
         }
 
@@ -49,6 +49,6 @@ class SplashActivity : AppCompatActivity() {
             )
             startActivity(intent, options.toBundle())
             finish()
-        }, 1500)
+        }, 1800)
     }
 }

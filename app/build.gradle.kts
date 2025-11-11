@@ -16,8 +16,6 @@ val localProperties = Properties().apply {
         file.inputStream().use { load(it) }
     }
 }
-
-// 없으면 빌드 실패하던 기존 로직 유지
 val openaiKey = localProperties.getProperty("openai.api.key")
     ?: throw IllegalStateException("Missing 'openai.api.key' in local.properties")
 
@@ -29,7 +27,7 @@ android {
         applicationId =  "com.dreamindream.app"
         minSdk = 28
         targetSdk = 35
-        versionCode = 8
+        versionCode = 11
         versionName = "1.07"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

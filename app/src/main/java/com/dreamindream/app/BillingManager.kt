@@ -12,14 +12,6 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.android.billingclient.api.*
 import com.google.firebase.functions.FirebaseFunctions
 
-/**
- * BillingManager (엔터프라이즈형 + 기존 UI 호환)
- * - Subscriptions v2 구매/복원/동기화
- * - Offer 선택: offerTags 우선 → 기간 파싱 fallback
- * - 구매 후 서버 Callable 검증(verifyPlaySubscription)
- * - 앱 포그라운드 진입 시 TTL 기반 재동기화
- * - ✅ 호환 레이어: BillingPeriod, launchPurchase(activity, period), formattedPriceForPeriodLabel(...)
- */
 object BillingManager : PurchasesUpdatedListener {
 
     private const val TAG = "BillingManager"

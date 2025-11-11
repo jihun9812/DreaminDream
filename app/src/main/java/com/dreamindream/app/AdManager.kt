@@ -11,11 +11,7 @@ import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback
 object AdManager {
     private const val TAG = "AdManager"
 
-    // ✅ 실제 보상형 광고 단위 ID
-
-    // 테스트 기간 동안만 이렇게:
-    private const val REWARDED_ID = "ca-app-pub-3940256099942544/5224354917" // 테스트 보상형
-
+    private const val REWARDED_ID = "ca-app-pub-1742201279182732/6656075788"
     private var rewardedAd: RewardedAd? = null
 
     fun initialize(context: Context) {

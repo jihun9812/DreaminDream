@@ -28,10 +28,9 @@ class TermsActivity : AppCompatActivity() {
         setSupportActionBar(binding.topAppBar)
         binding.topAppBar.setNavigationOnClickListener { finish() }
 
-        // 기본 탭
         binding.toggleGroup.check(binding.btnTermsTab.id)
 
-        // 언어별 가독성: ko만 양쪽정렬/하이픈, 그 외는 끔(영문 벌어짐 방지)
+
         val lang = resources.configuration.locales[0].language
         val isKo = lang.equals("ko", ignoreCase = true)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {

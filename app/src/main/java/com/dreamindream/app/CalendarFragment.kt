@@ -40,23 +40,22 @@ class CalendarFragment : Fragment() {
     private val appLocale: Locale
         get() = resources.configuration.locales[0]
 
-    /** 월/년 포맷도 앱 언어로 */
+
     private val dateFormatter by lazy {
         DateTimeFormatter.ofPattern(getString(R.string.fmt_month_year), appLocale)
     }
 
-    // 캘린더 범위
     private val CAL_START_YEAR = 2024
     private val CAL_END_YEAR = 2030
 
-    // Palette
+
     private val colSun = Color.parseColor("#FF6B6B")
     private val colSat = Color.parseColor("#6FA8FF")
     private val colText = Color.parseColor("#E8F1F8")
     private val colDim = Color.parseColor("#A0A0A0")
     private val colAccent = Color.parseColor("#37C2D0")
 
-    // Inline list
+
     private lateinit var adapter: DreamInlineAdapter
 
     override fun onCreateView(
@@ -71,7 +70,7 @@ class CalendarFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Recycler
+
         adapter = DreamInlineAdapter(
             mutableListOf(),
             onOpen = { entry ->
@@ -99,7 +98,6 @@ class CalendarFragment : Fragment() {
         updateMonthText(currentMonth)
         setupAds(view)
 
-        // Firestore -> 로컬 동기화 후 반영
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
             FirestoreManager.getAllDreamDates(requireContext(), userId) {
@@ -128,7 +126,7 @@ class CalendarFragment : Fragment() {
             object : MonthHeaderFooterBinder<MonthHeaderViewContainer> {
                 override fun create(view: View) = MonthHeaderViewContainer(view)
                 override fun bind(container: MonthHeaderViewContainer, month: CalendarMonth) {
-                    // 헤더 커스터마이즈 필요 시 사용
+
                 }
             }
     }
@@ -226,7 +224,7 @@ class CalendarFragment : Fragment() {
         binding.textViewMonthYear.text = dateFormatter.format(month)
     }
 
-    // --- Inline list helpers ---
+
 
     private fun refreshInlineListFor(date: LocalDate) {
         // 요일 약칭도 앱 언어로
@@ -259,12 +257,12 @@ class CalendarFragment : Fragment() {
         val arr = getDreamArray(date)
         if (pos !in 0 until arr.length()) return
 
-        // 1) 로컬 삭제
+
         val newArr = JSONArray()
         for (i in 0 until arr.length()) if (i != pos) newArr.put(arr.getJSONObject(i))
         saveDreamArray(date, newArr)
 
-        // 1-1) 서버 동기화(로그인 상태)
+
         FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
             FirestoreManager.updateDreamsForDate(
                 uid = uid,
@@ -274,13 +272,12 @@ class CalendarFragment : Fragment() {
             )
         }
 
-        // 2) UI 반영
         adapter.removeAt(pos)
         if (adapter.itemCount == 0) {
             binding.emptyDreamText.visibility = View.VISIBLE
             binding.recyclerDreams.visibility = View.GONE
         }
-        // 3) 달력 도트 갱신
+
         binding.calendarView.notifyDateChanged(date)
     }
 

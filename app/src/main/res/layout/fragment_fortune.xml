@@ -23,7 +23,7 @@
         android:gravity="center"
         android:textAlignment="center"
         android:textAllCaps="false"
-        android:textColor="#D111F2"
+        android:textColor="#6F6C6F"
         android:textSize="40sp"
         android:elevation="6dp"
         android:fontFamily="@font/pretendard_medium"
@@ -100,13 +100,14 @@
                 android:paddingTop="6dp"
                 android:paddingBottom="0dp">
 
-                <!-- 키워드 칩 -->
+
                 <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:scrollbars="none"
-
                     android:overScrollMode="never">
+
+
                     <com.google.android.material.chip.ChipGroup
                         android:id="@+id/chipsFortune"
                         android:layout_width="wrap_content"

@@ -11,11 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.launchIn
 
-/**
- * SubscriptionManager — 서버 스냅샷 우선의 단일 진실원(SSOT)
- * - Firestore: users/{uid}/billing/state 를 권위로 사용(서버 Functions가 갱신)
- * - 로컬 낙관 반영(setPremium)은 UX용 캐시, 최종 권한은 서버 스냅샷
- */
 object SubscriptionManager {
 
     private const val TAG = "SubscriptionManager"

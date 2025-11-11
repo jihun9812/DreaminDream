@@ -553,7 +553,6 @@ date:"$today ($weekday)", age:$userAge, age_tag:$tag, seed:$seed, tone:"$tone"
         val tvEve  = dialogView.findViewById<TextView>(R.id.tvPlanEvening)
         val tvTmr  = dialogView.findViewById<TextView>(R.id.tvDeepTomorrow)
         val btnClose = dialogView.findViewById<MaterialButton>(R.id.btnDeepClose)
-
         val lucky = lastDaily?.optJSONObject("lucky") ?: JSONObject()
         val colorHex = lucky.optString("colorHex")
         val colName = sanitizeColorName(deep.optString("luckyColorName"), colorHex)

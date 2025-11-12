@@ -21,12 +21,12 @@
     <string name="send_reset_email">रीसेट ईमेल भेजें</string>
     <string name="text_divider"> / </string>
     <string name="login_email_hint">ईमेल</string>
-    <string name="login_password_hint" translatable="false">पासवर्ड</string>
-    <string name="login_btn_login" translatable="false">लॉग इन</string>
-    <string name="login_btn_signup" translatable="false">साइन अप</string>
-    <string name="login_btn_google" translatable="false">Google से लॉग इन</string>
-    <string name="login_btn_guest" translatable="false">मेहमान</string>
-    <string name="privacy_and_version" translatable="false">v1.07 Dream in Dream | 개인정보처리방침</string>
+    <string name="login_password_hint" >पासवर्ड</string>
+    <string name="login_btn_login">लॉग इन</string>
+    <string name="login_btn_signup" >साइन अप</string>
+    <string name="login_btn_google" >Google से लॉग इन</string>
+    <string name="login_btn_guest" >मेहमान</string>
+    <string name="privacy_and_version">v1.07 Dream in Dream | गोपनीयता नीति</string>
     <string name="brand_logo_desc">Dream in Dream </string>
 
 
@@ -450,12 +450,14 @@ HTTPS, न्यूनतम एक्सेस अधिकार, एक्स
     <string name="chart_info_title">चार्ट 안내</string>
     <string name="chart_info_message">
     • यदि इस सप्ताह सपने %1$d या अधिक हैं, तो रिपोर्ट तुरंत बनती है।
-    \n• निर्माण के बाद 1 विज्ञापन देखने पर ‘गहन विश्लेषण’ उपलब्ध होता है।
-    \n• सप्ताह के दौरान सपनों की कुल संख्या %2$d या अधिक होने पर रिपोर्ट रीफ़्रेश होगी (अधिकतम %3$d),
-    \n  और 1 विज्ञापन देखने पर फिर से गहन विश्लेषण चला सकते हैं।
+    \n• निर्माण के बाद 1 विज्ञापन देखने पर ‘गहन विश्लेषण (PRO)’ उपलब्ध होता है।
+    \n• सप्ताह के दौरान सपनों की कुल संख्या %2$d या अधिक होने पर रिपोर्ट स्वतः रीफ़्रेश होगी (अधिकतम %3$d तक शामिल),
+    \n  और 1 विज्ञापन देखने पर गहन विश्लेषण फिर से चलाया जा सकता है।
     \n• बारें 8 भावनाओं और 5 थीम की साप्ताहिक हिस्सेदारी (%%) दर्शाती हैं।
+    \n• PRO सक्षम होने पर मॉडल द्वारा निकाले गए KPI (सकारात्मक/तटस्थ/नकारात्मक) के आधार पर भावनात्मक ग्राफ़ अधिक सटीक और स्थिर दिखेगा।
     \n• साप्ताहिक मानदंड: सोम~रवि (पिछले सप्ताह की रिपोर्ट ‘विश्लेषण इतिहास’ में देखें)
 </string>
+
     <string name="pro_cta">गहन विश्लेषण</string>
     <string name="pro_completed">गहन विश्लेषण पूर्ण</string>
     <string name="pro_refresh">गहन विश्लेषण (रीफ़्रेश)</string>
@@ -490,7 +492,7 @@ HTTPS, न्यूनतम एक्सेस अधिकार, एक्स
     <string name="section_title_weekly_deep_main">साप्ताहिक सपनों का गहन विश्लेषण</string>
     <string name="section_title_deep">गहन विश्लेषण</string>
     <string name="section_title_ai_pro">AI गहन विश्लेषण</string>
-    <string name="section_title_summary3">सार (3 वाक्य)</string>
+    <string name="section_title_summary3">सार</string>
     <string name="section_title_quant">संख्यात्मक सार</string>
     <string name="section_title_emotion_pattern">भावना पैटर्न व्याख्या</string>
     <string name="section_title_symbols">प्रतीक·दृश्य व्याख्या</string>

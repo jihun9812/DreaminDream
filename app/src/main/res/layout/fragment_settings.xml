@@ -104,7 +104,7 @@
                             android:text="@string/settings_title"
                             android:textColor="#FFFDCA60"
                             android:textSize="18sp"
-                            android:fontFamily="@font/jalnan"/>
+                            android:fontFamily = "@font/pretendard_bold"/>
 
                         <!-- ===== 프로필 헤더(띠 아이콘 아바타) ===== -->
                         <LinearLayout
@@ -179,7 +179,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="12dp"
-                            app:cardBackgroundColor="#1AFFFFFF"
+                            app:cardBackgroundColor="#872C2B2B"
                             app:cardCornerRadius="12dp"
                             app:strokeWidth="0dp">
 
@@ -437,7 +437,7 @@
                             android:paddingBottom="8dp"
                             android:text="@string/btn_profile_edit"
                             android:textColor="#FFFDCA60"
-                            android:fontFamily="@font/jalnan"
+                            android:fontFamily = "@font/pretendard_bold"
                             android:textSize="20sp"
                             android:textStyle="bold" />
 
@@ -570,14 +570,30 @@
                             android:textColor="#FFFABE41"
                             android:textSize="12sp" />
 
-                        <Spinner
-                            android:id="@+id/spinner_mbti"
+                        <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:layout_marginBottom="8dp"
-                            android:popupBackground="#AA060D35"
-                            android:backgroundTint="@android:color/transparent"
-                            android:spinnerMode="dropdown" />
+                            android:layout_height="wrap_content"
+                            app:boxBackgroundMode="outline"
+                            app:boxStrokeColor="#FFFDCA60"
+                            app:boxCornerRadiusTopStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusBottomEnd="8dp">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/tv_mbti"
+                                android:layout_width="match_parent"
+                                android:layout_height="44dp"
+                                android:focusable="false"
+                                android:clickable="true"
+                                android:inputType="none"
+                                android:hint="@string/select_none"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="10dp"
+                                android:textColor="#FFE8F1F8"
+                                android:textColorHint="#B3FFFFFF"
+                                android:textSize="16sp"/>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                         <!-- 출생시간 -->
                         <TextView
@@ -587,14 +603,31 @@
                             android:textColor="#FFFABE41"
                             android:textSize="12sp" />
 
-                        <Spinner
-                            android:id="@+id/spinner_birthtime"
+                        <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:layout_marginBottom="8dp"
-                            android:popupBackground="#AA060D35"
-                            android:backgroundTint="@android:color/transparent"
-                            android:spinnerMode="dropdown" />
+                            android:layout_height="wrap_content"
+                            app:boxBackgroundMode="outline"
+                            app:boxStrokeColor="#FFFDCA60"
+                            app:boxCornerRadiusTopStart="8dp"
+                            app:boxCornerRadiusTopEnd="8dp"
+                            app:boxCornerRadiusBottomStart="8dp"
+                            app:boxCornerRadiusBottomEnd="8dp">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/tv_birthtime"
+                                android:layout_width="match_parent"
+                                android:layout_height="44dp"
+                                android:focusable="false"
+                                android:clickable="true"
+                                android:inputType="none"
+                                android:hint="@string/birthtime_none"
+                                android:paddingHorizontal="12dp"
+                                android:paddingVertical="10dp"
+                                android:textColor="#FFE8F1F8"
+                                android:textColorHint="#B3FFFFFF"
+                                android:textSize="16sp"/>
+                        </com.google.android.material.textfield.TextInputLayout>
+
 
                         <!-- 취소/저장 -->
                         <LinearLayout

@@ -500,7 +500,7 @@ Sections (fixed order):
   • Add the sentence “This is a life guide based on tendencies, not a prophecy.” at the end
 - Checklist
 ]]></string>
-    <!-- time suffixes (AIReportFragment.formatAgo 에서 사용) -->
+
     <string name="time_seconds_suffix">s</string>
     <string name="time_minutes_suffix">m</string>
     <string name="time_hours_suffix">h</string>
@@ -552,7 +552,7 @@ Sections (fixed order):
     <string name="section_title_weekly_deep_main">Weekly dream deep analysis</string>
     <string name="section_title_deep">Deep analysis</string>
     <string name="section_title_ai_pro">AI Deep Analysis</string>
-    <string name="section_title_summary3">Summary (3 sentences)</string>
+    <string name="section_title_summary3">Summary</string>
     <string name="section_title_quant">Quant summary</string>
     <string name="section_title_emotion_pattern">Emotion pattern analysis</string>
     <string name="section_title_symbols">Symbols &amp; scenes</string>
@@ -605,16 +605,17 @@ Sections (fixed order):
         <item>@string/theme_growth</item>
     </string-array>
 
-    <!-- chart info dialog -->
     <string name="chart_info_title">Chart guide</string>
     <string name="chart_info_message">
-• If you have %1$d+ dreams this week, the report is generated immediately.
-\n• After generation, you can watch one ad to unlock deep analysis.
-\n• If total dreams during the week reach %2$d+, the report refreshes (up to %3$d shown),
-\n  and deep analysis can be rerun after watching an ad.
-\n• Bars indicate weekly ratios(%%) of 8 emotions and 5 themes.
-\n• Week: Mon–Sun (previous reports in “History”)
+    • If you have %1$d+ dreams this week, the report is generated immediately.
+    \n• After generation, watch one ad to unlock Deep Analysis (PRO).
+    \n• If total dreams during the week reach %2$d+, the report refreshes automatically (up to %3$d included),
+    \n  and you can rerun Deep Analysis after watching one ad.
+    \n• Bars show weekly ratios (%%) of 8 emotions and 5 themes.
+    \n• With PRO enabled, the emotion chart uses model-derived KPIs (Positive/Neutral/Negative) for more accurate and stable results.
+    \n• Week: Mon–Sun (previous reports are in “History”)
 </string>
+
 
     <!-- firestore manager helpers -->
 <string name="week_prompt_header_note">[Formatting rule] Emotion/Theme labels are fixed by the app. Provide only distribution values (emotionDist/themeDist). Provide enough core keywords.</string>

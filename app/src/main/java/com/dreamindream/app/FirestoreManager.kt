@@ -452,11 +452,6 @@ object FirestoreManager {
                 dreams.forEachIndexed { idx, d ->
                     appendLine(ctx.getString(R.string.tag_dream_original, idx + 1) + " " + d)
                 }
-                if (interps.any { it.isNotBlank() }) {
-                    interps.forEachIndexed { idx, t ->
-                        appendLine(ctx.getString(R.string.tag_interpret_text, idx + 1) + " " + t)
-                    }
-                }
                 append(rules)
             }
 

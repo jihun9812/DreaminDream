@@ -412,12 +412,14 @@ HTTPS、最小化权限、访问记录管理等
     <string name="chart_info_title">图表说明</string>
     <string name="chart_info_message">
     • 本周梦境达到 %1$d 条及以上时，将立即生成报告。
-    \n• 生成后观看 1 次广告即可使用“深度分析”。
-    \n• 周内梦境总数达到 %2$d 条时将刷新报告（最多 %3$d 条），
+    \n• 生成后观看 1 次广告即可使用“深度分析（PRO）”。
+    \n• 周内梦境总数达到 %2$d 条时将自动刷新报告（最多纳入 %3$d 条），
     \n  观看 1 次广告即可再次运行深度分析。
     \n• 柱状条表示 8 种情绪、5 个主题在本周的占比(%%)。
+    \n• 启用深度分析（PRO）后，将以模型产出的 KPI（积极/中立/消极）更新情绪图表，使其更准确、稳定。
     \n• 周期：周一~周日（上周报告请在“分析记录”查看）
 </string>
+
 
     <string name="pro_cta">深度分析</string>
     <string name="pro_completed">深度分析完成</string>
@@ -453,7 +455,7 @@ HTTPS、最小化权限、访问记录管理等
     <string name="section_title_weekly_deep_main">每周梦境深度分析</string>
     <string name="section_title_deep">深度分析</string>
     <string name="section_title_ai_pro">AI 深度分析</string>
-    <string name="section_title_summary3">摘要（3句）</string>
+    <string name="section_title_summary3">摘要</string>
     <string name="section_title_quant">数值摘要</string>
     <string name="section_title_emotion_pattern">情绪模式解析</string>
     <string name="section_title_symbols">象征·场景解析</string>

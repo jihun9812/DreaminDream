@@ -13,14 +13,9 @@ import android.text.Spanned
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import android.util.TypedValue
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.view.inputmethod.EditorInfo
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.ScrollView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -47,10 +42,7 @@ import com.google.firebase.firestore.SetOptions
 import com.google.firebase.functions.FirebaseFunctions
 import org.json.JSONArray
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
-import java.util.TimeZone
+import java.util.*
 
 class SettingsFragment : Fragment() {
 
@@ -60,7 +52,6 @@ class SettingsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private var mode: Mode = Mode.APP
-
     private lateinit var profilePrefs: SharedPreferences
 
     private var isSaving = false
@@ -72,7 +63,7 @@ class SettingsFragment : Fragment() {
         timeZone = TimeZone.getTimeZone("UTC")
     }
 
-
+    // ───────── Domain data ─────────
     private data class BirthSlot(val code: String, val ko: String, val en: String)
     private fun isKo() = resources.configuration.locales[0].language.startsWith("ko")
     private fun birthSlots(): List<BirthSlot> = listOf(
@@ -121,7 +112,7 @@ class SettingsFragment : Fragment() {
             "ISTJ","ISFJ","ESTJ","ESFJ","ISTP","ISFP","ESTP","ESFP")
     }
 
-    // Google link launcher
+    // Google link launcher (원본 유지)
     private val linkGoogleLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val auth = FirebaseAuth.getInstance()
@@ -233,9 +224,7 @@ class SettingsFragment : Fragment() {
         binding.btnLogout.setOnClickListener { showLogoutConfirm() }
 
         binding.tvGptUsageLabel.text = getString(R.string.gpt_usage_today)
-
-        // 초기 헤더/요약 갱신
-        updateAppProfileSummary()      // 내부에서 아바타/헤더도 함께 갱신
+        updateAppProfileSummary()
     }
 
     override fun onResume() {
@@ -272,12 +261,19 @@ class SettingsFragment : Fragment() {
             showDatePicker()
         }
 
-        fun makeAdapter(items: List<String>) =
-            ArrayAdapter(requireContext(), R.layout.spinner_item, items).apply {
-                setDropDownViewResource(R.layout.spinner_dropdown_item)
-            }
-        binding.spinnerMbti.adapter = makeAdapter(mbtiItems)
-        binding.spinnerBirthtime.adapter = makeAdapter(birthLabels())
+        // ✅ 팝업 기반 셀렉터 (Login의 언어 팝업과 동일한 규격)
+        setupPopupSelector(binding.tvMbti, mbtiItems) { sel ->
+            binding.tvMbti.setText(sel)
+            profilePrefs.edit().putString("mbti", sel).apply()
+        }
+        setupPopupSelector(binding.tvBirthtime, birthLabels()) { sel ->
+            binding.tvBirthtime.setText(sel)
+            val code = labelToBirthCode(sel)
+            profilePrefs.edit()
+                .putString("birth_time_code", code)
+                .putString("birth_time", codeToLocalizedLabel(code))
+                .apply()
+        }
 
         FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
             FirestoreManager.getUserProfile(uid) { map ->
@@ -315,7 +311,6 @@ class SettingsFragment : Fragment() {
         return nn.isBlank() || bd.isBlank() || gd.isBlank()
     }
 
-
     private fun Int.dp(): Int =
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), resources.displayMetrics).toInt()
 
@@ -324,7 +319,7 @@ class SettingsFragment : Fragment() {
         when (val sv = binding.scrollView) {
             is NestedScrollView -> sv.post { sv.smoothScrollTo(0, y) }
             is ScrollView       -> sv.post { sv.smoothScrollTo(0, y) }
-            else                -> sv.post { sv.scrollTo(0, y) } // safety fallback
+            else                -> sv.post { sv.scrollTo(0, y) }
         }
     }
 
@@ -346,8 +341,6 @@ class SettingsFragment : Fragment() {
         scrollToInsideCard(binding.cardProfile)
     }
 
-    /** 헤더(띠 아이콘 아바타/이름/서브)와 요약을 모두 갱신한다.
-     *  - 요구사항: 띠 텍스트 라인 제거, 아이콘(이모지)만 노출 */
     private fun updateAppProfileSummary() {
         val nn = profilePrefs.getString("nickname","") ?: ""
         val bd = (profilePrefs.getString("birthdate_iso", null) ?: profilePrefs.getString("birthdate","") ?: "")
@@ -357,21 +350,19 @@ class SettingsFragment : Fragment() {
         val btLabel = codeToLocalizedLabel(btCode)
 
         val age = calcAge(bd)
-        val (cz, czIcon) = chineseZodiac(bd)
+        val ( cz, czIcon) = chineseZodiac(bd)
         val (wz, _) = westernZodiac(bd)
 
-        // --- 헤더(아바타/이름/서브레이블) ---
         binding.tvZodiacAvatar?.text = czIcon.ifBlank { "🧿" }
         binding.tvProfileName?.text = if (nn.isBlank()) getString(R.string.value_placeholder_dash) else nn
 
         val subParts = mutableListOf<String>()
-        if (age >= 0) subParts.add(getString(R.string.summary_age_value, age)) // e.g. "나이 25세"
+        if (age >= 0) subParts.add(getString(R.string.summary_age_value, age))
         if (gd.isNotBlank()) subParts.add(gd)
         if (mb.isNotBlank()) subParts.add(mb)
         if (btLabel.isNotBlank() && !btLabel.equals(getStringSafe(R.string.birthtime_none, "선택안함"), true)) subParts.add(btLabel)
         binding.tvProfileSub?.text = subParts.joinToString(" · ")
 
-        // --- 텍스트 요약(띠 텍스트 라인 제거됨) ---
         val labelColor = ContextCompat.getColor(requireContext(), R.color.summary_label)
         fun line(label: String, value: String): CharSequence {
             val s = SpannableStringBuilder()
@@ -387,7 +378,6 @@ class SettingsFragment : Fragment() {
             .append(line(getString(R.string.summary_gender_prefix), if (gd.isBlank()) getString(R.string.value_placeholder_dash) else gd)).append("\n")
             .append(line(getString(R.string.summary_mbti_prefix), if (mb.isBlank()) getString(R.string.value_placeholder_dash) else mb)).append("\n")
             .append(line(getString(R.string.summary_age_prefix), if (age >= 0) getString(R.string.summary_age_value, age) else getString(R.string.value_placeholder_dash))).append("\n")
-            // .append(line(getString(R.string.summary_cz_prefix, czIcon), cz)).append("\n")
             .append(line(getString(R.string.summary_wz_prefix, ""), wz)).append("\n")
             .append(line(getString(R.string.summary_birthtime_prefix), btLabel))
 
@@ -426,10 +416,11 @@ class SettingsFragment : Fragment() {
         }
         val birthIso = normalizeDate(binding.editBirthdate.text?.toString())
         val nickname = binding.editNickname.text?.toString()?.trim().orEmpty()
-        val mbti = (binding.spinnerMbti.selectedItem as? String)?.takeIf { it != getString(R.string.select_none) } ?: ""
-        val btIndex = binding.spinnerBirthtime.selectedItemPosition.coerceIn(0, birthSlots().lastIndex)
-        val btSlot = birthSlots()[btIndex]
-        val btCode = btSlot.code
+
+        val mbti = binding.tvMbti.text?.toString()
+            ?.takeIf { it.isNotBlank() && it != getString(R.string.select_none) } ?: ""
+
+        val btCode = labelToBirthCode(binding.tvBirthtime.text?.toString())
         val btLabel = codeToLocalizedLabel(btCode)
 
         profilePrefs.edit().apply {
@@ -469,7 +460,6 @@ class SettingsFragment : Fragment() {
         val gd = profilePrefs.getString("gender","") ?: ""
         val mb = (profilePrefs.getString("mbti","") ?: "").uppercase(Locale.ROOT)
         val btCode = profilePrefs.getString("birth_time_code", null) ?: labelToBirthCode(profilePrefs.getString("birth_time", null))
-        val idx = birthSlots().indexOfFirst { it.code == btCode }.let { if (it >= 0) it else 0 }
 
         binding.editNickname.setText(nn)
         binding.editBirthdate.setText(bd)
@@ -478,18 +468,9 @@ class SettingsFragment : Fragment() {
             getString(R.string.gender_female) -> binding.radioFemale.isChecked = true
             else -> binding.radioGroupGender.clearCheck()
         }
-        binding.spinnerMbti.setSelection(
-            mbtiItems.indexOf(if (mb.isBlank()) getString(R.string.select_none) else mb).coerceAtLeast(0),
-            false
-        )
-        (binding.spinnerBirthtime.adapter as? ArrayAdapter<String>)?.apply {
-            clear(); addAll(birthLabels()); notifyDataSetChanged()
-        } ?: run {
-            binding.spinnerBirthtime.adapter = ArrayAdapter(requireContext(), R.layout.spinner_item, birthLabels()).apply {
-                setDropDownViewResource(R.layout.spinner_dropdown_item)
-            }
-        }
-        binding.spinnerBirthtime.setSelection(idx, false)
+
+        binding.tvMbti.setText(if (mb.isBlank()) getString(R.string.select_none) else mb)
+        binding.tvBirthtime.setText(codeToLocalizedLabel(btCode))
     }
 
     // ───────── Quick status ─────────
@@ -784,7 +765,7 @@ class SettingsFragment : Fragment() {
             .addOnFailureListener { onDone() }
     }
 
-    // ───────── 로그아웃 확인(브랜드 컬러) ─────────
+    // ───────── 로그아웃 확인 ─────────
     private fun showLogoutConfirm() {
         val dlg = MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.dlg_logout_title))
@@ -830,4 +811,42 @@ class SettingsFragment : Fragment() {
         return "dreamindream_profile_$key"
     }
     private fun getStringSafe(id: Int, fallback: String) = runCatching { getString(id) }.getOrElse { fallback }
+
+    // ───────── Popup util (Login의 언어 팝업과 동일 컨셉) ─────────
+    private fun setupPopupSelector(anchor: TextView, items: List<String>, onSelected: (String) -> Unit) {
+        val ctx = requireContext()
+        val popup = ListPopupWindow(ctx).apply {
+            anchorView = anchor
+            width = 180.dp()
+            isModal = true
+            setBackgroundDrawable(
+                android.graphics.drawable.GradientDrawable().apply {
+                    cornerRadius = 12.dp().toFloat()
+                    setColor(Color.parseColor("#FBFBFBFF"))
+                }
+            )
+            setAdapter(object : ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, items) {
+                private fun style(tv: TextView) {
+                    tv.layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                    tv.gravity = Gravity.START
+                    tv.textAlignment = View.TEXT_ALIGNMENT_VIEW_START
+                    tv.textDirection = View.TEXT_DIRECTION_LTR
+                    tv.setPadding(14.dp(), 12.dp(), 14.dp(), 12.dp())
+                    tv.setTextColor(Color.parseColor("#222222"))
+                }
+                override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                    val v = super.getView(position, convertView, parent) as TextView
+                    style(v); return v
+                }
+                override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                    val v = super.getDropDownView(position, convertView, parent) as TextView
+                    style(v); return v
+                }
+            })
+            setOnItemClickListener { _, _, pos, _ ->
+                onSelected(items[pos]); dismiss()
+            }
+        }
+        anchor.setOnClickListener { popup.show() }
+    }
 }

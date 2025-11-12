@@ -105,8 +105,8 @@ class FortuneApi(
     ) {
         val body = JSONObject().apply {
             put("model", "gpt-4.1-mini")
-            put("temperature", 0.7)
-            put("max_tokens", 2200)
+            put("temperature", 0.5)
+            put("max_tokens", 2000)
             put("messages", JSONArray().apply {
                 put(JSONObject().put("role", "system").put("content", context.getString(R.string.fortune_system_deep)))
                 put(JSONObject().put("role", "user").put("content", buildDeepPrompt(u, daily, seed)))

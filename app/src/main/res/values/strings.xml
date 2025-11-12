@@ -470,14 +470,8 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="report_meta_format">%1$d건 · %2$s</string>
 
     <string name="chart_info_title">차트 안내</string>
-    <string name="chart_info_message">
-    • 이번 주 꿈이 %1$d개 이상이면 리포트가 즉시 생성됩니다.
-    \n• 생성 후 광고 1회 시청으로 ‘심화 분석’을 이용할 수 있어요.
-    \n• 주 중에 꿈이 총 %2$d개 이상이 되면 리포트가 새로고침되고(최대%3$d개),
-    \n  광고 1회 시청으로 심화 분석을 다시 실행할 수 있어요.
-    \n• 막대는 감정 8가지·테마 5가지의 주간 비중(%%)을 의미합니다.
-    \n• 주간 기준: 월~일 (지난 주 리포트는 ‘분석 기록’에서 확인)
-</string>
+    <string name="chart_info_message">• 이번 주 꿈이 %1$d개 이상이면 리포트가 바로 생성됩니다.\n• 생성 후 광고 1회 시청으로 ‘심화 분석(PRO)’을 사용할 수 있어요.\n• 주중 꿈이 총 %2$d개 이상이 되면 리포트가 자동 새로고침되고(최대 %3$d개 반영),\n  광고 1회 시청으로 심화 분석을 다시 실행할 수 있어요.\n• 막대는 감정 8가지·테마 5가지의 주간 비중(%%)을 나타냅니다.\n• 심화 분석(PRO) 실행 시 모델이 산출한 KPI(긍정·중립·부정)를 반영해 감정 그래프가 더 정확하고 안정적으로 표시돼요.\n• 주간 기준: 월~일 (지난 주 리포트는 ‘분석 기록’에서 확인)</string>
+
     <string name="pro_cta">심화 분석</string>
     <string name="pro_completed">심화 분석 완료</string>
     <string name="pro_refresh">심화 분석 (새로고침)</string>
@@ -512,7 +506,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="section_title_weekly_deep_main">주간 꿈 심화 분석</string>
     <string name="section_title_deep">심화 분석</string>
     <string name="section_title_ai_pro">AI 심화분석</string>
-    <string name="section_title_summary3">요약(3문장)</string>
+    <string name="section_title_summary3">요약</string>
     <string name="section_title_quant">수치 요약</string>
     <string name="section_title_emotion_pattern">감정 패턴 해석</string>
     <string name="section_title_symbols">상징·장면 해석</string>

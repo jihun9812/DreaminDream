@@ -24,6 +24,7 @@
             android:layout_height="@dimen/calendar_nav_button_size"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_chevron_left"
+            android:layoutDirection="ltr"
             android:contentDescription="@string/prev_month"
             app:tint="#D6E5F6" />
 
@@ -46,6 +47,7 @@
             android:layout_height="@dimen/calendar_nav_button_size"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_chevron_right"
+            android:layoutDirection="ltr"
             android:contentDescription="@string/next_month"
             app:tint="#D6E5F6" />
     </LinearLayout>

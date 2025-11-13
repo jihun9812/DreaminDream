@@ -107,7 +107,22 @@ class CalendarFragment : Fragment() {
         } else {
             selectedDate?.let { refreshInlineListFor(it) }
         }
+        fixArabicIcons()
+
     }
+    private fun fixArabicIcons() {
+        val lang = resources.configuration.locales[0].language
+        if (lang == "ar") {
+            // RTL 때문에 한 번 뒤집힌 걸 다시 한 번 뒤집어서 원래대로
+            binding.buttonPreviousMonth.scaleX = -1f
+            binding.buttonNextMonth.scaleX = -1f
+        } else {
+            // 다른 언어에서는 정상값
+            binding.buttonPreviousMonth.scaleX = 1f
+            binding.buttonNextMonth.scaleX = 1f
+        }
+    }
+
 
     private fun setupCalendar(currentMonth: YearMonth, daysOfWeek: List<DayOfWeek>) {
         val start = YearMonth.of(CAL_START_YEAR, 1)
@@ -200,6 +215,7 @@ class CalendarFragment : Fragment() {
             binding.calendarView.findFirstVisibleMonth()?.yearMonth?.minusMonths(1)?.let {
                 binding.calendarView.smoothScrollToMonth(it)
                 updateMonthText(it)
+
             }
         }
         binding.buttonNextMonth.setOnClickListener {

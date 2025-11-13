@@ -27,7 +27,7 @@ android {
         applicationId =  "com.dreamindream.app"
         minSdk = 28
         targetSdk = 35
-        versionCode = 13
+        versionCode = 16
         versionName = "1.07"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

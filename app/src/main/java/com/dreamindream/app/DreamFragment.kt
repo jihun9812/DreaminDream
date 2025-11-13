@@ -48,7 +48,7 @@ class DreamFragment : Fragment() {
     private val adLimit = 2
     private val prefKeyDate = "dream_last_date"
     private val prefKeyCount = "dream_count"
-    private val dateFmt = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    private val dateFmt = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
     private val bannedStarters = listOf(
         "안녕","gpt","hello","how are you","what is","tell me","chatgpt","who are you","날씨","시간",

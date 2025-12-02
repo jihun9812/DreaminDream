@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <solid android:color="@color/brand_gold"/>          <!-- 반투명 골드 -->
+    <solid android:color="#DCDCDCFF"/>
     <corners android:radius="22dp"/>            <!-- 둥근 모서리 -->
     <padding android:bottom="10dp"/>            <!-- 기존 setPadding(0,0,0,10dp) 대체 -->
 </shape>

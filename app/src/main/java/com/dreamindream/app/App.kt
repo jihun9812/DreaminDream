@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
-import com.dreamindream.app.billing.SubscriptionManager
+
 
 class App : Application() {
 
@@ -53,6 +53,6 @@ class App : Application() {
         }
         AppCompatDelegate.setApplicationLocales(locales)
 
-        SubscriptionManager.init(this)
+
     }
 }

@@ -58,7 +58,7 @@
     <dimen name="ai_title">15sp</dimen>
     <dimen name="ai_sub">13sp</dimen>
     <dimen name="bubble_text">13sp</dimen>
-    <dimen name="btn_text">14sp</dimen>
+    <dimen name="btn_text">11sp</dimen>
 
     <!-- KPI -->
     <dimen name="kpi_value">20sp</dimen>
@@ -135,8 +135,8 @@
     <!-- 기타 -->
     <dimen name="divider_thickness">1dp</dimen>
     <dimen name="ad_margin_bottom">8dp</dimen>
-    <dimen name="calendar_day_size">40dp</dimen>
-    <dimen name="calendar_day_margin">4dp</dimen>
+    <dimen name="calendar_day_size">34dp</dimen>
+    <dimen name="calendar_day_margin">2dp</dimen>
     <dimen name="calendar_day_text_size">15sp</dimen>
     <dimen name="dream_indicator_size">6dp</dimen>
     <dimen name="dream_indicator_margin_bottom">4dp</dimen>

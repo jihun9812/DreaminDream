@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- 배경 그라데이션 -->
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="24dp" />
+            <gradient
+                android:angle="270"
+                android:startColor="#00C3C3C3"
+                android:centerColor="#04C3C3C3"
+                android:endColor="#00C3C3C3" />
+        </shape>
+    </item>
+
+
+
+</layer-list>

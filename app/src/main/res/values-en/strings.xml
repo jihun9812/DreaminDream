@@ -4,6 +4,17 @@
       <!-- en -->
     <string name="bs_subtitle_key_range_format">%1$s · %2$s</string>
 
+
+
+    <string name="fortune_daily_prompt_template">
+User Info:
+nickname="%1$s", mbti="%2$s", birthdate="%3$s", gender="%4$s", birth_time="%5$s"
+Date: %6$s, seed=%7$s
+
+Return only the fortune result as JSON following the rules below.
+</string>
+    <string name="fortune_lucky_time_fallback">11 AM</string>
+
     <!-- login.xml -->
 <string name="login_slogan">Find answers in your dreams</string>
 <string name="dreamin_slogan1"> </string>
@@ -41,6 +52,25 @@
 <string name="tab_terms">Terms</string>
 <string name="tab_privacy">Privacy</string>
 
+    <string name="logout_confirm_title">Logout</string>
+    <string name="logout_confirm_msg">Are you sure you want to log out?</string>
+    <string name="logout_confirm_yes">Yes</string>
+    <string name="logout_confirm_no">No</string>
+
+    <!-- Western Zodiac -->
+    <string name="wz_unknown">Unknown</string>
+    <string name="wz_capricorn">Capricorn</string>
+    <string name="wz_aquarius">Aquarius</string>
+    <string name="wz_pisces">Pisces</string>
+    <string name="wz_aries">Aries</string>
+    <string name="wz_taurus">Taurus</string>
+    <string name="wz_gemini">Gemini</string>
+    <string name="wz_cancer">Cancer</string>
+    <string name="wz_leo">Leo</string>
+    <string name="wz_virgo">Virgo</string>
+    <string name="wz_libra">Libra</string>
+    <string name="wz_scorpio">Scorpio</string>
+    <string name="wz_sagittarius">Sagittarius</string>
 
     <!-- dialog_ad_prompt.xml -->
 <string name="ad_prompt_title">Preparing your tailored interpretation</string>
@@ -61,8 +91,7 @@
 <string name="fortune_deep_plan_morning">Morning 09–12</string>
 <string name="fortune_deep_plan_afternoon">Afternoon 13–17</string>
 <string name="fortune_deep_plan_evening">Evening 19–22</string>
-<string name="fortune_deep_tomorrow_label">Prepare for tomorrow</string>
-
+    <string name ="community">Community</string>
     <!-- dialog_fortune_section.xml -->
 <string name="fortune_section_title_total">Overall</string>
 <string name="fortune_section_score_sample">80 pts</string>
@@ -77,6 +106,35 @@
 <string name="weekday_thu">Thu</string>
 <string name="weekday_fri">Fri</string>
 <string name="weekday_sat">Sat</string>
+
+
+
+        <string name="fortune_today_title">Today’s Fortune</string>
+
+        <string name="label_checklist_today">Today’s checklist</string>
+        <string name="label_positive">Positive</string>
+        <string name="label_neutral">Neutral</string>
+        <string name="label_negative">Negative</string>
+        <string name="label_score">Score</string>
+        <string name="deep_highlights_header">Highlights</string>
+        <string name="deep_plan_header">Plan</string>
+        <string name="deep_plan_morning">Morning</string>
+        <string name="deep_plan_afternoon">Afternoon</string>
+        <string name="deep_plan_evening">Evening</string>
+        <string name="deep_tomorrow_header">For tomorrow</string>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <!-- fragment_ai_report.xml -->
 <string name="empty_string"></string>
@@ -270,7 +328,7 @@ Access, correction, deletion, suspension of processing
 6. Security
 HTTPS, least-privilege access, access logs
 
-Contact: support@dreamindream.app]]>
+Contact: dreamindream@dreamindream.app]]>
 </string>
 
     <!-- SettingsFragment.kt : i18n keys -->
@@ -789,7 +847,7 @@ Please wait.</string>
 <string name="language_english">English</string>
 <string name="save_and_continue">Save &amp; continue</string>
 <string name="language">Language</string>
-<string name="language_changed">Language updated.</string>
+<string name="language_changed">You need to restart the app to apply the selected language.</string>
 
     <!-- ChartStyler -->
 <string name="chart_no_data">No data</string>
@@ -1097,10 +1155,10 @@ You must call deep_fortune_analysis.
     <string name="sub_price_yearly">₩40,000 per year</string>
 
     <!-- advertisement-->
-    <string name="ad_unit_fortune_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_dream_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_calendar_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_ai_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_settings_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_fortune_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_dream_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_calendar_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_ai_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_settings_banner">ca-app-pub-4715784452595618/6081547407</string>
 
 </resources>

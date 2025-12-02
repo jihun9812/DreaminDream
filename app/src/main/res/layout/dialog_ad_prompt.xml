@@ -24,9 +24,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/ad_prompt_title"
-            android:textColor="#E5FAFD"
+            android:textColor="#1D1D1D"
             android:textSize="18sp"
-            android:textStyle="bold"
+            android:fontFamily="@font/pretendard_bold"
             android:letterSpacing="0.07"
             android:lineHeight="24sp"/>
 
@@ -38,7 +38,8 @@
             android:layout_marginTop="8dp"
             android:letterSpacing="0.07"
             android:text="@string/ad_prompt_status"
-            android:textColor="#E5FAFD"
+            android:textColor="#1D1D1D"
+            android:fontFamily="@font/pretendard_medium"
             android:textSize="15sp"
             android:lineHeight="20sp"/>
 
@@ -78,9 +79,10 @@
                 android:minHeight="0dp"
                 android:text="@string/ad_prompt_cancel"
                 android:textSize="14sp"
-                app:backgroundTint="#C3C2C2"
+                app:backgroundTint="#00C3C2C2"
                 android:textColor="#050505"
                 app:strokeColor="#0DFFFFFF"
+                android:fontFamily="@font/pretendard_bold"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
                 app:cornerRadius="16dp"/>
@@ -93,13 +95,13 @@
                 android:layout_height="41dp"
                 android:layout_marginStart="10dp"
                 android:minHeight="0dp"
-                android:backgroundTint="#FDC54F"
-                android:fontFamily="@font/pretendard_medium"
+                android:backgroundTint="#00FDC54F"
+                android:fontFamily="@font/pretendard_bold"
                 android:minWidth="0dp"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
                 android:text="@string/ad_prompt_watch_ad"
-                android:textColor="#040404"
+                android:textColor="#B388FF"
                 android:textSize="14sp"
                 app:cornerRadius="16dp" />
         </LinearLayout>

@@ -46,7 +46,7 @@
     <dimen name="ai_title">16sp</dimen>
     <dimen name="ai_sub">14sp</dimen>
     <dimen name="bubble_text">14sp</dimen>
-    <dimen name="btn_text">14sp</dimen>
+    <dimen name="btn_text">12sp</dimen>
 
     <!-- KPI -->
     <dimen name="kpi_value">18sp</dimen>

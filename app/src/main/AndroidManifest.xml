@@ -7,9 +7,10 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+
     <queries>
-        <package android:name="com.google.android.gms"/>
-        <package android:name="com.android.vending"/>
+        <package android:name="com.google.android.gms" />
+        <package android:name="com.android.vending" />
     </queries>
 
     <application
@@ -32,11 +33,40 @@
             android:exported="false"
             android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
 
+        <!-- 🔹 메인 액티비티 + 인증 메일 딥링크 처리 -->
         <activity
             android:name="com.dreamindream.app.MainActivity"
             android:launchMode="singleTop"
             android:exported="true"
+            android:windowSoftInputMode="adjustResize|stateUnspecified">
+
+            <!-- ✅ 원래 LoginActivity 안에 있던 인증 메일 링크 처리 intent-filter 그대로 이동 -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="dreamindream.app"
+                    android:pathPrefix="/__/auth/action" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.community.CommunityActivity"
+            android:exported="false"
+            android:theme="@style/Theme.DreaminDream"
             android:windowSoftInputMode="adjustResize|stateUnspecified" />
+
+        <activity
+            android:name="com.dreamindream.app.SplashActivity"
+            android:theme="@style/Theme.DreaminDream.TransparentFullScreen"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -55,36 +85,8 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-1742201279182732~5140331053" />
+            android:value="ca-app-pub-4715784452595618~8460298731" />
 
-
-        <activity
-            android:name="com.dreamindream.app.SplashActivity"
-            android:theme="@style/Theme.DreaminDream.TransparentFullScreen"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-
-
-        <activity
-            android:name="com.dreamindream.app.LoginActivity"
-            android:exported="true"
-            android:theme="@style/Theme.DreaminDream">
-
-            <!-- 인증 메일 링크 처리 -->
-            <intent-filter android:autoVerify="true">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="https"
-                    android:host="dreamindream.app"
-                    android:pathPrefix="/__/auth/action" />
-            </intent-filter>
-        </activity>
     </application>
+
 </manifest>

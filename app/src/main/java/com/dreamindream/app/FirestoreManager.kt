@@ -68,16 +68,25 @@ object FirestoreManager {
                 set(Calendar.WEEK_OF_YEAR, w)
                 set(Calendar.YEAR, y)
             }
-            (0..6).map { val s = fmt.format(cal.time); cal.add(Calendar.DAY_OF_MONTH, 1); s }
+            (0..6).map {
+                val s = fmt.format(cal.time)
+                cal.add(Calendar.DAY_OF_MONTH, 1)
+                s
+            }
         }.getOrElse {
             val cal = Calendar.getInstance().apply {
                 firstDayOfWeek = Calendar.MONDAY
                 minimalDaysInFirstWeek = 4
                 set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
             }
-            (0..6).map { val s = fmt.format(cal.time); cal.add(Calendar.DAY_OF_MONTH, 1); s }
+            (0..6).map {
+                val s = fmt.format(cal.time)
+                cal.add(Calendar.DAY_OF_MONTH, 1)
+                s
+            }
         }
     }
+
     fun currentUid(): String? = FirebaseAuth.getInstance().currentUser?.uid
 
     private fun <T : Number> scaleToPercent(raw: List<T>, target: Int): List<Float> {

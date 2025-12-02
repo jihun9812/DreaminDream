@@ -27,7 +27,7 @@ android {
         applicationId =  "com.dreamindream.app"
         minSdk = 28
         targetSdk = 35
-        versionCode = 16
+        versionCode = 22
         versionName = "1.07"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -74,18 +74,21 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "17"
     }
 
     buildFeatures {
         buildConfig = true
         viewBinding = true
+        compose = true
     }
-
+    composeOptions {            // ✅ 이 블록 추가
+        kotlinCompilerExtensionVersion = "1.5.15"
+    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -104,8 +107,22 @@ dependencies {
     implementation("com.google.firebase:firebase-config-ktx:21.6.0")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-functions-ktx")
+    implementation("androidx.compose.ui:ui")
+    implementation(platform("androidx.compose:compose-bom:2024.04.01"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.04.01"))
+    implementation("com.airbnb.android:lottie-compose:6.6.10")
+    //compose
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    implementation("androidx.activity:activity-compose:1.9.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.navigation:navigation-compose:2.8.3")
+
     //Billing
-    implementation("com.android.billingclient:billing-ktx:6.2.1")
+
     implementation("androidx.lifecycle:lifecycle-process:2.8.4")
     // ML Kit
     implementation("com.google.mlkit:translate:17.0.3")

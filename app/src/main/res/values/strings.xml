@@ -3,8 +3,30 @@
     
     <string name="bs_subtitle_key_range_format">%1$s · %2$s</string>
 
-    
-    <string name="login_slogan">꿈에서 해답을찾다</string>
+    <!-- 🔥 로그아웃 다이얼로그 -->
+    <string name="logout_confirm_title">로그아웃</string>
+    <string name="logout_confirm_msg">정말 로그아웃 하시겠습니까?</string>
+    <string name="logout_confirm_yes">예</string>
+    <string name="logout_confirm_no">아니요</string>
+
+    <!-- 🔥 서양 별자리 (Western Zodiac) -->
+    <string name="wz_unknown">알 수 없음</string>
+    <string name="wz_capricorn">염소자리</string>
+    <string name="wz_aquarius">물병자리</string>
+    <string name="wz_pisces">물고기자리</string>
+    <string name="wz_aries">양자리</string>
+    <string name="wz_taurus">황소자리</string>
+    <string name="wz_gemini">쌍둥이자리</string>
+    <string name="wz_cancer">게자리</string>
+    <string name="wz_leo">사자자리</string>
+    <string name="wz_virgo">처녀자리</string>
+    <string name="wz_libra">천칭자리</string>
+    <string name="wz_scorpio">전갈자리</string>
+    <string name="wz_sagittarius">사수자리</string>
+
+
+
+    <string name="login_slogan">꿈에서 해답을 찾다</string>
     <string name="dreamin_slogan1"> </string>
     <string name="login_password_confirm_hint">비밀번호 확인</string>
     <string name="login_findpw">비밀번호 찾기</string>
@@ -59,7 +81,6 @@
     <string name="fortune_deep_plan_morning">아침 09~12시</string>
     <string name="fortune_deep_plan_afternoon">오후 13~17시</string>
     <string name="fortune_deep_plan_evening">저녁 19~22시</string>
-    <string name="fortune_deep_tomorrow_label">내일 준비</string>
 
 
     
@@ -132,7 +153,7 @@
     <string name="dream_input_label">• 꿈 내용 입력</string>
     <string name="usage_left_default">오늘 남은 횟수 : 0회</string>
     <string name="usage_left_format">오늘 남은 횟수 : %1$d회</string>
-    <string name="hint_input">꿈을 자세하게 적어주세요! ex)큰 상어 내 앞에 나타나서 도망갔어, 빌딩 한가운대서 엄청 뛰어다녔어.</string>
+    <string name="hint_input">꿈을 자세하게 이야기식으로 적어주세요!\n 예) 하늘을 날다가 갑자기 추락하는 느낌이 났어. 거대한 달이 바로 앞에 떠 있었고, 그 아래를 천천히 걸었어.</string>
     <string name="button_interpret">해몽하기</string>
 
     <string name="dream_input_empty">꿈 내용을 입력해주세요.</string>
@@ -294,7 +315,7 @@ DreamInDream 이용약관
 6. 안전성 확보 조치
 HTTPS, 접근권한 최소화, 접근기록 관리 등
 
-문의: support@dreamindream.app
+문의: dreamindream@dreamindream.app
     </string>
 
 
@@ -755,15 +776,15 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="common_notice">안내</string>
     <string name="fb_date_format">yyyy-MM-dd HH:mm:ss</string>
 
+    <string name="label_refresh_hint">새 꿈이 추가되면 새로고침해주세요</string>
+    <string name="whs_title">주간 리포트 히스토리</string>
 
     <string name="week_prompt_lang_line"><ns0:g id="lang">%1$s</ns0:g>로만 답변해 주세요.</string>
-
 
     <string name="pro_meta_emotion_label">감정</string>
     <string name="pro_meta_keywords_label">키워드</string>
     <string name="pro_meta_score_label">점수</string>
     <string name="pro_meta_ai_label">AI 분석</string>
-
 
     <string name="week_prompt_intro">아래는 사용자의 최근 1주 꿈 기록(최대 4개, 최신순)과 각 꿈에 대한 해몽/분석 텍스트입니다.</string>
 
@@ -884,13 +905,22 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="label_pm">오후</string>
     <string name="label_hour_suffix">시</string>
 
-    
+    <string name ="community">커뮤니티</string>
     <string name="err_auth">인증 오류가 발생했어요. 설정의 API 키를 확인해주세요. (%1$s)</string>
     <string name="err_forbidden">접근이 거부되었어요. 권한/결제 상태를 확인해주세요. (%1$s)</string>
     <string name="err_not_found">서버 주소를 찾지 못했어요. 잠시 후 다시 시도해주세요. (%1$s)</string>
     <string name="err_rate_limit">호출 한도가 초과되었어요. 잠시 후 다시 시도해주세요. (%1$s)</string>
     <string name="err_timeout">네트워크가 지연되고 있어요. 연결 상태를 확인한 뒤 다시 시도해주세요. (%1$s)</string>
     <string name="err_network_generic">네트워크 오류가 발생했어요. (%1$s)</string>
+    <string name="fortune_daily_prompt_template">
+사용자 정보:
+nickname="%1$s", mbti="%2$s", birthdate="%3$s", gender="%4$s", birth_time="%5$s"
+날짜: %6$s, seed=%7$s
+
+아래 규칙에 따라 오늘의 운세 JSON만 반환하세요.
+</string>
+
+    <string name="fortune_lucky_time_fallback">오전 11시</string>
 
 eep prompt 템플릿 --&gt;
     <string name="fortune_deep_prompt_template">
@@ -972,15 +1002,33 @@ eep prompt 템플릿 --&gt;
     <string name="sub_price_format">%1$s / %2$s</string>
     <string name="sub_unit_month">월</string>
     <string name="sub_unit_year">년</string>
-    <string name="sub_price_monthly">₩4,000 / 월</string>
-    <string name="sub_price_yearly">₩40,000 / 년</string>
+    <string name="sub_price_monthly">₩3,900 / 월</string>
+    <string name="sub_price_yearly">₩39,000 / 년</string>
 
 
 
+    <string name="fortune_today_title">오늘의 운세</string>
 
+    <string name="btn_fortune_show">❔</string>
+        <string name="deep_button_label">심화 분석 열기</string>
+        <string name="dialog_ok">확인</string>
+
+
+        <string name="label_checklist_today">오늘의 체크리스트</string>
+        <string name="label_positive">긍정</string>
+        <string name="label_neutral">중립</string>
+        <string name="label_negative">부정</string>
+        <string name="label_score">점수</string>
+
+        <string name="deep_highlights_header">핵심 포인트</string>
+        <string name="deep_plan_header">오늘 계획</string>
+        <string name="deep_plan_morning">아침</string>
+        <string name="deep_plan_afternoon">오후</string>
+        <string name="deep_plan_evening">저녁</string>
+        <string name="deep_tomorrow_header">내일 준비</string>
 
     
-    <string name="btn_fortune_show">❔</string>
+
     <string name="btn_come_tomorrow">내일 다시</string>
     <string name="toast_already_seen_today">오늘은 이미 확인했어요. 내일 다시 이용해주세요.</string>
     <string name="toast_run_fortune_first">먼저 "행운 보기"를 실행해주세요.</string>
@@ -988,10 +1036,9 @@ eep prompt 템플릿 --&gt;
     <string name="share_chooser_title">공유</string>
     <string name="dialog_profile_title">설정이 필요해요</string>
     <string name="dialog_profile_message">닉네임·생년월일·성별만 저장하면 맞춤 운세를 볼 수 있어요.\n(출생시간·MBTI는 선택)</string>
-    <string name="dialog_ok">확인</string>
+
     <string name="ad_failed_open_deep_now">광고 실패(%1$s) → 심화분석 바로 열기</string>
     <string name="deep_generating_label">생성 중…</string>
-    <string name="deep_button_label">심화 분석 보기</string>
 
     
 
@@ -1180,14 +1227,14 @@ eep prompt 템플릿 --&gt;
     <string name="language_english">English</string>
     <string name="save_and_continue">저장하고 계속</string>
     <string name="language">언어</string>
-    <string name="language_changed">언어가 업데이트되었습니다.</string>
+    <string name="language_changed">선택한 언어를 적용하려면 앱을 재실행해야 합니다.</string>
     <string name="recommended">추천</string>
 
     <!--Advertisement -->
-    <string name="ad_unit_fortune_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_dream_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_calendar_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_ai_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_settings_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_fortune_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_dream_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_calendar_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_ai_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_settings_banner">ca-app-pub-4715784452595618/6081547407</string>
 
 </resources>

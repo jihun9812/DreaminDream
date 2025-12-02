@@ -18,7 +18,7 @@ navigationUiKtx = "2.9.4"
 
 [plugins]
 android-application = { id = "com.android.application", version = "8.11.2" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version = "1.9.0" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version = "1.9.25" }
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }

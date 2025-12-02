@@ -3,6 +3,32 @@
 
     <string name="bs_subtitle_key_range_format">%1$s · %2$s</string>
 
+        <string name="fortune_today_title">आज का भाग्य</string>
+
+        <string name="label_checklist_today">आज की चेकलिस्ट</string>
+        <string name="label_positive">सकारात्मक</string>
+        <string name="label_neutral">तटस्थ</string>
+        <string name="label_negative">नकारात्मक</string>
+        <string name="label_score">स्कोर</string>
+
+    <string name="fortune_daily_prompt_template">
+用户信息：
+nickname="%1$s"，mbti="%2$s"，birthdate="%3$s"，gender="%4$s"，birth_time="%5$s"
+日期：%6$s，seed=%7$s
+
+请根据以下规则，仅以 JSON 格式返回今日运势。
+</string>
+    <string name="fortune_lucky_time_fallback">上午 11 点</string>
+
+
+        <string name="deep_highlights_header">मुख्य बिंदु</string>
+        <string name="deep_plan_header">योजना</string>
+        <string name="deep_plan_morning">सुबह</string>
+        <string name="deep_plan_afternoon">दोपहर</string>
+        <string name="deep_plan_evening">शाम</string>
+        <string name="deep_tomorrow_header">कल के लिए</string>
+
+
     <string name="login_slogan">在梦中找到答案</string>
     <string name="dreamin_slogan1"> </string>
     <string name="login_password_confirm_hint">确认密码</string>
@@ -33,6 +59,29 @@
     <string name="feedback_contents">请填写您的咨询/反馈内容</string>
     <string name="send">发送</string>
 
+
+    <string name="logout_confirm_title">登出</string>
+    <string name="logout_confirm_msg">您确定要登出吗？</string>
+    <string name="logout_confirm_yes">是</string>
+    <string name="logout_confirm_no">否</string>
+
+    <!-- Western Zodiac -->
+    <string name="wz_unknown">未知</string>
+    <string name="wz_capricorn">摩羯座</string>
+    <string name="wz_aquarius">水瓶座</string>
+    <string name="wz_pisces">双鱼座</string>
+    <string name="wz_aries">白羊座</string>
+    <string name="wz_taurus">金牛座</string>
+    <string name="wz_gemini">双子座</string>
+    <string name="wz_cancer">巨蟹座</string>
+    <string name="wz_leo">狮子座</string>
+    <string name="wz_virgo">处女座</string>
+    <string name="wz_libra">天秤座</string>
+    <string name="wz_scorpio">天蝎座</string>
+    <string name="wz_sagittarius">射手座</string>
+
+
+
     <string name="title_terms_privacy">条款 · 隐私政策</string>
     <string name="tab_terms">服务条款</string>
     <string name="tab_privacy">隐私政策</string>
@@ -53,7 +102,7 @@
     <string name="fortune_deep_plan_morning">上午 09~12时</string>
     <string name="fortune_deep_plan_afternoon">下午 13~17时</string>
     <string name="fortune_deep_plan_evening">晚上 19~22时</string>
-    <string name="fortune_deep_tomorrow_label">明日准备</string>
+    <string name ="community">커뮤니티</string>
 
     <string name="fortune_section_title_total">总运</string>
     <string name="fortune_section_score_sample">80分</string>
@@ -254,7 +303,7 @@ DreamInDream 服务条款
 6. 安全措施
 HTTPS、最小化权限、访问记录管理等
 
-联系：support@dreamindream.app
+联系：dreamindream@dreamindream.app
     </string>
 
     <string name="profile_edit_title">编辑资料</string>
@@ -1043,17 +1092,18 @@ HTTPS、最小化权限、访问记录管理等
     <string name="language_english">English</string>
     <string name="save_and_continue">保存并继续</string>
     <string name="language">语言</string>
-    <string name="language_changed">语言已更新。</string>
+    <string name="language_changed">要应用所选语言，需要重新启动应用。</string>
+
     <string name="recommended">推荐</string>
     <string name="press_back_again_to_exit">再次按下即可退出。</string>
     <string name="label_emotion">情感</string>
     <string name="label_keywords">关键词</string>
 
     <!-- Advertisement -->
-    <string name="ad_unit_fortune_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_dream_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_calendar_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_ai_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_settings_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_fortune_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_dream_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_calendar_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_ai_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_settings_banner">ca-app-pub-4715784452595618/6081547407</string>
 
 </resources>

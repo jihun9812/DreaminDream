@@ -3,6 +3,43 @@
 
     <string name="bs_subtitle_key_range_format">%1$s · %2$s</string>
 
+        <!-- Logout Dialog -->
+        <string name="logout_confirm_title">लॉगआउट</string>
+        <string name="logout_confirm_msg">क्या आप वाकई लॉगआउट करना चाहते हैं?</string>
+        <string name="logout_confirm_yes">हाँ</string>
+        <string name="logout_confirm_no">नहीं</string>
+
+        <!-- Western Zodiac -->
+        <string name="wz_unknown">अज्ञात</string>
+        <string name="wz_capricorn">मकर</string>
+        <string name="wz_aquarius">कुंभ</string>
+        <string name="wz_pisces">मीन</string>
+        <string name="wz_aries">मेष</string>
+        <string name="wz_taurus">वृषभ</string>
+        <string name="wz_gemini">मिथुन</string>
+        <string name="wz_cancer">कर्क</string>
+        <string name="wz_leo">सिंह</string>
+        <string name="wz_virgo">कन्या</string>
+        <string name="wz_libra">तुला</string>
+        <string name="wz_scorpio">वृश्चिक</string>
+        <string name="wz_sagittarius">धनु</string>
+
+
+
+
+
+
+    <string name ="community">커뮤니티</string>
+
+    <string name="fortune_daily_prompt_template">
+उपयोगकर्ता जानकारी:
+nickname="%1$s", mbti="%2$s", birthdate="%3$s", gender="%4$s", birth_time="%5$s"
+तारीख: %6$s, seed=%7$s
+
+कृपया नीचे दिए गए नियमों के अनुसार केवल JSON प्रारूप में आज का भाग्य लौटाएँ।
+</string>
+    <string name="fortune_lucky_time_fallback">सुबह 11 बजे</string>
+
 
     <string name="login_slogan">सपनों में समाधान खोजें</string>
     <string name="dreamin_slogan1"> </string>
@@ -59,8 +96,6 @@
     <string name="fortune_deep_plan_morning">सुबह 09~12 बजे</string>
     <string name="fortune_deep_plan_afternoon">दोपहर 13~17 बजे</string>
     <string name="fortune_deep_plan_evening">शाम 19~22 बजे</string>
-    <string name="fortune_deep_tomorrow_label">कल की तैयारी</string>
-
 
 
     <string name="fortune_section_title_total">समग्र भाग्य</string>
@@ -221,7 +256,7 @@
     <string name="account_link_note">* अतिथि (अनाम) डेटा Google खाता लिंक करने पर भी बना रहेगा।</string>
 
     <string name="label_name">नाम</string>
-    <string name="hint_name_example">उदा: 홍길동</string>
+    <string name="hint_name_example">उदा: Rahul </string>
     <string name="label_birthdate">जन्मतिथि</string>
     <string name="hint_birthdate_format">YYYY-MM-DD</string>
     <string name="label_gender">लिंग</string>
@@ -314,8 +349,9 @@ HTTPS, न्यूनतम एक्सेस अधिकार, एक्स
     <string name="status_email">ईमेल 로그인</string>
     <string name="btn_google_login">Google से लॉगिन</string>
     <string name="btn_google_merge">Google से खाता एकीकृत करें</string>
-    <string name="btn_google_connected">Google 연결됨</string>
-    <string name="btn_google_connect">Google 계정 연결</string>
+    <string name="btn_google_connected">Google जुड़ा हुआ</string>
+    <string name="btn_google_connect">Google खाता जोड़ें</string>
+
 
     <string name="toast_merge_partial">खाता मर्ज (आंशिक) पूरा: %1$s</string>
     <string name="toast_link_failed">लिंक विफल: %1$s</string>
@@ -447,7 +483,8 @@ HTTPS, न्यूनतम एक्सेस अधिकार, एक्स
     <string name="report_switched_due_to_lack">इस सप्ताह के रिकॉर्ड की कमी के कारण स्वतः स्विच किया गया</string>
     <string name="report_meta_format">%1$d प्रविष्टियाँ · %2$s</string>
 
-    <string name="chart_info_title">चार्ट 안내</string>
+    <string name="chart_info_title">चार्ट जानकारी</string>
+
     <string name="chart_info_message">
     • यदि इस सप्ताह सपने %1$d या अधिक हैं, तो रिपोर्ट तुरंत बनती है।
     \n• निर्माण के बाद 1 विज्ञापन देखने पर ‘गहन विश्लेषण (PRO)’ उपलब्ध होता है।
@@ -544,8 +581,8 @@ HTTPS, न्यूनतम एक्सेस अधिकार, एक्स
     </string-array>
 
     <string name="time_seconds_suffix">सेकंड</string>
-    <string name="time_minutes_suffix" translatable="false">분</string>
-    <string name="time_hours_suffix" translatable="false">시간</string>
+    <string name="time_minutes_suffix">मिनट</string>
+    <string name="time_hours_suffix">घंटे</string>
     <string name="time_days_suffix">दिन</string>
 
     <string name="chart_no_data">डेटा उपलब्ध नहीं है</string>
@@ -848,7 +885,7 @@ HTTPS, न्यूनतम एक्सेस अधिकार, एक्स
 [लेखन नियम (टोन)]
 - highlights: आज के प्रवाह के 3~6 मुख्य बिंदु (छोटे और प्रभावी)।
 - plan: सुबह/दोपहर/शाम—प्रत्येक 2~3 पंक्तियाँ, सभी के लिए सरल “आदेश” नहीं, “सुझाव/अनुशंसा” शैली (जैसे: “~करना ठीक है”, “~की अनुशंसा”, “~पर विचार”).
-- छात्र/स्कूल/संपर्क जैसी निर्देश-शब्दावली निषिद्ध। “री뷰” निषिद्ध—केवल “रिव्यू/‘돌아보기’” का प्रयोग। “25 मिनट फोकस 2 बार” प्रकार निषिद्ध (विकल्प: “छोटी तल्लीनता”).
+- 25 मिनट फोकस 2 बार” जैसे कठोर निर्देश भी वर्जित हैं—इसके स्थान पर “छोटी तल्लीनता” जैसी नरम और सुझावात्मक अभिव्यक्ति का प्रयोग करें।.
 - tips: 3~6, जो आज ही आज़माए जा सकें ऐसे सुझाव।
 - checklistAdjusted: daily.checklist को यथार्थपरक ढंग से सँवारें या बदलें (अधिकतम 3~5)।
 - luckyColorName: sanitizeColorName("", luckyHex) आदि से हिंदी रंग-नाम।
@@ -888,6 +925,27 @@ HTTPS, न्यूनतम एक्सेस अधिकार, एक्स
 
     <string name="sub_price_monthly_amount">₩4,000</string>
     <string name="sub_price_yearly_amount">₩40,000</string>
+
+
+        <string name="fortune_today_title">आज का भाग्य</string>
+
+
+        <string name="label_checklist_today">आज की चेकलिस्ट</string>
+        <string name="label_positive">सकारात्मक</string>
+        <string name="label_neutral">तटस्थ</string>
+        <string name="label_negative">नकारात्मक</string>
+        <string name="label_score">स्कोर</string>
+
+         <string name="deep_highlights_header">मुख्य बिंदु</string>
+        <string name="deep_plan_header">योजना</string>
+        <string name="deep_plan_morning">सुबह</string>
+        <string name="deep_plan_afternoon">दोपहर</string>
+        <string name="deep_plan_evening">शाम</string>
+        <string name="deep_tomorrow_header">कल के लिए</string>
+
+
+
+
 
     <string name="sub_btn_later">बाद में</string>
     <string name="sub_btn_start">प्रीमियम शुरू करें</string>
@@ -1082,14 +1140,14 @@ HTTPS, न्यूनतम एक्सेस अधिकार, एक्स
     <string name="language_english">अंग्रेज़ी</string>
     <string name="save_and_continue">सहेजें और जारी रखें</string>
     <string name="language">भाषा</string>
-    <string name="language_changed">भाषा अपडेट कर दी गई है।</string>
+    <string name="language_changed">चयनित भाषा लागू करने के लिए ऐप को पुनः प्रारंभ करना आवश्यक है।</string>
     <string name="recommended">अनुशंसित</string>
 
     <!-- Advertisement -->
-    <string name="ad_unit_fortune_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_dream_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_calendar_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_ai_banner">ca-app-pub-1742201279182732/9282239127</string>
-    <string name="ad_unit_settings_banner">ca-app-pub-1742201279182732/9282239127</string>
+    <string name="ad_unit_fortune_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_dream_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_calendar_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_ai_banner">ca-app-pub-4715784452595618/6081547407</string>
+    <string name="ad_unit_settings_banner">ca-app-pub-4715784452595618/6081547407</string>
 
 </resources>

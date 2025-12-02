@@ -110,6 +110,8 @@ dependencies {
     // ML Kit
     implementation("com.google.mlkit:translate:17.0.3")
 
+    debugImplementation ("androidx.fragment:fragment-testing:1.6.2")
+
     // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:21.1.0")
 
@@ -127,6 +129,40 @@ dependencies {
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+
+
+    // Unit Testing (JUnit 4)
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("androidx.test.ext:junit:1.1.5")
+    testImplementation("androidx.test:core:1.5.0")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+
+    // Mockito
+    testImplementation("org.mockito:mockito-core:5.3.1")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.1.0")
+    testImplementation("org.mockito:mockito-inline:5.2.0")
+
+
+    //robel
+    testImplementation("org.robolectric:robolectric:4.10.3")
+    // Truth (Google의 assertion 라이브러리)
+    testImplementation("com.google.truth:truth:1.1.5")
+
+    // Robolectric (Android 컴포넌트 테스트용)
+    testImplementation("org.robolectric:robolectric:4.11.1")
+
+    // Fragment Testing
+    debugImplementation("androidx.fragment:fragment-testing:1.6.2")
+
+    // Android Instrumentation Testing
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test:runner:1.5.2")
+    androidTestImplementation("androidx.test:rules:1.5.0")
+
+
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

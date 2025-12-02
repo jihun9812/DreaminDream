@@ -63,6 +63,43 @@
 <string name="fortune_deep_plan_evening">Evening 19–22</string>
 <string name="fortune_deep_tomorrow_label">Prepare for tomorrow</string>
 
+
+    //ar don;t touch
+    <string name="fortune_today_title">حظّ اليوم</string>
+    <string name="label_checklist_today">قائمة اليوم</string>
+    <string name="label_positive">إيجابي</string>
+    <string name="label_neutral">حيادي</string>
+    <string name="label_negative">سلبي</string>
+    <string name="label_score">الدرجة</string>
+
+    <string name="deep_highlights_header">أبرز النقاط</string>
+    <string name="deep_plan_header">الخطة</string>
+    <string name="deep_plan_morning">الصباح</string>
+    <string name="deep_plan_afternoon">بعد الظهر</string>
+    <string name="deep_plan_evening">المساء</string>
+    <string name="deep_tomorrow_header">استعدادات الغد</string>
+
+    <string name="logout_confirm_title">تسجيل الخروج</string>
+    <string name="logout_confirm_msg">هل أنت متأكد أنك تريد تسجيل الخروج؟</string>
+    <string name="logout_confirm_yes">نعم</string>
+    <string name="logout_confirm_no">لا</string>
+
+    <!-- Western Zodiac -->
+    <string name="wz_unknown">غير معروف</string>
+    <string name="wz_capricorn">الجدي</string>
+    <string name="wz_aquarius">الدلو</string>
+    <string name="wz_pisces">الحوت</string>
+    <string name="wz_aries">الحمل</string>
+    <string name="wz_taurus">الثور</string>
+    <string name="wz_gemini">الجوزاء</string>
+    <string name="wz_cancer">السرطان</string>
+    <string name="wz_leo">الأسد</string>
+    <string name="wz_virgo">العذراء</string>
+    <string name="wz_libra">الميزان</string>
+    <string name="wz_scorpio">العقرب</string>
+    <string name="wz_sagittarius">القوس</string>
+
+
     <!-- dialog_fortune_section.xml -->
 <string name="fortune_section_title_total">Overall</string>
 <string name="fortune_section_score_sample">80 pts</string>

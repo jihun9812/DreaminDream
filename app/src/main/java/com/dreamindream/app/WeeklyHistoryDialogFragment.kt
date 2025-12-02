@@ -43,7 +43,7 @@ class WeeklyHistoryDialogFragment(
             setOnShowListener {
                 window?.apply {
                     // 배경/코너/스트로크를 XML 드로어블로 교체
-                    setBackgroundDrawableResource(R.drawable.bg_weekly_dialog)
+                    setBackgroundDrawableResource(R.drawable.bg_avatar_circle)
 
                     // 가로 92%로 설정
                     val w = (resources.displayMetrics.widthPixels * 0.92f).toInt()

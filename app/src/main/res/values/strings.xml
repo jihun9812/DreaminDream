@@ -750,6 +750,60 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="ea_bullet_delim">·</string>
     <string name="ea_trend_up"> ↑</string>
 
+//ar don't touch
+
+
+    <string name="fortune_today_title">حظّ اليوم</string>
+    <string name="label_checklist_today">قائمة اليوم</string>
+    <string name="label_positive">إيجابي</string>
+    <string name="label_neutral">حيادي</string>
+    <string name="label_negative">سلبي</string>
+    <string name="label_score">الدرجة</string>
+
+    <string name="deep_highlights_header">أبرز النقاط</string>
+    <string name="deep_plan_header">الخطة</string>
+    <string name="deep_plan_morning">الصباح</string>
+    <string name="deep_plan_afternoon">بعد الظهر</string>
+    <string name="deep_plan_evening">المساء</string>
+    <string name="deep_tomorrow_header">استعدادات الغد</string>
+
+    <string name="logout_confirm_title">تسجيل الخروج</string>
+    <string name="logout_confirm_msg">هل أنت متأكد أنك تريد تسجيل الخروج؟</string>
+    <string name="logout_confirm_yes">نعم</string>
+    <string name="logout_confirm_no">لا</string>
+
+    <!-- Western Zodiac -->
+    <string name="wz_unknown">غير معروف</string>
+    <string name="wz_capricorn">الجدي</string>
+    <string name="wz_aquarius">الدلو</string>
+    <string name="wz_pisces">الحوت</string>
+    <string name="wz_aries">الحمل</string>
+    <string name="wz_taurus">الثور</string>
+    <string name="wz_gemini">الجوزاء</string>
+    <string name="wz_cancer">السرطان</string>
+    <string name="wz_leo">الأسد</string>
+    <string name="wz_virgo">العذراء</string>
+    <string name="wz_libra">الميزان</string>
+    <string name="wz_scorpio">العقرب</string>
+    <string name="wz_sagittarius">القوس</string>
+
+
+
+
+
+
+
+
+
+    <string name="fortune_daily_prompt_template">
+معلومات المستخدم:
+nickname="%1$s"، mbti="%2$s"، birthdate="%3$s"، gender="%4$s"، birth_time="%5$s"
+التاريخ: %6$s، seed=%7$s
+
+يرجى إرجاع نتيجة حظ اليوم بصيغة JSON فقط وفقًا للقواعد أدناه.
+</string>
+    <string name="fortune_lucky_time_fallback">١١ صباحًا</string>
+
 
 
     <string name="common_notice">안내</string>

@@ -16,7 +16,6 @@ import com.github.mikephil.charting.renderer.BarChartRenderer
 import com.github.mikephil.charting.utils.ViewPortHandler
 import kotlin.math.roundToInt
 
-
 class PercentFormatter : ValueFormatter() {
     override fun getBarLabel(e: BarEntry?): String {
         val v = e?.y ?: 0f
@@ -32,9 +31,9 @@ fun setupBarChart(chart: BarChart) = chart.apply {
     setExtraOffsets(8f, 8f, 8f, 16f)
     setDrawValueAboveBar(true)
     setDrawBarShadow(false)
-    setNoDataText(chart.context.getString(R.string.chart_no_data)) // 리소스로 분리
+    setNoDataText(chart.context.getString(R.string.chart_no_data))
     setNoDataTextColor(Color.parseColor("#9AA3AB"))
-    animateY(0)
+    animateY(600) // 약간의 애니메이션 추가
 
     axisLeft.apply {
         axisMinimum = 0f
@@ -60,61 +59,59 @@ fun setupBarChart(chart: BarChart) = chart.apply {
 
     legend.apply {
         isEnabled = false
-        verticalAlignment = Legend.LegendVerticalAlignment.TOP
-        textColor = Color.WHITE
     }
 }
 
+// ★ Refactored: 다국어(영어/한국어) 지원 색상 매핑
+fun richEmotionColor(label: String): Int = when (label.lowercase()) {
+    "긍정", "positive" -> 0xFF4CAF50.toInt()
+    "기쁨", "joy" -> 0xFF66BB6A.toInt()
+    "행복", "happiness" -> 0xFF81C784.toInt()
+    "감사", "gratitude" -> 0xFF26A69A.toInt()
+    "희망", "hope" -> 0xFF29B6F6.toInt()
+    "설렘", "flutter", "excitement" -> 0xFF42A5F5.toInt()
+    "사랑", "love" -> 0xFFAB47BC.toInt()
+    "만족", "satisfaction" -> 0xFF8BC34A.toInt()
+    "즐거움", "pleasure" -> 0xFF00BCD4.toInt()
+    "뿌듯", "pride" -> 0xFF7E57C2.toInt()
+    "성취감", "achievement" -> 0xFF26C6DA.toInt()
+    "안도", "relief" -> 0xFF26A69A.toInt()
+    "자신감", "confidence" -> 0xFF5C6BC0.toInt()
 
-fun richEmotionColor(label: String): Int = when (label) {
-    "긍정" -> 0xFF4CAF50.toInt()
-    "기쁨" -> 0xFF66BB6A.toInt()
-    "행복" -> 0xFF81C784.toInt()
-    "감사" -> 0xFF26A69A.toInt()
-    "희망" -> 0xFF29B6F6.toInt()
-    "설렘" -> 0xFF42A5F5.toInt()
-    "사랑" -> 0xFFAB47BC.toInt()
-    "만족" -> 0xFF8BC34A.toInt()
-    "즐거움" -> 0xFF00BCD4.toInt()
-    "뿌듯" -> 0xFF7E57C2.toInt()
-    "성취감" -> 0xFF26C6DA.toInt()
-    "안도" -> 0xFF26A69A.toInt()
-    "자신감" -> 0xFF5C6BC0.toInt()
+    "평온", "calm" -> 0xFF80CBC4.toInt()
+    "안정", "stability" -> 0xFF90CAF9.toInt()
+    "차분", "serenity" -> 0xFF4DD0E1.toInt()
+    "편안", "comfort" -> 0xFF81D4FA.toInt()
+    "중립", "neutral" -> 0xFFB0BEC5.toInt()
+    "몰입", "flow", "immersion" -> 0xFF64B5F6.toInt()
 
-    "평온" -> 0xFF80CBC4.toInt()
-    "안정" -> 0xFF90CAF9.toInt()
-    "차분" -> 0xFF4DD0E1.toInt()
-    "편안" -> 0xFF81D4FA.toInt()
-    "중립" -> 0xFFB0BEC5.toInt()
-    "몰입" -> 0xFF64B5F6.toInt()
+    "활력", "vitality" -> 0xFFFFC107.toInt()
 
-    "활력" -> 0xFFFFC107.toInt()
-
-    "혼란" -> 0xFF9575CD.toInt()
-    "불안" -> 0xFFFF7043.toInt()
-    "우울" -> 0xFFE53935.toInt()
-    "피로" -> 0xFF8D6E63.toInt()
-    "우울/피로" -> 0xFFD81B60.toInt()
-    "좌절" -> 0xFFEF5350.toInt()
-    "분노" -> 0xFFEF6C00.toInt()
-    "슬픔" -> 0xFFEC407A.toInt()
-    "외로움" -> 0xFF5C6BC0.toInt()
+    "혼란", "confusion" -> 0xFF9575CD.toInt()
+    "불안", "anxiety" -> 0xFFFF7043.toInt()
+    "우울", "depression" -> 0xFFE53935.toInt()
+    "피로", "fatigue" -> 0xFF8D6E63.toInt()
+    "우울/피로", "depression/fatigue" -> 0xFFD81B60.toInt()
+    "좌절", "frustration" -> 0xFFEF5350.toInt()
+    "분노", "anger" -> 0xFFEF6C00.toInt()
+    "슬픔", "sadness" -> 0xFFEC407A.toInt()
+    "외로움", "loneliness" -> 0xFF5C6BC0.toInt()
     else -> paletteFallback(label)
 }
 
-fun richThemeColor(label: String): Int = when (label) {
-    "관계" ->  0xFF4FC3F7.toInt()
-    "성취" ->  0xFFA5D6A7.toInt()
-    "변화" ->  0xFFFFD54F.toInt()
-    "불안요인" ->  0xFFF06292.toInt()
-    "성장" -> 0xFF81C784.toInt()
-    "자아" -> 0xFFBA68C8.toInt()
-    "재정" -> 0xFFFFA726.toInt()
-    "건강" -> 0xFF26A69A.toInt()
-    "학업" -> 0xFF64B5F6.toInt()
-    "일/커리어" -> 0xFF90CAF9.toInt()
-    "가족" -> 0xFFFF8A65.toInt()
-    "모험" -> 0xFF26C6DA.toInt()
+fun richThemeColor(label: String): Int = when (label.lowercase()) {
+    "관계", "relationships", "rel" -> 0xFF4FC3F7.toInt()
+    "성취", "achievement", "achieve" -> 0xFFA5D6A7.toInt()
+    "변화", "change" -> 0xFFFFD54F.toInt()
+    "불안요인", "risk factors", "risk" -> 0xFFF06292.toInt()
+    "성장", "growth" -> 0xFF81C784.toInt()
+    "자아", "self" -> 0xFFBA68C8.toInt()
+    "재정", "finance" -> 0xFFFFA726.toInt()
+    "건강", "health" -> 0xFF26A69A.toInt()
+    "학업", "academic", "study" -> 0xFF64B5F6.toInt()
+    "일/커리어", "work", "career" -> 0xFF90CAF9.toInt()
+    "가족", "family" -> 0xFFFF8A65.toInt()
+    "모험", "adventure" -> 0xFF26C6DA.toInt()
     else -> paletteFallback(label)
 }
 
@@ -157,7 +154,6 @@ private fun makeSet(values: List<Float>, labels: List<String>, colorFor: (String
     }
 }
 
-
 fun renderPercentBars(
     chart: BarChart,
     labels: List<String>,
@@ -166,22 +162,16 @@ fun renderPercentBars(
 ) {
     chart.xAxis.valueFormatter = IndexAxisValueFormatter(labels.map { short(it) })
     val set = makeSet(values, labels, colorFor)
-
-
-    set.colors = labels.map { colorFor(it) }
-    set.valueTextColor = Color.parseColor("#F4F7FB")
-
     chart.data = BarData(set).apply { barWidth = 0.56f }
-
 
     val topIdx = values.indexOf(values.maxOrNull() ?: 0f).coerceAtLeast(0)
     val topLabel = labels.getOrNull(topIdx) ?: ""
     val topValue = (values.getOrNull(topIdx) ?: 0f).roundToInt()
     chart.contentDescription = chart.context.getString(R.string.chart_accessibility_top, topLabel, topValue)
 
+    chart.notifyDataSetChanged()
     chart.invalidate()
 }
-
 
 fun useRoundedBars(chart: BarChart, radiusDp: Float = 12f) {
     val rpx = radiusDp * chart.resources.displayMetrics.density
@@ -189,8 +179,7 @@ fun useRoundedBars(chart: BarChart, radiusDp: Float = 12f) {
     chart.invalidate()
 }
 
-private fun short(s: String): String = if (s.length <= 5) s else s.take(6) + "…"
-
+private fun short(s: String): String = if (s.length <= 6) s else s.take(5) + "…"
 
 private class RoundedBarChartRenderer(
     chart: BarChart,
@@ -203,11 +192,9 @@ private class RoundedBarChartRenderer(
 
     override fun drawDataSet(c: Canvas, dataSet: IBarDataSet, index: Int) {
         val trans = mChart.getTransformer(dataSet.axisDependency)
-
         mBarBorderPaint.color = dataSet.barBorderColor
         mBarBorderPaint.strokeWidth = dataSet.barBorderWidth
         val drawBorder = dataSet.barBorderWidth > 0f
-
         val phaseX = mAnimator.phaseX
         val phaseY = mAnimator.phaseY
 
@@ -218,7 +205,6 @@ private class RoundedBarChartRenderer(
             setBarWidth(mChart.barData.barWidth)
             feed(dataSet)
         }
-
         trans.pointValuesToPixel(mBarBuffers[index].buffer)
         val buffer = mBarBuffers[index].buffer
 
@@ -231,17 +217,15 @@ private class RoundedBarChartRenderer(
             barRect.set(left, top, right, bottom)
             mRenderPaint.color = dataSet.getColor(j / 4)
 
-
+            // 그림자 효과
             val shadowPaint = Paint(mRenderPaint).apply {
                 color = darker(mRenderPaint.color, 0.75f)
                 alpha = 40
             }
             val shadowRect = RectF(barRect).apply { offset(0f, 2f) }
             c.drawRoundRect(shadowRect, radiusPx, radiusPx, shadowPaint)
-
-
+            // 메인 바
             c.drawRoundRect(barRect, radiusPx, radiusPx, mRenderPaint)
-
             if (drawBorder) c.drawRoundRect(barRect, radiusPx, radiusPx, mBarBorderPaint)
         }
     }

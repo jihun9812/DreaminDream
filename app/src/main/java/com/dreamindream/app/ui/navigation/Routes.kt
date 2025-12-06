@@ -8,6 +8,6 @@ object Routes {
     const val SETTINGS = "settings"
     const val COMMUNITY = "community"
     const val AI_REPORT = "aiReport/{weekKey}"
-
+    const val SUBSCRIPTION = "subscription"
     fun aiReport(weekKey: String) = "aiReport/$weekKey"
 }

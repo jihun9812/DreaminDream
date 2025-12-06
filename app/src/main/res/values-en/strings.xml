@@ -4,6 +4,12 @@
       <!-- en -->
     <string name="bs_subtitle_key_range_format">%1$s · %2$s</string>
 
+        <string name="analysis_template_basic">This week, the dominant emotion was \'%1$s\'.\nYour dreams were mostly related to \'%2$s\'.\nThe key symbol appearing in your subconscious is \'%3$s\'.</string>
+
+    <string name="fortune_title_format">%s\'s Fortune</string>
+    <string name="fortune_intro_title">Discover your destiny</string>
+    <string name="lucky_dir">Lucky Direction</string>
+    <string name="fortune_intro_user">Hello, %s</string>
 
 
     <string name="fortune_daily_prompt_template">
@@ -28,7 +34,7 @@ Return only the fortune result as JSON following the rules below.
 <string name="password_hint">Password</string>
 <string name="password_confirm_hint">Confirm password</string>
 <string name="sign_up_button">Sign up</string>
-<string name="cancel">Cancel</string>
+
 <string name="password_reset_title">Reset password</string>
 <string name="send_reset_email">Send reset email</string>
 <string name="text_divider"> / </string>
@@ -81,8 +87,25 @@ Return only the fortune result as JSON following the rules below.
     <!-- dialog_dream_list.xml -->
 <string name="day_dream">Dreams of the day</string>
 
+
+    <string name="sub_dialog_title">Subscription required</string>
+    <string name="sub_dialog_go_premium">Go to subscription</string>
+    <string name="sub_dialog_message_ai">Deep AI report is available only for subscribers. Would you like to subscribe now?</string>
+    <string name="sub_dialog_message_fortune">Deep fortune analysis is available only for subscribers. Would you like to subscribe now?</string>
+    <string name="sub_dialog_login_title">Sign‑in required</string>
+    <string name="sub_dialog_login_message">Please sign in with your Google account to use subscription and deep analysis.</string>
+    <string name="sub_dialog_go_login">Connect Google account</string>
+    <string name="ai_report_need_login">Google login required</string>
+
+
+
+
+    <string name="whd_sheet_title">Select Weekly Report</string>
+
+
+
     <!-- dialog_fortune_deep.xml -->
-<string name="fortune_deep_title">Deep analysis</string>
+
 <string name="fortune_deep_chip_time">3–4 PM</string>
 <string name="fortune_deep_chip_number">No. 56</string>
 <string name="fortune_deep_chip_color">Color Blue</string>
@@ -91,6 +114,7 @@ Return only the fortune result as JSON following the rules below.
 <string name="fortune_deep_plan_morning">Morning 09–12</string>
 <string name="fortune_deep_plan_afternoon">Afternoon 13–17</string>
 <string name="fortune_deep_plan_evening">Evening 19–22</string>
+
     <string name ="community">Community</string>
     <!-- dialog_fortune_section.xml -->
 <string name="fortune_section_title_total">Overall</string>
@@ -139,11 +163,12 @@ Return only the fortune result as JSON following the rules below.
     <!-- fragment_ai_report.xml -->
 <string name="empty_string"></string>
 <string name="ai_report_empty">No data to analyze.</string>
+
     <string name="ai_report_week_label_default">This week’s report
 0 entries · -</string>
     <string name="ai_report_week_label_format">This week’s report
 %1$d entries · %2$s</string>
-<string name="ai_report_history">History ▼</string>
+
 <string name="kpi_positive">Positive</string>
 <string name="kpi_neutral">Neutral</string>
 <string name="kpi_negative">Negative</string>
@@ -246,10 +271,10 @@ AI: %3$s</string>
 <string name="ai_msg_loading">✨ Fetching today’s interpretation…</string>
     <string name="ai_emotion_keywords_simple">Emotion: %1$s
 Keywords: %2$s</string>
-
+    <string name="btn_save">Save</string>
     <!-- settings.xml -->
-<string name="btn_cancel">Cancel</string>
-<string name="btn_save">Save</string>
+    <string name="btn_cancel">Cancel</string>
+
 <string name="btn_logout">Log out</string>
 <string name="settings_title">App Settings</string>
 <string name="settings_section">Settings</string>
@@ -587,7 +612,7 @@ Sections (fixed order):
     <string name="ai_basic_title">AI Analysis</string>
     <string name="ai_pro_title">AI Deep Analysis</string>
     <string name="refresh_hint_count_limited">This week %1$d dreams · will analyze up to %2$d–%3$d.</string>
-    <string name="login_required">Login required.</string>
+
     <string name="api_key_missing">API key not set. Please contact admin.</string>
     <string name="pro_requires_min">Deep analysis is available with %1$d+ dreams this week.</string>
     <string name="pro_too_many_entries">Too many dreams this week. Deep analysis supports %1$d–%2$d.</string>
@@ -663,15 +688,8 @@ Sections (fixed order):
         <item>@string/theme_growth</item>
     </string-array>
 
-    <string name="chart_info_title">Chart guide</string>
     <string name="chart_info_message">
-    • If you have %1$d+ dreams this week, the report is generated immediately.
-    \n• After generation, watch one ad to unlock Deep Analysis (PRO).
-    \n• If total dreams during the week reach %2$d+, the report refreshes automatically (up to %3$d included),
-    \n  and you can rerun Deep Analysis after watching one ad.
-    \n• Bars show weekly ratios (%%) of 8 emotions and 5 themes.
-    \n• With PRO enabled, the emotion chart uses model-derived KPIs (Positive/Neutral/Negative) for more accurate and stable results.
-    \n• Week: Mon–Sun (previous reports are in “History”)
+Deep analysis unlocks with 2+ dreams (up to 4 counted) · Resets every Monday · Subscription required
 </string>
 
 
@@ -706,6 +724,204 @@ Sections (fixed order):
         <item>Adaptability</item>
         <item>Decisiveness</item>
     </string-array>
+
+
+    <string name="sub_status_active">Currently subscribed</string>
+    <string name="sub_benefits_title">Subscription Benefits</string>
+    <string name="sub_unavailable">Unable to load subscription information.</string>
+    <string name="sub_restore">Restore Purchase</string>
+
+    <string name="label_refresh_hint">Please refresh when a new dream is added</string>
+
+
+        <string name="loading_analyzing">Analyzing your fortune data...</string>
+        <string name="loading_pro_analyzing">Generating deep analysis...</string>
+        <string name="network_error">Please check your network connection.</string>
+        <string name="server_error">A server error has occurred. (%d)</string>
+        <string name="parse_error">An error occurred while processing data.</string>
+        <string name="no_data_empty">No data available.</string>
+        <string name="confirm">Confirm</string>
+        <string name="cancel">Cancel</string>
+
+        <string name="login_desc">Deep analysis results are saved to your account.\nWould you like to link via Google Login?</string>
+        <string name="login_btn">Login / Link</string>
+
+          <string name="fortune_profile_title">Profile Required</string>
+        <string name="fortune_profile_desc">Name, birthdate, and birth time are required for accurate analysis.</string>
+        <string name="fortune_profile_go">Go to Settings</string>
+
+    <string name="dream_interpreter">What is your dream today?</string>
+
+    <string name="dream_image_prefix">DreamInDream_%1$d</string>
+
+    <string name="dream_image_description">Dream interpretation result</string>
+
+
+    <string name="image_create_failed">Failed to create image.</string>
+    <string name="profile_age">Age</string>
+    <string name="profile_zodiac">Zodiac Sign</string>
+    <string name="profile_mbti">MBTI</string>
+    <string name="edit_profile_title">Edit Profile</string>
+    <string name="label_nickname">Nickname</string>
+
+
+    <string name="btn_confirm">Confirm</string>
+
+    <string name="logout_dialog_title">Log Out</string>
+    <string name="logout_dialog_message">Are you sure you want to log out?</string>
+
+    <string name="share_instagram_title">Share to Instagram</string>
+    <string name="share_dream_title">Share Dream</string>
+    <string name="error_sharing">Error sharing: %1$s</string>
+    <string name="error_start_listening">Unable to start speech recognition: %1$s</string>
+
+    <string name="image_saved_gallery">Saved to gallery.</string>
+
+    <string name="chooser_share_instagram_title">Share to Instagram</string>
+
+    <!-- %1$s = app name/label -->
+    <string name="app_not_found">Could not find the %1$s app.</string>
+
+    <string name="chooser_share_dream_title">Share Dream</string>
+
+
+
+    <string name="realistic_advice_multi">Practical Advice</string>
+
+
+
+    <string name="dream_input_clean_language">Please use appropriate and respectful language.</string>
+
+    <string name="explain_dream">Interpret</string>
+
+     <string name="api_lang_code">English</string>
+    <string name="data_warning_title">Data Integration Warning</string>
+
+    <string name="dream_mirror">Dream is the mirror of unconsciousness</string>
+    <string name="dream_interpreting">Interpreting your dream...</string>
+    <string name="dream_input_too_short">Please describe your dream in more detail. (Minimum 10 characters)</string>
+
+    <string name="this_week_dream_count">You have analyzed %d dream fragments this week.</string>
+
+    <string name="ad_prompt_watch_button">Watch Video</string>
+    <string name="ad_prompt_upgrade_button">Upgrade to Premium</string>
+
+    <string-array name="loading_messages">
+        <item>Swimming through the sea of the unconscious...</item>
+        <item>Gathering the pieces of your dream...</item>
+        <item>Listening to the voice within...</item>
+        <item>Connecting the constellations in the night sky...</item>
+        <item>Opening the door to deep psychology...</item>
+    </string-array>
+
+
+    <string name="dream_logs_count"> %d</string>
+    <string name="interpretations_today"> %d</string>
+
+        <string name="fortune_checklist_empty">No items in the checklist.</string>
+        <string name="fortune_health">Health</string>
+        <string name="fortune_social">Relationships</string>
+    <string name="guest_warning_message">If you sign in with your Google account, the data recorded in the current trial (guest) mode may be deleted.\n\nWould you like to load your Google account data?</string>
+
+        <string name="fortune_deep_title"> AI Deep Report</string>
+        <string name="fortune_deep_desc">Your complete guidance for the day is ready.</string>
+        <string name="fortune_deep_btn">View Deep Analysis</string>
+        <string name="fortune_deep_preparing">Preparing analysis...</string>
+        <string name="fortune_deep_lock_desc">A benefactor will appear at 3 PM today.\nHead north for better luck...</string>
+        <string name="fortune_deep_unlock">Unlock Deep Content</string>
+    <string name="ai_report_pro_analyzing">AI is performing deep analysis...</string>
+
+        <string name="section_advice">💡 Tips</string>
+        <string name="lucky_color">Color</string>
+        <string name="lucky_number">Number</string>
+        <string name="lucky_time">Time</string>
+    <string name="msg_analysis_failed">Analysis failed.</string>
+    <string name="msg_no_history">No analysis history found.</string>
+    <string name="msg_pro_analysis_complete">Deep analysis is complete.</string>
+    <string name="pro_status_completed">Analysis Complete</string>
+    <string name="chart_info_title">Chart Info </string>
+    <string-array name="emotion_labels">
+        <item>Positive</item>
+        <item>Calm</item>
+        <item>Vitality</item>
+        <item>Flow</item>
+        <item>Neutral</item>
+        <item>Confusion</item>
+        <item>Anxiety</item>
+        <item>Depression/Fatigue</item>
+    </string-array>
+
+    <string-array name="theme_labels">
+        <item>Relationships</item>
+        <item>Achievement</item>
+        <item>Change</item>
+        <item>Risk Factors</item>
+    </string-array>
+    <string name="ai_report_title">This Week\u0027s Report</string>
+    <string name="fortune_already_seen">You have already checked today\'s fortune.</string>
+    <string name="fortune_start_btn">Check Today\'s Fortune</string>
+    <string name="fortune_checklist_title"> Today\'s Checklist</string>
+    <string name="local_analysis_template">This week, the emotion of \'%1$s\' was mainly felt. The keyword \'%2$s\' appeared frequently in your dreams. Overall, the flow of your dreams seems closely related to the %3$s theme.</string>
+
+    <string name="analysis_pending">Generating detailed analysis...</string>
+
+    <string name="pro_analysis_error">Failed to generate deep analysis. Please try again later.</string>
+    <string name="ai_report_history">History</string>
+
+
+
+
+
+
+
+    <string-array name="kw_calm_en">
+        <item>calm</item>
+        <item>peaceful</item>
+        <item>relaxed</item>
+        <item>serene</item>
+        <item>tranquil</item>
+        <item>comfortable</item>
+        <item>gentle</item>
+        <item>quiet</item>
+        <item>rest</item>
+        <item>ease</item>
+        <item>soft</item>
+        <item>soothing</item>
+    </string-array>
+    <string-array name="kw_positive_en">
+        <item>joy</item>
+        <item>happy</item>
+        <item>delight</item>
+        <item>cheerful</item>
+        <item>pleased</item>
+        <item>glad</item>
+        <item>excited</item>
+        <item>wonderful</item>
+        <item>great</item>
+        <item>amazing</item>
+        <item>smile</item>
+        <item>laugh</item>
+        <item>fun</item>
+        <item>enjoy</item>
+    </string-array>
+
+    <string name="ai_report_stat_emotion">Core Emotion</string>
+        <string name="ai_report_stat_count">Dreams This Week</string>
+        <string name="ai_report_stat_score">Dream Score</string>
+        <string name="ai_report_keywords_title">✨ Key Keywords</string>
+        <string name="ai_report_deep_title">Weekly Deep Analysis</string>
+        <string name="ai_report_pro_cta">Start Deep Analysis</string>
+        <string name="ai_report_pro_completed">Analysis Completed</string>
+        <string name="chart_emotion_title">Emotion Distribution</string>
+        <string name="chart_theme_title">Theme Ratio</string>
+
+        <string name="chart_info_msg">Basic analysis is provided for free, but deep analysis requires a subscription. Deep analysis unlocks with 2 or more dreams (up to 4 counted), resets every Monday, and past reports remain accessible.</string>
+
+
+
+    <string name="sub_buy_cta">View Dream Interpretation Ad-Free</string>
+
+    <string name="dream_ad_second_title">Your dream will be interpreted soon ✨</string>
 
     <!-- FortuneStorage.kt -->
 <string name="birth_time_not_selected">None</string>
@@ -1112,8 +1328,7 @@ You must call deep_fortune_analysis.
 <string name="toast_copied">Copied</string>
 <string name="share_chooser_title">Share</string>
 <string name="dialog_profile_title">Setup required</string>
-    <string name="dialog_profile_message">Save nickname, birthdate, and gender to view personalized fortune.
-(Birth time / MBTI are optional)</string>
+
 <string name="dialog_ok">OK</string>
 <string name="ad_failed_open_deep_now">Ad failed (%1$s) → Open deep analysis now</string>
 <string name="deep_generating_label">Generating…</string>

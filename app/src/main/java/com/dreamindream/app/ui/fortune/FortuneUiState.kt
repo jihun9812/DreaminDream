@@ -8,53 +8,53 @@ data class ChecklistItemUi(
 
 data class FortuneSectionUi(
     val key: String,
-    val title: String,
-    val score: Int?,      // lotto는 null
-    val colorInt: Int,    // score 색 (lotto는 0)
+    val titleResId: Int, // 리소스 ID로 관리하여 다국어 지원
+    val score: Int?,
+    val colorInt: Int,
     val body: String,
-    val isLotto: Boolean
+    val isLotto: Boolean = false
 )
 
-data class SectionDialogUiState(
-    val title: String,
-    val score: Int,
-    val colorInt: Int,
-    val body: String
+data class DeepFortuneResult(
+    val flowCurve: List<Int> = listOf(50, 50, 50, 50, 50, 50, 50),
+    val timeLabels: List<String> = listOf("6AM", "9AM", "12PM", "3PM", "6PM", "9PM", "12AM"),
+    val highlights: List<String> = emptyList(),
+    val riskAndOpportunity: String = "",
+    val solution: String = "",
+    val tomorrowPreview: String = ""
 )
 
 data class FortuneUiState(
-    // 로딩 / 레이아웃
     val isLoading: Boolean = false,
+    val isDeepLoading: Boolean = false,
+
     val showStartButton: Boolean = true,
-    val startButtonEnabled: Boolean = true,
-    val startButtonBreathing: Boolean = true,
     val showFortuneCard: Boolean = false,
 
-    // 키워드 & 행운 지표
+    val userName: String = "",
+
+    val radarChartData: Map<String, Int> = emptyMap(),
+    val oneLineSummary: String = "",
+
     val keywords: List<String> = emptyList(),
     val luckyColorHex: String = "#FFD54F",
     val luckyNumber: Int? = null,
     val luckyTime: String = "",
+    val luckyDirection: String = "",
 
-    // 감정 밸런스
-    val emoPositive: Int = 60,
-    val emoNeutral: Int = 25,
-    val emoNegative: Int = 15,
-
-    // 오늘 체크리스트
     val checklist: List<ChecklistItemUi> = emptyList(),
-
-    // 섹션 카드들
     val sections: List<FortuneSectionUi> = emptyList(),
 
-    // 기타 상태
-    val hasDailyPayload: Boolean = false,
-    val deepButtonEnabled: Boolean = false,
-    val deepButtonLabel: String = "",
-    val infoMessage: String? = null,         // "오늘 운세는 이미 확인했어요" 같은 안내
+    // 레이더 차트 클릭 시 상세 다이얼로그 상태
+    val showRadarDetail: Boolean = false,
 
-    // UI 이벤트
+    val deepButtonEnabled: Boolean = false,
+    val showDeepDialog: Boolean = false,
+    val deepResult: DeepFortuneResult? = null,
+
     val snackbarMessage: String? = null,
     val showProfileDialog: Boolean = false,
-    val sectionDialog: SectionDialogUiState? = null
+    val sectionDialog: FortuneSectionUi? = null,
+
+    val navigateToSubscription: Boolean = false
 )

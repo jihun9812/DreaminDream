@@ -107,7 +107,7 @@ dependencies {
     implementation("com.google.firebase:firebase-config-ktx:21.6.0")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-functions-ktx")
-    implementation("androidx.compose.ui:ui")
+    implementation("io.coil-kt:coil-compose:2.6.0") // 버전은 최신 버전을 확인해서 넣어도 됩니다.
     implementation(platform("androidx.compose:compose-bom:2024.04.01"))
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.04.01"))
     implementation("com.airbnb.android:lottie-compose:6.6.10")
@@ -122,19 +122,19 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.3")
 
     //Billing
-
+    implementation("com.android.billingclient:billing-ktx:7.0.0")
     implementation("androidx.lifecycle:lifecycle-process:2.8.4")
     // ML Kit
     implementation("com.google.mlkit:translate:17.0.3")
-
+    implementation("com.kizitonwose.calendar:core:2.5.0")
     // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:21.1.0")
-
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
     // Lottie / Ads / Calendar / 기타
     implementation("com.airbnb.android:lottie:6.4.0")
     implementation("com.google.android.gms:play-services-ads:23.4.0")
     implementation("com.kizitonwose.calendar:view:2.5.0")
-
+    implementation("com.kizitonwose.calendar:compose:2.5.0")
     implementation("androidx.activity:activity-ktx:1.9.2")
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation("androidx.core:core-splashscreen:1.0.1")

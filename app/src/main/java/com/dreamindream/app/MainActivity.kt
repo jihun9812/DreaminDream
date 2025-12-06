@@ -14,7 +14,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.dreamindream.app.ui.login.LoginScreen
+import com.dreamindream.app.ui.navigation.LoginNavGraph
 import com.dreamindream.app.ui.navigation.AppNavGraph
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.MobileAds
@@ -31,17 +31,22 @@ class MainActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Edge-to-Edge
+        // 🔥 전역 Edge-to-Edge + 시스템바 완전 투명 + 흰색 아이콘 강제
         enableEdgeToEdge()
+        // 앱 컨텐츠를 status/nav bar 아래까지 깔리게
         WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // ✅ 여기서 진짜 TRANSPARENT
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
+
+        // ✅ 상태바/내비게이션바 아이콘 "흰색"으로 고정 (어두운 배경용)
         WindowInsetsControllerCompat(window, window.decorView).apply {
-            isAppearanceLightStatusBars = false
-            isAppearanceLightNavigationBars = false
+            isAppearanceLightStatusBars = false      // false = 아이콘 흰색
+            isAppearanceLightNavigationBars = false  // false = 아이콘 흰색
         }
 
-        // 광고 초기화 (테스트 디바이스 유지)
+        // 🔸 광고 초기화
         if (BuildConfig.DEBUG) {
             MobileAds.setRequestConfiguration(
                 RequestConfiguration.Builder()
@@ -57,16 +62,15 @@ class MainActivity : BaseActivity() {
         MobileAds.initialize(this)
         AdManager.initialize(this)
 
-        // 알림 권한 요청
+        // 🔸 알림 권한 요청
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) != PackageManager.PERMISSION_GRANTED
+            val perm = Manifest.permission.POST_NOTIFICATIONS
+            if (ContextCompat.checkSelfPermission(this, perm)
+                != PackageManager.PERMISSION_GRANTED
             ) {
                 ActivityCompat.requestPermissions(
                     this,
-                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    arrayOf(perm),
                     REQ_NOTI
                 )
             } else {
@@ -79,11 +83,9 @@ class MainActivity : BaseActivity() {
         // 🔥 Compose 루트
         setContent {
             MaterialTheme {
-
                 val auth = remember { FirebaseAuth.getInstance() }
                 var isLoggedIn by remember { mutableStateOf(auth.currentUser != null) }
 
-                // FirebaseAuth 상태 변화 감지 → UI 자동 스위칭
                 LaunchedEffect(Unit) {
                     auth.addAuthStateListener { firebaseAuth ->
                         isLoggedIn = firebaseAuth.currentUser != null
@@ -91,16 +93,18 @@ class MainActivity : BaseActivity() {
                 }
 
                 if (!isLoggedIn) {
-                    // 🔹 로그인 화면 (Compose)
-                    LoginScreen(
+                    LoginNavGraph(
                         onLoginSuccess = {
-                            // 로그인 성공 시 홈으로 전환
                             isLoggedIn = true
                         }
                     )
                 } else {
-                    // 🔹 실제 앱 메인 네비게이션
-                    AppNavGraph()
+                    AppNavGraph(
+                        onLogout = {
+                            // SettingsScreen 쪽에서 vm.logout() 이미 호출됨
+                            isLoggedIn = false
+                        }
+                    )
                 }
             }
         }
@@ -110,8 +114,7 @@ class MainActivity : BaseActivity() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val token = task.result ?: return@addOnCompleteListener
-                val uid =
-                    FirebaseAuth.getInstance().currentUser?.uid ?: return@addOnCompleteListener
+                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@addOnCompleteListener
 
                 FirebaseFirestore.getInstance()
                     .collection("users").document(uid)

@@ -5,24 +5,19 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsFocusedAsState
+import androidx.compose.animation.*
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -30,17 +25,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dreamindream.app.AdPageScaffold
 import com.dreamindream.app.FeedbackActivity
@@ -51,1176 +45,560 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import java.text.SimpleDateFormat
 import java.util.*
 
-private val PretendardBold =
-    FontFamily(Font(R.font.pretendard_bold, FontWeight.Bold))
+// --- Premium Colors ---
+private val DeepNavy = Color(0xFF121626)
+private val GlassWhite = Color(0x1AFFFFFF)
+private val TextWhite = Color(0xFFEEEEEE)
+private val TextGray = Color(0xFFB0BEC5)
+private val AccentGold = Color(0xFFFFD54F)
+private val AccentPurple = Color(0xFFB39DDB)
+private val InputBg = Color(0x22FFFFFF)
 
-private val PretendardMedium =
-    FontFamily(Font(R.font.pretendard_medium, FontWeight.Medium))
-
-// 공통 컬러들
-private val CardBackground = Color(0xE611141D)
-private val CardStroke = Color(0x33FFFFFF)
-private val FieldContainer = Color(0x22FFFFFF)
-private val FieldBorder = Color(0x66FFFFFF)          // 기본 회색 라인
-private val FieldBorderFocused = Color(0xFFFFFFFF)   // 포커스 시 흰색
-private val FieldLabelUnfocused = Color(0xB3FFFFFF)  // 라벨 기본
-private val FieldLabelFocused = Color(0xFFFFFFFF)    // 포커스 라벨
-private val AccentLavender = Color(0xFFB388FF)
-
-// DatePicker용 컬러
-private val DatePickerBackground = Color(0xFFEDE7F6)   // 연보라
-private val DatePickerTextColor = Color(0xFF000000)    // 검정 글씨
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(vm: SettingsViewModel = viewModel()) {
-    val ui by vm.ui.collectAsState()
-    val ctx = LocalContext.current
-    val activity = ctx as? Activity
-    val focusManager = LocalFocusManager.current
+fun SettingsScreen(
+    vm: SettingsViewModel = viewModel(),
+    onNavigateToSubscription: () -> Unit,
+    onLogout: () -> Unit
+) {
+    val uiState by vm.ui.collectAsState()
+    val context = LocalContext.current
+    val activity = context as? Activity
 
-    // Google Sign-In launcher
-    val googleLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { res ->
-        vm.endLinkGoogle()
-        val task = GoogleSignIn.getSignedInAccountFromIntent(res.data)
-        runCatching {
-            task.getResult(com.google.android.gms.common.api.ApiException::class.java)
-        }.onSuccess { acc ->
-            acc?.idToken?.let {
-                vm.linkGoogleWithIdToken(it) { msg ->
-                    Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show()
-                }
-            }
-        }.onFailure {
-            Toast.makeText(
-                ctx,
-                ctx.getString(R.string.toast_error_with_reason, it.localizedMessage ?: "-"),
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
-
-    // 토스트 처리
-    ui.toast?.let { msg ->
-        LaunchedEffect(msg) {
-            Toast.makeText(ctx, msg, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    var showPremiumDialog by remember { mutableStateOf(false) }
+    // --- State: 게스트 경고 다이얼로그 ---
+    var showGuestWarningDialog by remember { mutableStateOf(false) }
+    // --- State: 로그아웃 확인 다이얼로그 (NEW) ---
     var showLogoutDialog by remember { mutableStateOf(false) }
 
-    AdPageScaffold(
-        adUnitRes = R.string.ad_unit_settings_banner) { pad ->
+    // Toast Handler
+    LaunchedEffect(uiState.toastMessage) {
+        uiState.toastMessage?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            vm.toastShown()
+        }
+    }
+
+    // Google Login Launcher
+    val googleLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(com.google.android.gms.common.api.ApiException::class.java)
+            account?.idToken?.let { token ->
+                vm.linkGoogleWithIdToken(token) { msg -> vm.handleGoogleError(msg) }
+            }
+        } catch (e: Exception) {
+            vm.handleGoogleError("Google Sign-In Failed: ${e.message}")
+        }
+    }
+
+    // 실제 구글 로그인 프로세스 시작 함수
+    val processGoogleSignIn = {
+        if (activity != null) {
+            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(context.getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build()
+            val client = GoogleSignIn.getClient(activity, gso)
+            vm.startLinkGoogle()
+            client.signOut().addOnCompleteListener {
+                googleLauncher.launch(client.signInIntent)
+            }
+        }
+    }
+
+    // 버튼 클릭 시 게스트 여부 확인 로직
+    val onGoogleConnectClick = {
+        if (uiState.isGuest) {
+            showGuestWarningDialog = true
+        } else {
+            processGoogleSignIn()
+        }
+    }
+
+    AdPageScaffold(adUnitRes = R.string.ad_unit_settings_banner) { padding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(pad)
-                // 아무 데나 탭하면 포커스 해제 → 키보드 내려감
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) {
-                    focusManager.clearFocus()
-                }
+                .background(DeepNavy)
         ) {
-            // 메인 배경 (main_ground 그대로 사용)
+            // Background Image
             Image(
                 painter = painterResource(R.drawable.main_ground),
                 contentDescription = null,
-                modifier = Modifier.matchParentSize(),
-                contentScale = ContentScale.Crop
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+                alpha = 0.5f
             )
 
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // 상단 타이틀
+                // Header
                 Text(
                     text = stringResource(R.string.settings_title),
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontFamily = PretendardBold,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = TextWhite,
+                    modifier = Modifier.padding(bottom = 24.dp)
                 )
 
-                // 고정 카드 영역 (안쪽만 스크롤)
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                ) {
-                    GlassCard(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        val scrollState = rememberScrollState()
-
-                        Crossfade(
-                            targetState = ui.isEditMode,
-                            label = "settings_mode_crossfade"
-                        ) { isEdit ->
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .verticalScroll(scrollState)
-                            ) {
-                                if (!isEdit) {
-                                    // ===== APP 모드 =====
-                                    ProfileHeader(ui)
-                                    Spacer(Modifier.height(10.dp))
-                                    QuickSummary(ui)
-                                    Spacer(Modifier.height(10.dp))
-                                    QuickStats(ui)
-                                    Spacer(Modifier.height(16.dp))
-
-                                    Text(
-                                        text = stringResource(R.string.settings_section),
-                                        color = Color(0xFFEDDF90),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        fontFamily = PretendardMedium
-                                    )
-
-                                    Spacer(Modifier.height(4.dp))
-
-                                    SettingsButtons(
-                                        onEdit = {
-                                            vm.loadFromPrefs()
-                                            vm.setEditMode(true)
-                                        },
-                                        onPremium = { showPremiumDialog = true },
-                                        onContact = {
-                                            activity?.startActivity(
-                                                Intent(ctx, FeedbackActivity::class.java)
-                                            )
-                                        },
-                                        onTerms = {
-                                            activity?.startActivity(
-                                                Intent(ctx, TermsActivity::class.java)
-                                            )
-                                        }
-                                    )
-
-                                    Spacer(Modifier.height(12.dp))
-                                    HorizontalDivider(color = Color(0x334A4B4B))
-                                    Spacer(Modifier.height(8.dp))
-
-                                    // 구글 계정 연동 섹션
-                                    AccountLinkSection(
-                                        ui = ui,
-                                        onLinkGoogle = {
-                                            if (activity == null) return@AccountLinkSection
-
-                                            val webClientId =
-                                                ctx.getString(R.string.default_web_client_id)
-                                            val gso =
-                                                GoogleSignInOptions.Builder(
-                                                    GoogleSignInOptions.DEFAULT_SIGN_IN
-                                                )
-                                                    .requestIdToken(webClientId)
-                                                    .requestEmail()
-                                                    .build()
-                                            val client =
-                                                GoogleSignIn.getClient(activity, gso)
-                                            vm.startLinkGoogle()
-                                            client.signOut().addOnCompleteListener {
-                                                googleLauncher.launch(client.signInIntent)
-                                            }
-                                        },
-                                        onDelete = {
-                                            vm.softDeleteAccount {
-                                                Toast.makeText(
-                                                    ctx,
-                                                    it,
-                                                    Toast.LENGTH_LONG
-                                                ).show()
-                                            }
-                                        }
-                                    )
-                                } else {
-                                    // ===== EDIT 모드 =====
-                                    EditProfileForm(
-                                        ui = ui,
-                                        onCancel = { vm.setEditMode(false) },
-                                        onSave = { nn, bd, gd, mb, bt ->
-                                            vm.save(nn, bd, gd, mb, bt)
-                                        }
-                                    )
-                                }
+                // Animated Content (View vs Edit Mode)
+                AnimatedContent(
+                    targetState = uiState.isEditMode,
+                    label = "ProfileMode"
+                ) { isEdit ->
+                    if (isEdit) {
+                        EditProfileView(
+                            uiState = uiState,
+                            onSave = vm::saveProfile,
+                            onCancel = vm::toggleEditMode
+                        )
+                    } else {
+                        ViewProfileView(
+                            uiState = uiState,
+                            onEditClick = vm::toggleEditMode,
+                            onPremiumClick = onNavigateToSubscription,
+                            onGoogleClick = onGoogleConnectClick,
+                            onLogoutClick = {
+                                // 바로 로그아웃 하지 않고 다이얼로그 띄움
+                                showLogoutDialog = true
+                            },
+                            onTestPremiumToggle = vm::setTestPremium,
+                            onContactClick = {
+                                activity?.startActivity(Intent(context, FeedbackActivity::class.java))
+                            },
+                            onTermsClick = {
+                                activity?.startActivity(Intent(context, TermsActivity::class.java))
                             }
-                        }
+                        )
                     }
                 }
 
-                // 로그아웃 버튼 (카드 아래, 광고 위에 고정)
-                Button(
-                    onClick = { showLogoutDialog = true },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0x00FDCA60),
-                        contentColor = Color.White
-                    )
-                ) {
-                    Text(
-                        text = stringResource(R.string.btn_logout),
-                        fontFamily = PretendardMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+                Spacer(Modifier.height(50.dp))
             }
 
-            // 프리미엄 준비중 다이얼로그
-            if (showPremiumDialog) {
+            // ⚠️ 1. 로그아웃 확인 다이얼로그 추가
+            if (showLogoutDialog) {
                 AlertDialog(
-                    onDismissRequest = { showPremiumDialog = false },
-                    confirmButton = {
-                        TextButton(onClick = { showPremiumDialog = false }) {
-                            Text(
-                                text = stringResource(R.string.ok),
-                                fontFamily = PretendardMedium
-                            )
-                        }
-                    },
+                    onDismissRequest = { showLogoutDialog = false },
                     title = {
                         Text(
-                            text = stringResource(R.string.dlg_premium_title),
-                            fontFamily = PretendardBold
+                            text = stringResource(R.string.logout_dialog_title),
+                            fontWeight = FontWeight.Bold,
+                            color = TextWhite
                         )
                     },
                     text = {
                         Text(
-                            text = stringResource(R.string.dlg_premium_msg),
-                            fontFamily = PretendardMedium
+                            text = stringResource(R.string.logout_dialog_message),
+                            color = TextGray
                         )
-                    }
-                )
-            }
-
-            // 로그아웃 확인 다이얼로그
-            if (showLogoutDialog) {
-                AlertDialog(
-                    onDismissRequest = { showLogoutDialog = false },
+                    },
                     confirmButton = {
                         TextButton(onClick = {
                             showLogoutDialog = false
                             vm.logout()
+                            onLogout()
                         }) {
-                            Text(
-                                text = stringResource(R.string.logout_confirm_yes),
-                                fontFamily = PretendardMedium
-                            )
+                            Text(stringResource(R.string.btn_logout), color = Color(0xFFFF8A80), fontWeight = FontWeight.Bold)
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showLogoutDialog = false }) {
-                            Text(
-                                text = stringResource(R.string.logout_confirm_no),
-                                fontFamily = PretendardMedium
-                            )
+                            Text(stringResource(R.string.btn_cancel), color = TextGray)
                         }
                     },
-                    title = {
-                        Text(
-                            text = stringResource(R.string.logout_confirm_title),
-                            fontFamily = PretendardBold
-                        )
-                    },
-                    text = {
-                        Text(
-                            text = stringResource(R.string.logout_confirm_msg),
-                            fontFamily = PretendardMedium
-                        )
-                    }
+                    containerColor = Color(0xFF1E212B)
                 )
             }
 
-            // 저장/연동 중 오버레이
-            if (ui.saving || ui.linkInProgress) {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .background(Color(0x66000000)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+            // ⚠️ 2. 게스트 데이터 경고 다이얼로그
+            if (showGuestWarningDialog) {
+                AlertDialog(
+                    onDismissRequest = { showGuestWarningDialog = false },
+                    title = {
+                        Text(
+                            text = stringResource(id = R.string.data_warning_title),
+                            fontWeight = FontWeight.Bold,
+                            color = TextWhite
+                        )
+                    },
+
+                    text = {
+                        Text(
+                            text = stringResource(R.string.guest_warning_message),
+                            color = TextGray
+                        )
+                    },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showGuestWarningDialog = false
+                            processGoogleSignIn()
+                        }) {
+                            Text(stringResource(R.string.btn_confirm), color = Color(0xFFFF8A80), fontWeight = FontWeight.Bold)
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showGuestWarningDialog = false }) {
+                            Text(stringResource(R.string.btn_cancel), color = TextGray)
+                        }
+                    },
+                    containerColor = Color(0xFF1E212B)
+                )
+            }
+
+            // Loading Overlay
+            if (uiState.isLoading || uiState.saving || uiState.linkInProgress) {
+                Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha=0.5f)), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = AccentGold)
                 }
             }
         }
     }
 }
 
+// ==========================================
+// View Mode Components
+// ==========================================
+
 @Composable
-private fun GlassCard(
-    modifier: Modifier = Modifier,
-    content: @Composable ColumnScope.() -> Unit
+fun ViewProfileView(
+    uiState: SettingsUiState,
+    onEditClick: () -> Unit,
+    onPremiumClick: () -> Unit,
+    onGoogleClick: () -> Unit,
+    onLogoutClick: () -> Unit,
+    onTestPremiumToggle: (Boolean) -> Unit,
+    onContactClick: () -> Unit,
+    onTermsClick: () -> Unit
 ) {
-    Card(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = CardBackground),
-        shape = RoundedCornerShape(22.dp),
-        border = BorderStroke(1.dp, CardStroke),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            content = content
-        )
-    }
-}
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
-@Composable
-private fun ProfileHeader(ui: SettingsUiState) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            Modifier
-                .size(56.dp)
-                .clip(CircleShape)
-                .background(Color(0x22000000)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = ui.chineseZodiacIcon,
-                color = Color.White,
-                style = MaterialTheme.typography.headlineSmall,
-                fontFamily = PretendardBold
+        // 1. Profile Card
+        GlassCard {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .background(Brush.linearGradient(listOf(AccentPurple, Color(0xFF7E57C2)))),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = uiState.zodiacAnimal.ifBlank { "👤" }, fontSize = 28.sp)
+                }
+
+                Spacer(Modifier.width(16.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = uiState.nickname.ifBlank { "Guest" },
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = TextWhite
+                        )
+                        if (uiState.isPremium) {
+                            Spacer(Modifier.width(8.dp))
+                            Box(contentAlignment = Alignment.Center) {
+                                AnimatedCrescentIcon(modifier = Modifier.size(24.dp))
+                            }
+                        }
+                    }
+                    Text(
+                        text = uiState.email,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextGray
+                    )
+                }
+
+                IconButton(onClick = onEditClick) {
+                    Icon(Icons.Default.Edit, contentDescription = "Edit", tint = AccentGold)
+                }
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFF1E212B), RoundedCornerShape(12.dp))
+                    .padding(vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = stringResource(R.string.dream_count), color = TextGray, fontSize = 12.sp)
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.dream_logs_count, uiState.dreamTotalCount),
+                        color = Color.White
+                    )
+                }
+                Box(modifier = Modifier.width(1.dp).height(30.dp).background(Color.White.copy(alpha = 0.1f)))
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = stringResource(R.string.gpt_usage_today), color = TextGray, fontSize = 12.sp)
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.interpretations_today, uiState.gptUsedToday),
+                        color = Color.White
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(20.dp))
+            HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
+            Spacer(Modifier.height(16.dp))
+
+            // ⚠️ 한글화 적용 (나이, 별자리, MBTI)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+                StatItem(stringResource(R.string.profile_age), if(uiState.age > 0) "${uiState.age}" else "-")
+                StatItem(stringResource(R.string.profile_zodiac), uiState.zodiacSign.ifBlank { "-" })
+                StatItem(stringResource(R.string.profile_mbti), uiState.mbti.ifBlank { "-" }) // MBTI는 영어 유지
+            }
+        }
+
+        // 2. Settings Menu
+        Text("General", color = AccentGold, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 8.dp))
+
+        GlassCard {
+            SettingsTile(
+                title = stringResource(R.string.btn_premium),
+                subtitle = "Remove ads & Unlock unlimited AI",
+                customIcon = { Icon(Icons.Default.Star, null, tint = AccentGold) },
+                onClick = onPremiumClick,
+                color = AccentGold
+            )
+            HorizontalDivider(color = Color.White.copy(alpha = 0.05f), modifier = Modifier.padding(vertical = 4.dp))
+            SettingsTile(
+                title = uiState.googleButtonLabel,
+                subtitle = uiState.accountProviderLabel,
+                icon = painterResource(R.drawable.google_logo),
+                onClick = onGoogleClick,
+                enabled = uiState.googleButtonEnabled
             )
         }
-        Spacer(Modifier.width(12.dp))
-        Column {
-            Text(
-                text = if (ui.nickname.isBlank())
-                    stringResource(R.string.value_placeholder_dash)
-                else ui.nickname,
-                color = Color.White,
-                style = MaterialTheme.typography.titleMedium,
-                fontFamily = PretendardBold,
-                fontWeight = FontWeight.Bold
+
+        // 3. Support & Legal
+        Text("Support", color = AccentGold, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 8.dp))
+
+        GlassCard {
+            SettingsTile(
+                title = stringResource(R.string.btn_contact),
+                iconVector = Icons.Default.Email,
+                onClick = onContactClick
+            )
+            HorizontalDivider(color = Color.White.copy(alpha = 0.05f), modifier = Modifier.padding(vertical = 4.dp))
+            SettingsTile(
+                title = stringResource(R.string.btn_terms),
+                iconVector = Icons.Default.Info,
+                onClick = onTermsClick
+            )
+        }
+
+        // 4. Logout & Dev
+        GlassCard {
+            SettingsTile(
+                title = stringResource(R.string.btn_logout),
+                iconVector = Icons.Default.Logout,
+                onClick = onLogoutClick,
+                color = Color(0xFFFF8A80)
             )
 
-            val subs = buildList {
-                if (ui.age >= 0) add(stringResource(R.string.summary_age_value, ui.age))
-                if (ui.gender.isNotBlank()) add(ui.gender)
-                if (ui.mbti.isNotBlank()) add(ui.mbti)
-                if (ui.birthTimeLabel.isNotBlank() && ui.birthTimeCode != "none") add(
-                    ui.birthTimeLabel
+            HorizontalDivider(color = Color.White.copy(alpha = 0.05f))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Developer: Force Premium", color = TextGray, fontSize = 12.sp)
+                Switch(
+                    checked = uiState.isPremium,
+                    onCheckedChange = onTestPremiumToggle,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = AccentGold,
+                        uncheckedThumbColor = TextGray,
+                        uncheckedTrackColor = Color.Black
+                    ),
+                    modifier = Modifier.scale(0.8f)
                 )
-            }.joinToString(" · ")
-
-            Text(
-                text = subs,
-                color = Color(0xB3FFFFFF),
-                style = MaterialTheme.typography.bodySmall,
-                fontFamily = PretendardMedium
-            )
+            }
         }
     }
 }
 
+// ... (StatItem, SettingsTile)
+
 @Composable
-private fun SummaryRow(label: String, value: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = label,
-            color = Color(0xFFEDDF90),
-            style = MaterialTheme.typography.bodySmall,
-            fontFamily = PretendardMedium
-        )
-        Text(
-            text = value,
-            color = Color.White,
-            style = MaterialTheme.typography.bodyMedium,
-            fontFamily = PretendardBold
-        )
+fun StatItem(label: String, value: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(label, color = TextGray, fontSize = 12.sp)
+        Text(value, color = TextWhite, fontWeight = FontWeight.Bold, fontSize = 16.sp)
     }
 }
 
 @Composable
-private fun QuickSummary(ui: SettingsUiState) {
-    val dash = stringResource(R.string.value_placeholder_dash)
-    val birth = if (ui.birthIso.isBlank()) dash else ui.birthIso
-    val gender = if (ui.gender.isBlank()) dash else ui.gender
-    val mbti = if (ui.mbti.isBlank()) dash else ui.mbti
-    val ageText =
-        if (ui.age >= 0) stringResource(R.string.summary_age_value, ui.age) else dash
-    val birthTime = if (ui.birthTimeLabel.isBlank()) dash else ui.birthTimeLabel
-
-    Column(
+fun SettingsTile(
+    title: String,
+    subtitle: String? = null,
+    icon: androidx.compose.ui.graphics.painter.Painter? = null,
+    iconVector: androidx.compose.ui.graphics.vector.ImageVector? = null,
+    customIcon: (@Composable () -> Unit)? = null,
+    onClick: () -> Unit,
+    color: Color = TextWhite,
+    enabled: Boolean = true
+) {
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        SummaryRow(
-            label = stringResource(R.string.summary_birth_prefix),
-            value = birth
-        )
-        SummaryRow(
-            label = stringResource(R.string.summary_gender_prefix),
-            value = gender
-        )
-        SummaryRow(
-            label = stringResource(R.string.summary_mbti_prefix),
-            value = mbti
-        )
-        SummaryRow(
-            label = stringResource(R.string.summary_age_prefix),
-            value = ageText
-        )
-        SummaryRow(
-            label = stringResource(R.string.summary_wz_prefix, ""),
-            value = ui.westernZodiacText
-        )
-        SummaryRow(
-            label = stringResource(R.string.summary_birthtime_prefix),
-            value = birthTime
-        )
-    }
-}
-
-@Composable
-private fun QuickStats(ui: SettingsUiState) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0x872C2B2B)),
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(0.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp, horizontal = 8.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = stringResource(R.string.gpt_usage_today),
-                    color = Color(0xFFA6E9E8),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontFamily = PretendardMedium
-                )
-                Text(
-                    text = stringResource(
-                        R.string.unit_times_value,
-                        ui.gptUsedToday
-                    ),
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontFamily = PretendardBold,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = stringResource(R.string.dream_count),
-                    color = Color(0xFFA6E9E8),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontFamily = PretendardMedium
-                )
-                Text(
-                    text = stringResource(
-                        R.string.unit_entries_value,
-                        ui.dreamTotalLocal
-                    ),
-                    color = Color.White,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontFamily = PretendardBold,
-                    fontWeight = FontWeight.SemiBold
-                )
+        Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
+            if (customIcon != null) {
+                customIcon()
+            } else if (icon != null) {
+                Image(painter = icon, contentDescription = null, modifier = Modifier.fillMaxSize())
+            } else if (iconVector != null) {
+                Icon(imageVector = iconVector, contentDescription = null, tint = color)
             }
         }
-    }
-}
-
-@Composable
-private fun SettingsButtons(
-    onEdit: () -> Unit,
-    onPremium: () -> Unit,
-    onContact: () -> Unit,
-    onTerms: () -> Unit
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-
-        TextButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onEdit,
-            contentPadding = PaddingValues(horizontal = 0.dp, vertical = 10.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.btn_profile_edit),
-                color = Color(0xFF76E4E0), // 잘못된 HEX 수정 + 약간의 포인트 컬러
-                style = MaterialTheme.typography.bodyMedium,
-                fontFamily = PretendardMedium
-            )
+        Spacer(Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, color = if(enabled) color else TextGray, fontWeight = FontWeight.Medium)
+            if (subtitle != null) {
+                Text(subtitle, color = TextGray, fontSize = 12.sp)
+            }
         }
-
-        TextButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onPremium,
-            contentPadding = PaddingValues(horizontal = 0.dp, vertical = 10.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.btn_premium),
-                color = Color.White,
-                style = MaterialTheme.typography.bodyMedium,
-                fontFamily = PretendardMedium
-            )
-        }
-
-        TextButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onContact,
-            contentPadding = PaddingValues(horizontal = 0.dp, vertical = 10.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.btn_contact),
-                color = Color.White,
-                style = MaterialTheme.typography.bodyMedium,
-                fontFamily = PretendardMedium
-            )
-        }
-
-        TextButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = onTerms,
-            contentPadding = PaddingValues(horizontal = 0.dp, vertical = 10.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.btn_terms),
-                color = Color.White,
-                style = MaterialTheme.typography.bodyMedium,
-                fontFamily = PretendardMedium
-            )
-        }
+        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = TextGray.copy(alpha = 0.5f))
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun EditProfileForm(
-    ui: SettingsUiState,
-    onCancel: () -> Unit,
-    onSave: (
-        nickname: String,
-        birthIso: String,
-        gender: String,
-        mbti: String,
-        birthTimeCode: String
-    ) -> Unit
+fun EditProfileView(
+    uiState: SettingsUiState,
+    onSave: (String, String, String, String, String) -> Unit,
+    onCancel: () -> Unit
 ) {
-    var nickname by remember(ui.nickname) { mutableStateOf(ui.nickname) }
-    var birth by remember(ui.birthIso) { mutableStateOf(ui.birthIso) }
-    var gender by remember(ui.gender) { mutableStateOf(ui.gender) }
-    var mbti by remember(ui.mbti) { mutableStateOf(ui.mbti) }
-    var birthCode by remember(ui.birthTimeCode) { mutableStateOf(ui.birthTimeCode) }
-    var birthLabel by remember(ui.birthTimeLabel) { mutableStateOf(ui.birthTimeLabel) }
-    var showBirthPicker by remember { mutableStateOf(false) }
+    var name by remember { mutableStateOf(uiState.nickname) }
+    var birth by remember { mutableStateOf(uiState.birthIso) }
+    var gender by remember { mutableStateOf(uiState.gender) }
+    var mbti by remember { mutableStateOf(uiState.mbti) }
+    var timeCode by remember { mutableStateOf(uiState.birthTimeCode) }
+    var showDatePicker by remember { mutableStateOf(false) }
 
-
-
-
-    val fieldColors = OutlinedTextFieldDefaults.colors(
-        focusedTextColor = Color.White,
-        unfocusedTextColor = Color.White,
-
-        focusedContainerColor = FieldContainer,
-        unfocusedContainerColor = FieldContainer,
-        disabledContainerColor = FieldContainer.copy(alpha = 0.7f),
-
-        focusedBorderColor = Color.Transparent,
-        unfocusedBorderColor = Color.Transparent,
-        disabledBorderColor = Color.Transparent,
-
-        focusedLabelColor = FieldLabelFocused,
-        unfocusedLabelColor = FieldLabelUnfocused,
-
-        focusedPlaceholderColor = Color(0x66FFFFFF),
-        unfocusedPlaceholderColor = Color(0x66FFFFFF),
-
-        cursorColor = AccentLavender
-    )
-
-    Text(
-        text = stringResource(R.string.btn_profile_edit),
-        color = Color(0xFFFDCA60),
-        style = MaterialTheme.typography.titleMedium,
-        fontFamily = PretendardBold,
-        fontWeight = FontWeight.Bold
-    )
-    HorizontalDivider(color = Color(0x44494949))
-    Spacer(Modifier.height(12.dp))
-
-    // 이름
-    AnimatedOutlinedTextField(
-        value = nickname,
-        onValueChange = { nickname = it },
-
-        modifier = Modifier.fillMaxWidth(),
-        singleLine = true,
-        label = {
-            Text(
-                text = stringResource(R.string.label_name),
-                fontFamily = PretendardMedium
-            )
-        },
-        placeholder = {
-            Text(
-                text = stringResource(R.string.hint_name_example),
-                fontFamily = PretendardMedium
-            )
-        },
-        colors = fieldColors
-    )
-
-    Spacer(Modifier.height(10.dp))
-
-    // 생일 (DatePicker 팝업 – 읽기 전용 필드)
-    Box(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        AnimatedOutlinedTextField(
-            value = birth,
-            onValueChange = { },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            readOnly = true,
-            label = {
-                Text(
-                    text = stringResource(R.string.label_birthdate),
-                    fontFamily = PretendardMedium
-                )
-            },
-            placeholder = {
-                Text(
-                    text = stringResource(R.string.hint_birthdate_format),
-                    fontFamily = PretendardMedium
-                )
-            },
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.CalendarMonth,
-                    contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.8f)
-                )
-            },
-            colors = fieldColors
-        )
-
-        // 전체를 투명 클릭 영역으로 사용 (Ripple 제거)
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) {
-                    showBirthPicker = true
-                }
-        )
+    GlassCard {
+        // ⚠️ 한글화 적용
+        Text(stringResource(R.string.edit_profile_title), color = AccentGold, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+        Spacer(Modifier.height(20.dp))
+        PremiumTextField(value = name, onValueChange = { name = it }, label = stringResource(R.string.label_nickname))
+        Spacer(Modifier.height(12.dp))
+        Box {
+            PremiumTextField(value = birth, onValueChange = {}, label = stringResource(R.string.label_birthdate), readOnly = true, trailingIcon = Icons.Default.CalendarMonth)
+            Box(modifier = Modifier.matchParentSize().clickable { showDatePicker = true })
+        }
+        Spacer(Modifier.height(12.dp))
+        Text(stringResource(R.string.label_gender), color = TextGray, fontSize = 12.sp)
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            // 성별 값 자체는 서버에 "Male"/"Female"로 보낼 수 있으므로 저장 값은 영어로, 표시는 한글로
+            PremiumChip(stringResource(R.string.gender_male), gender == "Male") { gender = "Male" }
+            PremiumChip(stringResource(R.string.gender_female), gender == "Female") { gender = "Female" }
+        }
+        Spacer(Modifier.height(16.dp))
+        PremiumTextField(value = mbti, onValueChange = { mbti = it.uppercase() }, label = stringResource(R.string.label_mbti)) // MBTI 유지
+        Spacer(Modifier.height(24.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            TextButton(onClick = onCancel) { Text(stringResource(R.string.btn_cancel), color = TextGray) }
+            Spacer(Modifier.width(8.dp))
+            Button(onClick = { onSave(name, birth, gender, mbti, timeCode) }, colors = ButtonDefaults.buttonColors(containerColor = AccentPurple)) {
+                Text(stringResource(R.string.btn_save), color = DeepNavy, fontWeight = FontWeight.Bold)
+            }
+        }
     }
 
-    if (showBirthPicker) {
+    if (showDatePicker) {
         val datePickerState = rememberDatePickerState()
-
         DatePickerDialog(
-            onDismissRequest = { showBirthPicker = false },
+            onDismissRequest = { showDatePicker = false },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        val millis = datePickerState.selectedDateMillis
-                        if (millis != null) {
-                            val date = Date(millis)
-                            val format =
-                                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                            birth = format.format(date)
-                        }
-                        showBirthPicker = false
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let {
+                        birth = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(it))
                     }
-                ) {
-                    Text(
-                        text = stringResource(R.string.ok),
-                        fontFamily = PretendardMedium,
-                        color = AccentLavender
-                    )
-                }
+                    showDatePicker = false
+                }) { Text(stringResource(R.string.btn_confirm), color = AccentGold) }
             },
             dismissButton = {
-                TextButton(onClick = { showBirthPicker = false }) {
-                    Text(
-                        text = stringResource(R.string.btn_cancel),
-                        fontFamily = PretendardMedium,
-                        color = Color(0xFFB0B0B0)
-                    )
-                }
-            }
+                TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.btn_cancel), color = TextGray) }
+            },
+            colors = DatePickerDefaults.colors(containerColor = Color(0xFF1E1E1E))
         ) {
             DatePicker(
                 state = datePickerState,
-                modifier = Modifier
-                    .scale(0.9f), // 달력 전체 사이즈 살짝 축소
-                title = {
-                    Text(
-                        text = stringResource(R.string.label_birthdate),
-                        fontFamily = PretendardBold,
-                        color = DatePickerTextColor,
-                        modifier = Modifier.padding(start = 24.dp, top = 16.dp)
-                    )
-                },
                 colors = DatePickerDefaults.colors(
-                    containerColor = DatePickerBackground,          // 연보라 배경
-                    titleContentColor = DatePickerTextColor,
-                    headlineContentColor = DatePickerTextColor,
-                    weekdayContentColor = DatePickerTextColor,      // 요일 글씨 검정
-                    subheadContentColor = DatePickerTextColor,
-                    dayContentColor = DatePickerTextColor,          // 날짜 숫자 검정
-                    disabledDayContentColor = DatePickerTextColor.copy(alpha = 0.3f),
-                    selectedDayContainerColor = AccentLavender,
-                    selectedDayContentColor = Color.White,
-                    todayContentColor = AccentLavender,
-                    todayDateBorderColor = AccentLavender
+                    containerColor = Color(0xFF1E1E1E),
+                    titleContentColor = AccentGold,
+                    headlineContentColor = TextWhite,
+                    dayContentColor = TextWhite,
+                    selectedDayContainerColor = AccentGold,
+                    selectedDayContentColor = DeepNavy,
+                    todayContentColor = AccentGold,
+                    todayDateBorderColor = AccentGold
                 )
-            )
-        }
-    }
-
-    Spacer(Modifier.height(12.dp))
-
-    // 성별
-    Text(
-        text = stringResource(R.string.label_gender),
-        color = Color.White,
-        style = MaterialTheme.typography.bodySmall,
-        fontFamily = PretendardMedium
-    )
-
-    val maleLabel = stringResource(R.string.gender_male)
-    val femaleLabel = stringResource(R.string.gender_female)
-
-    Spacer(Modifier.height(6.dp))
-
-    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        GenderChip(
-            text = maleLabel,
-            selected = gender == maleLabel,
-            onClick = { gender = maleLabel }
-        )
-        GenderChip(
-            text = femaleLabel,
-            selected = gender == femaleLabel,
-            onClick = { gender = femaleLabel }
-        )
-    }
-
-    Spacer(Modifier.height(12.dp))
-
-    // MBTI
-    Text(
-        text = stringResource(R.string.label_mbti),
-        color = Color(0xFFFDD071),
-        style = MaterialTheme.typography.bodySmall,
-        fontFamily = PretendardMedium
-    )
-    Spacer(Modifier.height(4.dp))
-    MBTIDropdown(
-        selected = mbti,
-        onSelect = { mbti = it },
-        fieldColors = fieldColors
-    )
-
-    Spacer(Modifier.height(12.dp))
-
-    // 출생시간
-    Text(
-        text = stringResource(R.string.label_birthtime),
-        color = Color(0xFFFDD071),
-        style = MaterialTheme.typography.bodySmall,
-        fontFamily = PretendardMedium
-    )
-    Spacer(Modifier.height(4.dp))
-    BirthTimeDropdown(
-        selectedLabel = birthLabel,
-        slots = birthSlotsUi(),
-        onSelect = { (code, label) ->
-            birthCode = code
-            birthLabel = label
-        },
-        fieldColors = fieldColors
-    )
-
-    Spacer(Modifier.height(16.dp))
-
-    // 취소 / 저장 버튼 → 배경 없는 텍스트 버튼
-    Row(
-        horizontalArrangement = Arrangement.End,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        TextButton(onClick = onCancel) {
-            Text(
-                text = stringResource(R.string.btn_cancel),
-                color = Color(0xFFCBCBCB),
-                fontFamily = PretendardMedium
-            )
-        }
-        Spacer(Modifier.width(4.dp))
-        TextButton(onClick = {
-            onSave(nickname, birth, gender, mbti, birthCode)
-        }) {
-            Text(
-                text = stringResource(R.string.btn_save),
-                color = AccentLavender,
-                fontFamily = PretendardBold,
-                fontWeight = FontWeight.Bold
             )
         }
     }
 }
 
 @Composable
-private fun GenderChip(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    val backgroundColor by animateColorAsState(
-        targetValue = if (selected) Color(0x33B388FF) else Color(0x22000000),
-        label = "gender_bg"
-    )
-    val borderColor by animateColorAsState(
-        targetValue = if (selected) AccentLavender else FieldBorder,
-        label = "gender_border"
-    )
-
-    Surface(
-        modifier = Modifier.height(34.dp),
-        shape = RoundedCornerShape(999.dp),
-        color = backgroundColor,
-        border = BorderStroke(1.dp, borderColor)
-    ) {
-        Box(
-            modifier = Modifier
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = rememberRipple(color = AccentLavender.copy(alpha = 0.25f)),
-                    onClick = onClick
-
-                )
-                .padding(horizontal = 16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = text,
-                fontFamily = PretendardMedium,
-                color = if (selected) Color.White else Color(0xCCFFFFFF),
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun MBTIDropdown(
-    selected: String,
-    onSelect: (String) -> Unit,
-    fieldColors: TextFieldColors
-) {
-    val noneLabel = stringResource(R.string.select_none)
-    val list = listOf(
-        noneLabel,
-        "INTJ", "INTP", "ENTJ", "ENTP",
-        "INFJ", "INFP", "ENFJ", "ENFP",
-        "ISTJ", "ISFJ", "ESTJ", "ESFJ",
-        "ISTP", "ISFP", "ESTP", "ESFP"
-    )
-    var expanded by remember { mutableStateOf(false) }
-
-    val interactionSource = remember { MutableInteractionSource() }
-    val isFocused by interactionSource.collectIsFocusedAsState()
-    val borderColor by animateColorAsState(
-        targetValue = if (expanded || isFocused) FieldBorderFocused else FieldBorder,
-        label = "mbti_border"
-    )
-    val borderWidth by animateDpAsState(
-        targetValue = if (expanded || isFocused) 1.dp else 2.dp,
-        label = "mbti_width"
-    )
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it }
-    ) {
-        Box(
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth()
-                .border(
-                    width = borderWidth,
-                    color = borderColor,
-                    shape = RoundedCornerShape(12.dp)
-                )
-        ) {
-            OutlinedTextField(
-                value = if (selected.isBlank()) list.first() else selected,
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                interactionSource = interactionSource,
-                colors = fieldColors,
-                textStyle = LocalTextStyle.current.copy(
-                    fontFamily = PretendardMedium,
-                    color = Color.White
-                )
-            )
-        }
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            list.forEach { item ->
-                DropdownMenuItem(
-                    text = { Text(item, fontFamily = PretendardMedium) },
-                    onClick = {
-                        onSelect(if (item == noneLabel) "" else item)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun BirthTimeDropdown(
-    selectedLabel: String,
-    slots: List<Pair<String, String>>,
-    onSelect: (Pair<String, String>) -> Unit,
-    fieldColors: TextFieldColors
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    val interactionSource = remember { MutableInteractionSource() }
-    val isFocused by interactionSource.collectIsFocusedAsState()
-    val borderColor by animateColorAsState(
-        targetValue = if (expanded || isFocused) FieldBorderFocused else FieldBorder,
-        label = "birthtime_border"
-    )
-    val borderWidth by animateDpAsState(
-        targetValue = if (expanded || isFocused) 1.dp else 2.dp,
-        label = "birthtime_width"
-    )
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = it }
-    ) {
-        Box(
-            modifier = Modifier
-                .menuAnchor()
-                .fillMaxWidth()
-                .border(
-                    width = borderWidth,
-                    color = borderColor,
-                    shape = RoundedCornerShape(12.dp)
-                )
-        ) {
-            OutlinedTextField(
-                value = if (selectedLabel.isBlank())
-                    stringResource(R.string.birthtime_none)
-                else selectedLabel,
-                onValueChange = {},
-                readOnly = true,
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                interactionSource = interactionSource,
-                colors = fieldColors,
-                textStyle = LocalTextStyle.current.copy(
-                    fontFamily = PretendardMedium,
-                    color = Color.White
-                )
-            )
-        }
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            slots.forEach { slot ->
-                DropdownMenuItem(
-                    text = { Text(slot.second, fontFamily = PretendardMedium) },
-                    onClick = {
-                        onSelect(slot)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun birthSlotsUi(): List<Pair<String, String>> {
-    val ctx = LocalContext.current
-    val isKo = ctx.resources.configuration.locales[0].language.startsWith("ko")
-
-    return remember(isKo) {
-        listOf(
-            "none" to (if (isKo) ctx.getString(R.string.birthtime_none) else "None"),
-            "23_01" to (if (isKo) "자시 (23:00~01:00)" else "Zi (23:00–01:00)"),
-            "01_03" to (if (isKo) "축시 (01:00~03:00)" else "Chou (01:00–03:00)"),
-            "03_05" to (if (isKo) "인시 (03:00~05:00)" else "Yin (03:00–05:00)"),
-            "05_07" to (if (isKo) "묘시 (05:00~07:00)" else "Mao (05:00–07:00)"),
-            "07_09" to (if (isKo) "진시 (07:00~09:00)" else "Chen (07:00–09:00)"),
-            "09_11" to (if (isKo) "사시 (09:00~11:00)" else "Si (09:00–11:00)"),
-            "11_13" to (if (isKo) "오시 (11:00~13:00)" else "Wu (11:00–13:00)"),
-            "13_15" to (if (isKo) "미시 (13:00~15:00)" else "Wei (13:00–15:00)"),
-            "15_17" to (if (isKo) "신시 (15:00~17:00)" else "Shen (15:00–17:00)"),
-            "17_19" to (if (isKo) "유시 (17:00~19:00)" else "You (17:00–19:00)"),
-            "19_21" to (if (isKo) "술시 (19:00~21:00)" else "Xu (19:00–21:00)"),
-            "21_23" to (if (isKo) "해시 (21:00~23:00)" else "Hai (21:00–23:00)")
-        )
-    }
-}
-
-@Composable
-private fun AccountLinkSection(
-    ui: SettingsUiState,
-    onLinkGoogle: () -> Unit,
-    onDelete: () -> Unit
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(
-            text = stringResource(R.string.label_account_link),
-            color = Color(0xFFFDD071),
-            style = MaterialTheme.typography.titleSmall,
-            fontFamily = PretendardMedium,
-            fontWeight = FontWeight.Bold
-        )
-
-        if (ui.accountStatusLabel.isNotBlank()) {
-            Text(
-                text = ui.accountStatusLabel,
-                color = Color(0xFFB3FFFFFF),
-                style = MaterialTheme.typography.bodySmall,
-                fontFamily = PretendardMedium
-            )
-        }
-
-        val enabled = ui.googleButtonEnabled && !ui.linkInProgress
-        val label = when {
-            ui.googleButtonLabel.isNotBlank() -> ui.googleButtonLabel
-            else -> stringResource(R.string.btn_google_connect)
-        }
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(44.dp)
-                .alpha(if (enabled) 1f else 0.6f)
-                .clip(RoundedCornerShape(20.dp))
-                .clickable(
-                    enabled = enabled,
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = rememberRipple(color = Color.Black.copy(alpha = 0.1f))
-                ) { onLinkGoogle() },
-            contentAlignment = Alignment.Center
-        ) {
-            // btn_google.xml 을 그대로 배경으로 사용 (텍스트는 이미지에만)
-            Image(
-                painter = painterResource(R.drawable.btn_google),
-                contentDescription = label,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .aspectRatio(4.5f, matchHeightConstraintsFirst = true),
-                contentScale = ContentScale.FillBounds
-            )
-        }
-
-        if (ui.canDeleteAccount) {
-            TextButton(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = onDelete,
-                contentPadding = PaddingValues(horizontal = 0.dp, vertical = 6.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.btn_delete_account),
-                    color = Color(0xFFFF8A80),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontFamily = PretendardMedium
-                )
-            }
-        }
-
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = stringResource(R.string.account_link_note),
-            style = MaterialTheme.typography.bodySmall,
-            color = Color(0x80FFFFFF),
-            fontFamily = PretendardMedium
-        )
-    }
-}
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AnimatedOutlinedTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    label: @Composable (() -> Unit)? = null,
-    placeholder: @Composable (() -> Unit)? = null,
-    singleLine: Boolean = true,
-    readOnly: Boolean = false,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    colors: TextFieldColors
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val isFocused by interactionSource.collectIsFocusedAsState()
-
-    val borderColor by animateColorAsState(
-        targetValue = if (isFocused) FieldBorderFocused else FieldBorder,
-        label = "textfield_border"
-    )
-    val borderWidth by animateDpAsState(
-        targetValue = if (isFocused) 1.dp else 2.dp,
-        label = "textfield_width"
-    )
-
+fun PremiumChip(text: String, selected: Boolean, onClick: () -> Unit) {
     Box(
-        modifier = modifier
-            .border(
-                width = borderWidth,
-                color = borderColor,
-                shape = RoundedCornerShape(12.dp)
-            )
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(if(selected) AccentPurple else InputBg)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 20.dp, vertical = 10.dp)
     ) {
-       TextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier
-                .fillMaxSize()
-                .heightIn(min = 50.dp),  // 이 부분 추가!
-            singleLine = singleLine,
-            readOnly = readOnly,
-            label = label,
-            placeholder = placeholder,
-            trailingIcon = trailingIcon,
-            interactionSource = interactionSource,
-            textStyle = LocalTextStyle.current.copy(
-                fontFamily = PretendardMedium,
-                color = Color.White
-            ),
-            colors = colors,
-            shape = RoundedCornerShape(12.dp)
-        )
+        Text(text, color = if(selected) DeepNavy else TextGray, fontWeight = FontWeight.Bold)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PremiumTextField(value: String, onValueChange: (String) -> Unit, label: String, readOnly: Boolean = false, trailingIcon: androidx.compose.ui.graphics.vector.ImageVector? = null) {
+    OutlinedTextField(
+        value = value, onValueChange = onValueChange, label = { Text(label, color = TextGray) },
+        readOnly = readOnly, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = TextWhite, unfocusedTextColor = TextWhite,
+            focusedContainerColor = InputBg, unfocusedContainerColor = InputBg,
+            focusedBorderColor = AccentGold, unfocusedBorderColor = Color.Transparent
+        ),
+        trailingIcon = if (trailingIcon != null) { { Icon(trailingIcon, contentDescription = null, tint = TextGray) } } else null
+    )
+}
+
+@Composable
+fun GlassCard(content: @Composable ColumnScope.() -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(GlassWhite)
+            .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(20.dp))
+            .padding(20.dp)
+    ) {
+        Column(content = content)
     }
 }

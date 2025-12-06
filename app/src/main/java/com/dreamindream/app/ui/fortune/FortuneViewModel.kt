@@ -2,385 +2,303 @@ package com.dreamindream.app.ui.fortune
 
 import android.app.Application
 import android.content.Context
-import android.content.SharedPreferences
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.viewModelScope
-import com.dreamindream.app.AdManager
 import com.dreamindream.app.FirestoreManager
 import com.dreamindream.app.FortuneApi
 import com.dreamindream.app.FortuneStorage
 import com.dreamindream.app.R
+import com.dreamindream.app.SubscriptionManager
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import org.json.JSONArray
 import org.json.JSONObject
 
 class FortuneViewModel(app: Application) : AndroidViewModel(app) {
 
     private val ctx: Application get() = getApplication()
     private val storage = FortuneStorage(ctx)
-    private val prefs: SharedPreferences = storage.prefs
-
-    // 텍스트/색 계산용(네트워크 X) FortuneApi – Application context로만 사용
-    private val textApi = FortuneApi(ctx, storage)
+    private val api = FortuneApi(ctx, storage)
+    private val prefs = storage.prefs
 
     private val _uiState = MutableStateFlow(FortuneUiState())
     val uiState: StateFlow<FortuneUiState> = _uiState.asStateFlow()
 
-    // 마지막 Daily JSON (심화 분석/다이얼로그용)
     private var lastPayload: JSONObject? = null
 
-    // 섹션 상세 텍스트용 raw 데이터
-    private val sectionRaw: MutableMap<String, SectionRaw> = mutableMapOf()
-
-    private data class SectionRaw(
-        val title: String,
-        val score: Int,
-        val text: String?,
-        val advice: String?
-    )
-
     init {
-        // 프로필 동기화 후 초기 UI 결정
         storage.syncProfileFromFirestore {
-            decideInitialUi()
+            fetchUserName()
+            checkInitialState()
         }
     }
 
-    private fun setState(block: (FortuneUiState) -> FortuneUiState) {
-        _uiState.update(block)
+    private fun fetchUserName() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (uid != null) {
+            FirestoreManager.getUserProfile(uid) { data ->
+                val name = data?.get("name")?.toString() ?: data?.get("nickname")?.toString() ?: ""
+                _uiState.update { it.copy(userName = name) }
+            }
+        }
     }
 
-    private fun decideInitialUi() {
+    private fun checkInitialState() {
         val cached = storage.getCachedTodayPayload()
         if (cached != null) {
             lastPayload = cached
-            bindFromPayload(cached)
-            return
-        }
-
-        if (storage.isFortuneSeenToday()) {
-            // 오늘 이미 봤는데 캐시는 없는 경우 → 버튼 숨기고 안내만
-            setState {
-                it.copy(
-                    showStartButton = false,
-                    showFortuneCard = false,
-                    isLoading = false,
-                    deepButtonEnabled = false,
-                    deepButtonLabel = ctx.getString(R.string.btn_deep_analysis)
-                )
-            }
+            parseAndBindBasic(cached)
+            checkDeepState()
         } else {
-            // 첫 진입 – 물음표 버튼만 보여줌
-            setState {
-                it.copy(
-                    showStartButton = true,
-                    showFortuneCard = false,
-                    isLoading = false,
-                    startButtonEnabled = true,
-                    startButtonBreathing = true,
-                    deepButtonEnabled = false,
-                    deepButtonLabel = ctx.getString(R.string.btn_deep_analysis)
-                )
+            _uiState.update { it.copy(showStartButton = true, showFortuneCard = false) }
+        }
+    }
+
+    private fun checkDeepState() {
+        val todayKey = storage.todayPersonaKey()
+        val deepCached = storage.getCachedDeep(todayKey)
+
+        if (deepCached != null) {
+            parseAndBindDeep(deepCached)
+        } else {
+            val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+            FirestoreManager.getDeepFortune(uid, storage.todayKey()) { json ->
+                if (json != null) {
+                    storage.cacheDeep(todayKey, json)
+                    parseAndBindDeep(json)
+                }
             }
         }
     }
 
-    // -------------------------------
-    //  시작 버튼 클릭
-    // -------------------------------
-    fun onStartButtonClick(activityContext: Context) {
+    fun onStartClick(context: Context) {
         if (!storage.isProfileComplete()) {
-            setState { it.copy(showProfileDialog = true) }
+            _uiState.update { it.copy(showProfileDialog = true) }
             return
         }
 
-        if (storage.isFortuneSeenToday() && storage.getCachedTodayPayload() == null) {
-            pushSnackbar(ctx.getString(R.string.toast_already_seen_today))
-            setState {
-                it.copy(
-                    startButtonEnabled = false,
-                    startButtonBreathing = false
-                )
-            }
-            return
-        }
+        _uiState.update { it.copy(isLoading = true, showStartButton = false) }
 
-        setState {
-            it.copy(
-                isLoading = true,
-                showFortuneCard = true,
-                showStartButton = false,
-                deepButtonEnabled = false
-            )
-        }
+        val userInfo = storage.loadUserInfoStrict()
+        val seed = storage.seedForToday(userInfo)
 
-        val u = storage.loadUserInfoStrict()
-        val seed = storage.seedForToday(u)
-        val api = FortuneApi(activityContext, storage)
-
-        api.fetchDaily(
-            u = u,
-            seed = seed,
-            onSuccess = { payload ->
-                lastPayload = payload
-                storage.cacheTodayPayload(payload)
+        api.fetchDaily(userInfo, seed,
+            onSuccess = { json ->
+                lastPayload = json
+                storage.cacheTodayPayload(json)
                 storage.markSeenToday()
 
-                // Firestore에도 저장 (예전 Fragment와 동일)
-                FirebaseAuth.getInstance().currentUser?.uid?.let { uid ->
-                    FirestoreManager.saveDailyFortune(uid, storage.todayKey(), payload) {}
+                val uid = FirebaseAuth.getInstance().currentUser?.uid
+                if (uid != null) {
+                    FirestoreManager.saveDailyFortune(uid, storage.todayKey(), json)
                 }
-
-                bindFromPayload(payload)
+                parseAndBindBasic(json)
             },
-            onError = { msg, seedPreset ->
-                val (pos, neu, neg) = seedPreset
-                setState {
-                    it.copy(
-                        isLoading = false,
-                        showFortuneCard = true,
-                        showStartButton = true,
-                        startButtonEnabled = true,
-                        startButtonBreathing = true,
-                        emoPositive = pos,
-                        emoNeutral = neu,
-                        emoNegative = neg,
-                        deepButtonEnabled = false
-                    )
+            onError = { msg ->
+                _uiState.update { state ->
+                    state.copy(isLoading = false, showStartButton = true, snackbarMessage = msg)
                 }
-                pushSnackbar(msg)
             }
         )
     }
 
-    // -------------------------------
-    //  Daily 결과 바인딩 → UiState
-    // -------------------------------
-    private fun bindFromPayload(obj: JSONObject) {
-        val kwArr = obj.optJSONArray("keywords") ?: JSONArray()
-        val keywords = (0 until kwArr.length())
-            .mapNotNull { kwArr.optString(it)?.takeIf { s -> s.isNotBlank() } }
-
-        val luckyObj = obj.optJSONObject("lucky") ?: JSONObject()
-        val luckyColor = luckyObj.optString("colorHex", "#FFD54F")
-        val luckyNumber = luckyObj.optInt("number", -1).takeIf { it > 0 }
-        val luckyTime = luckyObj.optString("time").orEmpty()
-
-        val emoObj = obj.optJSONObject("emotions") ?: JSONObject()
-        val pos = emoObj.optInt("positive", 60)
-        val neu = emoObj.optInt("neutral", 25)
-        val neg = emoObj.optInt("negative", 15)
-
-        // 체크리스트
-        val rawChecklist = (0 until (obj.optJSONArray("checklist")?.length() ?: 0))
-            .mapNotNull { idx -> obj.optJSONArray("checklist")?.optString(idx) }
-
-        val cleanedChecklist = textApi.sanitizeChecklist(rawChecklist)
-        val todayKey = storage.todayPersonaKey()
-        val checklistItems = cleanedChecklist.mapIndexed { idx, label ->
-            ChecklistItemUi(
-                id = idx,
-                text = label,
-                checked = prefs.getBoolean("fortune_check_${todayKey}_$idx", false)
-            )
+    fun onDeepAnalysisClick(context: Context) {
+        if (_uiState.value.deepResult != null) {
+            _uiState.update { it.copy(showDeepDialog = true) }
+            return
         }
 
-        // 섹션 카드들
-        val sectionsJson = obj.optJSONObject("sections") ?: JSONObject()
-        val lottoNums = obj.optJSONArray("lottoNumbers")
-        sectionRaw.clear()
-        val sections = mutableListOf<FortuneSectionUi>()
+        val payload = lastPayload ?: return
 
-        fun addSection(key: String, titleRes: Int) {
-            val title = ctx.getString(titleRes)
-            val sObj = sectionsJson.optJSONObject(key) ?: JSONObject()
-            val score = sObj.optInt("score", -1).coerceIn(40, 100)
+        if (!SubscriptionManager.isSubscribedNow()) {
+            _uiState.update { it.copy(navigateToSubscription = true) }
+            return
+        }
 
-            val isLotto = key == "lotto"
-            val color = if (isLotto || score < 0) 0 else textApi.scoreColor(score)
+        if (_uiState.value.isDeepLoading) return
 
-            val body = if (isLotto) {
-                if (lottoNums != null && lottoNums.length() == 6) {
-                    val arr = (0 until 6).map { lottoNums.optInt(it) }.sorted()
-                    ctx.getString(R.string.label_lotto_numbers, arr.joinToString(", "))
-                } else {
-                    ctx.getString(R.string.label_lotto_numbers_dash)
+        _uiState.update { it.copy(isDeepLoading = true) }
+
+        val userInfo = storage.loadUserInfoStrict()
+        val seed = storage.seedForToday(userInfo)
+
+        api.fetchDeep(userInfo, payload, seed) { deepJson ->
+            if (deepJson != null) {
+                val todayKey = storage.todayPersonaKey()
+                storage.cacheDeep(todayKey, deepJson)
+
+                val uid = FirebaseAuth.getInstance().currentUser?.uid
+                if (uid != null) {
+                    FirestoreManager.saveDeepFortune(uid, storage.todayKey(), deepJson)
                 }
+
+                parseAndBindDeep(deepJson)
+                _uiState.update { it.copy(isDeepLoading = false, showDeepDialog = true) }
             } else {
-                val t = sObj.optString("text").ifBlank { sObj.optString("advice") }.trim()
-                if (t.isNotBlank()) t else ctx.getString(R.string.section_body_fallback)
+                _uiState.update {
+                    it.copy(isDeepLoading = false, snackbarMessage = ctx.getString(R.string.parse_error))
+                }
             }
-
-            sections += FortuneSectionUi(
-                key = key,
-                title = title,
-                score = if (isLotto) null else score,
-                colorInt = color,
-                body = body,
-                isLotto = isLotto
-            )
-
-            if (!isLotto) {
-                sectionRaw[key] = SectionRaw(
-                    title = title,
-                    score = score,
-                    text = sObj.optString("text").takeIf { it.isNotBlank() },
-                    advice = sObj.optString("advice").takeIf { it.isNotBlank() }
-                )
-            }
-        }
-
-        addSection("overall", R.string.section_overall)
-        addSection("love", R.string.section_love)
-        addSection("study", R.string.section_study)
-        addSection("work", R.string.section_work)
-        addSection("money", R.string.section_money)
-        addSection("lotto", R.string.section_lotto)
-
-        setState {
-            it.copy(
-                isLoading = false,
-                showFortuneCard = true,
-                showStartButton = false,
-                startButtonEnabled = false,
-                startButtonBreathing = false,
-                keywords = keywords,
-                luckyColorHex = luckyColor,
-                luckyNumber = luckyNumber,
-                luckyTime = luckyTime,
-                emoPositive = pos,
-                emoNeutral = neu,
-                emoNegative = neg,
-                checklist = checklistItems,
-                sections = sections,
-                hasDailyPayload = true,
-                deepButtonEnabled = true,
-                deepButtonLabel = ctx.getString(R.string.btn_deep_analysis),
-                infoMessage = null
-            )
         }
     }
 
-    // -------------------------------
-    //  체크리스트 토글
-    // -------------------------------
+    private fun parseAndBindBasic(json: JSONObject) {
+        try {
+            val radar = json.optJSONObject("radar")
+            val radarMap = mapOf(
+                "Love" to (radar?.optInt("love") ?: 50),
+                "Money" to (radar?.optInt("money") ?: 50),
+                "Work" to (radar?.optInt("work") ?: 50),
+                "Health" to (radar?.optInt("health") ?: 50),
+                "Social" to (radar?.optInt("social") ?: 50)
+            )
+
+            val summary = json.optString("summary", "")
+            val kws = json.optJSONArray("keywords")
+            val keywords = (0 until (kws?.length() ?: 0)).map { kws!!.getString(it) }
+
+            val lucky = json.optJSONObject("lucky")
+            val color = lucky?.optString("colorHex") ?: "#FFD54F"
+            val number = lucky?.optInt("number")
+            val time = lucky?.optString("time") ?: "-"
+            val direction = lucky?.optString("direction") ?: "-"
+
+            val rawChecklist = json.optJSONArray("checklist")
+            val todayKey = storage.todayPersonaKey()
+            val checklist = if (rawChecklist != null) {
+                (0 until rawChecklist.length()).mapIndexed { index, _ ->
+                    val text = rawChecklist.getString(index)
+                    val isChecked = prefs.getBoolean("fortune_check_${todayKey}_$index", false)
+                    ChecklistItemUi(index, text, isChecked)
+                }
+            } else emptyList()
+
+            // 로또 번호 파싱 (배열 -> 문자열)
+            val lottoArr = json.optJSONArray("lottoNumbers")
+            val lottoText = if (lottoArr != null && lottoArr.length() > 0) {
+                (0 until lottoArr.length()).map { lottoArr.getInt(it) }.joinToString(", ")
+            } else {
+                "번호 생성 중..."
+            }
+
+            val sectionsJson = json.optJSONObject("sections")
+            val sectionsList = mutableListOf<FortuneSectionUi>()
+
+            val sectionMap = listOf(
+                Triple("overall", R.string.fortune_overall, 80),
+                Triple("love", R.string.fortune_love, radarMap["Love"] ?: 0),
+                Triple("money", R.string.fortune_money, radarMap["Money"] ?: 0),
+                Triple("work", R.string.fortune_work, radarMap["Work"] ?: 0),
+                Triple("health", R.string.fortune_health, radarMap["Health"] ?: 0),
+                Triple("social", R.string.fortune_social, radarMap["Social"] ?: 0),
+                Triple("lotto", R.string.fortune_lotto, 0)
+            )
+
+            sectionMap.forEach { (key, titleRes, defaultScore) ->
+                val s = sectionsJson?.optJSONObject(key)
+                if (s != null || key == "lotto") {
+                    val isLotto = key == "lotto"
+                    val score = if (isLotto) null else s?.optInt("score") ?: defaultScore
+
+                    // ★ 수정됨: 로또면 위에서 만든 lottoText 사용, 아니면 섹션 텍스트 사용
+                    val body = if (isLotto) lottoText else s?.optString("text") ?: ""
+
+                    sectionsList.add(FortuneSectionUi(
+                        key = key,
+                        titleResId = titleRes,
+                        score = score,
+                        colorInt = if (isLotto) 0 else api.scoreColor(score ?: 0),
+                        body = body,
+                        isLotto = isLotto
+                    ))
+                }
+            }
+
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    showFortuneCard = true,
+                    showStartButton = false,
+                    radarChartData = radarMap,
+                    oneLineSummary = summary,
+                    keywords = keywords,
+                    luckyColorHex = color,
+                    luckyNumber = number,
+                    luckyTime = time,
+                    luckyDirection = direction,
+                    checklist = checklist,
+                    sections = sectionsList,
+                    deepButtonEnabled = true
+                )
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            _uiState.update { it.copy(isLoading = false, snackbarMessage = ctx.getString(R.string.parse_error)) }
+        }
+    }
+
+    private fun parseAndBindDeep(json: JSONObject) {
+        try {
+            val flowArr = json.optJSONArray("flow_curve")
+            val flowList = if (flowArr != null && flowArr.length() >= 7) {
+                (0 until 7).map { flowArr.getInt(it) }
+            } else listOf(50, 50, 50, 50, 50, 50, 50)
+
+            val highArr = json.optJSONArray("highlights")
+            val highlights = (0 until (highArr?.length() ?: 0)).map { highArr!!.getString(it) }
+
+            val result = DeepFortuneResult(
+                flowCurve = flowList,
+                highlights = highlights,
+                riskAndOpportunity = json.optString("risk_opp"),
+                solution = json.optString("solution"),
+                tomorrowPreview = json.optString("tomorrow_preview")
+            )
+
+            _uiState.update {
+                it.copy(isDeepLoading = false, deepResult = result)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            _uiState.update { it.copy(isDeepLoading = false, snackbarMessage = ctx.getString(R.string.parse_error)) }
+        }
+    }
+
+    fun onRadarClick() {
+        _uiState.update { it.copy(showRadarDetail = true) }
+    }
+
+    fun closeRadarDialog() {
+        _uiState.update { it.copy(showRadarDetail = false) }
+    }
+
+    fun closeDeepDialog() {
+        _uiState.update { it.copy(showDeepDialog = false) }
+    }
+
+    fun onSectionClick(key: String) {
+        val section = _uiState.value.sections.find { it.key == key }
+        _uiState.update { it.copy(sectionDialog = section) }
+    }
+
+    fun closeSectionDialog() {
+        _uiState.update { it.copy(sectionDialog = null) }
+    }
+
     fun onChecklistToggle(id: Int, checked: Boolean) {
         val todayKey = storage.todayPersonaKey()
         prefs.edit().putBoolean("fortune_check_${todayKey}_$id", checked).apply()
-        setState { state ->
-            state.copy(
-                checklist = state.checklist.map {
-                    if (it.id == id) it.copy(checked = checked) else it
-                }
-            )
-        }
-    }
 
-    // -------------------------------
-    //  섹션 카드 클릭 → 상세 다이얼로그
-    // -------------------------------
-    fun onSectionClicked(sectionKey: String) {
-        val raw = sectionRaw[sectionKey] ?: return
-        val color = textApi.scoreColor(raw.score)
-        val body = textApi.buildSectionDetails(
-            title = raw.title,
-            score = raw.score,
-            text = raw.text,
-            advice = raw.advice
-        )
-        setState {
-            it.copy(
-                sectionDialog = SectionDialogUiState(
-                    title = raw.title,
-                    score = raw.score,
-                    colorInt = color,
-                    body = body
-                )
-            )
-        }
-    }
-
-    fun onSectionDialogDismiss() {
-        setState { it.copy(sectionDialog = null) }
-    }
-
-    // -------------------------------
-    //  심화 분석 버튼
-    // -------------------------------
-    fun onDeepButtonClick(activityContext: Context) {
-        val daily = lastPayload
-        if (daily == null) {
-            pushSnackbar(ctx.getString(R.string.toast_run_fortune_first))
-            return
-        }
-
-        val personaKey = storage.todayPersonaKey()
-        val prefKey = "fortune_deep_unlocked_$personaKey"
-        val alreadyUnlocked = prefs.getBoolean(prefKey, false) || AdManager.isPremium
-
-        if (alreadyUnlocked) {
-            openDeepNow(activityContext, daily)
-        } else {
-            // 광고 게이트 오픈 → 보상 후 심화 분석 실행
-            AdManager.openGate {
-                prefs.edit().putBoolean(prefKey, true).apply()
-                openDeepNow(activityContext, daily)
+        _uiState.update { state ->
+            val newChecklist = state.checklist.map { item ->
+                if (item.id == id) item.copy(checked = checked) else item
             }
+            state.copy(checklist = newChecklist)
         }
     }
 
-    private fun openDeepNow(activityContext: Context, daily: JSONObject) {
-        val todayPersonaKey = storage.todayPersonaKey()
-        val cached = storage.getCachedDeep(todayPersonaKey)
-        val api = FortuneApi(activityContext, storage)
-
-        if (cached != null) {
-            api.showDeepDialog(activityContext, cached, daily)
-            return
-        }
-
-        setState {
-            it.copy(
-                deepButtonEnabled = false,
-                deepButtonLabel = ctx.getString(R.string.deep_generating_label)
-            )
-        }
-
-        val u = storage.loadUserInfoStrict()
-        val seed = storage.seedForToday(u)
-
-        api.fetchDeep(u, daily, seed) { deep ->
-            viewModelScope.launch {
-                val obj = deep ?: JSONObject()
-                storage.cacheDeep(todayPersonaKey, obj)
-                setState {
-                    it.copy(
-                        deepButtonEnabled = true,
-                        deepButtonLabel = ctx.getString(R.string.deep_button_label)
-                    )
-                }
-                api.showDeepDialog(activityContext, obj, daily)
-            }
-        }
-    }
-
-    // -------------------------------
-    //  프로필 다이얼로그 / 스낵바
-    // -------------------------------
-    fun onProfileDialogDismiss() {
-        setState { it.copy(showProfileDialog = false) }
-    }
-
-    private fun pushSnackbar(msg: String) {
-        setState { it.copy(snackbarMessage = msg) }
-    }
-
-    fun onSnackbarShown() {
-        setState { it.copy(snackbarMessage = null) }
-    }
+    fun onSubscriptionNavHandled() { _uiState.update { it.copy(navigateToSubscription = false) } }
+    fun onProfileDialogDismiss() { _uiState.update { it.copy(showProfileDialog = false) } }
+    fun onSnackbarShown() { _uiState.update { it.copy(snackbarMessage = null) } }
 }

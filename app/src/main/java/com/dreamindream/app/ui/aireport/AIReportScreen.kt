@@ -1,137 +1,137 @@
 package com.dreamindream.app.ui.aireport
 
-import android.os.Build
-import android.text.Layout
+import android.annotation.SuppressLint
 import android.widget.TextView
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.text.HtmlCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.dreamindream.app.AdPageScaffold
 import com.dreamindream.app.R
 import com.dreamindream.app.chart.renderPercentBars
 import com.dreamindream.app.chart.richEmotionColor
 import com.dreamindream.app.chart.richThemeColor
 import com.dreamindream.app.chart.setupBarChart
 import com.dreamindream.app.chart.useRoundedBars
-import com.dreamindream.app.AdPageScaffold   // 네가 만든 AdkitCompose 패키지 이름에 맞게 수정
-import com.dreamindream.app.ads.openGate        // 예시: 실제 시그니처에 맞게 수정
-import com.dreamindream.app.AdManager
 import com.github.mikephil.charting.charts.BarChart
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.text.HtmlCompat
 
+// --- Fonts ---
+private val PretendardBold = FontFamily(Font(R.font.pretendard_bold, FontWeight.Bold))
+private val PretendardMedium = FontFamily(Font(R.font.pretendard_medium, FontWeight.Medium))
+
+// --- Colors ---
+private val DeepNavy = Color(0xFF121626)
+private val TextWhite = Color(0xFFEEEEEE)
+private val TextGray = Color(0xFFB0BEC5)
+private val AccentGold = Color(0xFFFFD54F)
+private val CardBg = Color(0x1AFFFFFF)
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AIReportRoute(
     weekKeyArg: String?,
-    // 네비게이션 콜백들
     onEmptyCta: () -> Unit,
     onOpenDreamWrite: () -> Unit = onEmptyCta,
+    onNavigateToSubscription: () -> Unit = {},
     viewModel: AIReportViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    LaunchedEffect(weekKeyArg) { viewModel.onStart(weekKeyArg) }
 
-    LaunchedEffect(weekKeyArg) {
-        viewModel.onStart(weekKeyArg)
+    LaunchedEffect(uiState.navigateToSubscription) {
+        if (uiState.navigateToSubscription) {
+            viewModel.onSubscriptionNavigationHandled()
+            onNavigateToSubscription()
+        }
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
-
-    // 스낵바 처리
     LaunchedEffect(uiState.snackbarMessage) {
-        val msg = uiState.snackbarMessage
-        if (!msg.isNullOrBlank()) {
-            snackbarHostState.showSnackbar(msg)
+        uiState.snackbarMessage?.let {
+            snackbarHostState.showSnackbar(it)
             viewModel.onSnackbarShown()
         }
     }
 
-
-    AdPageScaffold(
-        adUnitRes = R.string.ad_unit_ai_banner
-    ) { innerPadding ->
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+    // History BottomSheet
+    if (uiState.showHistorySheet) {
+        ModalBottomSheet(
+            onDismissRequest = { viewModel.onHistorySheetDismiss() },
+            containerColor = DeepNavy,
+            scrimColor = Color.Black.copy(alpha = 0.5f)
         ) {
-            AIReportScreen(
-                state = uiState,
-                modifier = Modifier.fillMaxSize(),
-                onClickHistory = { viewModel.onHistoryClicked() },
-                onClickChartInfo = { viewModel.onChartInfoClicked() },
-                onClickPro = {
-                    val shouldOpenGate = viewModel.onProButtonClicked()
-                    if (shouldOpenGate) {
-                        AdManager.openGate {
-                            viewModel.onProGateUnlocked()
-                        }
-                    }
-                }
-            )
-
-            // Snackbar
-            SnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-            )
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = stringResource(id = R.string.ai_report_history),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontFamily = PretendardBold,
+                    color = TextWhite,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                // History List Implementation...
+            }
         }
     }
 
-    // 빈 상태 다이얼로그 (예전 WeeklyHistoryDialogFragment 대체)
-        if (uiState.showEmptyDialog) {
-            WeeklyHistoryEmptyDialog(
-                onDismiss = { viewModel.onEmptyDialogDismissed() },
-                onCta = {
-                    viewModel.onEmptyDialogCta()
-                    onOpenDreamWrite()
-                }
-            )
-        }
 
-        // 히스토리 바텀시트 (예전 WeeklyHistoryBottomSheet 대체)
-        if (uiState.showHistorySheet) {
-            WeeklyHistorySheet(
-                weeks = uiState.historyWeeks,
-                currentWeekKey = uiState.targetWeekKey,
-                totalLabel = uiState.historyTotalWeeksLabel,
-                onDismiss = { viewModel.onHistorySheetDismiss() },
-                onPick = { picked ->
-                    viewModel.onHistoryWeekPicked(picked)
-                }
-            )
-        }
+     AdPageScaffold(adUnitRes = R.string.ad_unit_ai_banner) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(DeepNavy)
+                .padding(innerPadding)
 
-        if (uiState.showChartInfoDialog) {
-            AlertDialog(
-                onDismissRequest = { viewModel.onChartInfoDialogDismiss() },
-                confirmButton = {
-                    TextButton(onClick = { viewModel.onChartInfoDialogDismiss() }) {
-                        Text(stringResource(id = R.string.ok))
-                    }
-                },
-                title = { Text(stringResource(id = R.string.chart_info_title)) },
-                text = { Text(uiState.chartInfoMessage) }
+        ) {
+            // Background Art
+            Image(
+                painter = painterResource(R.drawable.main_ground),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize().alpha(0.4f),
+                contentScale = ContentScale.Crop
             )
+
+            AIReportScreen(
+                state = uiState,
+                onClickHistory = viewModel::onHistoryClicked,
+                onClickChartInfo = viewModel::onChartInfoClicked,
+                onClickPro = { if (viewModel.onProButtonClicked()) viewModel.onProGateUnlocked() }
+            )
+
+            SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
+
+            // Creative Loading Overlay
+            if (uiState.isLoading || uiState.isProSpinnerVisible) {
+                CreativeLoadingView(message = uiState.loadingMessage)
+            }
         }
     }
 }
@@ -139,676 +139,278 @@ fun AIReportRoute(
 @Composable
 fun AIReportScreen(
     state: AIReportUiState,
-    modifier: Modifier = Modifier,
-    onClickHistory: () -> Unit,
-    onClickChartInfo: () -> Unit,
-    onClickPro: () -> Unit,
-) {
-    val bgPainter = painterResource(id = R.drawable.main_ground)
-
-    Box(
-        modifier = modifier
-            .background(bgPainter)
-            .padding(horizontal = dimensionResource(id = R.dimen.content_side_padding))
-    ) {
-
-        // 빈 상태 아이콘
-        if (state.showEmptyState) {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(bottom = 48.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_no_data),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(dimensionResource(id = R.dimen.icon_btn))
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(id = R.string.ai_report_empty),
-                    color = Color(0xFFE1F0FA),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-        }
-
-        if (state.showReportCard) {
-            // 카드와 PRO 스피너를 함께 감싸서 Constraint 비슷하게
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 10.dp)
-                    .fillMaxWidth()
-                    .widthIn(max = dimensionResource(id = R.dimen.ai_card_max_width))
-            ) {
-                ReportCard(
-                    state = state,
-                    onClickHistory = onClickHistory,
-                    onClickChartInfo = onClickChartInfo,
-                    onClickPro = onClickPro,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                if (state.isProSpinnerVisible) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(12.dp)
-                            .size(20.dp),
-                        strokeWidth = 2.dp
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ReportCard(
-    state: AIReportUiState,
-    modifier: Modifier = Modifier,
     onClickHistory: () -> Unit,
     onClickChartInfo: () -> Unit,
     onClickPro: () -> Unit
 ) {
-    val cardCorner = dimensionResource(id = R.dimen.ai_card_corner)
-
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(cardCorner),
-        border = CardDefaults.outlinedCardBorder().copy(
-            width = 1.dp,
-            color = Color(0xFF1D1D1D)
-        ),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        elevation = CardDefaults.cardElevation(0.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .background(
-                    painter = painterResource(id = R.drawable.bg_panel_glass),
-                    shape = RoundedCornerShape(cardCorner)
-                )
-                .padding(dimensionResource(id = R.dimen.card_pad))
-        ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (state.showReportCard) {
             Column(
-                modifier = Modifier.fillMaxHeight()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 20.dp, vertical = 10.dp) // 여백 조정
             ) {
-                // 헤더
+                // --- Header ---
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_chart),
-                        contentDescription = null,
-                        modifier = Modifier.size(dimensionResource(id = R.dimen.ai_icon))
-                    )
                     Text(
-                        text = state.weekLabel.ifBlank {
-                            stringResource(id = R.string.ai_report_week_label_default)
-                        },
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 10.dp),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        color = Color(0xFFE1F0FA),
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontWeight = FontWeight.Bold
-                        )
+                        state.weekLabel,
+                        color = TextWhite,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontFamily = PretendardBold,
+                        modifier = Modifier.weight(1f)
                     )
-                    TextButton(
-                        onClick = onClickHistory,
-                        modifier = Modifier.height(29.dp),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                        colors = ButtonDefaults.textButtonColors(
-                            containerColor = Color(0x332A355C),
-                            contentColor = Color(0xFFE1F0FA)
-                        )
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.ai_report_history),
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontWeight = FontWeight.Bold
-                            )
-                        )
+
+                    // History Button
+                    IconButton(onClick = onClickHistory) {
+                        Icon(Icons.Default.History, contentDescription = "History", tint = TextGray)
                     }
                 }
 
-                // Divider
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.divider_margin_top)))
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(Color(0xFFFFD54F))
-                )
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.divider_margin_bottom)))
+                Spacer(Modifier.height(20.dp))
+                StatsRow(state)
+                Spacer(Modifier.height(24.dp))
 
-                // 스크롤 영역
-                val scrollState = rememberScrollState()
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .verticalScroll(scrollState)
-                ) {
-                    // KPI 3개 카드
-                    KpiRow(state = state)
+                // --- Keywords ---
+                if (state.keywordsLine.isNotBlank()) {
+                    Text("# Keywords", color = AccentGold, fontFamily = PretendardBold, fontSize = 14.sp)
+                    Spacer(Modifier.height(8.dp))
+                    Text(state.keywordsLine, color = TextWhite, fontFamily = PretendardMedium, fontSize = 18.sp, lineHeight = 26.sp)
+                    Spacer(Modifier.height(24.dp))
+                }
 
-                    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.section_margin_top)))
+                // --- Charts ---
+                ChartSection(stringResource(R.string.chart_emotion_title), state.emotionLabels, state.emotionDist, true, onClickChartInfo)
+                Spacer(Modifier.height(24.dp))
+                ChartSection(stringResource(R.string.chart_theme_title), state.themeLabels, state.themeDist, false, null)
+                Spacer(Modifier.height(30.dp))
 
-                    // 차트 타이틀 + info
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.section_title_emotion_percent),
-                            color = Color(0xFFE1F0FA),
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        )
-                        Spacer(modifier = Modifier.weight(1f))
-                        IconButton(onClick = onClickChartInfo) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_chart),
-                                contentDescription = null,
-                                tint = Color(0x80FFFFFF)
-                            )
+                // --- Analysis Content (Switch between Basic & Pro) ---
+                Crossfade(targetState = state.isProCompleted, label = "AnalysisSwitch") { isPro ->
+                    if (isPro) {
+                        // ★ Deep Analysis View 연결
+                        DeepAnalysisResultView(jsonString = state.analysisJson)
+                    } else {
+                        // Basic Text View
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(CardBg)
+                                .border(1.dp, Color(0x1AFFFFFF), RoundedCornerShape(20.dp))
+                                .padding(20.dp)
+                        ) {
+                            Column {
+                                Text(stringResource(R.string.ai_report_deep_title), color = AccentGold, fontFamily = PretendardBold, fontSize = 16.sp)
+                                Spacer(Modifier.height(12.dp))
+                                HtmlRichText(state.analysisHtml)
+                            }
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    EmotionBarChart(
-                        labels = state.emotionLabels,
-                        values = state.emotionDist
-                    )
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    Text(
-                        text = stringResource(id = R.string.section_title_theme_percent),
-                        color = Color(0xFFE1F0FA),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    ThemeBarChart(
-                        labels = state.themeLabels,
-                        values = state.themeDist
-                    )
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = stringResource(id = R.string.chart_caption),
-                        color = Color(0xFFB0C4D8),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-
-                    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.section_margin_top)))
-
-                    // 키워드
-                    Text(
-                        text = state.keywordsLine,
-                        color = Color(0xFFE1F0FA),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.section_margin_top)))
-
-                    // PRO 버튼 / 리프레시 힌트
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        ProGradientButton(
-                            text = state.proButtonText.ifBlank {
-                                stringResource(id = R.string.pro_cta)
-                            },
-                            enabled = state.proButtonEnabled,
-                            alpha = state.proButtonAlpha,
-                            onClick = onClickPro,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(id = R.string.label_refresh_hint),
-                            color = Color(0x80E1F0FA),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.section_margin_top)))
-
-                    // 분석 타이틀 + 내용
-                    Text(
-                        text = state.analysisTitle.ifBlank {
-                            stringResource(id = R.string.ai_basic_title)
-                        },
-                        color = Color(0xFFE1F0FA),
-                        style = MaterialTheme.typography.titleSmall.copy(
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    )
-
-                    Spacer(modifier = Modifier.height(6.dp))
-
-                    HtmlRichText(
-                        html = state.analysisHtml,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
+
+                Spacer(Modifier.height(24.dp))
+
+                // --- Pro Unlock Button ---
+                if (!state.isProCompleted) {
+                    ProGradientButton(
+                        text = stringResource(R.string.ai_report_pro_cta),
+                        enabled = state.proButtonEnabled,
+                        alpha = state.proButtonAlpha,
+                        onClick = onClickPro
+                    )
+                }
+
+                // --- Dream Count Footer (4개 분석됨 표시) ---
+                Spacer(Modifier.height(30.dp))
+                Text(
+                    text = stringResource(
+                        R.string.this_week_dream_count,
+                        state.thisWeekDreamCount
+                    ),
+                    color = TextGray.copy(alpha = 0.6f),
+                    fontFamily = PretendardMedium,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(Modifier.height(50.dp))
+            }
+
+        } else if (state.showEmptyState && !state.isLoading) {
+            // Empty State
+            Column(
+                modifier = Modifier.align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_no_data), // 아이콘 필요
+                    contentDescription = null,
+                    modifier = Modifier.size(80.dp).alpha(0.5f)
+                )
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    stringResource(R.string.ai_report_empty),
+                    color = TextGray,
+                    fontFamily = PretendardMedium,
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }
 }
 
+// --- Creative Loading View ---
 @Composable
-private fun KpiRow(state: AIReportUiState) {
-    val cardShape = RoundedCornerShape(18.dp)
-    Row(
-        modifier = Modifier.fillMaxWidth()
+fun CreativeLoadingView(message: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(DeepNavy.copy(alpha = 0.9f)) // 배경을 살짝 어둡게 깔아서 몰입감 증대
+            .clickable(enabled = false) {}, // 터치 차단
+        contentAlignment = Alignment.Center
     ) {
-        // Positive
-        Card(
-            modifier = Modifier
-                .weight(1f)
-                .height(dimensionResource(id = R.dimen.kpi_card_height)),
-            shape = cardShape,
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            border = CardDefaults.outlinedCardBorder().copy(
-                color = Color(0x2EFFFFFF),
-                width = 1.dp
-            ),
-            elevation = CardDefaults.cardElevation(0.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(id = R.string.kpi_positive),
-                    color = Color(0xFF89EFCB),
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.Medium
-                    )
-                )
-                Text(
-                    text = state.kpiPositiveText,
-                    color = Color(0xFFE7FFF6),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            // 커스텀 로더 (또는 Lottie 애니메이션 권장)
+            CircularProgressIndicator(
+                color = AccentGold,
+                strokeWidth = 3.dp,
+                modifier = Modifier.size(48.dp)
+            )
+            Spacer(Modifier.height(24.dp))
+
+            // 감성적인 로딩 멘트
+            Text(
+                text = message,
+                color = TextWhite,
+                fontFamily = PretendardBold,
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 32.dp)
+            )
         }
+    }
+}
 
-        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.kpi_gap_h)))
+// --- Stats Row ---
+@Composable
+fun StatsRow(state: AIReportUiState) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        StatChip(stringResource(R.string.ai_report_stat_emotion), state.dominantEmotion, Modifier.weight(1f))
+        StatChip(stringResource(R.string.ai_report_stat_count), "${state.thisWeekDreamCount}", Modifier.weight(1f))
+        StatChip(stringResource(R.string.ai_report_stat_score), "${state.dreamGrade}", Modifier.weight(1f))
+    }
+}
 
-        Card(
-            modifier = Modifier
-                .weight(1f)
-                .height(dimensionResource(id = R.dimen.kpi_card_height)),
-            shape = cardShape,
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            border = CardDefaults.outlinedCardBorder().copy(
-                color = Color(0x2EFFFFFF),
-                width = 1.dp
-            ),
-            elevation = CardDefaults.cardElevation(0.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(id = R.string.kpi_neutral),
-                    color = Color(0xFFBFCBD1),
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.Medium
-                    )
-                )
-                Text(
-                    text = state.kpiNeutralText,
-                    color = Color(0xFFF0F6FB),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.kpi_gap_h)))
-
-        Card(
-            modifier = Modifier
-                .weight(1f)
-                .height(dimensionResource(id = R.dimen.kpi_card_height)),
-            shape = cardShape,
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            border = CardDefaults.outlinedCardBorder().copy(
-                color = Color(0x2EFFFFFF),
-                width = 1.dp
-            ),
-            elevation = CardDefaults.cardElevation(0.dp)
-        ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(id = R.string.kpi_negative),
-                    color = Color(0xFFFB99AD),
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.Medium
-                    )
-                )
-                Text(
-                    text = state.kpiNegativeText,
-                    color = Color(0xFFFFE6EC),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
+@Composable
+fun StatChip(title: String, value: String, modifier: Modifier) {
+    Box(
+        modifier = modifier
+            .height(80.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(CardBg)
+            .border(1.dp, Color(0x0DFFFFFF), RoundedCornerShape(16.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(title, fontFamily = PretendardMedium, fontSize = 11.sp, color = TextGray)
+            Spacer(Modifier.height(4.dp))
+            Text(value, fontFamily = PretendardBold, fontSize = 18.sp, color = TextWhite)
         }
     }
 }
 
 @Composable
-private fun ProGradientButton(
+fun ChartSection(title: String, labels: List<String>, values: List<Float>, isEmo: Boolean, onInfo: (() -> Unit)?) {
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(title, color = TextWhite, fontFamily = PretendardBold, fontSize = 16.sp)
+            Spacer(Modifier.weight(1f))
+            if (onInfo != null) {
+                Icon(
+                    imageVector = Icons.Default.Info, // 아이콘 변경
+                    contentDescription = "Info",
+                    tint = TextGray,
+                    modifier = Modifier.size(18.dp).clickable { onInfo() }
+                )
+            }
+        }
+        Spacer(Modifier.height(16.dp))
+        // Chart logic remains...
+        AndroidView(
+            factory = { ctx -> BarChart(ctx).apply { setupBarChart(this); useRoundedBars(this, 12f) } },
+            update = { chart ->
+                if (labels.isNotEmpty()) {
+                    renderPercentBars(chart, labels, values, if(isEmo) ::richEmotionColor else ::richThemeColor)
+                }
+            },
+            modifier = Modifier.fillMaxWidth().height(200.dp)
+        )
+    }
+}
+
+// Rich Text, Pro Button 등 나머지 컴포넌트는 기존과 동일하지만 폰트 적용
+@SuppressLint("SetTextI18n")
+@Composable
+fun HtmlRichText(html: String) {
+    AndroidView(
+        factory = { context ->
+            TextView(context).apply {
+                setTextColor(0xFFEEEEEE.toInt())
+                textSize = 15f
+                setLineSpacing(0f, 1.5f)
+                // typeface 설정 가능 (Pretendard 폰트 파일을 asset에서 로드해야 함)
+            }
+        },
+        update = { it.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY) }
+    )
+}
+@Composable
+fun ProGradientButton(
     text: String,
     enabled: Boolean,
     alpha: Float,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit
 ) {
+    // 고급스러운 골드-블루 그라데이션
     val gradient = Brush.linearGradient(
-        colors = listOf(
-            Color(0xFFFEDCA6),
-            Color(0xFF8BAAFF)
-        )
+        colors = listOf(Color(0xFFFEDCA6), Color(0xFF8BAAFF))
     )
+
     Button(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier.height(36.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 6.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = Color.Black,
-            disabledContainerColor = Color.Transparent,
-            disabledContentColor = Color.Black.copy(alpha = 0.65f)
-        ),
-        shape = RoundedCornerShape(12.dp)
+        contentPadding = PaddingValues(0.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .height(54.dp) // 터치하기 좋게 높이 약간 증가
+            .fillMaxWidth()
+            .alpha(alpha)
+            .shadow(8.dp, RoundedCornerShape(12.dp), ambientColor = AccentGold, spotColor = AccentGold) // 살짝 빛나는 효과 추가
     ) {
         Box(
-            modifier = Modifier
-                .matchParentSize()
-                .background(gradient)
-                .alpha(alpha)
-        )
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelMedium.copy(
-                fontWeight = FontWeight.Medium
-            )
-        )
-    }
-}
-
-/** 기존 TextView + HtmlCompat 스타일을 유지하기 위해 AndroidView 사용 */
-@Composable
-private fun HtmlRichText(
-    html: String,
-    modifier: Modifier = Modifier
-) {
-    val context = LocalContext.current
-    AndroidView(
-        factory = {
-            TextView(it).apply {
-                includeFontPadding = false
-                setLineSpacing(1f, 1.10f)
-                if (Build.VERSION.SDK_INT >= 26) {
-                    justificationMode = Layout.JUSTIFICATION_MODE_INTER_WORD
-                }
-                if (Build.VERSION.SDK_INT >= 23) {
-                    breakStrategy = Layout.BREAK_STRATEGY_SIMPLE
-                    hyphenationFrequency = Layout.HYPHENATION_FREQUENCY_NORMAL
-                }
-                setTextColor(0xFFE1F0FA.toInt())
-            }
-        },
-        update = { tv ->
-            val spanned = HtmlCompat.fromHtml(
-                html,
-                HtmlCompat.FROM_HTML_MODE_LEGACY
-            )
-            tv.text = spanned
-        },
-        modifier = modifier
-    )
-}
-
-@Composable
-private fun EmotionBarChart(
-    labels: List<String>,
-    values: List<Float>,
-    modifier: Modifier = Modifier
-        .fillMaxWidth()
-        .height(190.dp)
-) {
-    AndroidView(
-        factory = { ctx ->
-            BarChart(ctx).apply {
-                setupBarChart(this)
-                useRoundedBars(this, 12f)
-            }
-        },
-        update = { chart ->
-            if (labels.isNotEmpty() && values.isNotEmpty()) {
-                renderPercentBars(
-                    chart,
-                    labels,
-                    values,
-                    ::richEmotionColor
-                )
-            }
-        },
-        modifier = modifier
-    )
-}
-
-@Composable
-private fun ThemeBarChart(
-    labels: List<String>,
-    values: List<Float>,
-    modifier: Modifier = Modifier
-        .fillMaxWidth()
-        .height(190.dp)
-) {
-    AndroidView(
-        factory = { ctx ->
-            BarChart(ctx).apply {
-                setupBarChart(this)
-                useRoundedBars(this, 12f)
-            }
-        },
-        update = { chart ->
-            if (labels.isNotEmpty() && values.isNotEmpty()) {
-                renderPercentBars(
-                    chart,
-                    labels,
-                    values,
-                    ::richThemeColor
-                )
-            }
-        },
-        modifier = modifier
-    )
-}
-
-/* ----- WeeklyHistory Empty Dialog (Compose 버전) ----- */
-
-@Composable
-private fun WeeklyHistoryEmptyDialog(
-    onDismiss: () -> Unit,
-    onCta: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(text = stringResource(id = R.string.whd_hero_title))
-        },
-        text = {
-            Text(text = stringResource(id = R.string.whd_hero_sub))
-        },
-        confirmButton = {
-            TextButton(onClick = {
-                onCta()
-            }) {
-                Text(text = stringResource(id = R.string.whd_cta_go_record))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(id = R.string.cancel))
-            }
-        }
-    )
-}
-
-/* ----- WeeklyHistory BottomSheet (Compose 버전) ----- */
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun WeeklyHistorySheet(
-    weeks: List<String>,
-    currentWeekKey: String?,
-    totalLabel: String,
-    onDismiss: () -> Unit,
-    onPick: (String) -> Unit
-) {
-    ModalBottomSheet(
-        onDismissRequest = onDismiss
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
+            // 그라데이션 배경
+            Box(modifier = Modifier.matchParentSize().background(gradient))
+
+            // 텍스트 (Pretendard Bold 적용)
             Text(
-                text = stringResource(id = R.string.whs_title),
-                style = MaterialTheme.typography.titleMedium
+                text = text,
+                color = Color(0xFF121626), // DeepNavy (가독성)
+                fontFamily = PretendardBold,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = totalLabel,
-                style = MaterialTheme.typography.bodySmall,
-                color = Color(0xFF8A93A6)
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            weeks.forEach { weekKey ->
-                val isCurrent = (weekKey == currentWeekKey)
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                        .let {
-                            if (isCurrent) it.background(
-                                Color(0x4D352D49),
-                                RoundedCornerShape(12.dp)
-                            ) else it
-                        }
-                        .padding(horizontal = 10.dp, vertical = 8.dp)
-                        .clickable {
-                            onPick(weekKey)
-                        },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = weekKey,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFFE1F0FA)
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    if (isCurrent) {
-                        Text(
-                            text = stringResource(id = R.string.chip_current),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color(0xFF1F2234),
-                            modifier = Modifier
-                                .background(
-                                    Color(0xFFE3F0FF),
-                                    RoundedCornerShape(16.dp)
-                                )
-                                .padding(horizontal = 8.dp, vertical = 3.dp)
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
         }
     }
-}
-
-// ---------- Preview ----------
-
-@Preview(showBackground = true)
-@Composable
-private fun AIReportScreenPreviewEmpty() {
-    AIReportScreen(
-        state = AIReportUiState(
-            showReportCard = false,
-            showEmptyState = true
-        ),
-        onClickHistory = {},
-        onClickChartInfo = {},
-        onClickPro = {}
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun AIReportScreenPreviewReport() {
-    AIReportScreen(
-        state = AIReportUiState(
-            showReportCard = true,
-            showEmptyState = false,
-            weekLabel = "이번 주 감정 리포트\n총 5개의 기록에서 분석",
-            analysisTitle = "기본 AI 해석",
-            keywordsLine = "기분: 잔잔함 · 키워드: 휴식",
-            emotionLabels = listOf("긍정", "중립", "부정"),
-            emotionDist = listOf(40f, 30f, 30f),
-            themeLabels = listOf("관계", "일/성취", "변화"),
-            themeDist = listOf(34f, 33f, 33f),
-            kpiPositiveText = "60.0%",
-            kpiNeutralText = "20.0%",
-            kpiNegativeText = "20.0%",
-            proButtonText = "PRO 심층 분석 받기",
-            proButtonEnabled = true,
-        ),
-        onClickHistory = {},
-        onClickChartInfo = {},
-        onClickPro = {}
-    )
 }

@@ -24,6 +24,24 @@
     <string name="wz_scorpio">전갈자리</string>
     <string name="wz_sagittarius">사수자리</string>
 
+    <string name="api_lang_code">Korean</string>
+    <string name="analysis_template_basic">이번 주는 주로 \'%1$s\'의 감정이 느껴졌습니다.\n전반적으로 \'%2$s\' 테마와 관련된 꿈들이 많았습니다.\n주요 키워드는 \'%3$s\' 입니다.\n더 깊은 무의식의 메시지가 궁금하다면 심화 분석을 이용해보세요.</string>
+
+
+    <string name="fortune_intro_title">당신의 운명을 발견하세요</string>
+    <string name="lucky_dir">행운의 방향</string>
+    <string name="fortune_intro_user">안녕하세요, %s님</string>
+
+    <string name="fortune_title_format">%s님의 오늘의 운세</string>
+    <string name="fortune_deep_desc">오늘의 흐름을 더 깊게 들여다보세요.</string>
+    <string name="fortune_deep_lock_desc">프리미엄 기능이 잠겨 있습니다.</string>
+    <string name="fortune_deep_btn">심화 분석하기</string>
+    <string name="lucky_color">행운의 색</string>
+    <string name="lucky_number">행운 숫자</string>
+    <string name="lucky_time">행운 시간</string>
+    <string name="loading_pro_analyzing">심화 분석 중...</string>
+
+
 
 
     <string name="login_slogan">꿈에서 해답을 찾다</string>
@@ -38,7 +56,7 @@
     <string name="password_hint">비밀번호</string>
     <string name="password_confirm_hint">비밀번호 확인</string>
     <string name="sign_up_button">가입하기</string>
-    <string name="cancel">취소</string>
+
     <string name="password_reset_title">비밀번호 재설정</string>
     <string name="send_reset_email">재설정 메일 보내기</string>
     <string name="text_divider"> / </string>
@@ -67,12 +85,13 @@
     <string name="ad_prompt_status">잠시만요! 광고를 보고나면 심화 해석이 열려요.</string>
     <string name="ad_prompt_cancel">취소</string>
     <string name="ad_prompt_watch_ad">광고 보기</string>
+    <string name="sub_buy_cta">광고 없이 해몽 보기</string>
+    <string name="dream_ad_second_title">곧 당신의 꿈이 해석될 거예요 ✨</string>
 
-    
     <string name="day_dream">이 날의 꿈들</string>
 
     
-    <string name="fortune_deep_title">심화 분석</string>
+
     <string name="fortune_deep_chip_time">오후 3시~4시</string>
     <string name="fortune_deep_chip_number">숫자 56</string>
     <string name="fortune_deep_chip_color">색상 블루</string>
@@ -104,7 +123,7 @@
     <string name="ai_report_empty">분석할 데이터가 없습니다.</string>
     <string name="ai_report_week_label_default">이번 주 분석 리포트\n0건 · -</string>
     <string name="ai_report_week_label_format">이번 주 분석 리포트\n%1$d건 · %2$s</string>
-    <string name="ai_report_history">분석 기록 ▼</string>
+
     <string name="kpi_positive">긍정</string>
     <string name="kpi_neutral">중립</string>
     <string name="kpi_negative">부정</string>
@@ -217,19 +236,44 @@
     <string name="ai_report_summary">이번 주 꿈 분석 요약</string>
     <string name="ai_emotion_keywords_ai">감정: %1$s\n키워드: %2$s\nAI: %3$s</string>
 
+    <string name="ad_prompt_watch_button">영상 시청하기</string>
+    <string name="ad_prompt_upgrade_button">프리미엄으로 업그레이드</string>
+
     <string name="ai_msg_loading">✨ 오늘의 해몽 메시지를 불러오는 중이에요...</string>
     <string name="ai_emotion_keywords_simple">감정: %1$s\n키워드: %2$s</string>
 
     <string name="label_emotion">감정</string>
     <string name="label_keywords">키워드</string>
+    <string name="dream_interpreting">꿈을 해석하는 중...</string>
+    <string name="dream_input_too_short">꿈 내용을 조금 더 자세히 적어주세요. (최소 10자)</string>
+    <string name="this_week_dream_count">이번 주 %d개의 꿈 조각을 분석했습니다.</string>
+
+    <string name="dream_mirror">꿈은 무의식의 거울</string>
+
+    <string-array name="loading_messages">
+        <item>무의식의 바다를 유영하는 중...</item>
+        <item>꿈의 조각들을 하나로 모으는 중...</item>
+        <item>내면의 목소리에 귀 기울이는 중...</item>
+        <item>밤하늘의 별자리를 연결하는 중...</item>
+        <item>심층 심리의 문을 여는 중...</item>
+    </string-array>
 
 
 
+    <string name="profile_age">나이</string>
+    <string name="profile_zodiac">별자리</string>
+    <string name="profile_mbti">MBTI</string>
+    <string name="edit_profile_title">프로필 수정</string>
+    <string name="label_nickname">닉네임</string>
+
+    <string name="btn_confirm">확인</string>
+
+    <string name="logout_dialog_title">로그아웃</string>
+    <string name="logout_dialog_message">정말 로그아웃 하시겠습니까?</string>
     <string name="btn_cancel">취소</string>
-        <string name="btn_save">저장</string>
+    <string name ="btn_save">저장</string>
+    <string name="btn_logout">로그아웃</string>
 
-
-        <string name="btn_logout">로그아웃</string>
         <string name="settings_title">앱 설정</string>
         <string name="settings_section">설정</string>
         <string name="gpt_usage_today">오늘 해몽</string>
@@ -452,7 +496,8 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <string name="fb_send_fail_title">안내</string>
         <string name="fb_send_fail_fmt">전송에 실패했습니다. 잠시 후 다시 시도해주세요.\n\n%1$s</string>
 
-
+        <string name="fortune_health">건강운</string>
+        <string name="fortune_social">대인운</string>
         <string name="fortune_overall">총운</string>
         <string name="fortune_love">연애운</string>
         <string name="fortune_study">학업운</string>
@@ -490,7 +535,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="report_switched_due_to_lack">이번 주 기록이 부족해 자동 전환됨</string>
     <string name="report_meta_format">%1$d건 · %2$s</string>
 
-    <string name="chart_info_title">차트 안내</string>
+
     <string name="chart_info_message">• 이번 주 꿈이 %1$d개 이상이면 리포트가 바로 생성됩니다.\n• 생성 후 광고 1회 시청으로 ‘심화 분석(PRO)’을 사용할 수 있어요.\n• 주중 꿈이 총 %2$d개 이상이 되면 리포트가 자동 새로고침되고(최대 %3$d개 반영),\n  광고 1회 시청으로 심화 분석을 다시 실행할 수 있어요.\n• 막대는 감정 8가지·테마 5가지의 주간 비중(%%)을 나타냅니다.\n• 심화 분석(PRO) 실행 시 모델이 산출한 KPI(긍정·중립·부정)를 반영해 감정 그래프가 더 정확하고 안정적으로 표시돼요.\n• 주간 기준: 월~일 (지난 주 리포트는 ‘분석 기록’에서 확인)</string>
 
     <string name="pro_cta">심화 분석</string>
@@ -502,7 +547,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="ai_pro_title">AI 심화분석</string>
     <string name="refresh_hint_count_limited">이번 주 꿈 %1$d개 · %2$d~%3$d개까지만 분석합니다.</string>
 
-    <string name="login_required">로그인이 필요해요.</string>
+
     <string name="api_key_missing">API 키가 설정되지 않았어요. 관리자에게 문의하세요.</string>
     <string name="pro_requires_min">심화 분석은 이번 주 꿈 %1$d개 이상일 때 제공됩니다.</string>
     <string name="pro_too_many_entries">이번 주 꿈이 많아요. 심화 분석은 %1$d~%2$d개까지만 지원합니다.</string>
@@ -597,7 +642,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         설명과 서사 없이, 전문 꿈해몽가의 톤으로 오늘(%1$s)의 조언을 한 문장 존댓말로만 작성해주세요.</string>
 
 
-
+    <string name="realistic_advice_multi">현실적인 조언 </string>
 
     <string name="dream_prompt_template">
     너는 예지몽을 알려주는 꿈해몽 전문분석가야.
@@ -611,11 +656,35 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     [꿈 내용] "<ns0:g id="dream">%1$s</ns0:g>"
 </string>
 
+    <string name="explain_dream">해석</string>
+
     <string name="dream_section_message">💭 꿈이 전하는 메시지</string>
     <string name="dream_section_symbols">🧠 핵심 상징 해석</string>
     <string name="dream_section_premonition">📌 예지 포인트</string>
     <string name="dream_section_tips_today">☀️ 오늘의 활용 팁</string>
     <string name="dream_section_actions_three">🎯 오늘의 행동 3가지</string>
+
+    <string name="dream_interpreter"> 오늘의 꿈은?</string>
+
+    <string name="dream_image_prefix">DreamInDream_%1$d</string>
+
+    <string name="dream_image_description">꿈 해석 결과</string>
+
+    <string name="image_create_failed">이미지 생성에 실패했습니다.</string>
+
+    <string name="image_saved_gallery">갤러리에 저장되었습니다.</string>
+
+    <string name="chooser_share_instagram_title">인스타그램으로 공유</string>
+
+    <string name="app_not_found">%1$s 앱을 찾을 수 없습니다.</string>
+
+    <string name="chooser_share_dream_title">꿈 공유하기</string>
+
+    <string name="share_instagram_title">인스타그램으로 공유</string>
+    <string name="share_dream_title">꿈 공유하기</string>
+    <string name="error_sharing">공유 오류: %1$s</string>
+
+    <string name="error_start_listening">음성 인식을 시작할 수 없습니다: %1$s</string>
 
 
         <string-array name="emotion_dict_positive">
@@ -732,6 +801,39 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
         <string name="ea_part_default_flow">두 꿈이 ‘정리 후 유입’의 흐름을 잇는 장면</string>
 
 
+
+    <!-- 구독/로그인 안내 공통 -->
+    <string name="sub_dialog_title">구독이 필요합니다</string>
+    <string name="sub_dialog_go_premium">구독하러 가기</string>
+
+    <string name="sub_dialog_message_ai">AI 리포트 심화 분석은 구독자만 이용할 수 있어요. 지금 구독하시겠어요?</string>
+    <string name="sub_dialog_message_fortune">운세 심화 분석은 구독자만 이용할 수 있어요. 지금 구독하시겠어요?</string>
+
+    <string name="sub_dialog_login_title">로그인이 필요해요</string>
+    <string name="sub_dialog_login_message">구글 계정으로 로그인하면 구독과 심화 분석 기능을 사용할 수 있어요.</string>
+    <string name="sub_dialog_go_login">구글 계정 연동하기</string>
+
+    <string name="ai_report_need_login">구글 로그인 필요</string>
+
+
+    <string name="dream_input_clean_language">바르고 고운 말을 사용해주세요.</string>
+
+    <!-- 구독 상태 -->
+    <string name="sub_status_active">현재 구독 중이에요</string>
+
+    <!-- 혜택 제목 -->
+    <string name="sub_benefits_title">구독 혜택</string>
+
+    <!-- 상품 없을 때 -->
+    <string name="sub_unavailable">구독 상품 정보를 불러올 수 없어요.</string>
+
+    <!-- 구매/구독 복원 -->
+    <string name="sub_restore">구매 복원</string>
+
+    //subscription
+
+
+
         <string name="ea_link_clear_then_fortune">불필요한 것을 비운 뒤(정화) 복이 들어오니, ‘정리 후 유입’의 전형적인 서사입니다.</string>
         <string name="ea_link_fortune_with_home">복(돼지)이 집/가정과 결합해 실생활 재정·가족 이슈에 긍정 흐름을 암시합니다.</string>
         <string name="ea_link_hands_on">스스로 손을 써 해결하는 장면은 주도권 회복을 뜻합니다.</string>
@@ -777,8 +879,8 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="fb_date_format">yyyy-MM-dd HH:mm:ss</string>
 
     <string name="label_refresh_hint">새 꿈이 추가되면 새로고침해주세요</string>
-    <string name="whs_title">주간 리포트 히스토리</string>
 
+    <string name="whd_sheet_title">주간 기록 선택</string>
     <string name="week_prompt_lang_line"><ns0:g id="lang">%1$s</ns0:g>로만 답변해 주세요.</string>
 
     <string name="pro_meta_emotion_label">감정</string>
@@ -824,7 +926,6 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
   • “예언이 아닌 경향 기반 생활 가이드” 문장을 마지막에 덧붙일 것
 - 체크리스트 (불릿 3개. 일상에서 바로 확인/점검할 수 있는 항목(각 1문장, 동사로 시작)
 </string>
-
 
 
 
@@ -905,6 +1006,8 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="label_pm">오후</string>
     <string name="label_hour_suffix">시</string>
 
+
+
     <string name ="community">커뮤니티</string>
     <string name="err_auth">인증 오류가 발생했어요. 설정의 API 키를 확인해주세요. (%1$s)</string>
     <string name="err_forbidden">접근이 거부되었어요. 권한/결제 상태를 확인해주세요. (%1$s)</string>
@@ -946,9 +1049,79 @@ eep prompt 템플릿 --&gt;
 반드시 deep_fortune_analysis를 호출하세요.
 </string>
 
+
+    <string name="ai_report_history">분석 기록</string>
+
+    <string name="local_analysis_template">이번 주는 \'%1$s\'의 감정이 주로 느껴졌네요. \'%2$s\' 키워드가 꿈에 자주 등장했습니다. 전반적으로 꿈의 흐름이 %3$s 테마와 관련이 깊어 보입니다.</string>
+    <string name="analysis_pending">상세 분석을 생성하고 있습니다...</string>
+    <string name="pro_analysis_error">심화 분석 생성에 실패했습니다. 잠시 후 다시 시도해주세요.</string>
+        <string name="loading_analyzing">운세 데이터를 분석하고 있어요...</string>
+          <string name="network_error">네트워크 연결을 확인해주세요.</string>
+        <string name="server_error">서버 오류가 발생했습니다. (%d)</string>
+        <string name="parse_error">데이터 처리 중 오류가 발생했습니다.</string>
+        <string name="no_data_empty">데이터가 없습니다.</string>
+        <string name="confirm">확인</string>
+        <string name="cancel">취소</string>
+         <string name="fortune_deep_title"> AI 심화 리포트</string>
+        <string name="login_desc">심화 분석 결과는 계정에 저장됩니다.\n구글 계정으로 연동하시겠습니까?</string>
+        <string name="login_btn">로그인 / 연동</string>
+        <string name="fortune_profile_title">프로필 입력 필요</string>
+        <string name="fortune_profile_desc">정확한 분석을 위해 이름, 생년월일, 태어난 시간이 필요합니다.</string>
+        <string name="fortune_profile_go">설정하러 가기</string>
+       <string name="fortune_checklist_empty">체크리스트가 없습니다.</string>
+       <string name="fortune_deep_preparing">분석을 준비하고 있습니다...</string>
+         <string name="fortune_deep_unlock">심화 내용 잠금 해제</string>
+        <string name="section_advice">💡 팁</string>
+         <string name="fortune_checklist_title"> 오늘의 체크</string>
+        <string name="ai_report_title">이번주 리포트</string>
+    <string name="ai_report_pro_analyzing">AI가 심층 분석 중입니다...</string>
+        <string name="ai_report_stat_emotion">핵심 감정</string>
+        <string name="ai_report_stat_count">이번주 꿈</string>
+        <string name="ai_report_stat_score">꿈 점수</string>
+        <string name="ai_report_keywords_title">✨ 주요 키워드</string>
+        <string name="ai_report_deep_title">주간 심화 분석</string>
+        <string name="ai_report_pro_cta">심화 분석 하기</string>
+        <string name="ai_report_pro_completed">분석 완료</string>
+        <string name="chart_emotion_title">감정 분포</string>
+        <string name="chart_theme_title">테마 비중</string>
+    <string name="fortune_start_btn">오늘의 운세 확인하기</string>
+        <string name="chart_info_msg">기본 분석은 무료로 제공되며, 심화 분석은 구독이 필요합니다. 꿈은 2개 이상(최대 4개까지) 기록해야 심화 분석이 가능하며, 분석은 매주 월요일 초기화되지만 지난 기록은 계속 확인할 수 있습니다.</string>
+    <string name="fortune_already_seen">오늘의 운세를 이미 확인하셨습니다.</string>
+
+    <string name="chart_info_title">차트안내</string>
+    <string name="msg_analysis_failed">분석에 실패했습니다.</string>
+    <string name="msg_no_history">분석 기록이 없습니다.</string>
+    <string name="msg_pro_analysis_complete">심화 분석이 완료되었습니다.</string>
+    <string name="pro_status_completed">분석 완료</string>
+
+    <string name="data_warning_title">데이터 연동 경고</string>
+    <string name="dream_logs_count"> %d개</string>
+    <string name="interpretations_today"> %d개</string>
+
+
+    <string name="guest_warning_message">구글 계정으로 로그인하면 현재 체험판(게스트)에서 기록한 데이터는 삭제될 수 있습니다.\n\n구글 계정의 데이터를 불러오시겠습니까?</string>
+
+    <string-array name="emotion_labels">
+        <item>긍정</item>
+        <item>평온</item>
+        <item>활력</item>
+        <item>몰입</item>
+        <item>중립</item>
+        <item>혼란</item>
+        <item>불안</item>
+        <item>우울/피로</item>
+    </string-array>
+
+    <string-array name="theme_labels">
+        <item>관계</item>
+        <item>성취</item>
+        <item>변화</item>
+        <item>불안요인</item>
+    </string-array>
+
     
-    <string name="fortune_system_daily">당신은 프리미엄 라이프 코치이자 운세 분석가입니다. 항상 function 호출만으로 JSON을 반환하세요.</string>
-    <string name="fortune_system_deep">당신은 프리미엄 라이프 코치이자 운세 분석가입니다. 도구 호출로 JSON만 반환하세요.</string>
+             <string name="fortune_system_daily">당신은 프리미엄 라이프 코치이자 운세 분석가입니다. 항상 function 호출만으로 JSON을 반환하세요.</string>
+                <string name="fortune_system_deep">당신은 프리미엄 라이프 코치이자 운세 분석가입니다. 도구 호출로 JSON만 반환하세요.</string>
 
     
     <string name="replace_meeting">상담/정리</string>
@@ -1035,7 +1208,6 @@ eep prompt 템플릿 --&gt;
     <string name="toast_copied">복사됨</string>
     <string name="share_chooser_title">공유</string>
     <string name="dialog_profile_title">설정이 필요해요</string>
-    <string name="dialog_profile_message">닉네임·생년월일·성별만 저장하면 맞춤 운세를 볼 수 있어요.\n(출생시간·MBTI는 선택)</string>
 
     <string name="ad_failed_open_deep_now">광고 실패(%1$s) → 심화분석 바로 열기</string>
     <string name="deep_generating_label">생성 중…</string>

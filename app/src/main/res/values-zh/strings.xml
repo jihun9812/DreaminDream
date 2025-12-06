@@ -4,12 +4,18 @@
     <string name="bs_subtitle_key_range_format">%1$s · %2$s</string>
 
         <string name="fortune_today_title">आज का भाग्य</string>
-
+    <string name="analysis_template_basic">本周的主要情绪是 \'%1$s\'。\n您的梦境大多与 \'%2$s\' 相关。\n潜意识中的关键符号是 \'%3$s\'。</string>
         <string name="label_checklist_today">आज की चेकलिस्ट</string>
         <string name="label_positive">सकारात्मक</string>
         <string name="label_neutral">तटस्थ</string>
         <string name="label_negative">नकारात्मक</string>
         <string name="label_score">स्कोर</string>
+    <string name="ai_report_pro_analyzing">AI 正在进行深度分析...</string>
+    <string name="local_analysis_template">本周主要感受到的情绪是：\'%1$s\'。关键词 \'%2$s\' 在您的梦中频繁出现。总体来看，您的梦境走势与 %3$s 主题密切相关。</string>
+
+    <string name="analysis_pending">正在生成详细分析...</string>
+
+    <string name="pro_analysis_error">深度分析生成失败，请稍后再试。</string>
 
     <string name="fortune_daily_prompt_template">
 用户信息：
@@ -60,10 +66,82 @@ nickname="%1$s"，mbti="%2$s"，birthdate="%3$s"，gender="%4$s"，birth_time="%
     <string name="send">发送</string>
 
 
+    <string name="whd_sheet_title">选择每周报告</string>
+
+
+
+
+
+
+    <!-- 구독/로그인 안내 공통 -->
+    <string name="sub_dialog_title">需要订阅</string>
+    <string name="sub_dialog_go_premium">立即订阅</string>
+    <string name="sub_dialog_message_ai">AI报告深度分析仅限订阅用户使用。现在订阅吗？</string>
+    <string name="sub_dialog_message_fortune">运势深度分析仅限订阅用户使用。现在订阅吗？</string>
+    <string name="sub_dialog_login_title">需要登录</string>
+    <string name="sub_dialog_login_message">使用Google账号登录后，即可使用订阅和深度分析功能。</string>
+    <string name="sub_dialog_go_login">关联Google账号</string>
+    <string name="ai_report_need_login">需要 Google 登录</string>
+
+
+    <string name="profile_age">年龄</string>
+    <string name="profile_zodiac">星座</string>
+    <string name="profile_mbti">MBTI 性格类型</string>
+    <string name="edit_profile_title">编辑资料</string>
+    <string name="label_nickname">昵称</string>
+    <string name="btn_confirm">确认</string>
+
+    <string name="logout_dialog_title">登出</string>
+    <string name="logout_dialog_message">确定要登出吗？</string>
+
+
+
+
+
+
+
+
+    <string name="share_instagram_title">分享到 Instagram</string>
+    <string name="share_dream_title">分享梦境</string>
+    <string name="error_sharing">分享时出错：%1$s</string>
+
+    <string name="error_start_listening">无法启动语音识别：%1$s</string>
+
+
+        <string name="dream_image_prefix">DreamInDream_%1$d</string>
+
+        <string name="dream_image_description">梦境解析结果</string>
+
+        <string name="image_create_failed">图像创建失败。</string>
+
+        <string name="image_saved_gallery">已保存到相册。</string>
+
+        <string name="chooser_share_instagram_title">分享到 Instagram</string>
+
+        <string name="app_not_found">找不到 %1$s 应用。</string>
+
+        <string name="chooser_share_dream_title">分享梦境</string>
+
+
+
+
+
+
+
+
+
+
+
+
+    <string name="realistic_advice_multi">实际建议</string>
+
+
+
     <string name="logout_confirm_title">登出</string>
     <string name="logout_confirm_msg">您确定要登出吗？</string>
     <string name="logout_confirm_yes">是</string>
     <string name="logout_confirm_no">否</string>
+    <string name="dream_input_clean_language">请使用礼貌且恰当的语言。</string>
 
     <!-- Western Zodiac -->
     <string name="wz_unknown">未知</string>
@@ -102,7 +180,96 @@ nickname="%1$s"，mbti="%2$s"，birthdate="%3$s"，gender="%4$s"，birth_time="%
     <string name="fortune_deep_plan_morning">上午 09~12时</string>
     <string name="fortune_deep_plan_afternoon">下午 13~17时</string>
     <string name="fortune_deep_plan_evening">晚上 19~22时</string>
-    <string name ="community">커뮤니티</string>
+
+    <string name="sub_buy_cta">无广告查看解梦</string>
+        //커뮤니티<string name="dream_ad_second_title">您的梦境即将被解读 ✨</string>
+    <string name="community">社区</string>
+
+    <string name="label_refresh_hint">添加新梦境后请刷新</string>
+
+        <string name="loading_analyzing">正在分析您的运势数据...</string>
+        <string name="loading_pro_analyzing">正在生成深度分析...</string>
+        <string name="network_error">请检查您的网络连接。</string>
+        <string name="server_error">发生服务器错误。（%d）</string>
+        <string name="parse_error">处理数据时发生错误。</string>
+        <string name="no_data_empty">暂无数据。</string>
+        <string name="confirm">确认</string>
+
+        <string name="login_desc">深度分析结果会保存到您的账号。\n是否通过谷歌账号登录？</string>
+        <string name="login_btn">登录 / 绑定</string>
+
+        <string name="fortune_start_btn">查看今日运势</string>
+        <string name="fortune_already_seen">您已查看今日运势。</string>
+        <string name="fortune_profile_title">需要填写个人资料</string>
+        <string name="fortune_profile_desc">为了更准确的分析，需要姓名、生日和出生时间。</string>
+        <string name="fortune_profile_go">前往设置</string>
+    <string name="dream_mirror">梦是无意识的镜子</string>
+    <string name="dream_interpreting">正在解析您的梦境...</string>
+    <string name="dream_input_too_short">请更详细地描述您的梦境。（至少 10 个字符）</string>
+     <string name="ad_prompt_watch_button">观看视频</string>
+    <string name="ad_prompt_upgrade_button">升级为高级版</string>
+
+    <string-array name="loading_messages">
+        <item>在无意识的海洋中游动中...</item>
+        <item>正在将梦境的碎片汇聚在一起...</item>
+        <item>倾听内心深处的声音...</item>
+        <item>连接夜空中的星座中...</item>
+        <item>开启深层心理之门...</item>
+    </string-array>
+
+    <string name="guest_warning_message">若使用 Google 帐号登录，当前试玩（访客）模式下记录的数据可能会被删除。\n\n要载入您的 Google 帐号数据吗？</string>
+
+        <string name="api_lang_code">Chinese</string>
+
+    <string name="fortune_health">健康运</string>
+    <string name="fortune_social">人际运</string>
+
+    <string name="dream_logs_count">%d 則</string>
+    <string name="interpretations_today">%d 則</string>
+
+    <string name="explain_dream">解析</string>
+
+    <!-- 꿈 쪽 이름 -->
+    <string name="dream_interpreter">你今天的梦是什么？</string>
+
+    <string name="this_week_dream_count">您本周分析了 %d 个梦境碎片。</string>
+
+    <string name="data_warning_title">数据整合警告</string>
+
+    <string name="fortune_checklist_title"> 今日清单</string>
+        <string name="fortune_checklist_empty">暂无清单内容。</string>
+
+        <string name="fortune_deep_desc">为您准备的完美指南已就绪。</string>
+        <string name="fortune_deep_btn">查看深度分析</string>
+        <string name="fortune_deep_preparing">正在准备分析...</string>
+        <string name="fortune_deep_lock_desc">今天下午 3 点贵人将出现。\n往北走会带来好运...</string>
+        <string name="fortune_deep_unlock">解锁深度内容</string>
+
+        <string name="section_advice">💡 建议</string>
+        <string name="lucky_color">颜色</string>
+        <string name="lucky_number">数字</string>
+        <string name="lucky_time">时间</string>
+
+        <string name="ai_report_title">本周报告</string>
+
+        <string name="ai_report_stat_emotion">核心情绪</string>
+        <string name="ai_report_stat_count">本周梦境数</string>
+        <string name="ai_report_stat_score">梦境评分</string>
+        <string name="ai_report_keywords_title">✨ 关键词</string>
+        <string name="ai_report_deep_title">每周深度分析</string>
+        <string name="ai_report_pro_cta">开始深度分析（PRO）</string>
+        <string name="ai_report_pro_completed">分析完成</string>
+        <string name="chart_emotion_title">情绪分布</string>
+        <string name="chart_theme_title">主题比例</string>
+
+        <string name="chart_info_msg">图表基于您的梦境数据分析。</string>
+
+
+
+    <string name="sub_status_active">当前已订阅</string>
+    <string name="sub_benefits_title">订阅权益</string>
+    <string name="sub_unavailable">无法加载订阅信息。</string>
+    <string name="sub_restore">恢复购买</string>
 
     <string name="fortune_section_title_total">总运</string>
     <string name="fortune_section_score_sample">80分</string>
@@ -223,8 +390,7 @@ nickname="%1$s"，mbti="%2$s"，birthdate="%3$s"，gender="%4$s"，birth_time="%
     <string name="ai_msg_loading">✨ 正在加载今日解梦消息...</string>
     <string name="ai_emotion_keywords_simple">情绪: %1$s\n关键词: %2$s</string>
 
-    <string name="btn_cancel">取消</string>
-    <string name="btn_save">保存</string>
+
 
     <string name="btn_logout">登出</string>
     <string name="settings_title">应用设置</string>
@@ -458,6 +624,11 @@ HTTPS、最小化权限、访问记录管理等
     <string name="report_switched_due_to_lack">本周记录不足，已自动切换</string>
     <string name="report_meta_format">%1$d条 · %2$s</string>
 
+    <string name="msg_analysis_failed">分析失败。</string>
+    <string name="msg_no_history">没有分析记录。</string>
+    <string name="msg_pro_analysis_complete">深度分析已完成。</string>
+    <string name="pro_status_completed">分析完成</string>
+
     <string name="chart_info_title">图表说明</string>
     <string name="chart_info_message">
     • 本周梦境达到 %1$d 条及以上时，将立即生成报告。
@@ -478,8 +649,16 @@ HTTPS、最小化权限、访问记录管理等
     <string name="ai_basic_title">AI 分析</string>
     <string name="ai_pro_title">AI 深度分析</string>
     <string name="refresh_hint_count_limited">本周梦境 %1$d 条 · 仅分析 %2$d~%3$d 条。</string>
+    <string name="fortune_title_format">%s 的今日运势</string>
 
-    <string name="login_required">需要登录。</string>
+
+
+
+    <string name="fortune_intro_title">探索你的命運</string>
+    <string name="lucky_dir">幸運方向</string>
+    <string name="fortune_intro_user">你好，%s</string>
+
+
     <string name="api_key_missing">未设置 API 密钥。请联系管理员。</string>
     <string name="pro_requires_min">深度分析需本周梦境不少于 %1$d 条。</string>
     <string name="pro_too_many_entries">本周梦境过多。深度分析仅支持 %1$d~%2$d 条。</string>
@@ -929,8 +1108,7 @@ HTTPS、最小化权限、访问记录管理等
     <string name="toast_copied">已复制</string>
     <string name="share_chooser_title">分享</string>
     <string name="dialog_profile_title">需要设置</string>
-    <string name="dialog_profile_message">只需保存昵称·生日·性别即可查看定制运势。\n（出生时间·MBTI 为可选）</string>
-    <string name="dialog_ok">确认</string>
+   <string name="dialog_ok">确认</string>
     <string name="ad_failed_open_deep_now">广告失败(%1$s) → 直接打开深度分析</string>
     <string name="deep_generating_label">生成中…</string>
     <string name="deep_button_label">查看深度分析</string>
@@ -1030,13 +1208,15 @@ HTTPS、最小化权限、访问记录管理等
 
     <string name="privacy_section4">4. 处理委托/跨境传输</string>
     <string name="privacy_section4_body">可能仅限于 OpenAI·AdMob·Firebase 等云/分析·广告服务进行委托或跨境传输。</string>
-
+    <string name="btn_save">保存</string>
     <string name="privacy_section5">5. 用户权利</string>
     <string name="privacy_section5_body">可要求查阅/更正/删除/停止处理并撤回同意。\n咨询：dreamindream@dreamindream.app</string>
     <string name="privacy_section6">6. 安全性保障措施</string>
     <string-array name="privacy_section6_items">
         <item>HTTPS 通信、最小化访问权限、访问记录管理等</item>
     </string-array>
+
+    <string name="btn_cancel">取消</string>
 
     <string name="weekly_history_title">分析记录</string>
     <string name="weekly_history_login_needed">需要登录</string>

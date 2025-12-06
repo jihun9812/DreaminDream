@@ -1,825 +1,690 @@
 package com.dreamindream.app.ui.fortune
 
-import android.graphics.Color
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import android.graphics.Paint
+import android.graphics.Typeface
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color as ComposeColor
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.airbnb.lottie.LottieAnimationView
-import com.dreamindream.app.AdPageScaffold
-import com.dreamindream.app.AdManager
+import com.airbnb.lottie.LottieDrawable
 import com.dreamindream.app.R
-import androidx.compose.ui.viewinterop.AndroidView
-import com.dreamindream.app.ui.fortune.FortuneScreenContent
+import com.dreamindream.app.SubscriptionManager
+import kotlin.math.cos
+import kotlin.math.sin
+
+// ★ New Premium Colors (더 세련된 조합)
+private val DarkBg = Color(0xFF090C14)       // 거의 블랙에 가까운 네이비
+private val CardBg = Color(0xFF131722)       // 아주 어두운 차콜 네이비
+private val ChampagneGold = Color(0xFFF7E7CE) // 은은한 샴페인 골드
+private val MetallicGold = Color(0xFFD4AF37)  // 진한 금색
+private val MysticPurple = Color(0xFF9F7AEA)  // 신비로운 보라색
+private val TextMain = Color(0xFFECEFF1)
+private val TextSub = Color(0xFF90A4AE)
+private val GlassBorder = Color(0x1AFFFFFF)
 
 @Composable
 fun FortuneScreen(
-    viewModel: FortuneViewModel = viewModel()
+    viewModel: FortuneViewModel = viewModel(),
+    onNavigateToSubscription: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val isSubscribed by SubscriptionManager.isSubscribed.collectAsState()
     val context = LocalContext.current
 
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    // 광고 초기화 (배너 + 보상형) :contentReference[oaicite:4]{index=4}
-    LaunchedEffect(Unit) {
-        AdManager.initialize(context)
-        AdManager.loadRewarded(context)
-    }
-
-    // 스낵바 처리
-    LaunchedEffect(uiState.snackbarMessage) {
-        val msg = uiState.snackbarMessage
-        if (!msg.isNullOrBlank()) {
-            snackbarHostState.showSnackbar(msg)
-            viewModel.onSnackbarShown()
+    // 구독 화면 이동 이벤트 처리
+    LaunchedEffect(uiState.navigateToSubscription) {
+        if (uiState.navigateToSubscription) {
+            viewModel.onSubscriptionNavHandled()
+            onNavigateToSubscription()
         }
     }
 
-    AdPageScaffold(
-        adUnitRes = R.string.ad_unit_fortune_banner,
-        topBar = null
-    ) { innerPadding ->
-        FortuneScreenContent(
-            state = uiState,
-            paddingValues = innerPadding,
-            onStartClick = { viewModel.onStartButtonClick(context) },
-            onChecklistToggle = { id, checked -> viewModel.onChecklistToggle(id, checked) },
-            onSectionClick = { key -> viewModel.onSectionClicked(key) },
-            onDeepClick = { viewModel.onDeepButtonClick(context) },
-            snackbarHostState = snackbarHostState
+    Box(modifier = Modifier.fillMaxSize().background(DarkBg)) {
+        // 배경: 은은한 오로라 효과 (이미지 or 그라데이션)
+        Image(
+            painter = painterResource(R.drawable.main_ground),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize().alpha(0.3f), // 투명도 낮춰서 고급스럽게
+            contentScale = ContentScale.Crop
         )
+
+        if (uiState.isLoading) {
+            LoadingView(stringResource(R.string.loading_analyzing))
+        } else if (uiState.showStartButton) {
+            StartView(uiState.userName) { viewModel.onStartClick(context) }
+            IconButton(
+                onClick = onNavigateToSettings,
+                modifier = Modifier.align(Alignment.TopEnd).padding(16.dp)
+            ) {
+                Icon(Icons.Default.Settings, contentDescription = "Settings", tint = TextSub)
+            }
+        } else if (uiState.showFortuneCard) {
+            FortuneResultView(
+                uiState = uiState,
+                isSubscribed = isSubscribed,
+                onChecklistToggle = viewModel::onChecklistToggle,
+                onSectionClick = viewModel::onSectionClick,
+                onRadarClick = viewModel::onRadarClick,
+                onDeepClick = { viewModel.onDeepAnalysisClick(context) },
+                onSubscribeClick = onNavigateToSubscription // ★ 잠금 해제 누르면 구독창으로
+            )
+        }
+
+        // --- Dialogs ---
+        if (uiState.showRadarDetail) {
+            RadarDetailDialog(uiState.sections, viewModel::closeRadarDialog)
+        }
+
+        if (uiState.showDeepDialog && uiState.deepResult != null) {
+            DeepAnalysisDialog(result = uiState.deepResult!!, onDismiss = viewModel::closeDeepDialog)
+        } else if (uiState.isDeepLoading) {
+            Dialog(onDismissRequest = {}) {
+                Box(Modifier.clip(RoundedCornerShape(16.dp)).background(CardBg).padding(24.dp), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        CircularProgressIndicator(color = MetallicGold)
+                        Spacer(Modifier.height(16.dp))
+                        Text(stringResource(R.string.loading_analyzing), color = TextMain)
+                    }
+                }
+            }
+        }
+
+        uiState.sectionDialog?.let { section ->
+            SectionDetailDialog(section = section, onDismiss = viewModel::closeSectionDialog)
+        }
 
         if (uiState.showProfileDialog) {
-            AlertDialog(
-                onDismissRequest = { viewModel.onProfileDialogDismiss() },
-                confirmButton = {
-                    TextButton(onClick = { viewModel.onProfileDialogDismiss() }) {
-                        Text(text = stringResource(id = R.string.dialog_ok))
-                    }
-                },
-                title = {
-                    Text(text = stringResource(id = R.string.dialog_profile_title))
-                },
-                text = {
-                    Text(text = stringResource(id = R.string.dialog_profile_message))
-                }
+            FortuneAlertDialog(
+                title = stringResource(R.string.fortune_profile_title),
+                text = stringResource(R.string.fortune_profile_desc),
+                confirmText = stringResource(R.string.fortune_profile_go),
+                onConfirm = { viewModel.onProfileDialogDismiss(); onNavigateToSettings() },
+                dismissText = stringResource(R.string.cancel),
+                onDismiss = { viewModel.onProfileDialogDismiss() }
             )
         }
-
-        uiState.sectionDialog?.let { dialogState ->
-            SectionDetailDialog(
-                data = dialogState,
-                onDismiss = { viewModel.onSectionDialogDismiss() }
-            )
-        }
-
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = innerPadding.calculateBottomPadding())
-                .align(Alignment.BottomCenter)
-        )
     }
 }
 
 @Composable
-private fun BoxScope.FortuneScreenContent(
-    state: FortuneUiState,
-    paddingValues: PaddingValues,
-    onStartClick: () -> Unit,
-    onChecklistToggle: (Int, Boolean) -> Unit,
-    onSectionClick: (String) -> Unit,
-    onDeepClick: () -> Unit,
-    snackbarHostState: SnackbarHostState
-) {
-    val bgPainter = painterResource(id = R.drawable.main_ground)
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
-    ) {
-        Image(
-            painter = bgPainter,
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxSize(),
-            alpha = 1f
-        )
-
-        // 가운데 물음표 카드
-        AnimatedVisibility(
-            visible = state.showStartButton,
-            modifier = Modifier.align(Alignment.Center)
-        ) {
-            FortuneStartButton(
-                enabled = state.startButtonEnabled,
-                breathing = state.startButtonBreathing,
-                onClick = onStartClick
+fun StartView(userName: String, onStart: () -> Unit) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = if (userName.isNotBlank()) stringResource(R.string.fortune_intro_user, userName)
+                else stringResource(R.string.fortune_intro_title),
+                color = ChampagneGold, // 고급스러운 색
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Light,
+                textAlign = TextAlign.Center,
+                lineHeight = 34.sp
             )
-        }
+            Spacer(Modifier.height(48.dp))
 
-        // 결과 카드
-        AnimatedVisibility(
-            visible = state.showFortuneCard,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-        ) {
-            FortuneResultCard(
-                state = state,
-                onChecklistToggle = onChecklistToggle,
-                onSectionClick = onSectionClick,
-                onDeepClick = onDeepClick,
-                modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 10.dp)
-                    .fillMaxWidth()
-                    .fillMaxHeight(0.92f)
-            )
-        }
-
-        // 로딩 Lottie
-        if (state.isLoading) {
+            // 그라데이션 버튼
             Box(
                 modifier = Modifier
-                    .matchParentSize()
-                    .background(ComposeColor.Black.copy(alpha = 0.30f)),
+                    .width(220.dp).height(56.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(Brush.horizontalGradient(listOf(MetallicGold, Color(0xFFF59E0B))))
+                    .clickable { onStart() },
                 contentAlignment = Alignment.Center
             ) {
-                LottieLoading()
+                Text(stringResource(R.string.fortune_start_btn), color = DarkBg, fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
+    }
+}
 
-        // 오늘 이미 봤다는 안내 메시지 (카드/버튼 둘 다 없을 때)
-        if (!state.showStartButton && !state.showFortuneCard && state.infoMessage != null) {
-            Text(
-                text = state.infoMessage,
-                modifier = Modifier.align(Alignment.Center),
-                color = ComposeColor(0xFFCFD8DC),
-                style = MaterialTheme.typography.bodyMedium
-            )
+@Composable
+fun LoadingView(message: String) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            LottieLoader(resId = R.raw.generator)
+            Spacer(Modifier.height(16.dp))
+            Text(message, color = TextSub)
         }
     }
 }
 
-// ------------------------------------------------------
-//  Start Button (물음표 사각 버튼)
-// ------------------------------------------------------
 @Composable
-private fun FortuneStartButton(
-    enabled: Boolean,
-    breathing: Boolean,
-    onClick: () -> Unit
-) {
-    val infinite = rememberInfiniteTransition(label = "breath")
-    val scale by if (breathing && enabled) {
-        infinite.animateFloat(
-            initialValue = 1.0f,
-            targetValue = 1.06f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(durationMillis = 1800, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "scale"
-        )
-    } else {
-        androidx.compose.runtime.remember { androidx.compose.runtime.mutableStateOf(1.0f) }
-    }
-
-    val borderGradient = Brush.verticalGradient(
-        colors = listOf(
-            ComposeColor(0x66FFFFFF),
-            ComposeColor(0x19FFFFFF)
-        )
-    )
-    val innerGradient = Brush.verticalGradient(
-        colors = listOf(
-            ComposeColor(0xFF1D2233),
-            ComposeColor(0xFF050713)
-        )
-    )
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(
-            modifier = Modifier
-                .size(190.dp)
-                .graphicsLayer {
-                    scaleX = scale
-                    scaleY = scale
-                }
-                .clip(RoundedCornerShape(28.dp))
-                .background(borderGradient)
-                .padding(1.5.dp)
-                .clip(RoundedCornerShape(26.dp))
-                .background(innerGradient)
-                .clickable(enabled = enabled, onClick = onClick),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "?",
-                color = ComposeColor.White,
-                style = MaterialTheme.typography.displayMedium.copy(
-                    fontWeight = FontWeight.SemiBold
-                )
-            )
-        }
-
-        Spacer(modifier = Modifier.height(14.dp))
-
-        Text(
-            text = stringResource(id = R.string.btn_fortune_show),
-            color = ComposeColor(0xFFE3F2FD),
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = FontWeight.Medium
-            )
-        )
-
-        Text(
-            text = stringResource(id = R.string.btn_fortune_show),
-            color = ComposeColor(0xFFB0BEC5),
-            style = MaterialTheme.typography.bodySmall
-        )
-    }
-}
-
-// ------------------------------------------------------
-//  결과 카드
-// ------------------------------------------------------
-@Composable
-private fun FortuneResultCard(
-    state: FortuneUiState,
+fun FortuneResultView(
+    uiState: FortuneUiState,
+    isSubscribed: Boolean,
     onChecklistToggle: (Int, Boolean) -> Unit,
     onSectionClick: (String) -> Unit,
+    onRadarClick: () -> Unit,
     onDeepClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onSubscribeClick: () -> Unit
 ) {
-    val glass = Brush.verticalGradient(
+    Column(
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom = 80.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(Modifier.height(40.dp))
+
+        // One Line Summary (카드 형태로 변경)
+        Box(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)
+                .border(1.dp, MetallicGold.copy(0.3f), RoundedCornerShape(16.dp))
+                .background(Color(0x0DFFFFFF), RoundedCornerShape(16.dp))
+                .padding(20.dp)
+        ) {
+            Column {
+                // 📌 1. TODAY’S FORTUNE 텍스트 크기 수정 (12.sp -> 11.sp)
+                Text(
+                    text = stringResource(R.string.fortune_today_title),
+                    color = MetallicGold,
+                    fontSize = 11.sp, // Reduced by 1sp as requested
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(uiState.oneLineSummary, color = TextMain, fontSize = 18.sp, fontWeight = FontWeight.Medium, lineHeight = 28.sp)
+            }
+        }
+
+        Spacer(Modifier.height(30.dp))
+
+        // Radar Chart
+        Box(
+            Modifier.size(320.dp).clickable { onRadarClick() },
+            contentAlignment = Alignment.Center
+        ) {
+            RadarChart(uiState.radarChartData)
+        }
+
+        Spacer(Modifier.height(20.dp))
+
+        // Lucky Items
+        Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+            LuckyItemView(stringResource(R.string.lucky_color), uiState.luckyColorHex, isColor = true)
+            LuckyItemView(stringResource(R.string.lucky_number), "${uiState.luckyNumber ?: "-"}")
+            LuckyItemView(stringResource(R.string.lucky_time), uiState.luckyTime)
+            LuckyItemView(stringResource(R.string.lucky_dir), uiState.luckyDirection)
+        }
+
+        Spacer(Modifier.height(30.dp))
+
+        // Checklist
+        GlassContainer(stringResource(R.string.fortune_checklist_title)) {
+            uiState.checklist.forEach { item ->
+                Row(
+                    Modifier.fillMaxWidth().clickable { onChecklistToggle(item.id, !item.checked) }.padding(vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        if (item.checked) Icons.Default.CheckBox else Icons.Default.CheckBoxOutlineBlank,
+                        null, tint = if (item.checked) MetallicGold else TextSub
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Text(item.text, color = if (item.checked) TextSub else TextMain, fontSize = 14.sp,
+                        textDecoration = if (item.checked) androidx.compose.ui.text.style.TextDecoration.LineThrough else null)
+                }
+                if (item != uiState.checklist.last()) HorizontalDivider(color = GlassBorder)
+            }
+        }
+
+        Spacer(Modifier.height(20.dp))
+
+        // Sections
+        Column(Modifier.padding(horizontal = 16.dp)) {
+            uiState.sections.chunked(2).forEach { row ->
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    row.forEach { sec ->
+                        Box(Modifier.weight(1f)) {
+                            SectionCardView(sec) { onSectionClick(sec.key) }
+                        }
+                    }
+                    if (row.size == 1) Spacer(Modifier.weight(1f))
+                }
+                Spacer(Modifier.height(12.dp))
+            }
+        }
+
+        Spacer(Modifier.height(40.dp))
+
+        // 📌 3. “운세 심화 분석” 버튼 디자인 개선 (Creative Redesign)
+        DeepAnalysisButton(isSubscribed, onDeepClick, onSubscribeClick)
+    }
+}
+
+// --- Visual Components ---
+
+@Composable
+fun RadarChart(data: Map<String, Int>) {
+    val context = LocalContext.current
+    val labels = data.keys.toList()
+    val values = data.values.toList()
+    val labelColor = TextSub.toArgb()
+
+    Canvas(modifier = Modifier.size(280.dp)) {
+        val center = center
+        val radius = size.minDimension / 2 - 35.dp.toPx()
+        val angleStep = (2 * Math.PI / 5).toFloat()
+        val startAngle = -Math.PI.toFloat() / 2
+
+        // Draw Web
+        val webPath = Path()
+        for (i in 0 until 5) {
+            val angle = i * angleStep + startAngle
+            val x = center.x + radius * cos(angle)
+            val y = center.y + radius * sin(angle)
+            if (i == 0) webPath.moveTo(x, y) else webPath.lineTo(x, y)
+            drawLine(TextSub.copy(alpha = 0.2f), center, Offset(x, y), strokeWidth = 1.dp.toPx())
+        }
+        webPath.close()
+        drawPath(webPath, style = Stroke(width = 1.dp.toPx()), color = TextSub.copy(alpha = 0.2f))
+
+        // Draw Data
+        val dataPath = Path()
+        values.forEachIndexed { i, v ->
+            val normalized = (v / 100f).coerceIn(0.1f, 1f)
+            val angle = i * angleStep + startAngle
+            val x = center.x + (radius * normalized) * cos(angle)
+            val y = center.y + (radius * normalized) * sin(angle)
+            if (i == 0) dataPath.moveTo(x, y) else dataPath.lineTo(x, y)
+            drawCircle(MetallicGold, radius = 3.dp.toPx(), center = Offset(x, y))
+        }
+        dataPath.close()
+        // 내부 채우기 (그라데이션 느낌)
+        drawPath(dataPath, color = MetallicGold.copy(alpha = 0.15f))
+        // 외곽선
+        drawPath(dataPath, style = Stroke(width = 2.dp.toPx()), color = MetallicGold)
+
+        drawIntoCanvas { canvas ->
+            val paint = Paint().apply {
+                color = labelColor
+                textSize = 11.dp.toPx()
+                textAlign = Paint.Align.CENTER
+                typeface = Typeface.DEFAULT_BOLD
+            }
+
+            labels.forEachIndexed { i, labelKey ->
+                val angle = i * angleStep + startAngle
+                val labelRadius = radius + 22.dp.toPx()
+                val x = center.x + labelRadius * cos(angle)
+                val y = center.y + labelRadius * sin(angle) + 5.dp.toPx()
+
+                val resName = "fortune_${labelKey.lowercase()}"
+                val resId = context.resources.getIdentifier(resName, "string", context.packageName)
+                val text = if (resId != 0) context.getString(resId) else labelKey
+
+                canvas.nativeCanvas.drawText(text, x, y, paint)
+            }
+        }
+    }
+}
+
+@Composable
+fun DeepAnalysisButton(isSubscribed: Boolean, onClick: () -> Unit, onSubscribe: () -> Unit) {
+    // 📌 3. 디자인 개선: 반짝이는 효과와 입체적인 카드 UI 적용
+    val infiniteTransition = rememberInfiniteTransition(label = "deep_anim")
+
+    // 테두리나 배경이 은은하게 빛나는 애니메이션
+    val pulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.6f,
+        targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1500, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "pulse"
+    )
+
+    // 그라데이션 색상 정의
+    val bgGradient = Brush.linearGradient(
         colors = listOf(
-            ComposeColor(0xCC111827),
-            ComposeColor(0xE6000513)
+            Color(0xFF2E1065), // Deep Purple
+            Color(0xFF4C1D95), // Lighter Purple
+            Color(0xFF1E1B4B)  // Dark Blue
+        ),
+        start = Offset(0f, 0f),
+        end = Offset(1000f, 1000f)
+    )
+
+    val borderBrush = Brush.sweepGradient(
+        listOf(
+            MysticPurple.copy(alpha = 0.3f),
+            MetallicGold.copy(alpha = pulseAlpha), // 애니메이션 적용
+            MysticPurple.copy(alpha = 0.3f)
         )
     )
 
-    Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = ComposeColor.Transparent
-        ),
-        border = CardDefaults.outlinedCardBorder(
-            borderColor = ComposeColor(0x66101010)
-        ),
-        elevation = CardDefaults.cardElevation(0.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .background(glass)
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-        ) {
-            val scroll = rememberScrollState()
-
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scroll)
-            ) {
-                // 키워드 칩
-                KeywordRow(state.keywords)
-
-                Spacer(modifier = Modifier.height(8.dp))
-                DividerLine()
-
-                // 행운 지표
-                LuckyRow(
-                    colorHex = state.luckyColorHex,
-                    number = state.luckyNumber,
-                    time = state.luckyTime
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // 감정 밸런스
-                EmotionBalance(
-                    pos = state.emoPositive,
-                    neu = state.emoNeutral,
-                    neg = state.emoNegative
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                // 체크리스트
-                ChecklistSection(
-                    items = state.checklist,
-                    onToggle = onChecklistToggle
-                )
-
-                DividerLine()
-
-                // 섹션 카드들
-                state.sections.forEach { section ->
-                    FortuneSectionCard(
-                        section = section,
-                        onClick = { if (!section.isLotto) onSectionClick(section.key) }
-                    )
-                }
-
-                DividerLine()
-
-                // 심화 분석 버튼
-                DeepButton(
-                    enabled = state.deepButtonEnabled,
-                    label = if (state.deepButtonLabel.isNotBlank())
-                        state.deepButtonLabel
-                    else
-                        stringResource(id = R.string.btn_deep_analysis),
-                    onClick = onDeepClick
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-            }
-        }
-    }
-}
-
-@Composable
-private fun KeywordRow(keywords: List<String>) {
-    if (keywords.isEmpty()) return
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        keywords.take(4).forEach { word ->
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(999.dp))
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(
-                                ComposeColor(0x332196F3),
-                                ComposeColor(0x332EE7D9)
-                            )
-                        )
-                    )
-                    .padding(horizontal = 10.dp, vertical = 4.dp)
-            ) {
-                Text(
-                    text = word,
-                    color = ComposeColor(0xFFE3F2FD),
-                    style = MaterialTheme.typography.labelMedium
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun DividerLine() {
-    Spacer(modifier = Modifier.height(8.dp))
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(1.dp)
-            .alpha(0.9f)
-            .background(ComposeColor(0xFFFFD86B))
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-}
-
-@Composable
-private fun LuckyRow(
-    colorHex: String,
-    number: Int?,
-    time: String
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
+            .padding(horizontal = 16.dp)
+            // 그림자 효과로 떠있는 느낌
+            .shadow(
+                elevation = 12.dp,
+                shape = RoundedCornerShape(24.dp),
+                spotColor = if(isSubscribed) MysticPurple else Color.Black
+            )
+            .clip(RoundedCornerShape(24.dp))
+            .background(bgGradient)
+            .border(2.dp, borderBrush, RoundedCornerShape(24.dp))
+            .clickable {
+                if (isSubscribed) onClick() else onSubscribe()
+            }
     ) {
-        // 색
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(1f)
-        ) {
-            val dotColor = runCatching { ComposeColor(Color.parseColor(colorHex)) }
-                .getOrElse { ComposeColor(0xFFFFD54F) }
-            Box(
-                modifier = Modifier
-                    .size(18.dp)
-                    .clip(RoundedCornerShape(999.dp))
-                    .background(dotColor)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = stringResource(id = R.string.fortune_lucky_color),
-                color = ComposeColor(0xFFFFD54F),
-                style = MaterialTheme.typography.labelSmall
-            )
+        // 배경에 미세한 패턴 추가 (선택사항)
+        Canvas(modifier = Modifier.fillMaxSize().alpha(0.1f)) {
+            drawCircle(Color.White, radius = size.width * 0.2f, center = Offset(size.width, 0f))
+            drawCircle(Color.White, radius = size.width * 0.1f, center = Offset(0f, size.height))
         }
 
-        // 숫자
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = number?.toString() ?: "-",
-                color = ComposeColor.White,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = stringResource(id = R.string.fortune_lucky_number),
-                color = ComposeColor(0xFFFFD54F),
-                style = MaterialTheme.typography.labelSmall
-            )
-        }
-
-        // 시간
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = if (time.isNotBlank()) time else stringResource(id = R.string.placeholder_dash),
-                color = ComposeColor.White,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = stringResource(id = R.string.fortune_good_time),
-                color = ComposeColor(0xFFFFD54F),
-                style = MaterialTheme.typography.labelSmall
-            )
-        }
-    }
-}
-
-@Composable
-private fun EmotionBalance(
-    pos: Int,
-    neu: Int,
-    neg: Int
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = stringResource(id = R.string.chart_emotion_balance),
-            color = ComposeColor(0xFFC6D4DF),
-            style = MaterialTheme.typography.bodyMedium
-        )
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        EmotionBarRow(
-            label = stringResource(id = R.string.label_positive),
-            value = pos,
-            tint = ComposeColor(0xFF17D499)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        EmotionBarRow(
-            label = stringResource(id = R.string.label_neutral),
-            value = neu,
-            tint = ComposeColor(0xFFFFC75F)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        EmotionBarRow(
-            label = stringResource(id = R.string.label_negative),
-            value = neg,
-            tint = ComposeColor(0xFFFF6B7B)
-        )
-    }
-}
-
-@Composable
-private fun EmotionBarRow(
-    label: String,
-    value: Int,
-    tint: ComposeColor
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = String.format("%d%%", value.coerceIn(0, 100)),
-            modifier = Modifier.width(42.dp),
-            color = tint.copy(alpha = 0.85f),
-            style = MaterialTheme.typography.labelSmall
-        )
-        LinearProgressIndicator(
-            progress = (value.coerceIn(0, 100) / 100f),
-            modifier = Modifier
-                .weight(1f)
-                .height(8.dp)
-                .clip(RoundedCornerShape(999.dp)),
-            trackColor = ComposeColor(0x222B3B4D),
-            color = tint
-        )
-    }
-}
-
-@Composable
-private fun ChecklistSection(
-    items: List<ChecklistItemUi>,
-    onToggle: (Int, Boolean) -> Unit
-) {
-    if (items.isEmpty()) return
-
-    Text(
-        text = stringResource(id = R.string.fortune_today_check),
-        color = ComposeColor(0xFFB3FFFFFF),
-        style = MaterialTheme.typography.labelMedium
-    )
-    Spacer(modifier = Modifier.height(4.dp))
-
-    items.forEach { item ->
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-                .clickable {
-                    onToggle(item.id, !item.checked)
-                },
+            modifier = Modifier.padding(24.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            androidx.compose.material3.Checkbox(
-                checked = item.checked,
-                onCheckedChange = { checked -> onToggle(item.id, checked) }
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = "• ${item.text}",
-                color = ComposeColor(0xFFF0F4F8),
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-    }
-
-    Spacer(modifier = Modifier.height(6.dp))
-}
-
-@Composable
-private fun FortuneSectionCard(
-    section: FortuneSectionUi,
-    onClick: () -> Unit
-) {
-    val glassBg = painterResource(id = R.drawable.bg_glass_fortune_section)
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 10.dp)
-            .clip(RoundedCornerShape(22.dp))
-            .clickable(enabled = !section.isLotto, onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = ComposeColor.Transparent
-        ),
-        elevation = CardDefaults.cardElevation(0.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .background(
-                    ComposeColor.Transparent
-                )
-                .padding(1.dp)
-        ) {
+            // 왼쪽: 아이콘 영역
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(22.dp))
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(
-                                ComposeColor(0x33222B3D),
-                                ComposeColor(0x55000421)
-                            )
-                        )
-                    )
-                    .padding(horizontal = 14.dp, vertical = 12.dp)
+                    .size(56.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.1f)),
+                contentAlignment = Alignment.Center
             ) {
-                Column {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = section.title,
-                            modifier = Modifier.weight(1f),
-                            color = ComposeColor.White,
-                            style = MaterialTheme.typography.titleSmall.copy(
-                                fontWeight = FontWeight.SemiBold
-                            ),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-
-                        if (!section.isLotto && section.score != null) {
-                            val c = ComposeColor(section.colorInt)
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(999.dp))
-                                    .background(c)
-                                    .padding(horizontal = 10.dp, vertical = 4.dp)
-                            ) {
-                                Text(
-                                    text = stringResource(
-                                        id = R.string.score_points,
-                                        section.score
-                                    ),
-                                    color = ComposeColor(0xFF0C1830),
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                )
-                            }
-                        }
-                    }
-
-                    if (!section.isLotto && section.score != null) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        LinearProgressIndicator(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(8.dp)
-                                .clip(RoundedCornerShape(999.dp)),
-                            progress = section.score.coerceIn(0, 100) / 100f,
-                            color = ComposeColor(section.colorInt),
-                            trackColor = ComposeColor(0x1FFFFFFF)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = section.body,
-                        color = ComposeColor(0xFFEAF2FA),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun DeepButton(
-    enabled: Boolean,
-    label: String,
-    onClick: () -> Unit
-) {
-    val gradient = Brush.horizontalGradient(
-        colors = listOf(
-            ComposeColor(0xFFFEDCA6),
-            ComposeColor(0xFF8BAAFF)
-        )
-    )
-
-    Button(
-        onClick = onClick,
-        enabled = enabled,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(44.dp),
-        contentPadding = PaddingValues(),
-        shape = RoundedCornerShape(14.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .background(gradient),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = label,
-                color = ComposeColor.Black,
-                style = MaterialTheme.typography.labelLarge.copy(
-                    fontWeight = FontWeight.Medium
+                Icon(
+                    imageVector = if(isSubscribed) Icons.Default.AutoAwesome else Icons.Default.Lock,
+                    contentDescription = null,
+                    tint = if(isSubscribed) ChampagneGold else TextSub,
+                    modifier = Modifier.size(28.dp)
                 )
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            // 가운데: 텍스트 영역
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.fortune_deep_title),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 17.sp
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(if(isSubscribed) R.string.fortune_deep_desc else R.string.fortune_deep_lock_desc),
+                    color = TextSub,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // 오른쪽: 화살표 또는 CTA
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = if(isSubscribed) MetallicGold else TextSub.copy(alpha = 0.5f)
             )
         }
-    }
-}
 
-@Composable
-private fun LottieLoading() {
-    AndroidView(
-        factory = { ctx ->
-            LottieAnimationView(ctx).apply {
-                setAnimation(R.raw.generator)
-                repeatCount = LottieAnimationView.INFINITE
-                playAnimation()
-            }
-        },
-        modifier = Modifier.size(120.dp),
-        update = { view ->
-            if (!view.isAnimating) view.playAnimation()
-        }
-    )
-}
-
-// ------------------------------------------------------
-//  섹션 상세 다이얼로그 (Compose 버전)
-// ------------------------------------------------------
-@Composable
-private fun SectionDetailDialog(
-    data: SectionDialogUiState,
-    onDismiss: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(id = R.string.ok))
-            }
-        },
-        title = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
+        // 하단에 "잠금 해제" 뱃지 (미구독 시)
+        if (!isSubscribed) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .background(
+                        color = MetallicGold,
+                        shape = RoundedCornerShape(topStart = 16.dp)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
                 Text(
-                    text = data.title,
-                    modifier = Modifier.weight(1f),
-                    color = ComposeColor(0xFFFABD3E),
-                    style = MaterialTheme.typography.titleMedium
+                    text = stringResource(R.string.fortune_deep_unlock),
+                    color = DarkBg,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp
                 )
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(999.dp))
-                        .background(ComposeColor(data.colorInt))
-                        .padding(horizontal = 10.dp, vertical = 4.dp)
-                ) {
-                    Text(
-                        text = stringResource(
-                            id = R.string.score_points,
-                            data.score
-                        ),
-                        color = ComposeColor.Black,
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                }
             }
-        },
-        text = {
+        }
+    }
+}
+
+@Composable
+fun LuckyItemView(title: String, value: String, isColor: Boolean = false) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            modifier = Modifier.size(56.dp).clip(CircleShape).background(CardBg)
+                .border(1.dp, GlassBorder, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isColor) {
+                val c = try { Color(android.graphics.Color.parseColor(value)) } catch(e:Exception){ Color.Gray }
+                Box(Modifier.size(28.dp).clip(CircleShape).background(c))
+            } else {
+                Text(value, color = MetallicGold, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            }
+        }
+        Spacer(Modifier.height(8.dp))
+        Text(title, color = TextSub, fontSize = 11.sp)
+    }
+}
+
+@Composable
+fun SectionCardView(section: FortuneSectionUi, onClick: () -> Unit) {
+    Box(
+        Modifier.height(100.dp).clip(RoundedCornerShape(16.dp))
+            .background(CardBg).clickable(onClick = onClick).padding(16.dp)
+    ) {
+        Column {
+            Text(stringResource(section.titleResId), color = MetallicGold, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            Spacer(Modifier.height(6.dp))
+            Text(section.body, color = TextSub, fontSize = 11.sp, lineHeight = 15.sp, maxLines = 3)
+        }
+        if (section.score != null) {
             Text(
-                text = data.body,
-                color = ComposeColor(0xFFEAF2FA),
-                style = MaterialTheme.typography.bodyMedium
+                "${section.score}",
+                color = Color(section.colorInt), fontWeight = FontWeight.Bold, fontSize = 16.sp,
+                modifier = Modifier.align(Alignment.TopEnd)
             )
         }
-    )
+    }
+}
+
+@Composable
+fun GlassContainer(title: String, content: @Composable () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(CardBg).border(1.dp, GlassBorder, RoundedCornerShape(20.dp))
+            .padding(20.dp)
+    ) {
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.CheckCircle, null, tint = MetallicGold, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(title, color = TextMain, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            }
+            Spacer(Modifier.height(16.dp))
+            content()
+        }
+    }
+}
+
+@Composable
+fun DeepAnalysisDialog(result: DeepFortuneResult, onDismiss: () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Box(
+            modifier = Modifier.fillMaxWidth().fillMaxHeight(0.9f)
+                .clip(RoundedCornerShape(24.dp))
+                .background(DarkBg)
+                .border(1.dp, MysticPurple.copy(alpha = 0.5f), RoundedCornerShape(24.dp))
+        ) {
+            Column(Modifier.padding(24.dp).verticalScroll(rememberScrollState())) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.fortune_deep_title), color = MysticPurple, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Icon(Icons.Default.Close, null, tint = TextSub, modifier = Modifier.clickable { onDismiss() })
+                }
+                Spacer(Modifier.height(24.dp))
+
+                Box(Modifier.fillMaxWidth().height(180.dp), contentAlignment = Alignment.Center) {
+                    TimeFlowGraphEnhanced(result.flowCurve, result.timeLabels)
+                }
+                Spacer(Modifier.height(24.dp))
+
+                DeepSection(Icons.Default.Star, "Key Highlights", result.highlights)
+                DeepSectionText(Icons.Default.Balance, "Risk & Opportunity", result.riskAndOpportunity)
+                DeepSectionText(Icons.Default.Lightbulb, "Actionable Tip", result.solution)
+            }
+        }
+    }
+}
+
+@Composable
+fun TimeFlowGraphEnhanced(points: List<Int>, labels: List<String>) {
+    Canvas(Modifier.fillMaxSize().padding(start = 10.dp, end = 10.dp, bottom = 20.dp)) {
+        val w = size.width
+        val h = size.height
+        val stepX = w / (points.size - 1)
+        val path = Path()
+
+        points.forEachIndexed { i, p ->
+            val x = i * stepX
+            val y = h - (p / 100f * h)
+            if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+            drawCircle(MetallicGold, 4.dp.toPx(), Offset(x, y))
+        }
+
+        drawPath(path, style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round), color = MetallicGold)
+        drawLine(TextSub.copy(0.2f), Offset(0f, h/2), Offset(w, h/2))
+
+        drawIntoCanvas { canvas ->
+            val paint = Paint().apply {
+                color = TextSub.toArgb()
+                textSize = 10.dp.toPx()
+                textAlign = Paint.Align.CENTER
+            }
+            labels.forEachIndexed { i, label ->
+                val x = i * stepX
+                canvas.nativeCanvas.drawText(label, x, h + 15.dp.toPx(), paint)
+            }
+        }
+    }
+}
+
+@Composable
+fun DeepSection(icon: ImageVector, title: String, items: List<String>) {
+    Column(Modifier.padding(bottom = 24.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, tint = MysticPurple, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(title, color = MysticPurple, fontWeight = FontWeight.Bold, fontSize = 16.sp) }
+        Spacer(Modifier.height(12.dp))
+        Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(CardBg).padding(16.dp)) {
+            Column { items.forEach { Text("• $it", color = TextMain, fontSize = 14.sp, modifier = Modifier.padding(bottom = 6.dp)) } }
+        }
+    }
+}
+
+@Composable
+fun DeepSectionText(icon: ImageVector, title: String, content: String) {
+    Column(Modifier.padding(bottom = 24.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) { Icon(icon, null, tint = MysticPurple, modifier = Modifier.size(18.dp)); Spacer(Modifier.width(8.dp)); Text(title, color = MysticPurple, fontWeight = FontWeight.Bold, fontSize = 16.sp) }
+        Spacer(Modifier.height(12.dp))
+        Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(CardBg).padding(16.dp)) {
+            Text(content, color = TextMain.copy(0.9f), fontSize = 14.sp, lineHeight = 20.sp)
+        }
+    }
+}
+
+@Composable
+fun RadarDetailDialog(sections: List<FortuneSectionUi>, onDismiss: () -> Unit) {
+    LuxuryDialog(onDismiss) {
+        Column {
+            Text(stringResource(R.string.fortune_overall), color = MetallicGold, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.align(Alignment.CenterHorizontally))
+            Spacer(Modifier.height(20.dp))
+            sections.filter { !it.isLotto }.forEach { sec ->
+                Row(Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(sec.titleResId), color = TextMain, fontWeight = FontWeight.Bold, modifier = Modifier.width(70.dp))
+                    Column(Modifier.weight(1f)) {
+                        LinearProgressIndicator(
+                            progress = { (sec.score ?: 0) / 100f },
+                            modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(4.dp)),
+                            color = Color(sec.colorInt),
+                            trackColor = Color.DarkGray
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(sec.body, color = TextSub, fontSize = 12.sp, lineHeight = 16.sp)
+                    }
+                    Spacer(Modifier.width(12.dp))
+                    Text("${sec.score}", color = Color(sec.colorInt), fontWeight = FontWeight.Bold)
+                }
+                if (sec != sections.last()) HorizontalDivider(color = GlassBorder, modifier = Modifier.padding(vertical = 4.dp))
+            }
+            Spacer(Modifier.height(20.dp))
+            Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = GlassBorder)) {
+                Text(stringResource(R.string.ok), color = TextMain)
+            }
+        }
+    }
+}
+
+@Composable
+fun SectionDetailDialog(section: FortuneSectionUi, onDismiss: () -> Unit) {
+    LuxuryDialog(onDismiss) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(stringResource(section.titleResId), color = MetallicGold, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(24.dp))
+            if (section.isLotto) Text(section.body, color = TextMain, fontSize = 24.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+            else Text(section.body, color = TextMain, fontSize = 16.sp, lineHeight = 26.sp, textAlign = TextAlign.Center)
+            Spacer(Modifier.height(32.dp))
+            Button(onClick = onDismiss, colors = ButtonDefaults.buttonColors(containerColor = GlassBorder)) { Text(stringResource(R.string.ok), color = TextMain) }
+        }
+    }
+}
+
+@Composable
+fun LuxuryDialog(onDismiss: () -> Unit, content: @Composable () -> Unit) {
+    Dialog(onDismissRequest = onDismiss) {
+        Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(DarkBg).border(1.dp, MetallicGold.copy(0.5f), RoundedCornerShape(24.dp))) {
+            Column(Modifier.padding(24.dp)) {
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) { Icon(Icons.Default.Close, null, tint = TextSub, modifier = Modifier.clickable { onDismiss() }) }
+                content()
+            }
+        }
+    }
+}
+
+@Composable
+fun FortuneAlertDialog(title: String, text: String, confirmText: String, onConfirm: () -> Unit, dismissText: String?, onDismiss: () -> Unit) {
+    AlertDialog(onDismissRequest = onDismiss, title = { Text(title, color = TextMain, fontWeight = FontWeight.Bold) }, text = { Text(text, color = TextSub) },
+        confirmButton = { TextButton(onClick = onConfirm) { Text(confirmText, color = MetallicGold) } },
+        dismissButton = if (dismissText != null) { { TextButton(onClick = onDismiss) { Text(dismissText, color = TextSub) } } } else null,
+        containerColor = DarkBg, shape = RoundedCornerShape(16.dp))
+}
+
+@Composable
+fun LottieLoader(resId: Int) {
+    AndroidView(modifier = Modifier.size(150.dp), factory = { ctx -> LottieAnimationView(ctx).apply { setAnimation(resId); repeatCount = LottieDrawable.INFINITE; playAnimation() } })
 }

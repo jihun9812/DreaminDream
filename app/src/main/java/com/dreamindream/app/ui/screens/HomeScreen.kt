@@ -9,7 +9,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -39,6 +38,7 @@ import com.dreamindream.app.R
 import com.dreamindream.app.DailyMessageManager
 import com.dreamindream.app.FirestoreManager
 import com.dreamindream.app.WeekUtils
+import com.dreamindream.app.WeeklyReportData
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 
@@ -54,24 +54,28 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val auth = remember { FirebaseAuth.getInstance() }
+    val user = auth.currentUser
+    val uid = user?.uid
+    val isAnonymous = user?.isAnonymous == true
 
-    // uid & prefs (원본과 동일 키)
-    val uid = remember { FirebaseAuth.getInstance().currentUser?.uid }
+    // 키워드 저장을 위한 SharedPreferences (키 이름 동일 유지)
     val prefs = remember(uid) {
         context.getSharedPreferences("dream_history_${uid.orEmpty()}", Context.MODE_PRIVATE)
     }
 
-    // ---- State (1:1)
     var dailyMessage by remember { mutableStateOf(context.getString(R.string.ai_msg_loading)) }
     var aiReportTitle by remember { mutableStateOf(context.getString(R.string.ai_report_summary)) }
     var aiReportSummary by remember { mutableStateOf(context.getString(R.string.preparing_analysis)) }
     var isReportEnabled by remember { mutableStateOf(false) }
     var cardVisible by remember { mutableStateOf(false) }
 
-    // ---- Daily message
+    // 1. 데일리 메시지 로드
     LaunchedEffect(Unit) {
+        // DailyMessageManager가 이제 언어별로 분리된 키를 사용하므로,
+        // 여기서는 기존과 동일하게 호출해도 내부적으로 언어에 맞는 메시지를 가져옵니다.
         DailyMessageManager.getMessage(context) { msg ->
-            val safe = msg?.trim()?.takeIf { it.isNotEmpty() && !it.contains("불러올 수 없어요") }
+            val safe = msg.trim().takeIf { it.isNotEmpty() && !it.contains("불러올 수 없어요") }
                 ?: getDailyFallbacks(context).random()
             dailyMessage = safe
         }
@@ -79,51 +83,62 @@ fun HomeScreen(
         cardVisible = true
     }
 
-    // ---- Weekly
-    LaunchedEffect(uid) {
-        val cachedFeeling = prefs.getString("home_feeling", null)
-        val cachedKeywords = prefs.getString("home_keywords", null)
-            ?.split("|")?.filter { it.isNotBlank() }
-
-        aiReportTitle = context.getString(R.string.ai_report_summary)
-        aiReportSummary = if (!cachedFeeling.isNullOrBlank() || !cachedKeywords.isNullOrEmpty()) {
-            buildWeeklySummaryLine(context, cachedFeeling, cachedKeywords)
-        } else {
-            context.getString(R.string.preparing_analysis)
+    // 2. AI 리포트 요약 정보 로드
+    LaunchedEffect(uid, isAnonymous) {
+        if (uid == null || isAnonymous) {
+            aiReportTitle = context.getString(R.string.ai_report_summary)
+            aiReportSummary = context.getString(R.string.ai_report_need_login)
+            isReportEnabled = true
+            return@LaunchedEffect
         }
 
-        uid?.let { currentUid ->
-            val weekKey = WeekUtils.weekKey()
-            FirestoreManager.countDreamEntriesForWeek(currentUid, weekKey) { count ->
-                if (count < 2) {
+        // 캐시된 데이터 먼저 확인
+        val cachedFeeling = prefs.getString("home_feeling", null)
+        val cachedKeywordsStr = prefs.getString("home_keywords", null)
+        val cachedKeywords = cachedKeywordsStr?.split("|")?.filter { it.isNotBlank() }
+
+        aiReportTitle = context.getString(R.string.ai_report_summary)
+
+        // 캐시 데이터가 있으면 먼저 보여주기
+        if (!cachedFeeling.isNullOrBlank() || !cachedKeywords.isNullOrEmpty()) {
+            aiReportSummary = buildWeeklySummaryLine(context, cachedFeeling, cachedKeywords)
+        } else {
+            aiReportSummary = context.getString(R.string.preparing_analysis)
+        }
+
+        // Firestore에서 최신 데이터 확인
+        FirestoreManager.countDreamEntriesForWeek(uid, WeekUtils.weekKey()) { count ->
+            if (count < 2) {
+                // 꿈 데이터가 부족할 때
+                aiReportTitle = context.getString(R.string.ai_report_summary)
+                aiReportSummary = context.getString(R.string.ai_report_guide)
+                isReportEnabled = true
+            } else {
+                // 꿈 데이터 충분 -> 리포트 로드
+                FirestoreManager.loadWeeklyReportFull(
+                    context, uid, WeekUtils.weekKey()
+                ) { data: WeeklyReportData ->
+
                     aiReportTitle = context.getString(R.string.ai_report_summary)
-                    aiReportSummary = context.getString(R.string.ai_report_guide)
+                    // [핵심] 키워드 리스트 전체를 넘기면 buildWeeklySummaryLine 내부에서 첫 번째만 사용함
+                    aiReportSummary = buildWeeklySummaryLine(context, data.feeling, data.keywords)
                     isReportEnabled = true
-                } else {
-                    FirestoreManager.loadWeeklyReportFull(
-                        context, currentUid, weekKey
-                    ) { feeling, keywords, _, _, _, _, _, _, _, _, _, _ ->
-                        aiReportTitle = context.getString(R.string.ai_report_summary)
-                        aiReportSummary = buildWeeklySummaryLine(context, feeling, keywords.take(1))
-                        isReportEnabled = true
-                        // 캐시
-                        prefs.edit().apply {
-                            putString("home_feeling", feeling)
-                            putString("home_keywords", keywords.take(1).joinToString("|"))
-                            apply()
-                        }
+
+                    // 로컬에 최신 상태 저장
+                    prefs.edit().apply {
+                        putString("home_feeling", data.feeling)
+                        // 리스트를 파이프로 연결해 저장
+                        putString("home_keywords", data.keywords.joinToString("|"))
+                        apply()
                     }
                 }
             }
-        } ?: run { isReportEnabled = true }
+        }
     }
 
-    // ---- UI
     Box(
-        modifier = modifier
-            .fillMaxSize()
+        modifier = modifier.fillMaxSize()
     ) {
-        // 1) 전체 배경 이미지
         Image(
             painter = painterResource(R.drawable.main_ground),
             contentDescription = null,
@@ -131,106 +146,64 @@ fun HomeScreen(
             contentScale = ContentScale.Crop
         )
 
-        // 실제 콘텐츠 레이어
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .systemBarsPadding()
-        ) {
-            // 설정 아이콘(스케일 터치)
+        Box(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
+            // 설정 버튼
             SettingsButton(
                 onClick = onNavigateToSettings,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 64.dp, end = 22.dp)
+                modifier = Modifier.align(Alignment.TopEnd).padding(top = 64.dp, end = 22.dp)
             )
 
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp),
+                modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // 2) 타이틀 – 살짝 위로 올림
                 GradientTitle(
                     text = stringResource(R.string.home_title),
-                    modifier = Modifier
-                        .padding(bottom = 24.dp)
-                        .offset(y = (-12).dp) // 위로 12dp
+                    modifier = Modifier.padding(bottom = 24.dp).offset(y = (-12).dp)
                 )
 
-                // AI Report 카드
+                // AI 리포트 카드 (애니메이션 적용)
                 AnimatedVisibility(
                     visible = cardVisible,
-                    enter = slideInVertically(
-                        initialOffsetY = { -it },
-                        animationSpec = tween(450)
-                    ) + fadeIn(tween(450))
+                    enter = slideInVertically(initialOffsetY = { -it }, animationSpec = tween(450)) + fadeIn(tween(450))
                 ) {
                     AIReportCard(
                         title = aiReportTitle,
                         summary = aiReportSummary,
-                        isEnabled = isReportEnabled,
+                        isEnabled = !isAnonymous && isReportEnabled,
                         onReportClick = {
-                            uid?.let { onNavigateToAIReport(WeekUtils.weekKey()) }
-                                ?: Unit
+                            if (user == null || user.isAnonymous) onNavigateToSettings()
+                            else onNavigateToAIReport(WeekUtils.weekKey())
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 20.dp)
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp)
                     )
                 }
 
-                // Daily message
                 DailyMessageBubble(
                     message = dailyMessage,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 20.dp)
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp)
                 )
 
-                // 하단 3버튼 (꿈/캘린더/운세) – 살짝 아래로
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(40.dp)
-                        .offset(y = 12.dp),      // 아래로 12dp
+                    modifier = Modifier.fillMaxWidth().height(40.dp).offset(y = 12.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    HomeButton(
-                        text = stringResource(R.string.btn_dream),
-                        iconRes = R.drawable.ic_dream,
-                        onClick = onNavigateToDream,
-                        modifier = Modifier.weight(0.8f)
-                    )
-                    HomeButton(
-                        text = stringResource(R.string.btn_calendar),
-                        iconRes = R.drawable.ic_calendar_moon,
-                        onClick = onNavigateToCalendar,
-                        modifier = Modifier.weight(0.8f)
-                    )
-                    HomeButton(
-                        text = stringResource(R.string.btn_fortune),
-                        iconRes = R.drawable.ic_fortune,
-                        onClick = onNavigateToFortune,
-                        modifier = Modifier.weight(0.8f)
-                    )
+                    HomeButton(stringResource(R.string.btn_dream), R.drawable.ic_dream, onNavigateToDream, Modifier.weight(0.8f))
+                    HomeButton(stringResource(R.string.btn_calendar), R.drawable.ic_calendar_moon, onNavigateToCalendar, Modifier.weight(0.8f))
+                    HomeButton(stringResource(R.string.btn_fortune), R.drawable.ic_fortune, onNavigateToFortune, Modifier.weight(0.8f))
                 }
             }
 
-            // 커뮤니티 버튼
             CommunityButton(
                 onClick = onNavigateToCommunity,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 32.dp)
+                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 32.dp)
             )
         }
     }
 }
 
-// ----- 아래 보조 컴포넌트들은 원본 스타일을 Compose로 1:1 반영 -----
+// ----- 보조 컴포넌트들 -----
 
 @Composable
 private fun GradientTitle(text: String, modifier: Modifier = Modifier) {
@@ -250,101 +223,41 @@ private fun GradientTitle(text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun AIReportCard(
-    title: String,
-    summary: String,
-    isEnabled: Boolean,
-    onReportClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun AIReportCard(title: String, summary: String, isEnabled: Boolean, onReportClick: () -> Unit, modifier: Modifier = Modifier) {
     var scale by remember { mutableStateOf(0.96f) }
     var alpha by remember { mutableStateOf(0f) }
-
     LaunchedEffect(Unit) {
-        androidx.compose.animation.core.animate(
-            initialValue = 0f,
-            targetValue = 1f,
-            animationSpec = tween(160)
-        ) { value, _ ->
+        androidx.compose.animation.core.animate(initialValue = 0f, targetValue = 1f, animationSpec = tween(160)) { value, _ ->
             scale = 0.96f + (0.04f * value)
             alpha = value
         }
     }
-
     Card(
-        modifier = modifier
-            .scale(scale)
-            .graphicsLayer { this.alpha = alpha },
+        modifier = modifier.scale(scale).graphicsLayer { this.alpha = alpha },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0x14D7D7DB)),
         elevation = CardDefaults.cardElevation(0.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp)
-                .padding(horizontal = 16.dp, vertical = 1.dp),
+            modifier = Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 16.dp, vertical = 1.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(R.drawable.ic_ai_report),
-                contentDescription = stringResource(R.string.ai_report),
-                modifier = Modifier.size(18.dp).padding(end = 8.dp)
-            )
+            Image(painter = painterResource(R.drawable.ic_ai_report), contentDescription = stringResource(R.string.ai_report), modifier = Modifier.size(18.dp).padding(end = 8.dp))
             Column(Modifier.weight(1f)) {
-                Text(
-                    text = title,
-                    style = TextStyle(
-                        fontSize = 13.sp,
-                        fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                        color = Color(0xFFE4E2E2)
-                    ),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = summary,
-                    style = TextStyle(
-                        fontSize = 11.sp,
-                        fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                        color = Color(0xFFC6D4DF)
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 2.dp)
-                )
+                Text(text = title, style = TextStyle(fontSize = 13.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)), color = Color(0xFFE4E2E2)), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                // 요약 텍스트 (감정 + 키워드)
+                Text(text = summary, style = TextStyle(fontSize = 11.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)), color = Color(0xFFC6D4DF)), maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 2.dp))
             }
-            GradientButton(
-                text = stringResource(R.string.ai_report_btn),
-                onClick = onReportClick,
-                enabled = isEnabled,
-                modifier = Modifier.padding(start = 8.dp)
-            )
+            GradientButton(text = stringResource(R.string.ai_report_btn), onClick = onReportClick, enabled = isEnabled, modifier = Modifier.padding(start = 8.dp))
         }
     }
 }
 
 @Composable
 private fun DailyMessageBubble(message: String, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .padding(horizontal = 12.dp, vertical = 10.dp)
-    ) {
-        Image(
-            painter = painterResource(R.drawable.home_message),
-            contentDescription = stringResource(R.string.ai_avatar),
-            modifier = Modifier.size(22.dp).padding(end = 8.dp)
-        )
-        Text(
-            text = message,
-            style = TextStyle(
-                fontSize = 12.sp,
-                fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                color = Color.White,
-                lineHeight = 15.sp
-            ),
-            modifier = Modifier.weight(1f)
-        )
+    Row(modifier = modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
+        Image(painter = painterResource(R.drawable.home_message), contentDescription = stringResource(R.string.ai_avatar), modifier = Modifier.size(22.dp).padding(end = 8.dp))
+        Text(text = message, style = TextStyle(fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)), color = Color.White, lineHeight = 15.sp), modifier = Modifier.weight(1f))
     }
 }
 
@@ -353,88 +266,33 @@ private fun HomeButton(text: String, iconRes: Int, onClick: () -> Unit, modifier
     var scale by remember { mutableStateOf(1f) }
     Button(
         onClick = onClick,
-        modifier = modifier
-            .height(40.dp)
-            .scale(scale)
-            .pointerInput(Unit) {
-                detectTapGestures(onPress = {
-                    scale = 0.95f
-                    tryAwaitRelease()
-                    scale = 1f
-                })
-            },
+        modifier = modifier.height(40.dp).scale(scale).pointerInput(Unit) { detectTapGestures(onPress = { scale = 0.95f; tryAwaitRelease(); scale = 1f }) },
         shape = RoundedCornerShape(14.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0x33FFFFFF),
-            contentColor = Color(0xFFC6D4DF)
-        ),
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0x33FFFFFF), contentColor = Color(0xFFC6D4DF)),
         contentPadding = PaddingValues(horizontal = 8.dp)
     ) {
-        Icon(
-            painter = painterResource(iconRes),
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = Color(0xFFC6D4DF)
-        )
+        Icon(painter = painterResource(iconRes), contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFC6D4DF))
         Spacer(Modifier.width(7.dp))
-        Text(
-            text = text,
-            style = TextStyle(fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)))
-        )
+        Text(text = text, style = TextStyle(fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium))))
     }
 }
 
 @Composable
 private fun GradientButton(text: String, onClick: () -> Unit, enabled: Boolean, modifier: Modifier = Modifier) {
-    var scale by remember { mutableStateOf(1f) }
+    val colors = if (enabled) listOf(Color(0xFFFEDCA6), Color(0xFF8BAAFF)) else listOf(Color(0x66FEDCA6), Color(0x668BAAFF))
     Box(
-        modifier = modifier
-            .height(32.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(brush = Brush.linearGradient(listOf(Color(0xFFFEDCA6), Color(0xFF8BAAFF))))
-            .clickable(
-                enabled = enabled,
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) {
-                android.util.Log.e("🔴 HOME", "AI Report Button Clicked!")
-                onClick()
-            }
-            .scale(scale)  // scale을 clickable 뒤로 이동!
-            .padding(horizontal = 10.dp),
+        modifier = modifier.height(32.dp).clip(RoundedCornerShape(14.dp)).background(brush = Brush.linearGradient(colors)).clickable(enabled = true) { onClick() }.padding(horizontal = 10.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = text,
-            style = TextStyle(
-                fontSize = 12.sp,
-                fontFamily = FontFamily(Font(R.font.pretendard_medium)),
-                color = Color(0xFF17212B)
-            )
-        )
+        Text(text = text, style = TextStyle(fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)), color = Color(0xFF17212B)))
     }
 }
+
 @Composable
 private fun SettingsButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     var scale by remember { mutableStateOf(1f) }
-    IconButton(
-        onClick = onClick,
-        modifier = modifier
-            .size(33.dp)
-            .scale(scale)
-            .pointerInput(Unit) {
-                detectTapGestures(onPress = {
-                    scale = 1.4f
-                    tryAwaitRelease()
-                    scale = 1f
-                })
-            }
-    ) {
-        Image(
-            painter = painterResource(R.drawable.ic_setting),
-            contentDescription = stringResource(R.string.settings),
-            modifier = Modifier.size(24.dp)
-        )
+    IconButton(onClick = onClick, modifier = modifier.size(33.dp).scale(scale).pointerInput(Unit) { detectTapGestures(onPress = { scale = 1.4f; tryAwaitRelease(); scale = 1f }) }) {
+        Image(painter = painterResource(R.drawable.ic_setting), contentDescription = stringResource(R.string.settings), modifier = Modifier.size(24.dp))
     }
 }
 
@@ -442,59 +300,43 @@ private fun SettingsButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
 private fun CommunityButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     var scale by remember { mutableStateOf(1f) }
     Button(
-        onClick = onClick,
-        modifier = modifier
-            .size(72.dp)
-            .scale(scale)
-            .pointerInput(Unit) {
-                detectTapGestures(onPress = {
-                    scale = 0.95f
-                    tryAwaitRelease()
-                    scale = 1f
-                })
-            },
-        shape = RoundedCornerShape(36.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0x33FFFFFF),
-            contentColor = Color.White
-        )
+        onClick = onClick, modifier = modifier.size(72.dp).scale(scale).pointerInput(Unit) { detectTapGestures(onPress = { scale = 0.95f; tryAwaitRelease(); scale = 1f }) },
+        shape = RoundedCornerShape(36.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0x33FFFFFF), contentColor = Color.White)
     ) {
-        Text(
-            text = "커뮤니티",
-            style = TextStyle(fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)))
-        )
+        Text(text = "커뮤니티", style = TextStyle(fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium))))
     }
 }
 
+// [수정] 1개의 핵심 키워드만 선별하여 보여주는 로직
 private fun buildWeeklySummaryLine(context: Context, topEmotion: String?, keywords: List<String>?): String {
     val emo = topEmotion?.trim().orEmpty()
-    val kw = keywords?.asSequence()?.filter { it.isNotBlank() }?.map { it.trim() }?.distinct()?.take(1)?.joinToString(", ").orEmpty()
+
+    // 키워드 리스트 중 첫 번째(Index 0)만 가져옴. # 제거.
+    val singleKeyword = keywords?.asSequence()
+        ?.filter { it.isNotBlank() }
+        ?.map { it.replace("#", "").trim() }
+        ?.firstOrNull()
+        .orEmpty()
+
     val emoLabel = context.getString(R.string.label_emotion)
     val kwLabel  = context.getString(R.string.label_keywords)
+
+    // "감정: 긍정 • 키워드: 탈출" 형태로 포맷팅
     return when {
-        emo.isNotEmpty() && kw.isNotEmpty() -> "$emoLabel: $emo • $kwLabel: $kw"
+        emo.isNotEmpty() && singleKeyword.isNotEmpty() -> "$emoLabel: $emo • $kwLabel: $singleKeyword"
         emo.isNotEmpty() -> "$emoLabel: $emo"
-        kw.isNotEmpty()  -> "$kwLabel: $kw"
+        singleKeyword.isNotEmpty()  -> "$kwLabel: $singleKeyword"
         else -> context.getString(R.string.home_ai_sub)
     }
 }
 
 private fun getDailyFallbacks(context: Context): List<String> = listOf(
-    context.getString(R.string.daily_fallback_1),
-    context.getString(R.string.daily_fallback_2),
-    context.getString(R.string.daily_fallback_3),
-    context.getString(R.string.daily_fallback_4),
-    context.getString(R.string.daily_fallback_5)
+    context.getString(R.string.daily_fallback_1), context.getString(R.string.daily_fallback_2),
+    context.getString(R.string.daily_fallback_3), context.getString(R.string.daily_fallback_4), context.getString(R.string.daily_fallback_5)
 )
+
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen(
-        onNavigateToDream = {},
-        onNavigateToCalendar = {},
-        onNavigateToFortune = {},
-        onNavigateToSettings = {},
-        onNavigateToAIReport = {},
-        onNavigateToCommunity = {}
-    )
+    HomeScreen({}, {}, {}, {}, {}, {})
 }

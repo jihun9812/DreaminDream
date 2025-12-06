@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="kw_positive_en">
+        <item>joy</item><item>happy</item><item>pleasure</item><item>excited</item>
+    </string-array>
+    <string-array name="kw_positive_ko">
+        <item>기쁨</item><item>행복</item><item>즐거움</item><item>신남</item>
+    </string-array>
+    <string-array name="kw_positive_zh">
+        <item>快乐</item><item>幸福</item><item>高兴</item><item>喜悦</item>
+    </string-array>
+    <string-array name="kw_positive_hi">
+        <item>खुशी</item><item>आनंद</item><item>सुख</item> </string-array>
+    <string-array name="kw_positive_ar">
+        <item>سعيد</item><item>فرح</item><item>سرور</item><item>مبتسم</item> </string-array>
+
+    <string-array name="kw_calm_en">
+        <item>calm</item><item>peace</item><item>relax</item><item>serene</item>
+    </string-array>
+    <string-array name="kw_calm_ko">
+        <item>평온</item><item>편안</item><item>휴식</item><item>차분</item>
+    </string-array>
+    <string-array name="kw_calm_zh">
+        <item>平静</item><item>安宁</item><item>放松</item>
+    </string-array>
+    <string-array name="kw_calm_hi">
+        <item>शांति</item><item>आराम</item><item>सकून</item> </string-array>
+    <string-array name="kw_calm_ar">
+        <item>هدوء</item><item>سلام</item><item>راحة</item> </string-array>
+
+    <string-array name="kw_vitality_en">
+        <item>energy</item><item>vitality</item><item>power</item><item>strong</item>
+    </string-array>
+    <string-array name="kw_vitality_ko">
+        <item>활력</item><item>에너지</item><item>힘</item><item>기운</item>
+    </string-array>
+    <string-array name="kw_vitality_zh">
+        <item>活力</item><item>能量</item><item>力量</item>
+    </string-array>
+    <string-array name="kw_vitality_hi">
+        <item>ऊर्जा</item><item>शक्ति</item><item>बल</item> </string-array>
+    <string-array name="kw_vitality_ar">
+        <item>طاقة</item><item>حيوية</item><item>قوة</item> </string-array>
+
+    <string-array name="kw_focus_en">
+        <item>focus</item><item>immersion</item><item>deep</item>
+    </string-array>
+    <string-array name="kw_focus_ko">
+        <item>집중</item><item>몰입</item><item>깊은</item>
+    </string-array>
+    <string-array name="kw_focus_zh">
+        <item>专注</item><item>沉浸</item><item>集中</item>
+    </string-array>
+    <string-array name="kw_focus_hi">
+        <item>ध्यान</item><item>एकाग्रता</item> </string-array>
+    <string-array name="kw_focus_ar">
+        <item>تركيز</item><item>انغماس</item> </string-array>
+
+    <string-array name="kw_confusion_en">
+        <item>confused</item><item>weird</item><item>strange</item><item>lost</item>
+    </string-array>
+    <string-array name="kw_confusion_ko">
+        <item>혼란</item><item>이상함</item><item>모름</item><item>길을잃음</item>
+    </string-array>
+    <string-array name="kw_confusion_zh">
+        <item>困惑</item><item>奇怪</item><item>迷失</item>
+    </string-array>
+    <string-array name="kw_confusion_hi">
+        <item>उलझन</item><item>अजीब</item> </string-array>
+    <string-array name="kw_confusion_ar">
+        <item>ارتباك</item><item>غريب</item><item>ضائع</item> </string-array>
+
+    <string-array name="kw_anxiety_en">
+        <item>anxiety</item><item>worry</item><item>nervous</item><item>scared</item>
+    </string-array>
+    <string-array name="kw_anxiety_ko">
+        <item>불안</item><item>걱정</item><item>긴장</item><item>무서움</item>
+    </string-array>
+    <string-array name="kw_anxiety_zh">
+        <item>焦虑</item><item>担心</item><item>紧张</item><item>害怕</item>
+    </string-array>
+    <string-array name="kw_anxiety_hi">
+        <item>चिंता</item><item>डर</item><item>घबराहट</item> </string-array>
+    <string-array name="kw_anxiety_ar">
+        <item>قلق</item><item>خوف</item><item>توتر</item> </string-array>
+
+    <string-array name="kw_depression_en">
+        <item>sad</item><item>depressed</item><item>gloom</item><item>cry</item><item>tear</item>
+    </string-array>
+    <string-array name="kw_depression_ko">
+        <item>우울</item><item>슬픔</item><item>눈물</item><item>울음</item><item>어둠</item>
+    </string-array>
+    <string-array name="kw_depression_zh">
+        <item>悲伤</item><item>抑郁</item><item>哭泣</item><item>眼泪</item>
+    </string-array>
+    <string-array name="kw_depression_hi">
+        <item>उदासी</item><item>दुख</item><item>रोना</item> </string-array>
+    <string-array name="kw_depression_ar">
+        <item>حزن</item><item>كآبة</item><item>بكي</item><item>دموع</item> </string-array>
+
+    <string-array name="kw_theme_rel_en">
+        <item>family</item><item>friend</item><item>lover</item><item>people</item>
+    </string-array>
+    <string-array name="kw_theme_rel_ko">
+        <item>가족</item><item>친구</item><item>연인</item><item>사람</item>
+    </string-array>
+    <string-array name="kw_theme_rel_zh"><item>家庭</item><item>朋友</item><item>爱人</item></string-array>
+    <string-array name="kw_theme_rel_hi"><item>परिवार</item><item>मित्र</item><item>प्यार</item></string-array>
+    <string-array name="kw_theme_rel_ar"><item>عائلة</item><item>صديق</item><item>حب</item></string-array>
+
+    <string-array name="kw_theme_success_en">
+        <item>money</item><item>success</item><item>rich</item><item>win</item>
+    </string-array>
+    <string-array name="kw_theme_success_ko">
+        <item>성공</item><item>돈</item><item>부자</item><item>당첨</item>
+    </string-array>
+    <string-array name="kw_theme_success_zh"><item>金钱</item><item>成功</item><item>赢</item></string-array>
+    <string-array name="kw_theme_success_hi"><item>पैसा</item><item>सफलता</item><item>जीत</item></string-array>
+    <string-array name="kw_theme_success_ar"><item>مال</item><item>نجاح</item><item>فوز</item></string-array>
+
+    <string-array name="kw_theme_change_en">
+        <item>change</item><item>move</item><item>new</item><item>start</item>
+    </string-array>
+    <string-array name="kw_theme_change_ko">
+        <item>변화</item><item>이사</item><item>이직</item><item>새로운</item>
+    </string-array>
+    <string-array name="kw_theme_change_zh"><item>改变</item><item>移动</item><item>新</item></string-array>
+    <string-array name="kw_theme_change_hi"><item>परिवर्तन</item><item>नया</item></string-array>
+    <string-array name="kw_theme_change_ar"><item>تغيير</item><item>جديد</item><item>انتقال</item></string-array>
+
+    <string-array name="kw_theme_risk_en">
+        <item>accident</item><item>blood</item><item>hurt</item><item>danger</item><item>die</item>
+    </string-array>
+    <string-array name="kw_theme_risk_ko">
+        <item>사고</item><item>피</item><item>다침</item><item>위험</item><item>죽음</item>
+    </string-array>
+    <string-array name="kw_theme_risk_zh"><item>事故</item><item>血</item><item>危险</item></string-array>
+    <string-array name="kw_theme_risk_hi"><item>दुर्घटना</item><item>खून</item><item>खतरा</item></string-array>
+    <string-array name="kw_theme_risk_ar"><item>حادث</item><item>دم</item><item>خطر</item></string-array>
+</resources>

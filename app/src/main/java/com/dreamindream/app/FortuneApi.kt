@@ -1,246 +1,103 @@
 package com.dreamindream.app
 
 import android.content.Context
-import android.util.Log
+import android.graphics.Color
 import com.dreamindream.app.FortuneStorage.UserInfo
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 class FortuneApi(
     private val context: Context,
     private val storage: FortuneStorage
 ) {
-    private val client = OkHttpClient()
+    private val client: OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(90, TimeUnit.SECONDS)
+        .readTimeout(90, TimeUnit.SECONDS)
+        .build()
 
     companion object {
-        private const val TAG = "FortuneApi"
+        private const val API_URL = "https://api.openai.com/v1/chat/completions"
         private val JSON_MEDIA = "application/json; charset=utf-8".toMediaType()
     }
 
-    // 오늘 날짜 키 (예: 2025-12-01)
-    private fun todayKey(): String {
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        return sdf.format(Date())
+    fun fetchDaily(u: UserInfo, seed: Int, onSuccess: (JSONObject) -> Unit, onError: (String) -> Unit) {
+        // ★ 수정됨: "lottoNumbers"를 최상단 필드로 요청함
+        val prompt = """
+            Role: Expert Fortune Teller.
+            User: ${u.nickname}, ${u.birth}, ${u.gender}, MBTI: ${u.mbti}.
+            Date: ${storage.todayKey()}. Seed: $seed.
+            
+            Generate JSON.
+            1. "radar": Scores (0-100) for "love", "money", "work", "health", "social".
+            2. "summary": One mystical sentence summary.
+            3. "lucky": { "colorHex": "#RRGGBB", "number": (1-99), "time": "ex) 2 PM", "direction": "ex) East" }
+            4. "checklist": 2 specific actionable tasks.
+            5. "sections": 
+               - "love", "money", "work", "health", "social": Each needs { "score": int, "text": "Specific advice (1-2 sentences)" }.
+            6. "lottoNumbers": [Generate 6 unique integers (1-45)].
+            
+            Output JSON only. Language: ${context.getString(R.string.api_lang_code)}.
+        """.trimIndent()
+
+        postRequest(prompt, onSuccess, onError)
     }
 
-    // =========================
-    //  Daily Fortune
-    // =========================
-    fun fetchDaily(
-        u: UserInfo,
-        seed: Int,
-        onSuccess: (JSONObject) -> Unit,
-        onError: (String, Triple<Int, Int, Int>) -> Unit
-    ) {
-        val body = buildDailyRequest(u, seed)
-        val req = Request.Builder()
-            .url("https://api.openai.com/v1/chat/completions")
-            .post(body.toString().toRequestBody(JSON_MEDIA))
-            .addHeader("Authorization", "Bearer ${BuildConfig.OPENAI_API_KEY}")
-            .build()
+    fun fetchDeep(u: UserInfo, daily: JSONObject, seed: Int, onSuccess: (JSONObject?) -> Unit) {
+        val prompt = """
+            Based on daily fortune: $daily
+            Perform DEEP Analysis.
+            
+            Required JSON:
+            1. "flow_curve": Array of 7 integers (0-100) for [6AM, 9AM, 12PM, 3PM, 6PM, 9PM, 12AM].
+            2. "highlights": 3 bullet points of hidden insights.
+            3. "risk_opp": "Risk vs Opportunity analysis".
+            4. "solution": "Concrete behavioral solution".
+            5. "tomorrow_preview": "Hint for tomorrow".
+            
+            Output JSON only. Language: ${context.getString(R.string.api_lang_code)}. Tone: Premium.
+        """.trimIndent()
 
-        client.newCall(req).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: java.io.IOException) {
-                Log.e(TAG, "fetchDaily onFailure", e)
-                val msg = mapErrorToUserMessage(e.message ?: "network")
-                // 기본 감정 프리셋 (긍정/중립/부정)
-                onError(msg, Triple(60, 25, 15))
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                response.use {
-                    if (!response.isSuccessful) {
-                        val msg = mapHttpError(response.code)
-                        onError(msg, Triple(60, 25, 15))
-                        return
-                    }
-                    val bodyStr = response.body?.string() ?: run {
-                        onError(
-                            context.getString(R.string.err_network_generic, "empty"),
-                            Triple(60, 25, 15)
-                        )
-                        return
-                    }
-                    try {
-                        val root = JSONObject(bodyStr)
-                        val choices = root.optJSONArray("choices")
-                        if (choices == null || choices.length() == 0) {
-                            onError(
-                                context.getString(R.string.err_network_generic, "choices"),
-                                Triple(60, 25, 15)
-                            )
-                            return
-                        }
-                        val msgObj = choices.getJSONObject(0)
-                            .getJSONObject("message")
-                        val content = msgObj.optString("content")
-                        val json = JSONObject(content)
-                        onSuccess(json)
-                    } catch (t: Throwable) {
-                        Log.e(TAG, "fetchDaily parse error", t)
-                        onError(
-                            context.getString(R.string.err_network_generic, "parse"),
-                            Triple(60, 25, 15)
-                        )
-                    }
-                }
-            }
-        })
+        postRequest(prompt, { onSuccess(it) }, { onSuccess(null) })
     }
 
-    private fun buildDailyRequest(u: UserInfo, seed: Int): JSONObject {
-        val sys = context.getString(R.string.fortune_system_daily)
-        val prompt = context.getString(
-            R.string.fortune_daily_prompt_template,
-            u.nickname ?: "",
-            u.mbti ?: "",
-            u.birth ?: "",
-            u.gender ?: "",
-            u.birthTime ?: "",
-            todayKey(),
-            seed.toString()
-        )
-
-        return JSONObject().apply {
-            put("model", "gpt-4.1-mini")
-            put("temperature", 0.7)
-            put("max_tokens", 2000)
-            put("messages", JSONArray().apply {
-                put(JSONObject().put("role", "system").put("content", sys))
-                put(JSONObject().put("role", "user").put("content", prompt))
-            })
-        }
-    }
-
-    // =========================
-    //  Deep Fortune (심화 분석)
-    // =========================
-    fun fetchDeep(
-        u: UserInfo,
-        daily: JSONObject,
-        seed: Int,
-        cb: (JSONObject?) -> Unit
-    ) {
-        val sys = context.getString(R.string.fortune_system_deep)
-        val prompt = buildDeepPrompt(u, daily, seed)
-
+    private fun postRequest(prompt: String, onSuccess: (JSONObject) -> Unit, onError: (String) -> Unit) {
         val body = JSONObject().apply {
-            put("model", "gpt-4.1-mini")
-            put("temperature", 0.5)
-            put("max_tokens", 2000)
-            put("messages", JSONArray().apply {
-                put(JSONObject().put("role", "system").put("content", sys))
-                put(JSONObject().put("role", "user").put("content", prompt))
-            })
+            put("model", "gpt-4o-mini")
+            put("messages", JSONArray().put(JSONObject().put("role", "user").put("content", prompt)))
+            put("response_format", JSONObject().put("type", "json_object"))
         }
 
         val req = Request.Builder()
-            .url("https://api.openai.com/v1/chat/completions")
+            .url(API_URL)
             .post(body.toString().toRequestBody(JSON_MEDIA))
             .addHeader("Authorization", "Bearer ${BuildConfig.OPENAI_API_KEY}")
             .build()
 
         client.newCall(req).enqueue(object : Callback {
             override fun onFailure(call: Call, e: java.io.IOException) {
-                Log.e(TAG, "fetchDeep onFailure", e)
-                cb(null)
+                onError(context.getString(R.string.network_error))
             }
-
             override fun onResponse(call: Call, response: Response) {
-                response.use {
-                    if (!response.isSuccessful) {
-                        Log.e(TAG, "fetchDeep http ${response.code}")
-                        cb(null)
-                        return
-                    }
-                    val bodyStr = response.body?.string() ?: run {
-                        cb(null)
-                        return
-                    }
-                    cb(
-                        try {
-                            val root = JSONObject(bodyStr)
-                            val choices = root.optJSONArray("choices")
-                            if (choices == null || choices.length() == 0) null
-                            else {
-                                val msgObj = choices.getJSONObject(0)
-                                    .getJSONObject("message")
-                                val content = msgObj.optString("content")
-                                JSONObject(content)
-                            }
-                        } catch (t: Throwable) {
-                            Log.e(TAG, "fetchDeep parse error", t)
-                            null
-                        }
-                    )
+                try {
+                    val respBody = response.body?.string() ?: throw Exception("Empty Body")
+                    val content = JSONObject(respBody).getJSONArray("choices")
+                        .getJSONObject(0).getJSONObject("message").getString("content")
+                    onSuccess(JSONObject(content))
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    onError(context.getString(R.string.parse_error))
                 }
             }
         })
     }
 
-    private fun buildDeepPrompt(
-        u: UserInfo,
-        daily: JSONObject,
-        seed: Int
-    ): String {
-
-        val tone = "calm" // 또는 너희 프로젝트의 tone 생성 방식 사용(원하면 styleTokens 넣어줄게)
-
-        return context.getString(
-            R.string.fortune_deep_prompt_template,
-            u.nickname ?: "",     // %1$s
-            u.mbti ?: "",         // %2$s
-            u.birth ?: "",        // %3$s
-            u.gender ?: "",       // %4$s
-            u.birthTime ?: "",    // %5$s
-            todayKey(),           // %6$s
-            tone,                 // %7$s  ← ★ 반드시 추가!
-            seed.toString(),      // %8$s
-            daily.toString()      // %9$s
-        )
+    fun scoreColor(score: Int): Int = when {
+        score >= 80 -> Color.parseColor("#FFD700")
+        score >= 60 -> Color.parseColor("#4FC3F7")
+        else -> Color.parseColor("#EF5350")
     }
-
-
-    // =========================
-    //  Lucky time helpers
-    // =========================
-
-    fun humanizeLuckyTime(raw: String): String {
-        // 일단은 원래 문자열 그대로 쓰고,
-        // 필요하면 나중에 "09:00~12:00" -> "오전 9시 ~ 12시" 같은 변환 추가하면 됨.
-        return raw.trim()
-    }
-
-    fun pickLuckyTimeFallback(): String {
-        // strings.xml 에 적당한 기본 문구가 있다면 그걸 쓰고,
-        // 없으면 그냥 "오전 11시" 고정
-        return try {
-            context.getString(R.string.fortune_lucky_time_fallback)
-        } catch (_: Throwable) {
-            "오전 11시"
-        }
-    }
-
-    // =========================
-    //  Error helpers
-    // =========================
-
-    private fun mapErrorToUserMessage(reason: String): String = when {
-        reason.contains("401") -> context.getString(R.string.err_auth, reason)
-        reason.contains("403") -> context.getString(R.string.err_forbidden, reason)
-        reason.contains("404") -> context.getString(R.string.err_not_found, reason)
-        reason.contains("429") -> context.getString(R.string.err_rate_limit, reason)
-        reason.contains("timeout", ignoreCase = true) ->
-            context.getString(R.string.err_timeout, reason)
-
-        else -> context.getString(R.string.err_network_generic, reason)
-    }
-
-    private fun mapHttpError(code: Int): String = mapErrorToUserMessage("http $code")
 }

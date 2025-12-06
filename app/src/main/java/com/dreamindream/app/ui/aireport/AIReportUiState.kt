@@ -3,62 +3,55 @@ package com.dreamindream.app.ui.aireport
 import com.dreamindream.app.FirestoreManager
 
 data class AIReportUiState(
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
+    val loadingMessage: String = "",
 
-    // 카드/빈 상태 토글
     val showReportCard: Boolean = false,
-    val showEmptyState: Boolean = true,
+    val showEmptyState: Boolean = false,
 
-    // 헤더
+    // Header Info
     val weekLabel: String = "",
-    val analysisTitle: String = "",
 
-    // 키워드 라벨
+    // Basic Data
     val keywordsLine: String = "",
-
-    // AI 분석 (HTML 문자열, 스타일링은 Composable에서)
     val analysisHtml: String = "",
+    val analysisJson: String = "",
 
-    // 감정 차트
+    // ★ [추가됨] 이미지 URL을 담을 변수
+    val analysisImageUrl: String = "",
+
+    // Charts
     val emotionLabels: List<String> = emptyList(),
     val emotionDist: List<Float> = emptyList(),
-
-    // 테마 차트
     val themeLabels: List<String> = emptyList(),
     val themeDist: List<Float> = emptyList(),
 
-    // KPI 텍스트
-    val kpiPositiveText: String = "-",
-    val kpiNeutralText: String = "-",
-    val kpiNegativeText: String = "-",
+    // 상단 통계
+    val dominantEmotion: String = "-",
+    val thisWeekDreamCount: Int = 0,
+    val dreamCountTrend: Int = 0,
+    val dreamScore: Int = 0,
+    val dreamGrade: String = "-",
 
-    // PRO 버튼 상태
+    // PRO Logic
     val proButtonText: String = "",
     val proButtonEnabled: Boolean = false,
     val proButtonAlpha: Float = 1f,
-
-    // PRO 스피너
     val isProSpinnerVisible: Boolean = false,
-
-    // PRO 진행상태
     val isProCompleted: Boolean = false,
-    val isProRefreshNeeded: Boolean = false,
 
-    // 주간/이력
+    // 사용자 이름
+    val userName: String = "",
+
+    // Navigation trigger
+    val navigateToSubscription: Boolean = false,
+
+    // Navigation/Dialogs
     val targetWeekKey: String = FirestoreManager.thisWeekKey(),
-    val autoSwitchedFromWeekKey: String? = null,
-    val lastDreamCount: Int = 0,
-
-    // 위클리 히스토리 UI
     val showEmptyDialog: Boolean = false,
     val showHistorySheet: Boolean = false,
     val historyWeeks: List<String> = emptyList(),
-    val historyTotalWeeksLabel: String = "",
-
-    // 차트 정보 다이얼로그
     val showChartInfoDialog: Boolean = false,
     val chartInfoMessage: String = "",
-
-    // 스낵바 1회성 메시지
-    val snackbarMessage: String? = null,
+    val snackbarMessage: String? = null
 )

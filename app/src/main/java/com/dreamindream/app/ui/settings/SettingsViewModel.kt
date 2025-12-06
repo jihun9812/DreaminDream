@@ -2,433 +2,271 @@ package com.dreamindream.app.ui.settings
 
 import android.app.Application
 import android.content.Context
-import android.content.SharedPreferences
 import android.provider.Settings
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.dreamindream.app.FirestoreManager
 import com.dreamindream.app.R
-import com.google.firebase.Timestamp
-import com.google.firebase.auth.EmailAuthProvider
+import com.dreamindream.app.SubscriptionManager
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
-import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.json.JSONArray
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     private val ctx = app.applicationContext
-    private val ISO = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).apply {
-        timeZone = TimeZone.getTimeZone("UTC")
-    }
+    private val PREFS_NAME_PREFIX = "dream_profile_"
 
-    private val prefs: SharedPreferences by lazy { resolveProfilePrefs() }
-    private fun resolveProfilePrefs(): SharedPreferences {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid
-        val key = uid
-            ?: "guest-" + (Settings.Secure.getString(ctx.contentResolver, Settings.Secure.ANDROID_ID)
-                ?: "device")
-        return ctx.getSharedPreferences("dreamindream_profile_$key", Context.MODE_PRIVATE)
+    private fun str(id: Int, fb: String): String =
+        runCatching { ctx.getString(id) }.getOrElse { fb }
+
+    private fun getPrefs() = ctx.getSharedPreferences(
+        PREFS_NAME_PREFIX + (FirebaseAuth.getInstance().currentUser?.uid ?: getDeviceId()),
+        Context.MODE_PRIVATE
+    )
+
+    private fun getDeviceId(): String {
+        return Settings.Secure.getString(ctx.contentResolver, Settings.Secure.ANDROID_ID) ?: "unknown_device"
     }
 
     private val _ui = MutableStateFlow(SettingsUiState())
-    val ui: StateFlow<SettingsUiState> = _ui
+    val ui: StateFlow<SettingsUiState> = _ui.asStateFlow()
 
     init {
-        loadFromPrefs()
-        refreshQuickStatus()
-        updateAccountLinkUi()
-        enterCorrectMode()
+        initialLoad()
+
+        viewModelScope.launch {
+            SubscriptionManager.isSubscribed.collect { subscribed ->
+                _ui.update { it.copy(isPremium = subscribed) }
+            }
+        }
     }
 
-    private fun enterCorrectMode() {
-        val incomplete =
-            _ui.value.nickname.isBlank() ||
-                    _ui.value.birthIso.isBlank() ||
-                    _ui.value.gender.isBlank()
-        _ui.value = _ui.value.copy(isEditMode = incomplete)
+    private fun initialLoad() {
+        loadFromLocal()
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            syncWithFirestore(user.uid)
+        }
+        refreshStats()
+        updateAccountStatus()
     }
 
-    fun setEditMode(enabled: Boolean) {
-        _ui.value = _ui.value.copy(isEditMode = enabled)
+    // --- Stats Logic (Modified) ---
+    private fun refreshStats() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        // ★ 수정됨: FirestoreManager의 새로운 메서드를 사용하여
+        // 전체 누적 횟수와 오늘 해석 횟수를 동시에 가져옴
+        FirestoreManager.getDreamStats(uid) { total, today ->
+            _ui.update {
+                it.copy(
+                    dreamTotalCount = total,
+                    gptUsedToday = today
+                )
+            }
+        }
     }
 
-    fun loadFromPrefs() {
-        val nn = prefs.getString("nickname", "") ?: ""
-        val bd = (prefs.getString("birthdate_iso", null)
-            ?: prefs.getString("birthdate", "")).orEmpty()
-        val gd = prefs.getString("gender", "") ?: ""
-        val mb = (prefs.getString("mbti", "") ?: "").uppercase(Locale.ROOT)
-        val btCode = prefs.getString("birth_time_code", null)
-            ?: labelToBirthCode(prefs.getString("birth_time", null))
-        val btLabel = codeToLocalizedLabel(btCode)
+    // --- Data Loading & Sync ---
+    private fun loadFromLocal() {
+        val prefs = getPrefs()
+        val birthIso = prefs.getString("birthdate_iso", "") ?: ""
+        val btCode = prefs.getString("birth_time_code", "none") ?: "none"
 
-        val age = calcAge(bd)
-        val (cz, czIcon) = chineseZodiac(bd)
-        val (wz, _) = westernZodiac(bd)
+        val (zodiacSign, _) = calculateWesternZodiac(birthIso)
+        val (zodiacAnimal, icon) = calculateChineseZodiac(birthIso)
+        val age = calculateAge(birthIso)
 
-        _ui.value = _ui.value.copy(
-            nickname = nn,
-            birthIso = bd,
-            gender = gd,
-            mbti = mb,
-            birthTimeCode = btCode,
-            birthTimeLabel = btLabel,
-            age = age,
-            chineseZodiacText = cz,
-            chineseZodiacIcon = czIcon,
-            westernZodiacText = wz
-        )
-    }
-
-    // ====== 저장 ======
-    fun save(
-        nickname: String,
-        birthIso: String,
-        gender: String,
-        mbti: String,
-        birthTimeCode: String
-    ) {
-        if (nickname.isBlank() || birthIso.isBlank() || gender.isBlank()) {
-            _ui.value = _ui.value.copy(
-                toast = ctx.getString(R.string.err_select_birthdate)
+        _ui.update {
+            it.copy(
+                nickname = prefs.getString("nickname", "") ?: "",
+                birthIso = birthIso,
+                gender = prefs.getString("gender", "") ?: "",
+                mbti = prefs.getString("mbti", "") ?: "",
+                birthTimeCode = btCode,
+                birthTimeLabel = codeToLocalizedLabel(btCode),
+                age = age,
+                zodiacSign = zodiacSign,
+                zodiacAnimal = icon
             )
+        }
+    }
+
+    private fun syncWithFirestore(uid: String) {
+        _ui.update { it.copy(isLoading = true) }
+        FirestoreManager.getUserProfile(uid) { data ->
+            if (data != null) {
+                getPrefs().edit().apply {
+                    putString("nickname", data["nickname"] as? String ?: "")
+                    putString("birthdate_iso", data["birthdate_iso"] as? String ?: "")
+                    putString("gender", data["gender"] as? String ?: "")
+                    putString("mbti", data["mbti"] as? String ?: "")
+                    putString("birth_time_code", data["birth_time_code"] as? String ?: "none")
+                }.apply()
+                loadFromLocal()
+            }
+            _ui.update { it.copy(isLoading = false) }
+        }
+    }
+
+    fun toggleEditMode() {
+        val current = _ui.value.isEditMode
+        if (!current) loadFromLocal()
+        _ui.update { it.copy(isEditMode = !current) }
+    }
+
+    fun saveProfile(nickname: String, birthIso: String, gender: String, mbti: String, birthTimeCode: String) {
+        if (nickname.isBlank() || birthIso.isBlank() || gender.isBlank()) {
+            showToast(ctx.getString(R.string.err_select_birthdate))
             return
         }
-        _ui.value = _ui.value.copy(saving = true)
 
-        val btLabel = codeToLocalizedLabel(birthTimeCode)
+        _ui.update { it.copy(saving = true) }
 
-        prefs.edit().apply {
+        getPrefs().edit().apply {
             putString("nickname", nickname)
             putString("birthdate_iso", birthIso)
-            putString("birthdate", birthIso)
             putString("gender", gender)
             putString("mbti", mbti)
             putString("birth_time_code", birthTimeCode)
-            putString("birth_time", btLabel)
-            putLong("profile_last_saved", System.currentTimeMillis())
         }.apply()
 
-        val user = FirebaseAuth.getInstance().currentUser
-        if (user == null) {
-            doneSaved()
-        } else {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (uid != null) {
             val data = mapOf(
                 "nickname" to nickname,
                 "birthdate_iso" to birthIso,
-                "birthdate" to birthIso,
                 "gender" to gender,
                 "mbti" to mbti,
                 "birth_time_code" to birthTimeCode,
-                "birth_time" to btLabel
+                "updatedAt" to System.currentTimeMillis()
             )
-            FirebaseFirestore.getInstance()
-                .collection("users").document(user.uid)
-                .set(data, SetOptions.merge())
-                .addOnCompleteListener { doneSaved() }
-        }
-    }
-
-    private fun doneSaved() {
-        _ui.value = _ui.value.copy(
-            saving = false,
-            isEditMode = false,
-            toast = ctx.getString(R.string.toast_saved)
-        )
-        loadFromPrefs()
-        refreshQuickStatus()
-        updateAccountLinkUi()
-    }
-
-    // ====== 빠른 통계 ======
-    private fun dreamHistoryPrefs(): SharedPreferences {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid
-        return if (uid != null)
-            ctx.getSharedPreferences("dream_history_$uid", Context.MODE_PRIVATE)
-        else
-            ctx.getSharedPreferences("dream_history", Context.MODE_PRIVATE)
-    }
-
-    private fun countDreamEntriesTotalLocal(): Int {
-        val p = dreamHistoryPrefs()
-        var total = 0
-        val dateRegex = Regex("""\d{4}-\d{2}-\d{2}""")
-        p.all.forEach { (key, value) ->
-            if (dateRegex.matches(key)) {
-                val s = value as? String ?: return@forEach
-                total += runCatching { JSONArray(s).length() }.getOrDefault(0)
+            FirestoreManager.updateUserProfile(uid, data) {
+                onSaveComplete()
             }
-        }
-        return total
-    }
-
-    fun refreshQuickStatus() {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid
-        if (uid == null) {
-            val todayInterpret = prefs.getInt(
-                "interpret_used_today",
-                prefs.getInt("gpt_used_today", 0) +
-                        prefs.getInt("gpt_reward_used_today", 0)
-            )
-            _ui.value = _ui.value.copy(
-                gptUsedToday = todayInterpret,
-                dreamTotalLocal = countDreamEntriesTotalLocal()
-            )
-            return
-        }
-        com.dreamindream.app.FirestoreManager.countDreamEntriesToday(uid) { today ->
-            _ui.value = _ui.value.copy(
-                gptUsedToday = today,
-                dreamTotalLocal = countDreamEntriesTotalLocal()
-            )
-            prefs.edit().putInt("interpret_used_today", today).apply()
+        } else {
+            onSaveComplete()
         }
     }
 
-    // ====== 계정 링크 / 상태 ======
-    fun updateAccountLinkUi() {
-        val user = FirebaseAuth.getInstance().currentUser
-        if (user == null) {
-            _ui.value = _ui.value.copy(
-                accountStatusLabel = ctx.getString(R.string.status_logged_out),
-                canDeleteAccount = false,
-                googleButtonLabel = ctx.getString(R.string.btn_google_login),
-                googleButtonEnabled = true
-            )
-            return
-        }
-        val providers = user.providerData.map { it.providerId }.toSet()
-        when {
-            user.isAnonymous -> {
-                _ui.value = _ui.value.copy(
-                    accountStatusLabel = ctx.getString(R.string.status_guest),
-                    canDeleteAccount = false,
-                    googleButtonLabel = ctx.getString(R.string.btn_google_merge),
-                    googleButtonEnabled = true
-                )
-            }
-
-            "google.com" in providers -> {
-                _ui.value = _ui.value.copy(
-                    accountStatusLabel = ctx.getString(R.string.status_google),
-                    canDeleteAccount = true,
-                    googleButtonLabel = ctx.getString(R.string.btn_google_connected),
-                    googleButtonEnabled = false
-                )
-            }
-
-            EmailAuthProvider.PROVIDER_ID in providers -> {
-                _ui.value = _ui.value.copy(
-                    accountStatusLabel = ctx.getString(R.string.status_email),
-                    canDeleteAccount = true,
-                    googleButtonLabel = ctx.getString(R.string.btn_google_connect),
-                    googleButtonEnabled = true
-                )
-            }
-
-            else -> {
-                _ui.value = _ui.value.copy(
-                    canDeleteAccount = false,
-                    googleButtonLabel = ctx.getString(R.string.btn_google_connect),
-                    googleButtonEnabled = true
-                )
-            }
-        }
-    }
-
-    fun startLinkGoogle() {
-        _ui.value = _ui.value.copy(linkInProgress = true)
-    }
-
-    fun endLinkGoogle() {
-        _ui.value = _ui.value.copy(linkInProgress = false)
-    }
-
-    fun linkGoogleWithIdToken(idToken: String, onToast: (String) -> Unit) {
-        val auth = FirebaseAuth.getInstance()
-        val credential =
-            com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, null)
-        val user = auth.currentUser
-        val wasAnonymous = (user?.isAnonymous == true)
-        val anonUid = user?.uid
-
-        val linkOp =
-            if (user == null) auth.signInWithCredential(credential)
-            else user.linkWithCredential(credential)
-
-        linkOp.addOnCompleteListener { t ->
-            if (t.isSuccessful) {
-                if (wasAnonymous) {
-                    FirebaseAuth.getInstance().currentUser?.uid?.let {
-                        migrateGuestLocalDataToUid(it)
-                    }
-                }
-                onToast(ctx.getString(R.string.toast_google_linked))
-                updateAccountLinkUi()
-                endLinkGoogle()
-            } else {
-                val e = t.exception
-                if (e is com.google.firebase.auth.FirebaseAuthUserCollisionException ||
-                    (e as? com.google.firebase.auth.FirebaseAuthException)?.errorCode ==
-                    "ERROR_CREDENTIAL_ALREADY_IN_USE"
-                ) {
-                    auth.signInWithCredential(credential)
-                        .addOnSuccessListener { res ->
-                            val newUid = res.user?.uid
-                            if (anonUid != null && newUid != null && anonUid != newUid) {
-                                FirebaseFunctions.getInstance()
-                                    .getHttpsCallable("mergeUserData")
-                                    .call(
-                                        mapOf(
-                                            "oldUid" to anonUid,
-                                            "newUid" to newUid
-                                        )
-                                    )
-                                    .addOnSuccessListener {
-                                        migrateGuestLocalDataToUid(newUid)
-                                        onToast(ctx.getString(R.string.toast_merge_done))
-                                        updateAccountLinkUi()
-                                        endLinkGoogle()
-                                    }
-                                    .addOnFailureListener { fe ->
-                                        minimallyMergeTopProfileDoc(anonUid, newUid) {
-                                            migrateGuestLocalDataToUid(newUid)
-                                            onToast(
-                                                ctx.getString(
-                                                    R.string.toast_merge_partial,
-                                                    fe.localizedMessage ?: "-"
-                                                )
-                                            )
-                                            updateAccountLinkUi()
-                                            endLinkGoogle()
-                                        }
-                                    }
-                            } else {
-                                onToast(ctx.getString(R.string.toast_google_signed_in))
-                                updateAccountLinkUi()
-                                endLinkGoogle()
-                            }
-                        }
-                        .addOnFailureListener { se ->
-                            onToast(
-                                ctx.getString(
-                                    R.string.toast_google_login_failed,
-                                    se.localizedMessage ?: "-"
-                                )
-                            )
-                            endLinkGoogle()
-                        }
-                } else {
-                    onToast(
-                        ctx.getString(
-                            R.string.toast_link_failed,
-                            e?.localizedMessage ?: "-"
-                        )
-                    )
-                    endLinkGoogle()
-                }
-            }
-        }
+    private fun onSaveComplete() {
+        _ui.update { it.copy(saving = false, isEditMode = false) }
+        showToast(ctx.getString(R.string.toast_saved))
+        loadFromLocal()
     }
 
     fun logout() {
         FirebaseAuth.getInstance().signOut()
-        prefs.edit().clear().apply()
-        _ui.value = _ui.value.copy(
-            toast = ctx.getString(R.string.btn_logout)
-        )
-        updateAccountLinkUi()
-        setEditMode(false)
+        showToast(ctx.getString(R.string.btn_logout))
+        initialLoad()
     }
 
-    fun softDeleteAccount(onToast: (String) -> Unit) {
-        val user = FirebaseAuth.getInstance().currentUser ?: return
-        val uid = user.uid
-        val db = FirebaseFirestore.getInstance()
-        val now = Timestamp.now()
-        val purgeAt = Timestamp(now.seconds + 7 * 24 * 60 * 60, 0)
-        val data =
-            mapOf("status" to "deactivated", "deactivatedAt" to now, "purgeAt" to purgeAt)
-        db.collection("users").document(uid).set(data, SetOptions.merge())
-            .addOnSuccessListener {
-                onToast(ctx.getString(R.string.toast_deactivated))
-                logout()
-            }
-            .addOnFailureListener {
-                onToast(
-                    ctx.getString(
-                        R.string.toast_process_failed_with_reason,
-                        it.localizedMessage ?: "-"
-                    )
+    private fun updateAccountStatus() {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user == null) {
+            _ui.update {
+                it.copy(
+                    isGuest = true,
+                    email = "Guest Mode",
+                    accountProviderLabel = ctx.getString(R.string.status_guest),
+                    googleButtonLabel = ctx.getString(R.string.btn_google_login),
+                    googleButtonEnabled = true
                 )
             }
+        } else {
+            val isGoogle = user.providerData.any { it.providerId == GoogleAuthProvider.PROVIDER_ID }
+            _ui.update {
+                it.copy(
+                    isGuest = user.isAnonymous,
+                    email = user.email ?: "No Email",
+                    accountProviderLabel = if (isGoogle) "Google Connected" else "Guest Account",
+                    googleButtonLabel = if (isGoogle) ctx.getString(R.string.btn_google_connected) else ctx.getString(R.string.btn_google_merge),
+                    googleButtonEnabled = !isGoogle
+                )
+            }
+        }
     }
 
-    // ====== 유틸/도메인 ======
-    fun birthSlots(): List<BirthSlot> = listOf(
-        BirthSlot("none", str(R.string.birthtime_none, "선택안함"), str(R.string.birthtime_none, "None")),
-        BirthSlot("23_01", "자시 (23:00~01:00)", "Zi (23:00–01:00)"),
-        BirthSlot("01_03", "축시 (01:00~03:00)", "Chou (01:00–03:00)"),
-        BirthSlot("03_05", "인시 (03:00~05:00)", "Yin (03:00–05:00)"),
-        BirthSlot("05_07", "묘시 (05:00~07:00)", "Mao (05:00–07:00)"),
-        BirthSlot("07_09", "진시 (07:00~09:00)", "Chen (07:00–09:00)"),
-        BirthSlot("09_11", "사시 (09:00~11:00)", "Si (09:00–11:00)"),
-        BirthSlot("11_13", "오시 (11:00~13:00)", "Wu (11:00–13:00)"),
-        BirthSlot("13_15", "미시 (13:00~15:00)", "Wei (13:00–15:00)"),
-        BirthSlot("15_17", "신시 (15:00~17:00)", "Shen (15:00–17:00)"),
-        BirthSlot("17_19", "유시 (17:00~19:00)", "You (17:00–19:00)"),
-        BirthSlot("19_21", "술시 (19:00~21:00)", "Xu (19:00–21:00)"),
-        BirthSlot("21_23", "해시 (21:00~23:00)", "Hai (21:00–23:00)")
-    )
+    // --- Google Link Logic ---
+    fun startLinkGoogle() { _ui.update { it.copy(linkInProgress = true) } }
+    fun endLinkGoogle() { _ui.update { it.copy(linkInProgress = false) } }
 
-    data class BirthSlot(val code: String, val ko: String, val en: String)
+    fun linkGoogleWithIdToken(idToken: String, onToast: (String) -> Unit) {
+        val auth = FirebaseAuth.getInstance()
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        val currentUser = auth.currentUser
 
-    private fun str(id: Int, fb: String) =
-        runCatching { ctx.getString(id) }.getOrElse { fb }
-
-    fun codeToLocalizedLabel(code: String?): String =
-        (birthSlots().firstOrNull { it.code == (code ?: "none") }
-            ?: birthSlots().first()).let {
-            val isKo =
-                ctx.resources.configuration.locales[0].language.startsWith("ko")
-            if (isKo) it.ko else it.en
+        if (currentUser != null && currentUser.isAnonymous) {
+            currentUser.linkWithCredential(credential)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        onToast(ctx.getString(R.string.toast_google_linked))
+                        initialLoad()
+                        endLinkGoogle()
+                    } else {
+                        signInDirectly(credential, onToast)
+                    }
+                }
+        } else {
+            signInDirectly(credential, onToast)
         }
-
-    fun labelToBirthCode(label: String?): String {
-        if (label.isNullOrBlank()) return "none"
-        val t = label.trim()
-        birthSlots().forEach { s ->
-            if (t.equals(s.ko, true) || t.equals(s.en, true)) return s.code
-        }
-        return "none"
     }
 
-    fun calcAge(iso: String): Int = runCatching {
+    private fun signInDirectly(credential: com.google.firebase.auth.AuthCredential, onToast: (String) -> Unit) {
+        FirebaseAuth.getInstance().signInWithCredential(credential)
+            .addOnSuccessListener {
+                onToast("Login Successful")
+                initialLoad()
+                endLinkGoogle()
+            }
+            .addOnFailureListener { e ->
+                onToast("Login Failed: ${e.message}")
+                endLinkGoogle()
+            }
+    }
+
+    fun handleGoogleError(msg: String) {
+        showToast(msg)
+        endLinkGoogle()
+    }
+
+    fun showToast(msg: String) {
+        _ui.update { it.copy(toastMessage = msg) }
+    }
+
+    fun toastShown() {
+        _ui.update { it.copy(toastMessage = null) }
+    }
+
+    fun setTestPremium(isPremium: Boolean) {
+        com.dreamindream.app.SubscriptionManager.markSubscribed(ctx, isPremium)
+    }
+
+    // --- Calculations ---
+    private fun calculateAge(iso: String): Int {
         if (iso.isBlank()) return -1
-        val dob = ISO.parse(iso) ?: return -1
-        val calDob = Calendar.getInstance().apply { time = dob }
-        val now = Calendar.getInstance()
-        var age = now.get(Calendar.YEAR) - calDob.get(Calendar.YEAR)
-        if (now.get(Calendar.DAY_OF_YEAR) < calDob.get(Calendar.DAY_OF_YEAR)) age--
-        age
-    }.getOrElse { -1 }
+        return try {
+            val birth = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(iso) ?: return -1
+            val today = Calendar.getInstance()
+            val dob = Calendar.getInstance().apply { time = birth }
+            var age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR)
+            if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) age--
+            age
+        } catch (e: Exception) { -1 }
+    }
 
-    // 별자리 표시 – 다국어 대응 (문자열 리소스 기반)
-    fun westernZodiac(iso: String): Pair<String, String> = runCatching {
+    private fun calculateWesternZodiac(iso: String): Pair<String, String> = runCatching {
         if (iso.isBlank()) return str(R.string.wz_unknown, "Zodiac -") to "✨"
         val (m, d) = iso.substring(5).split("-").map { it.toInt() }
-        data class Sign(
-            val month: Int,
-            val day: Int,
-            val emoji: String,
-            val labelId: Int,
-            val fallback: String
-        )
 
+        data class Sign(val month: Int, val day: Int, val emoji: String, val labelId: Int, val fallback: String)
         val signs = listOf(
             Sign(1, 20, "♑", R.string.wz_capricorn, "Capricorn"),
             Sign(2, 19, "♒", R.string.wz_aquarius, "Aquarius"),
@@ -448,82 +286,28 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         val key = m * 100 + d
         val sign = signs.first { key < it.month * 100 + it.day }
         val name = str(sign.labelId, sign.fallback)
-        "${sign.emoji} $name" to "✨"
+        "$name" to sign.emoji
     }.getOrElse { str(R.string.wz_unknown, "Zodiac -") to "✨" }
 
-    fun chineseZodiac(iso: String): Pair<String, String> = run {
+    private fun calculateChineseZodiac(iso: String): Pair<String, String> = run {
         if (iso.isBlank()) return@run str(R.string.cz_unknown, "-") to "🧿"
-        val y = iso.substring(0, 4).toIntOrNull()
-            ?: return@run str(R.string.cz_unknown, "-") to "🧿"
+        val y = iso.substring(0, 4).toIntOrNull() ?: return@run str(R.string.cz_unknown, "-") to "🧿"
+
         val names = listOf(
-            str(R.string.cz_rat, "Rat"),
-            str(R.string.cz_ox, "Ox"),
-            str(R.string.cz_tiger, "Tiger"),
-            str(R.string.cz_rabbit, "Rabbit"),
-            str(R.string.cz_dragon, "Dragon"),
-            str(R.string.cz_snake, "Snake"),
-            str(R.string.cz_horse, "Horse"),
-            str(R.string.cz_goat, "Goat"),
-            str(R.string.cz_monkey, "Monkey"),
-            str(R.string.cz_rooster, "Rooster"),
-            str(R.string.cz_dog, "Dog"),
-            str(R.string.cz_pig, "Pig")
+            str(R.string.cz_rat, "Rat"), str(R.string.cz_ox, "Ox"), str(R.string.cz_tiger, "Tiger"),
+            str(R.string.cz_rabbit, "Rabbit"), str(R.string.cz_dragon, "Dragon"), str(R.string.cz_snake, "Snake"),
+            str(R.string.cz_horse, "Horse"), str(R.string.cz_goat, "Goat"), str(R.string.cz_monkey, "Monkey"),
+            str(R.string.cz_rooster, "Rooster"), str(R.string.cz_dog, "Dog"), str(R.string.cz_pig, "Pig")
         )
         val idx = (y - 1900) % 12
-        val name = names[(idx + 12) % 12]
-        val icon = listOf("🐭", "🐮", "🐯", "🐰", "🐲", "🐍", "🐴", "🐑", "🐵", "🐔", "🐶", "🐷")[
-            (idx + 12) % 12
-        ]
-        ctx.getString(R.string.cz_format, name) to icon
+        val positiveIdx = if (idx < 0) (idx + 12) else idx
+        val name = names[(positiveIdx + 12) % 12]
+        val icon = listOf("🐭", "🐮", "🐯", "🐰", "🐲", "🐍", "🐴", "🐑", "🐵", "🐔", "🐶", "🐷")[(positiveIdx + 12) % 12]
+        val formattedName = runCatching { ctx.getString(R.string.cz_format, name) }.getOrElse { name }
+        formattedName to icon
     }
 
-    // ====== 게스트 → UID 로컬 이전 & 최소 병합 ======
-    private fun migrateGuestLocalDataToUid(uid: String) {
-        try {
-            val androidId =
-                Settings.Secure.getString(ctx.contentResolver, Settings.Secure.ANDROID_ID)
-                    ?: "device"
-            val oldProfileName = "dreamindream_profile_guest-$androidId"
-            val newProfileName = "dreamindream_profile_$uid"
-            copySharedPrefs(oldProfileName, newProfileName, clearOld = false)
-            copySharedPrefs("dream_history", "dream_history_$uid", clearOld = false)
-            ctx.getSharedPreferences("migrations", Context.MODE_PRIVATE)
-                .edit().putBoolean("guest_to_$uid", true).apply()
-        } catch (_: Exception) {
-        }
-    }
-
-    private fun copySharedPrefs(oldName: String, newName: String, clearOld: Boolean) {
-        val old = ctx.getSharedPreferences(oldName, Context.MODE_PRIVATE)
-        val all = old.all
-        if (all.isEmpty()) return
-        val dst = ctx.getSharedPreferences(newName, Context.MODE_PRIVATE).edit()
-        for ((k, v) in all) when (v) {
-            is String -> dst.putString(k, v)
-            is Int -> dst.putInt(k, v)
-            is Long -> dst.putLong(k, v)
-            is Float -> dst.putFloat(k, v)
-            is Boolean -> dst.putBoolean(k, v)
-        }
-        dst.apply()
-        if (clearOld) old.edit().clear().apply()
-    }
-
-    private fun minimallyMergeTopProfileDoc(
-        oldUid: String,
-        newUid: String,
-        onDone: () -> Unit
-    ) {
-        val db = FirebaseFirestore.getInstance()
-        val oldRef = db.collection("users").document(oldUid)
-        val newRef = db.collection("users").document(newUid)
-        oldRef.get()
-            .addOnSuccessListener { snap ->
-                if (snap.exists())
-                    newRef.set(snap.data ?: emptyMap<String, Any>(), SetOptions.merge())
-                        .addOnCompleteListener { onDone() }
-                else onDone()
-            }
-            .addOnFailureListener { onDone() }
+    private fun codeToLocalizedLabel(code: String): String {
+        return if(code == "none" || code.isBlank()) "Unknown Time" else code
     }
 }

@@ -1,4 +1,3 @@
-// app/src/main/java/com/example/dreamindream/FirestoreManager.kt
 package com.dreamindream.app
 
 import android.content.Context
@@ -13,785 +12,533 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.IOException
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
-import kotlin.math.max
+import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.roundToInt
+import kotlin.random.Random
+
+data class WeeklyReportData(
+    val feeling: String, val keywords: List<String>, val analysis: String,
+    val analysisJson: String,
+    val analysisImageUrl: String,
+    val emotionLabels: List<String>, val emotionDist: List<Float>,
+    val themeLabels: List<String>, val themeDist: List<Float>,
+    val sourceCount: Int, val lastRebuiltAt: Long, val tier: String,
+    val proAt: Long, val stale: Boolean, val score: Int, val grade: String
+)
+
+data class WeekEntry(val ts: Long, val dream: String, val interp: String)
+
+data class DreamScoreResult(val score: Int, val grade: String)
 
 object FirestoreManager {
     private val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     private const val TAG = "FirestoreManager"
     private fun now() = System.currentTimeMillis()
 
-    private val http by lazy { OkHttpClient() }
+    private val http by lazy {
+        OkHttpClient.Builder()
+            .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .build()
+    }
     private val apiKey by lazy { BuildConfig.OPENAI_API_KEY }
 
-    private fun emoLabels(res: android.content.res.Resources) = listOf(
-        res.getString(R.string.emo_positive),
-        res.getString(R.string.emo_calm),
-        res.getString(R.string.emo_vitality),
-        res.getString(R.string.emo_flow),
-        res.getString(R.string.emo_neutral),
-        res.getString(R.string.emo_confusion),
-        res.getString(R.string.emo_anxiety),
-        res.getString(R.string.emo_depression_fatigue)
-    )
-    private fun themeLabels(res: android.content.res.Resources) = listOf(
-        res.getString(R.string.theme_rel),
-        res.getString(R.string.theme_achieve),
-        res.getString(R.string.theme_change),
-        res.getString(R.string.theme_risk)
-    )
+    private fun getResList(ctx: Context, resId: Int): List<String> {
+        return try { ctx.resources.getStringArray(resId).toList() } catch (e: Exception) { emptyList() }
+    }
 
-    fun todayKey(): String = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA).format(Date())
+    fun todayKey(): String = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+
+
+    fun saveDeepFortune(uid: String, dateKey: String, deepPayload: JSONObject, onComplete: (() -> Unit)? = null) {
+        val map = jsonToMap(deepPayload)
+        // daily_fortunes 컬렉션 내의 해당 날짜 문서에 'deep_analysis' 필드로 병합 저장
+        db.collection("users").document(uid).collection("daily_fortunes").document(dateKey)
+            .set(mapOf("deep_analysis" to map, "has_deep" to true), SetOptions.merge())
+            .addOnCompleteListener { onComplete?.invoke() }
+    }
+
+    // 심화 운세 불러오기
+    fun getDeepFortune(uid: String, dateKey: String, onResult: (JSONObject?) -> Unit) {
+        db.collection("users").document(uid).collection("daily_fortunes").document(dateKey).get()
+            .addOnSuccessListener { doc ->
+                if (doc.exists() && doc.contains("deep_analysis")) {
+                    val deepMap = doc.get("deep_analysis") as? Map<*, *>
+                    if (deepMap != null) {
+                        onResult(JSONObject(deepMap))
+                    } else {
+                        onResult(null)
+                    }
+                } else {
+                    onResult(null)
+                }
+            }
+            .addOnFailureListener { onResult(null) }
+    }
+
     fun thisWeekKey(): String {
         val cal = Calendar.getInstance().apply {
             firstDayOfWeek = Calendar.MONDAY
             minimalDaysInFirstWeek = 4
         }
-        val y = cal.get(Calendar.YEAR)
-        val w = cal.get(Calendar.WEEK_OF_YEAR)
-        return String.format(Locale.US, "%04d-W%02d", y, w)
-    }
-    fun weekDateKeys(weekKey: String): List<String> {
-        val fmt = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA)
-        return runCatching {
-            val parts = weekKey.split("-W")
-            val y = parts[0].toInt()
-            val w = parts[1].toInt()
-            val cal = Calendar.getInstance().apply {
-                firstDayOfWeek = Calendar.MONDAY
-                minimalDaysInFirstWeek = 4
-                set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-                set(Calendar.WEEK_OF_YEAR, w)
-                set(Calendar.YEAR, y)
-            }
-            (0..6).map {
-                val s = fmt.format(cal.time)
-                cal.add(Calendar.DAY_OF_MONTH, 1)
-                s
-            }
-        }.getOrElse {
-            val cal = Calendar.getInstance().apply {
-                firstDayOfWeek = Calendar.MONDAY
-                minimalDaysInFirstWeek = 4
-                set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
-            }
-            (0..6).map {
-                val s = fmt.format(cal.time)
-                cal.add(Calendar.DAY_OF_MONTH, 1)
-                s
-            }
-        }
+        return String.format(Locale.US, "%04d-W%02d", cal.get(Calendar.YEAR), cal.get(Calendar.WEEK_OF_YEAR))
     }
 
-    fun currentUid(): String? = FirebaseAuth.getInstance().currentUser?.uid
+    fun weekDateKeys(weekKey: String): List<String> {
+        val fmt = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+        return runCatching {
+            val parts = weekKey.split("-W")
+            val year = parts[0].toInt()
+            val week = parts[1].toInt()
+            val cal = Calendar.getInstance().apply {
+                firstDayOfWeek = Calendar.MONDAY
+                minimalDaysInFirstWeek = 4
+                set(Calendar.YEAR, year)
+                set(Calendar.WEEK_OF_YEAR, week)
+                set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+            }
+            (0..6).map {
+                val s = fmt.format(cal.time)
+                cal.add(Calendar.DAY_OF_MONTH, 1)
+                s
+            }
+        }.getOrElse { emptyList() }
+    }
 
     private fun <T : Number> scaleToPercent(raw: List<T>, target: Int): List<Float> {
         val v = raw.map { it.toFloat().coerceAtLeast(0f) }
-        val list = when {
-            v.isEmpty() -> List(target) { 0f }
-            v.size == target -> v
-            v.size > target -> v.take(target)
-            else -> v + List(target - v.size) { 0f }
-        }
-        val maxVal = list.maxOrNull() ?: 0f
+        val list = if (v.size >= target) v.take(target) else v + List(target - v.size) { 0f }
         val sum = list.sum()
+        return if (sum > 0f) list.map { (it / sum) * 100f } else list
+    }
 
-        if (maxVal >= 10f || sum >= 100f) {
-            return if (sum > 0f && sum != 100f) list.map { it * (100f / sum) } else list
+    private fun jsonToMap(json: JSONObject): Map<String, Any?> {
+        val map = mutableMapOf<String, Any?>()
+        val keys = json.keys()
+        while (keys.hasNext()) {
+            val key = keys.next()
+            val value = json.get(key)
+            map[key] = convertJsonValue(value)
         }
-        if (maxVal <= 1.01f) {
-            val s = list.sum().takeIf { it > 0f } ?: 1f
-            return list.map { (it / s) * 100f }
+        return map
+    }
+
+    private fun jsonToList(array: JSONArray): List<Any?> {
+        val list = mutableListOf<Any?>()
+        for (i in 0 until array.length()) {
+            list.add(convertJsonValue(array.get(i)))
         }
-        val s2 = list.sum().takeIf { it > 0f } ?: 1f
-        return list.map { (it / s2) * 100f }
+        return list
     }
 
-    private fun topIndexOrNull(dist: List<Float>): Int? {
-        if (dist.isEmpty()) return null
-        var maxI = 0
-        var maxV = dist[0]
-        for (i in 1 until dist.size) {
-            val v = dist[i]
-            if (v > maxV) { maxV = v; maxI = i }
-        }
-        return if (maxV > 0f) maxI else null
-    }
-    private fun positivityScore(dist: List<Float>): Int {
-        val sum = dist.sum().takeIf { it > 0f } ?: return 0
-        val pos = (0..3).sumOf { dist[it].toDouble() }.toFloat()
-        return ((pos / sum) * 100f).roundToInt().coerceIn(0, 100)
-    }
-
-    data class WeekEntry(val ts: Long, val dream: String, val interp: String)
-
-    private fun localAnalyze(
-        entries: List<WeekEntry>,
-        res: android.content.res.Resources
-    ): Pair<List<Float>, List<Float>> {
-        val emo = FloatArray(8)
-        val th  = FloatArray(4)
-
-        val emoDict = mapOf(
-            0 to listOf(
-                "희망","기대","기쁨","행복","좋","즐겁","감사","사랑","뿌듯",
-                "hope","joy","happi","delight","gratitud","love","proud","optimis","excite","cheer","good"
-            ),
-            1 to listOf(
-                "평온","차분","안정","편안","여유","느긋",
-                "calm","peace","seren","relax","comfor","chill","stable","steady","easygoing","laidback"
-            ),
-            2 to listOf(
-                "활력","에너지","의욕","상쾌","기운","파워","생기",
-                "ener","energy","motiv","fresh","vigor","vigour","power","livel","spirited","drive"
-            ),
-            3 to listOf(
-                "몰입","집중","열중","열심","빠져",
-                "flow","immers","focus","concentrat","absorb","engag","inthezone","zone"
-            ),
-            5 to listOf(
-                "혼란","헷갈","갈등","모르겠","혼돈",
-                "confus","puzzl","conflict","unsure","uncertain","chaos","mess"
-            ),
-            6 to listOf(
-                "불안","걱정","긴장","초조","두려움","공포","염려","근심",
-                "anx","worr","tens","nerv","fear","scare","terr","concern","uneas","stress","panic"
-            ),
-            7 to listOf(
-                "우울","피곤","지침","무기력","슬픔","허탈","고단","피로",
-                "depress","tired","exhaust","fatig","powerless","sad","blue","letharg","drain","burnout","weary"
-            )
-        )
-
-        val themeDict = mapOf(
-            0 to listOf(
-                "가족","친구","연인","사람","관계","대화","만남","팀","동료","부모","형제","연락",
-                "family","friend","partner","relationship","people","talk","conversation","meet","team","colleague",
-                "parent","mother","father","sibling","girlfriend","boyfriend","wife","husband"
-            ),
-            1 to listOf(
-                "성공","성취","시험","공부","일","프로젝트","승진","합격","목표","성과","점수","우승",
-                "success","achiev","exam","test","study","work","project","promotion","pass","goal","result","score","win","grade"
-            ),
-            2 to listOf(
-                "변화","이사","이직","전학","시작","종료","이동","전환","새로","끝","옮기","교체",
-                "change","move","relocat","transfer","start","begin","end","finish","shift","transition","switch","new","quit","leave"
-            ),
-            3 to listOf(
-                "위험","사고","문제","실패","손해","리스크","불안요소","위협","불상사","사건",
-                "risk","danger","accident","problem","fail","failure","loss","threat","hazard","crisis","trouble","incident"
-            )
-        )
-
-        val texts = entries.joinToString("\n") { (it.dream + " " + it.interp).lowercase(Locale.getDefault()) }
-        val tokenRegex = Regex("""\p{L}+""")
-        val tokens = tokenRegex.findAll(texts).map { it.value }.toList()
-
-        fun countByPrefixes(prefixes: List<String>): Int {
-            var hits = 0
-            outer@ for (p in prefixes) {
-                val pref = p.lowercase(Locale.getDefault())
-                for (t in tokens) {
-                    if (t.startsWith(pref)) { hits++; continue@outer }
-                }
-            }
-            return hits
-        }
-
-        for ((idx, kws) in emoDict) emo[idx] = countByPrefixes(kws).toFloat()
-        val nonNeutral = emo[0] + emo[1] + emo[2] + emo[3] + emo[5] + emo[6] + emo[7]
-        emo[4] = max(0f, entries.size * 0.5f - nonNeutral * 0.2f)
-
-        for ((idx, kws) in themeDict) th[idx] = countByPrefixes(kws).toFloat()
-
-        val emoP = scaleToPercent(emo.toList(), 8)
-        val thP  = scaleToPercent(th.toList(), 4)
-        return emoP to thP
-    }
-
-    private fun fullKeywords(list: List<String>): List<String> =
-        list.asSequence().map { it.trim() }.filter { it.isNotEmpty() }.distinct().toList()
-    private fun top1(list: List<String>): List<String> =
-        list.asSequence().map { it.trim() }.filter { it.isNotEmpty() }.distinct().take(3).toList()
-
-    fun saveDream(
-        uid: String,
-        dream: String,
-        result: String,
-        dateKey: String = todayKey(),
-        onComplete: (() -> Unit)? = null,
-        onError: ((Exception) -> Unit)? = null
-    ) {
-        val dayRef = db.collection("users").document(uid)
-            .collection("dreams").document(dateKey)
-        val entry = hashMapOf("dream" to dream, "result" to result, "timestamp" to now())
-        dayRef.collection("entries").add(entry)
-            .addOnSuccessListener {
-                dayRef.set(
-                    mapOf("count" to FieldValue.increment(1.0), "last_updated" to now()),
-                    SetOptions.merge()
-                ).addOnCompleteListener { onComplete?.invoke() }
-                db.collection("users").document(uid)
-                    .collection("weekly_reports").document(thisWeekKey())
-                    .set(mapOf("stale" to true), SetOptions.merge())
-            }
-            .addOnFailureListener { e -> Log.e(TAG, "saveDream failed", e); onError?.invoke(e) }
-    }
-
-    fun loadDayEntries(uid: String, dateKey: String, onResult: (List<Map<String, Any>>) -> Unit) {
-        db.collection("users").document(uid)
-            .collection("dreams").document(dateKey)
-            .collection("entries")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .get()
-            .addOnSuccessListener { snap ->
-                val list = snap.documents.map { d ->
-                    mapOf(
-                        "dream" to (d.getString("dream") ?: ""),
-                        "result" to (d.getString("result") ?: ""),
-                        "timestamp" to (d.getLong("timestamp") ?: 0L)
-                    )
-                }
-                onResult(list)
-            }
-            .addOnFailureListener { onResult(emptyList()) }
-    }
-
-    fun loadWeeklySummary(
-        uid: String,
-        weekKey: String = thisWeekKey(),
-        onResult: (feeling: String, keywords: List<String>, analysis: String, score: Int?) -> Unit
-    ) {
-        db.collection("users").document(uid)
-            .collection("weekly_reports").document(weekKey)
-            .get()
-            .addOnSuccessListener { doc ->
-                if (!doc.exists()) { onResult("", emptyList(), "", null); return@addOnSuccessListener }
-
-                val labels = (doc.get("emotionLabels") as? List<*>)?.map { it.toString() }
-                val dist   = (doc.get("emotionDist")   as? List<*>)?.mapNotNull { (it as? Number)?.toFloat() }
-                val distP  = if (dist != null) scaleToPercent(dist, 8) else null
-
-                val feeling = run {
-                    val saved = doc.getString("feeling").orEmpty().trim()
-                    val top = if (labels != null && distP != null && labels.size == distP.size) {
-                        topIndexOrNull(distP)?.let { labels[it] }
-                    } else null
-                    when {
-                        top != null -> top
-                        saved.contains(",") -> saved.substringBefore(",").trim()
-                        else -> saved
-                    }
-                }
-
-                val keywordsHome = (doc.get("keywords_home") as? List<*>)?.mapNotNull { it?.toString() }
-                    ?: ((doc.get("keywords") as? List<*>)?.mapNotNull { it?.toString() }?.let { top1(it) } ?: emptyList())
-
-                val analysis = doc.getString("analysis").orEmpty()
-                val scoreSaved = (doc.getLong("score") ?: doc.getDoubleOrNull("score"))?.toInt()
-                val score = scoreSaved ?: (distP?.let { positivityScore(it) })
-                onResult(feeling, keywordsHome, analysis, score)
-            }
-            .addOnFailureListener { onResult("", emptyList(), "", null) }
-    }
-    fun loadWeeklyReport(
-        uid: String,
-        weekKey: String = thisWeekKey(),
-        onResult: (feeling: String, keywords: List<String>, analysis: String, score: Int?) -> Unit
-    ) = loadWeeklySummary(uid, weekKey, onResult)
-
-    fun loadWeeklyReportFull(
-        ctx: Context,
-        uid: String,
-        weekKey: String,
-        onResult: (
-            feeling: String,
-            keywords: List<String>,
-            analysis: String,
-            emotionLabels: List<String>,
-            emotionDist: List<Float>,
-            themeLabels: List<String>,
-            themeDist: List<Float>,
-            sourceCount: Int,
-            lastRebuiltAt: Long,
-            tier: String,
-            proAt: Long,
-            stale: Boolean
-        ) -> Unit
-    ) {
-        val emoDefault = emoLabels(ctx.resources)
-        val themeDefault = themeLabels(ctx.resources)
-        db.collection("users").document(uid)
-            .collection("weekly_reports").document(weekKey)
-            .get()
-            .addOnSuccessListener { doc ->
-                if (!doc.exists()) {
-                    onResult("", emptyList(), "", emoDefault, List(8) { 0f },
-                        themeDefault, List(4) { 0f }, 0, 0L, "base", 0L, true)
-                    return@addOnSuccessListener
-                }
-
-                val keywords = ((doc.get("keywords") as? List<*>)?.map { it.toString() } ?: emptyList()).let { fullKeywords(it) }
-
-                val emoLabelsDoc  = (doc.get("emotionLabels") as? List<*>)?.map { it.toString() } ?: emoDefault
-                val emoDistDocRaw = (doc.get("emotionDist")   as? List<*>)?.mapNotNull { (it as? Number)?.toFloat() } ?: List(8){0f}
-                val themeLabelsDoc  = (doc.get("themeLabels") as? List<*>)?.map { it.toString() } ?: themeDefault
-                val themeDistDocRaw = (doc.get("themeDist")   as? List<*>)?.mapNotNull { (it as? Number)?.toFloat() } ?: List(4){0f}
-
-                val emoDist = scaleToPercent(emoDistDocRaw, 8)
-                val themeDist = scaleToPercent(themeDistDocRaw, 4)
-
-                val feeling = topIndexOrNull(emoDist)?.let { emoLabelsDoc[it] }
-                    ?: doc.getString("feeling").orEmpty().let { s -> if (s.contains(",")) s.substringBefore(",").trim() else s }
-
-                val analysis = doc.getString("analysis") ?: ""
-                val sourceCount = (doc.getLong("sourceCount") ?: 0L).toInt()
-                val lastRebuiltAt = doc.getLong("lastRebuiltAt") ?: 0L
-                val tier = doc.getString("tier") ?: "base"
-                val proAt = doc.getLong("proAt") ?: 0L
-                val stale = doc.getBoolean("stale") ?: true
-
-                onResult(
-                    feeling, keywords, analysis,
-                    emoLabelsDoc, emoDist, themeLabelsDoc, themeDist,
-                    sourceCount, lastRebuiltAt, tier, proAt, stale
-                )
-            }
-            .addOnFailureListener {
-                onResult("", emptyList(), "",
-                    emoDefault, List(8) { 0f },
-                    themeDefault, List(4) { 0f },
-                    0, 0L, "base", 0L, true)
-            }
-    }
-
-    fun countDreamEntriesForWeek(uid: String, weekKey: String = thisWeekKey(), onResult: (Int) -> Unit) {
-        val dates = weekDateKeys(weekKey)
-        if (dates.isEmpty()) { onResult(0); return }
-        var total = 0
-        var done = 0
-        dates.forEach { dateKey ->
-            db.collection("users").document(uid)
-                .collection("dreams").document(dateKey)
-                .collection("entries")
-                .get()
-                .addOnSuccessListener { snap ->
-                    total += snap.size()
-                    if (++done == dates.size) onResult(total)
-                }
-                .addOnFailureListener { if (++done == dates.size) onResult(total) }
+    private fun convertJsonValue(value: Any): Any? {
+        return when (value) {
+            is JSONObject -> jsonToMap(value)
+            is JSONArray -> jsonToList(value)
+            else -> value
         }
     }
-    fun countDreamEntriesToday(uid: String, onResult: (Int) -> Unit) {
+
+    // --- Core Functions (Calendar & Profile Support) ---
+
+    // [수정됨] 꿈 해몽 저장 시 전체 누적 카운트 증가 로직 추가
+    fun saveDream(uid: String, dream: String, result: String) {
         val dateKey = todayKey()
-        db.collection("users").document(uid)
-            .collection("dreams").document(dateKey)
-            .collection("entries")
-            .get()
-            .addOnSuccessListener { onResult(it.size()) }
-            .addOnFailureListener { onResult(0) }
+        val userRef = db.collection("users").document(uid)
+        val dayRef = userRef.collection("dreams").document(dateKey)
+        val entry = hashMapOf("dream" to dream, "result" to result, "timestamp" to now())
+
+        dayRef.collection("entries").add(entry).addOnSuccessListener {
+            // 1. 해당 날짜의 카운트 증가
+            dayRef.set(mapOf("count" to FieldValue.increment(1.0), "last_updated" to now()), SetOptions.merge())
+
+            // 2. 주간 리포트 갱신 필요 표시
+            userRef.collection("weekly_reports").document(thisWeekKey())
+                .set(mapOf("stale" to true), SetOptions.merge())
+
+            // 3. [추가] 유저 전체 꿈 해몽 횟수(total_dream_count) 증가 -> Settings 화면 표시용
+            userRef.set(mapOf("total_dream_count" to FieldValue.increment(1.0)), SetOptions.merge())
+        }
     }
 
-    fun collectWeekEntriesLimited(
-        uid: String,
-        weekKey: String,
-        limit: Int,
-        onResult: (used: List<WeekEntry>, totalCount: Int) -> Unit
-    ) {
-        val dates = weekDateKeys(weekKey)
-        if (dates.isEmpty()) { onResult(emptyList(), 0); return }
-        val all = mutableListOf<WeekEntry>()
-        var fetched = 0
-        dates.forEach { dateKey ->
-            db.collection("users").document(uid)
-                .collection("dreams").document(dateKey)
-                .collection("entries")
-                .get()
-                .addOnSuccessListener { snap ->
-                    snap.forEach { d ->
-                        val dream = d.getString("dream").orEmpty()
-                        val interp = d.getString("result").orEmpty()
-                        val ts = d.getLong("timestamp") ?: 0L
-                        if (dream.isNotBlank() || interp.isNotBlank()) all += WeekEntry(ts, dream, interp)
-                    }
-                    if (++fetched == dates.size) {
-                        val sorted = all.sortedBy { it.ts }
-                        onResult(sorted.takeLast(limit), sorted.size)
-                    }
+    // [추가] Settings 화면을 위한 통계 데이터 (전체 누적, 오늘) 조회
+    fun getDreamStats(uid: String, onResult: (total: Int, today: Int) -> Unit) {
+        // 1. 유저 정보에서 전체 카운트 조회
+        db.collection("users").document(uid).get().addOnSuccessListener { userDoc ->
+            val total = userDoc.getLong("total_dream_count")?.toInt() ?: 0
+
+            // 2. 오늘 날짜 서브컬렉션에서 금일 횟수 조회
+            db.collection("users").document(uid).collection("dreams").document(todayKey())
+                .collection("entries").get()
+                .addOnSuccessListener { todaySnap ->
+                    onResult(total, todaySnap.size())
                 }
                 .addOnFailureListener {
-                    if (++fetched == dates.size) {
-                        val sorted = all.sortedBy { it.ts }
-                        onResult(sorted.takeLast(limit), sorted.size)
+                    onResult(total, 0)
+                }
+        }.addOnFailureListener {
+            onResult(0, 0)
+        }
+    }
+
+    fun countDreamEntriesToday(uid: String, onResult: (Int) -> Unit) {
+        db.collection("users").document(uid).collection("dreams").document(todayKey()).collection("entries").get()
+            .addOnSuccessListener { onResult(it.size()) }.addOnFailureListener { onResult(0) }
+    }
+
+    fun getAllDreamDates(context: Context, uid: String, onResult: (Set<String>) -> Unit) {
+        db.collection("users").document(uid).collection("dreams").get()
+            .addOnSuccessListener { snap ->
+                val dates = snap.documents.map { it.id }.toSet()
+                onResult(dates)
+            }
+            .addOnFailureListener { onResult(emptySet()) }
+    }
+
+    fun updateDreamsForDate(uid: String, dateKey: String, itemsJson: String, onComplete: (() -> Unit)? = null) {
+        val dayRef = db.collection("users").document(uid).collection("dreams").document(dateKey)
+        dayRef.collection("entries").get().addOnSuccessListener { snapshot ->
+            val batch = db.batch()
+            for (doc in snapshot.documents) batch.delete(doc.reference)
+            batch.commit().addOnSuccessListener {
+                val arr = try { JSONArray(itemsJson) } catch (e: Exception) { JSONArray() }
+                if (arr.length() == 0) {
+                    dayRef.set(mapOf("count" to 0, "last_updated" to now()), SetOptions.merge())
+                    onComplete?.invoke()
+                } else {
+                    var addedCount = 0
+                    for (i in 0 until arr.length()) {
+                        val obj = arr.getJSONObject(i)
+                        dayRef.collection("entries").add(mapOf(
+                            "dream" to obj.optString("dream"),
+                            "result" to obj.optString("result"),
+                            "timestamp" to now()
+                        )).addOnCompleteListener {
+                            addedCount++
+                            if (addedCount == arr.length()) {
+                                dayRef.set(mapOf("count" to arr.length(), "last_updated" to now()), SetOptions.merge())
+                                db.collection("users").document(uid).collection("weekly_reports").document(thisWeekKey())
+                                    .set(mapOf("stale" to true), SetOptions.merge())
+                                onComplete?.invoke()
+                            }
+                        }
                     }
+                }
+            }
+        }
+    }
+
+    fun getUserProfile(uid: String, onResult: (Map<String, Any>?) -> Unit) {
+        db.collection("users").document(uid).get()
+            .addOnSuccessListener { onResult(it.data) }.addOnFailureListener { onResult(null) }
+    }
+
+    fun updateUserProfile(uid: String, data: Map<String, Any>, onComplete: () -> Unit) {
+        db.collection("users").document(uid).set(data, SetOptions.merge()).addOnCompleteListener { onComplete() }
+    }
+
+    fun saveDailyFortune(uid: String, dateKey: String, payload: JSONObject, onComplete: (() -> Unit)? = null) {
+        val map = jsonToMap(payload)
+        db.collection("users").document(uid).collection("daily_fortunes").document(dateKey)
+            .set(map + mapOf("timestamp" to now()), SetOptions.merge())
+            .addOnCompleteListener { onComplete?.invoke() }
+    }
+
+    // --- Report Logic ---
+
+    fun countDreamEntriesForWeek(uid: String, weekKey: String, onResult: (Int) -> Unit) {
+        val dates = weekDateKeys(weekKey)
+        if (dates.isEmpty()) { onResult(0); return }
+        val counter = AtomicInteger(0)
+        val totalDreams = AtomicInteger(0)
+
+        dates.forEach { dateKey ->
+            db.collection("users").document(uid).collection("dreams").document(dateKey).collection("entries").get()
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) totalDreams.addAndGet(task.result?.size() ?: 0)
+                    if (counter.incrementAndGet() == dates.size) onResult(totalDreams.get())
                 }
         }
     }
 
-    fun aggregateDreamsForWeek(uid: String, weekKey: String, ctx: Context, callback: (Boolean) -> Unit) {
-        collectWeekEntriesLimited(uid, weekKey, limit = 4) { entries, totalCount ->
-            val ref = db.collection("users").document(uid).collection("weekly_reports").document(weekKey)
-            val dreams = entries.map { it.dream }.filter { it.isNotBlank() }
-            val interps = entries.map { it.interp }.filter { it.isNotBlank() }
-            val meta = mapOf(
-                "snapshotDreams" to dreams,
-                "snapshotInterps" to interps,
-                "sourceCount" to totalCount,
-                "rebuildPolicy" to "ADD_ONLY",
-                "lastRebuiltAt" to now(),
-                "timestamp" to now()
-            )
+    fun loadWeeklyReportFull(ctx: Context, uid: String, weekKey: String, onResult: (WeeklyReportData) -> Unit) {
+        val emoLabels = getResList(ctx, R.array.emotion_labels)
+        val themeLabels = getResList(ctx, R.array.theme_labels)
+        val empty = WeeklyReportData("", emptyList(), "", "", "", emoLabels, List(8){0f}, themeLabels, List(4){0f}, 0, 0L, "base", 0L, true, 0, "F")
 
-            if (totalCount < 2) {
-                ref.set(meta + mapOf("stale" to true), SetOptions.merge())
-                    .addOnSuccessListener { callback(false) }
-                    .addOnFailureListener { callback(false) }
-                return@collectWeekEntriesLimited
+        db.collection("users").document(uid).collection("weekly_reports").document(weekKey).get()
+            .addOnSuccessListener { doc ->
+                if (!doc.exists()) { onResult(empty); return@addOnSuccessListener }
+                try {
+                    val emD = scaleToPercent((doc.get("emotionDist") as? List<*>)?.mapNotNull { (it as? Number)?.toFloat() } ?: List(8){0f}, 8)
+                    val thD = scaleToPercent((doc.get("themeDist") as? List<*>)?.mapNotNull { (it as? Number)?.toFloat() } ?: List(4){0f}, 4)
+
+                    onResult(WeeklyReportData(
+                        feeling = doc.getString("feeling") ?: "",
+                        keywords = (doc.get("keywords") as? List<*>)?.map { it.toString() } ?: emptyList(),
+                        analysis = doc.getString("analysis") ?: "",
+                        analysisJson = doc.getString("analysis_json") ?: "",
+                        analysisImageUrl = doc.getString("analysis_image_url") ?: "",
+                        emotionLabels = emoLabels,
+                        emotionDist = emD,
+                        themeLabels = themeLabels,
+                        themeDist = thD,
+                        sourceCount = (doc.getLong("sourceCount") ?: 0L).toInt(),
+                        lastRebuiltAt = doc.getLong("lastRebuiltAt") ?: 0L,
+                        tier = doc.getString("tier") ?: "base",
+                        proAt = doc.getLong("proAt") ?: 0L,
+                        stale = doc.getBoolean("stale") ?: true,
+                        score = (doc.getLong("score") ?: 0L).toInt(),
+                        grade = doc.getString("grade") ?: "F"
+                    ))
+                } catch (e: Exception) { onResult(empty) }
             }
+            .addOnFailureListener { onResult(empty) }
+    }
 
-            val header = ctx.getString(R.string.week_prompt_intro) + "\n" +
-                    ctx.getString(R.string.week_prompt_header_note)
-            val rules = ctx.getString(R.string.week_prompt_rules)
-            val prompt = buildString {
-                appendLine(header)
-                dreams.forEachIndexed { idx, d ->
-                    appendLine(ctx.getString(R.string.tag_dream_original, idx + 1) + " " + d)
-                }
-                append(rules)
-            }
+    fun generateProReport(uid: String, weekKey: String, ctx: Context, callback: (Boolean) -> Unit) {
+        collectWeekEntriesLimited(uid, weekKey, limit = 10) { entries, count ->
+            if (count < 1) { callback(false); return@collectWeekEntriesLimited }
 
-            var emoDist: List<Float> = List(8) { 0f }
-            var themeDist: List<Float> = List(4) { 0f }
-            var feelingTop = ""
-            var keywordsFull: List<String> = emptyList()
-            var analysis = ""
+            // 1. 통계 및 로컬 분석 실행 (그래프/점수 생성 필수)
+            val (emoD, thD) = localAnalyze(ctx, entries)
+            val scoreData = calculateDreamScore(emoD, thD)
+            val allText = entries.joinToString(" ") { it.dream }
+            val dummyKws = extractKeywords(allText)
+            val userLang = Locale.getDefault().displayLanguage
+
+            val prompt = """
+    You are an experienced clinical psychologist specializing in Jungian and psychodynamic dream work.
+    Your goal is to give grounded, realistic insights that help the user reflect on their week.
+
+    Dreams (from the same person over one week):
+    ${entries.map { it.dream }.joinToString(" | ")}
+
+    STRICT INSTRUCTIONS:
+    - Write in $userLang only.
+    - No fortune-telling, magic, spirits, astrology, past lives, or supernatural predictions.
+    - Keep the tone calm, warm, and professional. Focus on emotions, inner conflicts, needs, and coping strategies.
+    - Treat all dreams as parts of ONE connected story about the same person.
+      Do NOT analyze each dream separately or enumerate them (no "first dream, second dream" style).
+    - Use simple, conversational language that a non-expert can easily read.
+    - Avoid very long sentences. Prefer clear, short sentences.
+
+    Field-by-field rules:
+
+    - "title":
+      * A short, poetic title (max 25 characters) that captures the overall mood of the week.
+    - "summary":
+      * 1–2 sentences that briefly describe the main emotional theme of these dreams.
+    - "core_themes":
+      * 3–5 simple keywords (single words or very short phrases).
+    - "deep_analysis":
+      * 3–5 short paragraphs, each 2–4 sentences.
+      * Clearly weave the dreams into ONE integrated narrative about the dreamer’s current inner world.
+      * Use blank lines between paragraphs so it is easy to read on a phone.
+      * Focus on realistic psychological interpretation (emotions, patterns, relationships, stress, desires).
+    - "subconscious_message":
+      * Exactly 1 sentence that gently summarizes what the inner self wants to say to the dreamer.
+      * No magic, no prophecy, no guaranteed outcomes.
+    - "actionable_advice":
+      * 3–5 concrete, realistic suggestions the user can actually do in everyday life
+        (e.g. journaling, setting boundaries, resting, talking to someone, planning small changes).
+      * Each item should be short and practical.
+    - "lucky_action":
+      * ONE small symbolic action that feels a bit special but is still realistic and healthy
+        (for example: writing a kind letter to yourself, taking a quiet evening walk, tidying your room
+        as a fresh start, lighting a candle while reflecting on your week).
+      * It MUST NOT mention miracles, the universe granting wishes, magical luck, or any guaranteed success.
+      * It should sound like a gentle self-care ritual, not fortune-telling.
+
+    Output JSON only, with this exact structure and keys (no extra text before or after):
+
+    {
+      "title": "A poetic title",
+      "summary": "Concise summary.",
+      "core_themes": ["Keyword1", "Keyword2", "Keyword3"],
+      "deep_analysis": "Integrated multi-paragraph analysis...",
+      "subconscious_message": "One powerful sentence.",
+      "actionable_advice": ["Advice 1", "Advice 2", "Advice 3"],
+      "lucky_action": "A realistic, symbolic action."
+    }
+""".trimIndent()
+
 
             val reqBody = JSONObject().apply {
-                put("model", "gpt-4.1-mini")
-                put("temperature", 0.6)
+                put("model", "gpt-4o-mini")
                 put("messages", JSONArray().put(JSONObject().put("role", "user").put("content", prompt)))
-                put("response_format", JSONObject().put("type", "json_schema").put("json_schema",
-                    JSONObject()
-                        .put("name", "weekly_report")
-                        .put("schema", JSONObject()
-                            .put("type", "object")
-                            .put("properties", JSONObject()
-                                .put("feeling", JSONObject().put("type", "string"))
-                                .put("keywords", JSONObject().put("type", "array").put("items", JSONObject().put("type", "string")))
-                                .put("analysis", JSONObject().put("type", "string"))
-                                .put("score", JSONObject().put("type", "number"))
-                                .put("emotionLabels", JSONObject().put("type", "array").put("items", JSONObject().put("type", "string")))
-                                .put("emotionDist", JSONObject().put("type", "array").put("items", JSONObject().put("type", "number")))
-                                .put("themeLabels", JSONObject().put("type", "array").put("items", JSONObject().put("type", "string")))
-                                .put("themeDist", JSONObject().put("type", "array").put("items", JSONObject().put("type", "number")))
-                            )
-                            .put("required", JSONArray(listOf("feeling", "keywords", "analysis")))
-                            .put("additionalProperties", false)
-                        )
-                ))
+                put("response_format", JSONObject().put("type", "json_object"))
+                put("temperature", 0.7)
             }
+
             val req = Request.Builder()
                 .url("https://api.openai.com/v1/chat/completions")
                 .header("Authorization", "Bearer $apiKey")
                 .header("Content-Type", "application/json")
-                .post(reqBody.toString().toRequestBody("application/json; charset=utf-8".toMediaType()))
+                .post(reqBody.toString().toRequestBody("application/json".toMediaType()))
                 .build()
 
             http.newCall(req).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: java.io.IOException) {
-                    Log.w(TAG, "GPT call failed, fallback to local: ${e.message}")
-                    val (emoF, themeF) = localAnalyze(entries, ctx.resources)
-                    emoDist = emoF; themeDist = themeF
-                    feelingTop = topIndexOrNull(emoDist)?.let { emoLabels(ctx.resources)[it] } ?: ""
-                    keywordsFull = fullKeywords(interps + dreams)
-                    analysis = ""
-                    saveWeekly(ref, meta, ctx, feelingTop, keywordsFull, analysis, emoDist, themeDist) { callback(false) }
-                }
-
+                override fun onFailure(call: Call, e: IOException) { callback(false) }
                 override fun onResponse(call: Call, response: Response) {
-                    val bodyStr = response.body?.string().orEmpty()
-                    response.close()
                     try {
-                        val js = JSONObject(bodyStr)
-                        val content = js.getJSONArray("choices").getJSONObject(0)
-                            .getJSONObject("message").getString("content")
-                        val payload = JSONObject(content)
+                        val body = response.body?.string() ?: ""
+                        if (!response.isSuccessful) throw IOException("HTTP ${response.code}")
 
-                        val emoRaw = payload.optJSONArray("emotionDist")?.let { a ->
-                            (0 until a.length()).map { a.optDouble(it, 0.0).toFloat() }
-                        } ?: emptyList()
-                        val thRaw = payload.optJSONArray("themeDist")?.let { a ->
-                            (0 until a.length()).map { a.optDouble(it, 0.0).toFloat() }
-                        } ?: emptyList()
-                        emoDist = scaleToPercent(emoRaw, 8)
-                        themeDist = scaleToPercent(thRaw, 4)
-
-                        feelingTop = topIndexOrNull(emoDist)?.let { emoLabels(ctx.resources)[it] }
-                            ?: payload.optString("feeling", "")
-
-                        val kwList = payload.optJSONArray("keywords")?.let { arr ->
-                            (0 until arr.length()).map { arr.getString(it) }
-                        } ?: emptyList()
-                        keywordsFull = fullKeywords(kwList)
-
-                        analysis = payload.optString("analysis", "")
-
-                        if (emoDist.all { it == 0f } && themeDist.all { it == 0f }) {
-                            val (emoF, themeF) = localAnalyze(entries, ctx.resources)
-                            emoDist = emoF; themeDist = themeF
-                            if (feelingTop.isBlank()) {
-                                feelingTop = topIndexOrNull(emoDist)?.let { emoLabels(ctx.resources)[it] } ?: ""
-                            }
+                        val textContent = JSONObject(body).getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content")
+                        val jsonParsed = JSONObject(textContent)
+                        val aiThemes = jsonParsed.optJSONArray("core_themes")
+                        val finalKeywords = if (aiThemes != null && aiThemes.length() > 0) {
+                            (0 until aiThemes.length()).map { aiThemes.getString(it).replace("#", "") }
+                        } else {
+                            dummyKws
                         }
+                        val feeling = jsonParsed.optString("title")
 
-                        saveWeekly(ref, meta, ctx, feelingTop, keywordsFull, analysis, emoDist, themeDist) { callback(true) }
-                    } catch (e: Exception) {
-                        Log.w(TAG, "GPT parse fail, fallback to local: ${e.message}")
-                        val (emoF, themeF) = localAnalyze(entries, ctx.resources)
-                        emoDist = emoF; themeDist = themeF
-                        feelingTop = topIndexOrNull(emoDist)?.let { emoLabels(ctx.resources)[it] } ?: ""
-                        keywordsFull = fullKeywords(interps + dreams)
-                        analysis = ""
-                        saveWeekly(ref, meta, ctx, feelingTop, keywordsFull, analysis, emoDist, themeDist) { callback(false) }
-                    }
+                        saveWeekly(
+                            db.collection("users").document(uid).collection("weekly_reports").document(weekKey),
+                            feeling, finalKeywords, "", textContent, "",
+                            emoD, thD, scoreData, count, "pro"
+                        ) { callback(true) }
+
+                    } catch (e: Exception) { e.printStackTrace(); callback(false) }
                 }
             })
         }
     }
 
+    fun aggregateDreamsForWeek(uid: String, weekKey: String, ctx: Context, callback: (Boolean) -> Unit) {
+        collectWeekEntriesLimited(uid, weekKey, limit = 10) { entries, totalCount ->
+            val ref = db.collection("users").document(uid).collection("weekly_reports").document(weekKey)
+            if (totalCount < 2) {
+                ref.set(mapOf("stale" to true, "sourceCount" to totalCount), SetOptions.merge())
+                callback(false)
+                return@collectWeekEntriesLimited
+            }
+            fallbackToLocal(entries, ref, ctx, callback)
+        }
+    }
+
+    private fun fallbackToLocal(entries: List<WeekEntry>, ref: com.google.firebase.firestore.DocumentReference, ctx: Context, callback: (Boolean) -> Unit) {
+        val (emoD, thD) = localAnalyze(ctx, entries)
+        val scoreData = calculateDreamScore(emoD, thD)
+        val allText = entries.joinToString(" ") { it.dream }
+        val keywords = extractKeywords(allText)
+        val emoLabels = getResList(ctx, R.array.emotion_labels)
+        val themeLabels = getResList(ctx, R.array.theme_labels)
+        val emoIdx = emoD.indices.maxByOrNull { emoD[it] } ?: 0
+        val emoLbl = emoLabels.getOrElse(emoIdx) { "Neutral" }
+        val thIdx = thD.indices.maxByOrNull { thD[it] } ?: 0
+        val themeLbl = themeLabels.getOrElse(thIdx) { "Life" }
+        val mainKeyword = keywords.firstOrNull() ?: "Dream"
+
+        val analysisText = try {
+            ctx.getString(R.string.analysis_template_basic, emoLbl, themeLbl, mainKeyword)
+        } catch (e: Exception) {
+            "Analysis complete. Emotion: $emoLbl, Theme: $themeLbl."
+        }
+
+        saveWeekly(ref, emoLbl, keywords, analysisText, "", "", emoD, thD, scoreData, entries.size, "base") {
+            callback(true)
+        }
+    }
+
+    private fun extractKeywords(text: String): List<String> {
+        return text.split(" ", "\n", ".")
+            .filter { it.length > 1 }
+            .groupingBy { it }
+            .eachCount()
+            .entries.sortedByDescending { it.value }
+            .take(4)
+            .map { it.key.replace("#", "").replace(Regex("[^a-zA-Z0-9가-힣]"), "") }
+    }
+
+    private fun calculateDreamScore(emoDist: List<Float>, themeDist: List<Float>): DreamScoreResult {
+        val posScore = (emoDist.getOrElse(0){0f} + emoDist.getOrElse(1){0f} + emoDist.getOrElse(2){0f} + emoDist.getOrElse(3){0f})
+        val negScore = (emoDist.getOrElse(5){0f} + emoDist.getOrElse(6){0f} + emoDist.getOrElse(7){0f})
+        var rawScore = 50f + (posScore * 0.8f) - (negScore * 1.2f)
+        val thSum = themeDist.sum().coerceAtLeast(1f)
+        if (thSum > 0) {
+            rawScore += (themeDist.getOrElse(0){0f}/thSum * 5f) + (themeDist.getOrElse(1){0f}/thSum * 5f) - (themeDist.getOrElse(3){0f}/thSum * 8f)
+        }
+        val finalScore = rawScore.roundToInt().coerceIn(0, 100)
+        val grade = when { finalScore >= 85 -> "A"; finalScore >= 65 -> "B"; finalScore >= 35 -> "C"; finalScore >= 15 -> "D"; else -> "F" }
+        return DreamScoreResult(finalScore, grade)
+    }
+
+    private fun localAnalyze(ctx: Context, entries: List<WeekEntry>): Pair<List<Float>, List<Float>> {
+        val emo = FloatArray(8)
+        val th = FloatArray(4)
+        val texts = entries.joinToString(" ") { (it.dream + " " + it.interp).lowercase() }
+        val res = ctx.resources
+
+        fun checkMultiLang(vararg arrayIds: Int): Boolean {
+            return arrayIds.any { id ->
+                try { res.getStringArray(id).any { keyword -> texts.contains(keyword.lowercase()) } }
+                catch (e: Exception) { false }
+            }
+        }
+
+        if (checkMultiLang(R.array.kw_positive_en, R.array.kw_positive_ko, R.array.kw_positive_zh, R.array.kw_positive_hi, R.array.kw_positive_ar)) emo[0] += 1f
+        if (checkMultiLang(R.array.kw_calm_en, R.array.kw_calm_ko, R.array.kw_calm_zh, R.array.kw_calm_hi, R.array.kw_calm_ar)) emo[1] += 1f
+        if (checkMultiLang(R.array.kw_vitality_en, R.array.kw_vitality_ko, R.array.kw_vitality_zh, R.array.kw_vitality_hi, R.array.kw_vitality_ar)) emo[2] += 1f
+        if (checkMultiLang(R.array.kw_focus_en, R.array.kw_focus_ko, R.array.kw_focus_zh, R.array.kw_focus_hi, R.array.kw_focus_ar)) emo[3] += 1f
+        if (checkMultiLang(R.array.kw_confusion_en, R.array.kw_confusion_ko, R.array.kw_confusion_zh, R.array.kw_confusion_hi, R.array.kw_confusion_ar)) emo[5] += 1f
+        if (checkMultiLang(R.array.kw_anxiety_en, R.array.kw_anxiety_ko, R.array.kw_anxiety_zh, R.array.kw_anxiety_hi, R.array.kw_anxiety_ar)) emo[6] += 1f
+        if (checkMultiLang(R.array.kw_depression_en, R.array.kw_depression_ko, R.array.kw_depression_zh, R.array.kw_depression_hi, R.array.kw_depression_ar)) emo[7] += 1f
+
+        if (emo.sum() == 0f) emo[4] = 5f
+
+        if (checkMultiLang(R.array.kw_theme_rel_en, R.array.kw_theme_rel_ko, R.array.kw_theme_rel_zh, R.array.kw_theme_rel_hi, R.array.kw_theme_rel_ar)) th[0] += 1f
+        if (checkMultiLang(R.array.kw_theme_success_en, R.array.kw_theme_success_ko, R.array.kw_theme_success_zh, R.array.kw_theme_success_hi, R.array.kw_theme_success_ar)) th[1] += 1f
+        if (checkMultiLang(R.array.kw_theme_change_en, R.array.kw_theme_change_ko, R.array.kw_theme_change_zh, R.array.kw_theme_change_hi, R.array.kw_theme_change_ar)) th[2] += 1f
+        if (checkMultiLang(R.array.kw_theme_risk_en, R.array.kw_theme_risk_ko, R.array.kw_theme_risk_zh, R.array.kw_theme_risk_hi, R.array.kw_theme_risk_ar)) th[3] += 1f
+
+        if (th.sum() == 0f) th[0] = 1f
+
+        return Pair(scaleToPercent(emo.toList(), 8), scaleToPercent(th.toList(), 4))
+    }
+
     private fun saveWeekly(
         ref: com.google.firebase.firestore.DocumentReference,
-        meta: Map<String, Any>,
-        ctx: Context,
-        feelingTop: String,
-        keywordsFull: List<String>,
-        analysis: String,
-        emoDist: List<Float>,
-        themeDist: List<Float>,
+        feeling: String, kws: List<String>, analysis: String, analysisJson: String, imgUrl: String,
+        emoDist: List<Float>, themeDist: List<Float>, score: DreamScoreResult, count: Int, tier: String,
         done: () -> Unit
     ) {
-        val emoL = emoLabels(ctx.resources)
-        val themeL = themeLabels(ctx.resources)
-        val score = positivityScore(emoDist)
-
-        val save = mapOf(
-            "feeling" to feelingTop,
-            "keywords" to keywordsFull,
-            "keywords_home" to top1(keywordsFull),
-            "analysis" to analysis,
-            "score" to score,
-            "emotionLabels" to emoL,
-            "emotionDist" to emoDist,
-            "themeLabels" to themeL,
-            "themeDist" to themeDist,
-            "stale" to false,
-            "lastRebuiltAt" to now(),
-            "timestamp" to now()
+        val data = mapOf(
+            "feeling" to feeling, "keywords" to kws, "analysis" to analysis,
+            "analysis_json" to analysisJson, "analysis_image_url" to imgUrl,
+            "emotionDist" to emoDist, "themeDist" to themeDist,
+            "score" to score.score, "grade" to score.grade, "sourceCount" to count,
+            "stale" to false, "lastRebuiltAt" to now(), "timestamp" to now(), "tier" to tier
         )
-        ref.set(meta + save, SetOptions.merge())
-            .addOnCompleteListener { done() }
+        ref.set(data, SetOptions.merge()).addOnCompleteListener { done() }
     }
 
-    fun saveProUpgrade(
-        uid: String,
-        weekKey: String,
-        feeling: String,
-        keywords: List<String>,
-        analysis: String,
-        model: String,
-        onDone: (() -> Unit)? = null
-    ) {
-        db.collection("users").document(uid)
-            .collection("weekly_reports").document(weekKey)
-            .set(
-                mapOf(
-                    "feeling" to feeling,
-                    "keywords" to fullKeywords(keywords),
-                    "keywords_home" to top1(keywords),
-                    "analysis" to analysis,
-                    "tier" to "pro",
-                    "proAt" to now(),
-                    "proModel" to model,
-                    "timestamp" to now()
-                ),
-                SetOptions.merge()
-            )
-            .addOnCompleteListener { onDone?.invoke() }
+    fun listWeeklyReportKeys(uid: String, limit: Int, onResult: (List<String>) -> Unit) {
+        db.collection("users").document(uid).collection("weekly_reports").orderBy("timestamp", Query.Direction.DESCENDING).limit(limit.toLong()).get()
+            .addOnSuccessListener { onResult(it.documents.map { d -> d.id }) }.addOnFailureListener { onResult(emptyList()) }
     }
 
-    fun getAllDreamDates(ctx: Context, onResult: (Set<String>) -> Unit) {
-        val uid = currentUid()
-        if (uid == null) { onResult(emptySet()); return }
-        getAllDreamDates(uid, null, onResult)
-    }
-    fun getAllDreamDates(ctx: Context, uid: String, monthPrefix: String? = null, onResult: (Set<String>) -> Unit) {
-        getAllDreamDates(uid, monthPrefix, onResult)
-    }
-    fun getAllDreamDates(uid: String, monthPrefix: String? = null, onResult: (Set<String>) -> Unit) {
-        db.collection("users").document(uid).collection("dreams").get()
-            .addOnSuccessListener { snap ->
-                val all = snap.documents.map { it.id }
-                val filtered = monthPrefix?.let { pfx -> all.filter { it.startsWith(pfx) } } ?: all
-                onResult(filtered.toSet())
-            }
-            .addOnFailureListener { onResult(emptySet()) }
-    }
-
-    fun updateDreamsForDate(
-        uid: String = currentUid().orEmpty(),
-        dateKey: String = todayKey(),
-        itemsJson: String,
-        onComplete: (() -> Unit)? = null
-    ) {
-        if (uid.isBlank()) { onComplete?.invoke(); return }
-        val arr: JSONArray = runCatching {
-            val raw = itemsJson.trim()
-            if (raw.startsWith("[")) JSONArray(raw) else JSONArray().put(JSONObject(raw))
-        }.getOrElse { JSONArray() }
-        if (arr.length() == 0) { onComplete?.invoke(); return }
-
-        val perDateAdded = mutableMapOf<String, Int>()
-        var done = 0
-        val total = arr.length()
-
-        for (i in 0 until arr.length()) {
-            val obj = arr.optJSONObject(i) ?: continue
-            val dk = obj.optString("dateKey", dateKey)
-            val dream = obj.optString("dream", "")
-            val result = obj.optString("result", "")
-            val ts = if (obj.has("timestamp")) obj.optLong("timestamp") else now()
-            val dayRef = db.collection("users").document(uid).collection("dreams").document(dk)
-            val entry = mapOf("dream" to dream, "result" to result, "timestamp" to ts)
-
-            dayRef.collection("entries").add(entry)
-                .addOnSuccessListener {
-                    perDateAdded[dk] = (perDateAdded[dk] ?: 0) + 1
-                    if (++done == total) {
-                        perDateAdded.forEach { (dkey, c) ->
-                            db.collection("users").document(uid).collection("dreams").document(dkey)
-                                .set(mapOf("count" to FieldValue.increment(c.toDouble()), "last_updated" to now()), SetOptions.merge())
-                        }
-                        db.collection("users").document(uid)
-                            .collection("weekly_reports").document(thisWeekKey())
-                            .set(mapOf("stale" to true), SetOptions.merge())
-                            .addOnCompleteListener { onComplete?.invoke() }
+    fun collectWeekEntriesLimited(uid: String, weekKey: String, limit: Int, onResult: (List<WeekEntry>, Int) -> Unit) {
+        val dates = weekDateKeys(weekKey)
+        if (dates.isEmpty()) { onResult(emptyList(), 0); return }
+        val allEntries = Collections.synchronizedList(mutableListOf<WeekEntry>())
+        val counter = AtomicInteger(0)
+        dates.forEach { dateKey ->
+            db.collection("users").document(uid).collection("dreams").document(dateKey).collection("entries").get().addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    task.result?.documents?.forEach { doc ->
+                        allEntries.add(WeekEntry(doc.getLong("timestamp")?:0L, doc.getString("dream")?:"", doc.getString("result")?:""))
                     }
                 }
-                .addOnFailureListener {
-                    if (++done == total) onComplete?.invoke()
+                if (counter.incrementAndGet() == dates.size) {
+                    onResult(allEntries.filter { it.dream.isNotBlank() }.sortedBy { it.ts }.takeLast(limit), allEntries.size)
                 }
-        }
-    }
-    fun updateDreamsForDate(itemsJson: String, onComplete: (() -> Unit)? = null) {
-        val uid = currentUid()
-        if (uid == null) { onComplete?.invoke(); return }
-        updateDreamsForDate(uid = uid, dateKey = todayKey(), itemsJson = itemsJson, onComplete = onComplete)
-    }
-    fun updateDreamsForDate(uid: String, dateKey: String, onCount: ((Int) -> Unit)? = null) {
-        val dayRef = db.collection("users").document(uid).collection("dreams").document(dateKey)
-        dayRef.collection("entries").get()
-            .addOnSuccessListener { snap ->
-                val c = snap.size()
-                dayRef.set(mapOf("count" to c, "last_updated" to now()), SetOptions.merge())
-                    .addOnCompleteListener { onCount?.invoke(c) }
-            }
-            .addOnFailureListener { onCount?.invoke(0) }
-    }
-
-    fun deleteWeeklyReport(uid: String, weekKey: String, onComplete: ((Boolean) -> Unit)? = null) {
-        db.collection("users").document(uid)
-            .collection("weekly_reports").document(weekKey)
-            .delete()
-            .addOnSuccessListener { onComplete?.invoke(true) }
-            .addOnFailureListener { onComplete?.invoke(false) }
-    }
-
-    fun saveDailyFortune(uid: String, dateKey: String = todayKey(),
-                         payload: Map<String, Any>, onComplete: (() -> Unit)? = null) {
-        db.collection("users").document(uid)
-            .collection("daily_fortunes").document(dateKey)
-            .set(payload + mapOf("timestamp" to now()), SetOptions.merge())
-            .addOnSuccessListener { onComplete?.invoke() }
-            .addOnFailureListener { onComplete?.invoke() }
-    }
-    fun saveDailyFortune(uid: String, dateKey: String = todayKey(),
-                         payloadJson: JSONObject, onComplete: (() -> Unit)? = null) {
-        saveDailyFortune(uid, dateKey, jsonObjectToMap(payloadJson), onComplete)
-    }
-
-    fun listWeeklyReportKeys(uid: String, limit: Int = 30, onResult: (List<String>) -> Unit) {
-        db.collection("users").document(uid)
-            .collection("weekly_reports")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
-            .limit(limit.toLong())
-            .get()
-            .addOnSuccessListener { snap -> onResult(snap.documents.map { it.id }) }
-            .addOnFailureListener { onResult(emptyList()) }
-    }
-
-    fun resetWeeklyReport(uid: String, weekKey: String = thisWeekKey(), ctx: Context, onComplete: (() -> Unit)? = null) {
-        val payload = mapOf(
-            "feeling" to "",
-            "keywords" to emptyList<String>(),
-            "keywords_home" to emptyList<String>(),
-            "analysis" to "",
-            "emotionLabels" to emoLabels(ctx.resources),
-            "emotionDist" to List(8) { 0f },
-            "themeLabels" to themeLabels(ctx.resources),
-            "themeDist" to List(4) { 0f },
-            "sourceCount" to 0,
-            "tier" to "base",
-            "proAt" to 0L,
-            "stale" to true,
-            "lastRebuiltAt" to now(),
-            "timestamp" to now()
-        )
-        db.collection("users").document(uid)
-            .collection("weekly_reports").document(weekKey)
-            .set(payload, SetOptions.merge())
-            .addOnSuccessListener { onComplete?.invoke() }
-            .addOnFailureListener { onComplete?.invoke() }
-    }
-
-    fun getUserProfile(uid: String, onResult: (Map<String, Any>?) -> Unit) {
-        db.collection("users").document(uid).get()
-            .addOnSuccessListener { doc -> onResult(if (doc.exists()) doc.data else null) }
-            .addOnFailureListener { onResult(null) }
-    }
-    fun saveUserProfile(uid: String, userProfile: Map<String, Any>, onComplete: (() -> Unit)? = null) {
-        db.collection("users").document(uid).set(userProfile, SetOptions.merge())
-            .addOnSuccessListener { onComplete?.invoke() }
-            .addOnFailureListener { onComplete?.invoke() }
-    }
-
-    private fun jsonObjectToMap(js: JSONObject): Map<String, Any> {
-        val out = mutableMapOf<String, Any>()
-        val it = js.keys()
-        while (it.hasNext()) {
-            val k = it.next()
-            val v = js.get(k)
-            out[k] = when (v) {
-                is JSONObject -> jsonObjectToMap(v)
-                is JSONArray -> (0 until v.length()).map { idx ->
-                    val item = v.get(idx)
-                    when (item) {
-                        is JSONObject -> jsonObjectToMap(item)
-                        is JSONArray -> (0 until item.length()).map { j -> item.get(j) }
-                        else -> item
-                    }
-                }
-                else -> v
             }
         }
-        return out
-    }
-
-    private fun com.google.firebase.firestore.DocumentSnapshot.getDoubleOrNull(key: String): Double? {
-        val v = get(key) ?: return null
-        return if (v is Number) v.toDouble() else null
     }
 }

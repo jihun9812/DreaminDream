@@ -23,8 +23,8 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     private val ctx = app.applicationContext
     private val PREFS_NAME_PREFIX = "dream_profile_"
 
-    private fun str(id: Int, fb: String): String =
-        runCatching { ctx.getString(id) }.getOrElse { fb }
+    private fun str(id: Int, vararg args: Any): String =
+        runCatching { ctx.getString(id, *args) }.getOrElse { "" }
 
     private fun getPrefs() = ctx.getSharedPreferences(
         PREFS_NAME_PREFIX + (FirebaseAuth.getInstance().currentUser?.uid ?: getDeviceId()),
@@ -40,7 +40,6 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     init {
         initialLoad()
-
         viewModelScope.launch {
             SubscriptionManager.isSubscribed.collect { subscribed ->
                 _ui.update { it.copy(isPremium = subscribed) }
@@ -58,27 +57,20 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         updateAccountStatus()
     }
 
-    // --- Stats Logic (Modified) ---
     private fun refreshStats() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
-
-        // ★ 수정됨: FirestoreManager의 새로운 메서드를 사용하여
-        // 전체 누적 횟수와 오늘 해석 횟수를 동시에 가져옴
         FirestoreManager.getDreamStats(uid) { total, today ->
-            _ui.update {
-                it.copy(
-                    dreamTotalCount = total,
-                    gptUsedToday = today
-                )
-            }
+            _ui.update { it.copy(dreamTotalCount = total, gptUsedToday = today) }
         }
     }
 
-    // --- Data Loading & Sync ---
     private fun loadFromLocal() {
         val prefs = getPrefs()
         val birthIso = prefs.getString("birthdate_iso", "") ?: ""
         val btCode = prefs.getString("birth_time_code", "none") ?: "none"
+
+        // ★ 저장된 프로필이 있는지 확인 (있으면 잠금 상태로 시작)
+        val hasSavedProfile = prefs.getBoolean("has_saved_profile", false)
 
         val (zodiacSign, _) = calculateWesternZodiac(birthIso)
         val (zodiacAnimal, icon) = calculateChineseZodiac(birthIso)
@@ -92,6 +84,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                 mbti = prefs.getString("mbti", "") ?: "",
                 birthTimeCode = btCode,
                 birthTimeLabel = codeToLocalizedLabel(btCode),
+                countryCode = prefs.getString("country_code", "KR") ?: "KR",
+                countryName = prefs.getString("country_name", "South Korea") ?: "South Korea",
+                countryFlag = prefs.getString("country_flag", "🇰🇷") ?: "🇰🇷",
+                isProfileLocked = hasSavedProfile, // UI에서 경고창 띄우는 기준
                 age = age,
                 zodiacSign = zodiacSign,
                 zodiacAnimal = icon
@@ -109,6 +105,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     putString("gender", data["gender"] as? String ?: "")
                     putString("mbti", data["mbti"] as? String ?: "")
                     putString("birth_time_code", data["birth_time_code"] as? String ?: "none")
+                    putString("country_code", data["country_code"] as? String ?: "KR")
+                    putString("country_name", data["country_name"] as? String ?: "South Korea")
+                    putString("country_flag", data["country_flag"] as? String ?: "🇰🇷")
+                    putBoolean("has_saved_profile", true)
                 }.apply()
                 loadFromLocal()
             }
@@ -116,15 +116,25 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun toggleEditMode() {
-        val current = _ui.value.isEditMode
-        if (!current) loadFromLocal()
-        _ui.update { it.copy(isEditMode = !current) }
+    // 편집 모드 진입 (경고창 확인 후 호출됨)
+    fun enterEditMode() {
+        loadFromLocal() // 최신 데이터 로드
+        _ui.update { it.copy(isEditMode = true) }
     }
 
-    fun saveProfile(nickname: String, birthIso: String, gender: String, mbti: String, birthTimeCode: String) {
-        if (nickname.isBlank() || birthIso.isBlank() || gender.isBlank()) {
-            showToast(ctx.getString(R.string.err_select_birthdate))
+    // 편집 취소
+    fun cancelEditMode() {
+        _ui.update { it.copy(isEditMode = false) }
+        loadFromLocal() // 원래 값 복구
+    }
+
+    // ★ 저장 로직 개선: Country 포함, 저장 후 잠금 설정
+    fun saveProfile(
+        nickname: String, birthIso: String, gender: String, mbti: String, birthTimeCode: String,
+        countryCode: String, countryName: String, countryFlag: String
+    ) {
+        if (nickname.isBlank() || birthIso.isBlank() || gender.isBlank() || countryCode.isBlank()) {
+            showToast(str(R.string.toast_input_error))
             return
         }
 
@@ -136,6 +146,10 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
             putString("gender", gender)
             putString("mbti", mbti)
             putString("birth_time_code", birthTimeCode)
+            putString("country_code", countryCode)
+            putString("country_name", countryName)
+            putString("country_flag", countryFlag)
+            putBoolean("has_saved_profile", true) // 저장 완료 시 잠금 플래그 설정
         }.apply()
 
         val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -146,6 +160,9 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                 "gender" to gender,
                 "mbti" to mbti,
                 "birth_time_code" to birthTimeCode,
+                "country_code" to countryCode,
+                "country_name" to countryName,
+                "country_flag" to countryFlag,
                 "updatedAt" to System.currentTimeMillis()
             )
             FirestoreManager.updateUserProfile(uid, data) {
@@ -158,13 +175,13 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun onSaveComplete() {
         _ui.update { it.copy(saving = false, isEditMode = false) }
-        showToast(ctx.getString(R.string.toast_saved))
-        loadFromLocal()
+        showToast(str(R.string.toast_saved))
+        loadFromLocal() // UI 갱신 (잠금 상태 반영)
     }
 
     fun logout() {
         FirebaseAuth.getInstance().signOut()
-        showToast(ctx.getString(R.string.btn_logout))
+        showToast(str(R.string.btn_logout))
         initialLoad()
     }
 
@@ -175,8 +192,8 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                 it.copy(
                     isGuest = true,
                     email = "Guest Mode",
-                    accountProviderLabel = ctx.getString(R.string.status_guest),
-                    googleButtonLabel = ctx.getString(R.string.btn_google_login),
+                    accountProviderLabel = str(R.string.status_guest),
+                    googleButtonLabel = str(R.string.btn_google_login),
                     googleButtonEnabled = true
                 )
             }
@@ -187,7 +204,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
                     isGuest = user.isAnonymous,
                     email = user.email ?: "No Email",
                     accountProviderLabel = if (isGoogle) "Google Connected" else "Guest Account",
-                    googleButtonLabel = if (isGoogle) ctx.getString(R.string.btn_google_connected) else ctx.getString(R.string.btn_google_merge),
+                    googleButtonLabel = if (isGoogle) str(R.string.btn_google_connected) else str(R.string.btn_google_merge),
                     googleButtonEnabled = !isGoogle
                 )
             }
@@ -207,7 +224,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
             currentUser.linkWithCredential(credential)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        onToast(ctx.getString(R.string.toast_google_linked))
+                        onToast(str(R.string.toast_google_linked))
                         initialLoad()
                         endLinkGoogle()
                     } else {
@@ -246,7 +263,7 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun setTestPremium(isPremium: Boolean) {
-        com.dreamindream.app.SubscriptionManager.markSubscribed(ctx, isPremium)
+        SubscriptionManager.markSubscribed(ctx, isPremium)
     }
 
     // --- Calculations ---
@@ -263,41 +280,41 @@ class SettingsViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun calculateWesternZodiac(iso: String): Pair<String, String> = runCatching {
-        if (iso.isBlank()) return str(R.string.wz_unknown, "Zodiac -") to "✨"
+        if (iso.isBlank()) return str(R.string.wz_unknown) to "✨"
         val (m, d) = iso.substring(5).split("-").map { it.toInt() }
 
-        data class Sign(val month: Int, val day: Int, val emoji: String, val labelId: Int, val fallback: String)
+        data class Sign(val month: Int, val day: Int, val emoji: String, val labelId: Int)
         val signs = listOf(
-            Sign(1, 20, "♑", R.string.wz_capricorn, "Capricorn"),
-            Sign(2, 19, "♒", R.string.wz_aquarius, "Aquarius"),
-            Sign(3, 21, "♓", R.string.wz_pisces, "Pisces"),
-            Sign(4, 20, "♈", R.string.wz_aries, "Aries"),
-            Sign(5, 21, "♉", R.string.wz_taurus, "Taurus"),
-            Sign(6, 22, "♊", R.string.wz_gemini, "Gemini"),
-            Sign(7, 23, "♋", R.string.wz_cancer, "Cancer"),
-            Sign(8, 23, "♌", R.string.wz_leo, "Leo"),
-            Sign(9, 24, "♍", R.string.wz_virgo, "Virgo"),
-            Sign(10, 24, "♎", R.string.wz_libra, "Libra"),
-            Sign(11, 23, "♏", R.string.wz_scorpio, "Scorpio"),
-            Sign(12, 22, "♐", R.string.wz_sagittarius, "Sagittarius"),
-            Sign(12, 32, "♑", R.string.wz_capricorn, "Capricorn")
+            Sign(1, 20, "♑", R.string.wz_capricorn),
+            Sign(2, 19, "♒", R.string.wz_aquarius),
+            Sign(3, 21, "♓", R.string.wz_pisces),
+            Sign(4, 20, "♈", R.string.wz_aries),
+            Sign(5, 21, "♉", R.string.wz_taurus),
+            Sign(6, 22, "♊", R.string.wz_gemini),
+            Sign(7, 23, "♋", R.string.wz_cancer),
+            Sign(8, 23, "♌", R.string.wz_leo),
+            Sign(9, 24, "♍", R.string.wz_virgo),
+            Sign(10, 24, "♎", R.string.wz_libra),
+            Sign(11, 23, "♏", R.string.wz_scorpio),
+            Sign(12, 22, "♐", R.string.wz_sagittarius),
+            Sign(12, 32, "♑", R.string.wz_capricorn)
         )
 
         val key = m * 100 + d
         val sign = signs.first { key < it.month * 100 + it.day }
-        val name = str(sign.labelId, sign.fallback)
-        "$name" to sign.emoji
-    }.getOrElse { str(R.string.wz_unknown, "Zodiac -") to "✨" }
+        val name = str(sign.labelId)
+        name to sign.emoji
+    }.getOrElse { str(R.string.wz_unknown) to "✨" }
 
     private fun calculateChineseZodiac(iso: String): Pair<String, String> = run {
-        if (iso.isBlank()) return@run str(R.string.cz_unknown, "-") to "🧿"
-        val y = iso.substring(0, 4).toIntOrNull() ?: return@run str(R.string.cz_unknown, "-") to "🧿"
+        if (iso.isBlank()) return@run str(R.string.cz_unknown) to "🧿"
+        val y = iso.substring(0, 4).toIntOrNull() ?: return@run str(R.string.cz_unknown) to "🧿"
 
         val names = listOf(
-            str(R.string.cz_rat, "Rat"), str(R.string.cz_ox, "Ox"), str(R.string.cz_tiger, "Tiger"),
-            str(R.string.cz_rabbit, "Rabbit"), str(R.string.cz_dragon, "Dragon"), str(R.string.cz_snake, "Snake"),
-            str(R.string.cz_horse, "Horse"), str(R.string.cz_goat, "Goat"), str(R.string.cz_monkey, "Monkey"),
-            str(R.string.cz_rooster, "Rooster"), str(R.string.cz_dog, "Dog"), str(R.string.cz_pig, "Pig")
+            str(R.string.cz_rat), str(R.string.cz_ox), str(R.string.cz_tiger),
+            str(R.string.cz_rabbit), str(R.string.cz_dragon), str(R.string.cz_snake),
+            str(R.string.cz_horse), str(R.string.cz_goat), str(R.string.cz_monkey),
+            str(R.string.cz_rooster), str(R.string.cz_dog), str(R.string.cz_pig)
         )
         val idx = (y - 1900) % 12
         val positiveIdx = if (idx < 0) (idx + 12) else idx

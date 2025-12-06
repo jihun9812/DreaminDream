@@ -97,6 +97,12 @@ android {
 }
 
 dependencies {
+
+
+    //review googleplay store
+    implementation("com.google.android.play:review:2.0.1")
+    implementation("com.google.android.play:review-ktx:2.0.1")
+    
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-analytics")

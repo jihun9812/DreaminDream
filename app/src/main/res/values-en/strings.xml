@@ -268,7 +268,25 @@ Fortune</string>
     <string name="ai_emotion_keywords_ai">Emotion: %1$s
 Keywords: %2$s
 AI: %3$s</string>
-<string name="ai_msg_loading">✨ Fetching today’s interpretation…</string>
+
+    <string name="lang_korean">Korean</string>
+    <string name="lang_arabic">Arabic</string>
+    <string name="lang_english">English</string>
+    <string name="lang_hindi">Hindi</string>
+    <string name="lang_chinese">Chinese</string>
+
+    <string name="toast_speak_language">Please speak in %1$s. (Device language)</string>
+
+    <string name="error_no_match">No speech recognized. (Check device language)</string>
+    <string name="error_network">Please check your network connection.</string>
+    <string name="error_permissions">Microphone permission is required.</string>
+    <string name="error_client">Microphone error or another app is using it.</string>
+    <string name="error_timeout">Timeout. Please try again.</string>
+    <string name="error_generic">Speech recognition error (%1$d). Please try again.</string>
+    <string name="error_start_failed">Unable to start speech recognition: %1$s</string>
+
+
+    <string name="ai_msg_loading">✨ Fetching today’s interpretation…</string>
     <string name="ai_emotion_keywords_simple">Emotion: %1$s
 Keywords: %2$s</string>
     <string name="btn_save">Save</string>
@@ -299,6 +317,129 @@ Keywords: %2$s</string>
 <string name="gender_female">Female</string>
 <string name="label_mbti">MBTI</string>
 <string name="label_birthtime">Birth time</string>
+    <string name="alert_edit_profile_title">Profile Edit Warning</string>
+    <string name="alert_edit_profile_msg">Your name, birthdate, and country are key reference points for fortune and astrology analysis.\n\nPlease ensure the information is accurate. Changing it may disconnect previous fortune data.\n\nDo you want to proceed?</string>
+
+    <string name="alert_save_confirm_title">Confirm Information</string>
+    <string name="alert_save_confirm_msg">Is the entered information correct?\nYour fortune data will be generated based on this information.</string>
+
+    <string name="label_country">Country</string>
+    <string name="hint_search_country">Search country (e.g. Uk, US)</string>
+    <string name="country_select_title">Select Country</string>
+
+    <string name="btn_yes_edit">Yes, edit</string>
+    <string name="btn_save_final">Confirm &amp; Save</string>
+
+    <string name="toast_input_error">Some required fields are empty. Please check your information.</string>
+
+
+    <string name="loading_text">Reading the Stars...</string>
+
+    <string name="destiny_awaits">DESTINY AWAITS</string>
+    <string name="hello_user">Hello, %s</string>
+    <string name="btn_open_fortune">OPEN FORTUNE</string>
+
+    <string name="daily_oracle_title">DAILY ORACLE</string>
+    <string name="lotto_default_title">LUCKY NUMBER</string>
+
+    <string name="card_overview">Today\'s Overview</string>
+
+    <string name="card_wealth">Wealth</string>
+    <string name="card_love">Love</string>
+    <string name="card_health">Health</string>
+    <string name="card_action">Action Tip</string>
+
+    <string name="missions_title">DAILY MISSIONS</string>
+
+    <string name="deep_unlock_title">UNLOCK DEEP ANALYSIS</string>
+    <string name="deep_view_full">View Full Report</string>
+    <string name="deep_premium_content">Premium Content</string>
+
+    <string name="tab_verdict">Verdict</string>
+    <string name="tab_trend">Trend</string>
+    <string name="tab_money">Money</string>
+    <string name="tab_love">Love</string>
+    <string name="tab_health">Health</string>
+    <string name="tab_career">Career</string>
+    <string name="tab_mind">Mind</string>
+    <string name="tab_risk">Risk</string>
+    <string name="tab_action">Action</string>
+
+    <string name="keywords_placeholder">Focus • Patience</string>
+    <string name="lucky_item">ITEM</string>
+
+
+
+    <string name="keywords_title">TODAY\'S KEYWORDS</string>
+
+
+
+
+    <string name="cal_tap_to_change">Tap to change</string>
+    <string name="cal_select_date_title">Select Date</string>
+    <string name="common_confirm">Confirm</string>
+
+    <string name="date_month_unit">Month</string>
+    <string name="error_speech_not_supported">🚫 This device does not support speech recognition, or the Google app is required.</string>
+
+    <string name="day_short_sun">SUN</string>
+    <string name="day_short_mon">MON</string>
+    <string name="day_short_tue">TUE</string>
+    <string name="day_short_wed">WED</string>
+    <string name="day_short_thu">THU</string>
+    <string name="day_short_fri">FRI</string>
+    <string name="day_short_sat">SAT</string>
+    <string name="error_parsing_result">An issue occurred while processing the result. The original content will be displayed.</string>
+    <string name="back_press_exit">Press back again to exit.</string>
+
+
+
+    <string name="dream_record_prefix">Dream Record #</string>
+   <string name="dream_interpretation_title">Dream Interpretation</string>
+    <string name="dream_original_title">Original Dream</string>
+    <string name="dream_analysis_default_title">Dream Analysis</string>
+
+    <string name="share_sheet_title">Share Your Dream</string>
+    <string name="share_target_save">Save to Gallery</string>
+    <string name="share_target_instagram">Instagram</string>
+    <string name="share_target_facebook">Facebook</string>
+    <string name="share_target_kakao">KakaoTalk</string>
+    <string name="share_target_whatsapp">WhatsApp</string>
+
+    <string name="share_canvas_app_title">Dream In Dream</string>
+    <string name="share_canvas_interpretation_header">Interpretation</string>
+    <string name="share_error_msg">Error sharing: %s</string>
+    <string name="image_saved_msg">Image saved to gallery.</string>
+    <string name="app_not_found_msg">%s app not found.</string>
+    <string name="share_insta_chooser_title">Share to Instagram</string>
+
+    <string name="dream_image_file_prefix">Dream_Analysis_%d</string>
+    <string name="dream_image_desc">Dream interpretation image generated by AI.</string>
+
+
+
+
+
+    <string name="pros_opportunity">Opportunity</string>
+    <string name="cons_caution">Caution</string>
+    <string name="masters_verdict">MASTER\'S VERDICT</string>
+
+    <string name="trend_flow_title">Today\'s Luck Flow</string>
+    <string name="trend_summary">Summary</string>
+
+    <string name="title_financial">Financial Analysis</string>
+    <string name="title_relationship">Love &amp; Relationships</string>
+    <string name="title_vitality">Health &amp; Vitality</string>
+    <string name="title_career">Career &amp; Study</string>
+    <string name="title_emotional">Emotional Balance (Mind)</string>
+    <string name="title_risk">Risk Warning</string>
+    <string name="title_action">Action Guide</string>
+
+    <string name="profile_req_title">Profile Required</string>
+    <string name="profile_req_msg">Please complete your profile (Name, Birthdate) in Settings.</string>
+    <string name="btn_go_settings">Go to Settings</string>
+
+
 
     <!-- Settings/Profile/Info -->
 <string name="default_web_client_id">886944015637-96pcphpcqug6pga1v9aogdcg4bfr7mav.apps.googleusercontent.com</string>
@@ -461,8 +602,32 @@ If you log in again within 7 days, it will be restored. After 7 days, it will be
 <string name="sec_actions3">3 actions today</string>
 <string name="dream_result_empty">Result is empty.</string>
 
-    <!-- Feedback -->
-<string name="fb_title_need">Enter a title</string>
+
+
+    <string name="dream_original_content_header">Dream Content</string>
+
+    <string name="common_close">Close</string>
+    <string name="ai_report_tab_prediction">Forecast</string>
+    <string name="ai_report_prediction_title">Positive Forecast for Next Week</string>
+    <string name="ai_report_prediction_subtitle">Realistic signals from your subconscious.</string>
+    <string name="ai_report_prediction_empty">No prediction data available.\nRecord more dreams and analyze again.</string>
+
+
+    <string name="ai_report_pred_category_career">Career &amp; Success</string>
+    <string name="ai_report_pred_category_relation">Relationships</string>
+    <string name="ai_report_pred_category_inner">Inner Growth</string>
+    <string name="theme_label_relationships">Relationships</string>
+    <string name="theme_label_achievement">Achievement</string>
+    <string name="theme_label_change">Change &amp; Evolution</string>
+    <string name="theme_label_anxiety">Unconscious Anxiety</string>
+
+
+
+
+
+    이걸
+
+    <string name="fb_title_need">Enter a title</string>
 <string name="fb_msg_need">Enter a message</string>
 <string name="fb_sent_title">Sent</string>
 <string name="fb_sent_body">We received your message. We’ll check quickly.</string>
@@ -905,17 +1070,85 @@ Deep analysis unlocks with 2+ dreams (up to 4 counted) · Resets every Monday ·
         <item>enjoy</item>
     </string-array>
 
+    <string name="ai_report_growth_msg_high">You are filled with strong positive energy. It is a perfect time to start a new challenge.</string>
+    <string name="ai_report_growth_msg_mid">Your inner balance is improving. Trust yourself and you will achieve meaningful growth.</string>
+    <string name="ai_report_growth_msg_low">You may need rest and recovery. Listen to the signals your dreams are sending.</string>
+
+    <string name="ai_report_growth_current_energy_label">Current Energy</string>
+    <string name="ai_report_growth_point_label">Point</string>
+    <string name="ai_report_growth_potential_title">Growth Potential</string>
+    <string name="ai_report_growth_next_step_title">Next Step</string>
+
+    <string name="fortune_luck_index">Luck Index</string>
+
+
+
+
     <string name="ai_report_stat_emotion">Core Emotion</string>
         <string name="ai_report_stat_count">Dreams This Week</string>
         <string name="ai_report_stat_score">Dream Score</string>
         <string name="ai_report_keywords_title">✨ Key Keywords</string>
         <string name="ai_report_deep_title">Weekly Deep Analysis</string>
-        <string name="ai_report_pro_cta">Start Deep Analysis</string>
         <string name="ai_report_pro_completed">Analysis Completed</string>
         <string name="chart_emotion_title">Emotion Distribution</string>
         <string name="chart_theme_title">Theme Ratio</string>
 
         <string name="chart_info_msg">Basic analysis is provided for free, but deep analysis requires a subscription. Deep analysis unlocks with 2 or more dreams (up to 4 counted), resets every Monday, and past reports remain accessible.</string>
+
+
+    <string name="ai_report_chart_info_title">Chart Info</string>
+    <string name="ai_report_chart_info_ok">OK</string>
+    <string name="ai_report_chart_info_button_content_description">Show chart information</string>
+
+    <string name="ai_report_weekly_insight_subtitle">Weekly Insight</string>
+    <string name="ai_report_history_content_description">History</string>
+
+    <string name="ai_report_stat_core_emotion">Core Emotion</string>
+    <string name="ai_report_stat_total_dreams">Total Dreams</string>
+
+    <string name="ai_report_tab_theme">Theme Chart</string>
+    <string name="ai_report_tab_growth">Growth Points</string>
+
+    <string name="ai_report_theme_chart_title">Theme Distribution</string>
+    <string name="ai_report_theme_chart_subtitle">The themes that appeared most often in your dreams this week.</string>
+
+    <string name="ai_report_growth_energy_title">Current Energy</string>
+    <string name="ai_report_growth_energy_point">Point</string>
+    <string name="ai_report_growth_potential">Growth Potential</string>
+    <string name="ai_report_growth_point_title">Growth Point</string>
+
+    <string name="ai_report_pro_cta">Unlock AI Deep Analysis</string>
+
+    <string name="ai_report_chart_info_default_message">This is the explanation of the chart data.</string>
+
+
+
+
+
+    <string name="ai_report_tab_insight">Deep Insight</string>
+    <string name="ai_report_tab_symbols">Core Symbols</string>
+    <string name="ai_report_tab_action">Action Guide</string>
+    <string name="ai_report_default_title">Insight</string>
+
+    <string name="ai_report_symbols_description">These are the core keywords that run through this dream.</string>
+    <string name="ai_report_symbols_empty">No analyzed keywords.</string>
+
+    <string name="ai_report_action_lucky_label">Lucky Ritual</string>
+    <string name="ai_report_action_practical_title">Practical Advice</string>
+
+    <string name="ai_report_history_title">Dream Journal</string>
+    <string name="ai_report_history_empty">No history recorded yet.</string>
+    <string name="ai_report_history_group_others">Others</string>
+    <string name="ai_report_history_week_label">Week %1$s</string>
+
+    <string name="ai_report_analysis_summary_title">Analysis Summary</string>
+
+
+
+
+
+
+
 
 
 
@@ -1112,21 +1345,52 @@ Please wait.</string>
 
     <!-- Prompt template (dream) -->
     <string name="dream_prompt_template">
-You are a professional dream analyst who offers grounded, realistic interpretations.
-Rules:
-- <xliff:g id="msg">%2$s</xliff:g>
-- <xliff:g id="sym">%3$s</xliff:g>
-- <xliff:g id="pre">%4$s</xliff:g>
-- <xliff:g id="tip">%5$s</xliff:g>
-- <xliff:g id="act">%6$s</xliff:g>
-[Dream] "<xliff:g id="dream">%1$s</xliff:g>"
+    [Dream Content]\n
+    \"%1$s\"\n\n
+
+    [Interpretation Rules]\n
+    Analyze the dream above and offer an interpretation that feels mystical yet practical.\n
+    Follow the structure exactly as provided below, and do not add any introduction or conclusion beyond the given headers.\n\n
+
+    The tone should remain empathetic, mystical, and encouraging.\n
+    Do not use markdown symbols such as asterisks or hashtags.\n
+    If you want to emphasize a word, use quotation marks or express it naturally in the flow of the sentence.\n
+    ---\n
+    %2$s\n
+    (Summarize the core theme and emotional atmosphere of the dream in 2–3 sentences.)\n\n
+
+    %3$s\n
+    (Select two key symbols and interpret them in the format \'word: meaning\'. Do not use asterisks.)\n\n
+
+    %4$s\n
+    (Provide a mystical insight into the future flow, opportunities, or energetic shifts suggested by the dream.)\n\n
+
+    %5$s\n
+    (Offer one practical and immediate tip for using the dream\'s energy in the day ahead.)\n\n
+
+    %6$s\n
+    (Present two concrete and actionable steps that can be practiced today.\n
+     Avoid generic wellness advice such as \"meditation\" or \"drinking water\".\n
+     Make them feel like small quests.)\n
+    1. [Action 1]\n
+    2. [Action 2]\n
+    ---
 </string>
 
-<string name="dream_section_message">💭 Message from your dream</string>
-<string name="dream_section_symbols">🧠 Core symbols</string>
-<string name="dream_section_premonition">📌 Premonition points</string>
-<string name="dream_section_tips_today">☀️ Tips for today</string>
-<string name="dream_section_actions_three">🎯 3 actions today</string>
+
+    <string name="dream_section_message">☁️ Core Message</string>
+    <string name="dream_section_symbols">🧠 Key Symbol Analysis</string>
+    <string name="dream_section_premonition">📌 Premonition &amp; Insight</string>
+    <string name="dream_section_tips_today">💡 Practical Tip</string>
+    <string name="dream_section_actions_three">⚡ Two Actionable Steps</string>
+
+    <string name="dream_select_title">Select Dreams to Analyze</string>
+    <string name="dream_select_desc">For the most accurate analysis, please select up to 4 dreams.</string>
+    <string name="dream_select_confirm">Analyze (%d)</string>
+
+    <string name="ai_report_pred_category_love">Love &amp; Romance</string>
+    <string name="ai_report_pred_category_wealth">Finance &amp; Abundance</string>
+    <string name="ai_report_pred_category_health">Health &amp; Energy</string>
 
     <!-- EmotionAnalyzer dictionaries (EN equivalents) -->
     <string-array name="emotion_dict_positive">

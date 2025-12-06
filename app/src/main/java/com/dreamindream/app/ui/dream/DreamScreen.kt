@@ -43,9 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -58,18 +56,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.airbnb.lottie.LottieAnimationView
@@ -80,6 +72,7 @@ import com.dreamindream.app.SubscriptionManager
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.android.play.core.review.ReviewManagerFactory // ✨ 리뷰 매니저 import
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.lang.Math
@@ -102,12 +95,12 @@ private val GlassBg = Color(0x1AFFFFFF)
 private val GlassBorder = Color(0x33FFFFFF)
 private val Pretendard = FontFamily.Default
 
-// --- Section Colors (for Parsing) ---
-private val ColorMessage = Color(0xFF90CAF9)
-private val ColorSymbol = Color(0xFFF48FB1)
-private val ColorPremonition = Color(0xFFFFCC80)
-private val ColorTips = Color(0xFFA5D6A7)
-private val ColorAction = Color(0xFFCE93D8)
+// --- ✨ Section Colors (Mystical Palette) ---
+private val ColorMessage = Color(0xFF90CAF9) // ☁️
+private val ColorSymbol = Color(0xFFF48FB1)  // 🧠
+private val ColorPremonition = Color(0xFFFFCC80) // 📌
+private val ColorTips = Color(0xFFA5D6A7)    // 💡
+private val ColorAction = Color(0xFFCE93D8)  // ⚡
 
 @Composable
 fun DreamScreen(
@@ -121,7 +114,6 @@ fun DreamScreen(
     val isSubscribed by SubscriptionManager.isSubscribed.collectAsState(initial = false)
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    // 음성 인식기 초기화
     val speechRecognizer = remember {
         if (SpeechRecognizer.isRecognitionAvailable(context)) {
             SpeechRecognizer.createSpeechRecognizer(context)
@@ -130,14 +122,13 @@ fun DreamScreen(
         }
     }
 
-    // 권한 요청 런처
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
         if (isGranted) {
             startListening(speechRecognizer, context, viewModel)
         } else {
-            Toast.makeText(context, "음성 인식을 위해 마이크 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.error_permissions), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -155,14 +146,38 @@ fun DreamScreen(
         }
     }
 
-    // 화면 이탈 시 인식기 정리
+    // ✨ [인앱 리뷰 팝업 트리거 로직]
+    LaunchedEffect(uiState.showReviewRequest) {
+        if (uiState.showReviewRequest && activity != null) {
+            try {
+                val manager = ReviewManagerFactory.create(context)
+                val request = manager.requestReviewFlow()
+                request.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        // 리뷰 정보를 성공적으로 가져오면 팝업 실행
+                        val reviewInfo = task.result
+                        val flow = manager.launchReviewFlow(activity, reviewInfo)
+                        flow.addOnCompleteListener {
+                            // 리뷰 작성 완료 혹은 취소 시 뷰모델에 알림 (상태 초기화)
+                            viewModel.onReviewRequested()
+                        }
+                    } else {
+                        // 실패해도 상태는 초기화해야 다음 로직이 안 꼬임
+                        viewModel.onReviewRequested()
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                viewModel.onReviewRequested()
+            }
+        }
+    }
+
     DisposableEffect(Unit) {
         onDispose {
             try {
                 speechRecognizer?.destroy()
-            } catch (e: Exception) {
-                // Ignore destruction error
-            }
+            } catch (e: Exception) { }
         }
     }
 
@@ -219,14 +234,11 @@ fun DreamScreen(
                             onRefresh = viewModel::onRefreshClicked,
                             onMicClick = {
                                 if (speechRecognizer == null) {
-                                    Toast.makeText(context, "🚫 이 기기는 음성 인식을 지원하지 않거나 Google 서비스 앱이 필요합니다.", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(context, context.getString(R.string.error_speech_not_supported), Toast.LENGTH_LONG).show()
                                     return@InputView
                                 }
-
                                 if (uiState.isListening) {
-                                    try {
-                                        speechRecognizer.stopListening()
-                                    } catch(e: Exception) {}
+                                    try { speechRecognizer.stopListening() } catch(e: Exception) {}
                                     viewModel.onListeningChanged(false)
                                 } else {
                                     val permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO)
@@ -275,43 +287,31 @@ fun DreamScreen(
     }
 }
 
-// 음성 인식 시작 헬퍼 함수
-private fun startListening(
-    speechRecognizer: SpeechRecognizer?,
-    context: Context,
-    viewModel: DreamViewModel
-) {
+private fun startListening(speechRecognizer: SpeechRecognizer?, context: Context, viewModel: DreamViewModel) {
     if (speechRecognizer == null) return
-
     val currentLocale = Locale.getDefault()
     val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
         putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
         putExtra(RecognizerIntent.EXTRA_LANGUAGE, currentLocale.toString())
-        putExtra(RecognizerIntent.EXTRA_PROMPT, "꿈 내용을 말해주세요...")
+        putExtra(RecognizerIntent.EXTRA_PROMPT, context.getString(R.string.dream_input_empty))
         putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, context.packageName)
     }
 
     speechRecognizer.setRecognitionListener(object : RecognitionListener {
         override fun onReadyForSpeech(params: Bundle?) {
             viewModel.onListeningChanged(true)
-            val langDisplay = if (currentLocale.language == "ko") "한국어" else currentLocale.displayLanguage
-            Toast.makeText(context, "${langDisplay}로 말씀하세요. (기기 설정 언어)", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.toast_speak_language, currentLocale.displayLanguage), Toast.LENGTH_LONG).show()
         }
         override fun onBeginningOfSpeech() {}
         override fun onRmsChanged(rmsdB: Float) {}
         override fun onBufferReceived(buffer: ByteArray?) {}
-        override fun onEndOfSpeech() {
-            viewModel.onListeningChanged(false)
-        }
+        override fun onEndOfSpeech() { viewModel.onListeningChanged(false) }
         override fun onError(error: Int) {
             viewModel.onListeningChanged(false)
-            val msg = when(error) {
-                SpeechRecognizer.ERROR_NO_MATCH ->  "인식된 음성이 없습니다. (기기 언어 확인)"
-                SpeechRecognizer.ERROR_NETWORK -> "네트워크 연결을 확인해주세요."
-                SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS ->  "마이크 권한이 필요합니다."
-                SpeechRecognizer.ERROR_CLIENT ->  "마이크 오류 또는 다른 앱이 사용 중입니다."
-                SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "시간이 초과되었습니다. 다시 시도해주세요."
-                else -> "음성 인식 오류 ($error). 다시 시도해주세요."
+            val msg = when (error) {
+                SpeechRecognizer.ERROR_NO_MATCH -> context.getString(R.string.error_no_match)
+                SpeechRecognizer.ERROR_NETWORK -> context.getString(R.string.error_network)
+                else -> context.getString(R.string.error_generic, error)
             }
             Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
         }
@@ -328,130 +328,12 @@ private fun startListening(
         override fun onPartialResults(partialResults: Bundle?) {}
         override fun onEvent(eventType: Int, params: Bundle?) {}
     })
-
-    try {
-        speechRecognizer.startListening(intent)
-    } catch (e: Exception) {
+    try { speechRecognizer.startListening(intent) } catch (e: Exception) {
         viewModel.onListeningChanged(false)
-        Toast.makeText(context, "음성 인식을 시작할 수 없습니다: ${e.message}", Toast.LENGTH_LONG).show()
     }
 }
 
 private enum class DreamScreenState { Input, Loading, Result }
-
-@Composable
-fun NightSkyEffect() {
-    Box(Modifier.fillMaxSize()) {
-        TwinklingStars()
-        ShootingStar()
-    }
-}
-
-@Composable
-fun TwinklingStars() {
-    val density = LocalDensity.current
-    val stars = remember {
-        List(20) {
-            StarData(
-                x = Math.random().toFloat(),
-                y = Math.random().toFloat(),
-                size = (Math.random() * 0.4 + 0.1).toFloat(),
-                offset = Math.random().toFloat() * 2000f,
-                speed = (Math.random() * 0.06 + 0.02).toFloat()
-            )
-        }
-    }
-
-    val infiniteTransition = rememberInfiniteTransition(label = "stars_time")
-    val time by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(120000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "time"
-    )
-
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        val width = size.width
-        val height = size.height
-
-        stars.forEach { star ->
-            val rawSin = sin((time * star.speed + star.offset).toDouble()).toFloat()
-            val alphaBase = ((rawSin + 1) / 2).pow(30)
-            val alpha = alphaBase * 0.7f
-
-            if (alpha > 0.01f) {
-                drawCircle(
-                    color = Color.White.copy(alpha = alpha.coerceIn(0f, 1f)),
-                    radius = star.size * density.density,
-                    center = Offset(star.x * width, star.y * height)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun ShootingStar() {
-    val progress = remember { Animatable(0f) }
-    var startX by remember { mutableFloatStateOf(0f) }
-    var startY by remember { mutableFloatStateOf(0f) }
-    var scale by remember { mutableFloatStateOf(1f) }
-
-    LaunchedEffect(Unit) {
-        while(true) {
-            val waitTime = Random.nextLong(3000, 5000)
-            delay(waitTime)
-            startX = Random.nextFloat() * 0.5f + 0.4f
-            startY = Random.nextFloat() * 0.3f
-            scale = Random.nextFloat() * 0.5f + 0.5f
-            progress.snapTo(0f)
-            progress.animateTo(
-                targetValue = 1f,
-                animationSpec = tween(800, easing = LinearEasing)
-            )
-        }
-    }
-
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        if (progress.value > 0f && progress.value < 1f) {
-            val width = size.width
-            val height = size.height
-            val moveDistance = width * 0.4f
-            val currentX = (startX * width) - (moveDistance * progress.value)
-            val currentY = (startY * height) + (moveDistance * progress.value)
-            val tailLength = 100f * scale
-            val headX = currentX
-            val headY = currentY
-            val tailX = currentX + (tailLength * 0.7f)
-            val tailY = currentY - (tailLength * 0.7f)
-            val alpha = if (progress.value < 0.1f) progress.value * 10f else if (progress.value > 0.8f) (1f - progress.value) * 5f else 1f
-
-            drawLine(
-                brush = Brush.linearGradient(
-                    colors = listOf(Color.White.copy(alpha = 0f), Color.White.copy(alpha = alpha)),
-                    start = Offset(tailX, tailY),
-                    end = Offset(headX, headY)
-                ),
-                start = Offset(tailX, tailY),
-                end = Offset(headX, headY),
-                strokeWidth = 2f * scale,
-                cap = StrokeCap.Round
-            )
-            drawCircle(
-                color = Color.White.copy(alpha = alpha),
-                radius = 1.5f * scale,
-                center = Offset(headX, headY)
-            )
-        }
-    }
-}
-
-private data class StarData(
-    val x: Float, val y: Float, val size: Float, val offset: Float, val speed: Float
-)
 
 @Composable
 private fun InputView(
@@ -469,22 +351,9 @@ private fun InputView(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(Modifier.height(40.dp))
-
-        Text(
-            text = stringResource(R.string.dream_interpreter),
-            color = MetallicGold,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            fontFamily = Pretendard
-        )
+        Text(text = stringResource(R.string.dream_interpreter), color = MetallicGold, fontSize = 24.sp, fontWeight = FontWeight.Bold, fontFamily = Pretendard)
         Spacer(Modifier.height(8.dp))
-        Text(
-            text = stringResource(R.string.dream_input_label),
-            color = TextSub,
-            fontSize = 14.sp,
-            fontFamily = Pretendard
-        )
-
+        Text(text = stringResource(R.string.dream_input_label), color = TextSub, fontSize = 14.sp, fontFamily = Pretendard)
         Spacer(Modifier.height(30.dp))
 
         Box(
@@ -496,15 +365,9 @@ private fun InputView(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("✨ ", fontSize = 12.sp)
-                Text(
-                    text = stringResource(R.string.dream_today_left, uiState.remainingCount),
-                    color = MetallicGold,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+                Text(text = stringResource(R.string.dream_today_left, uiState.remainingCount), color = MetallicGold, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             }
         }
-
         Spacer(Modifier.height(24.dp))
 
         Box(
@@ -519,35 +382,18 @@ private fun InputView(
             BasicTextField(
                 value = uiState.inputText,
                 onValueChange = { if (it.length <= 500) onValueChange(it) },
-                textStyle = TextStyle(
-                    color = TextMain,
-                    fontSize = 16.sp,
-                    lineHeight = 26.sp,
-                    fontFamily = Pretendard
-                ),
+                textStyle = TextStyle(color = TextMain, fontSize = 16.sp, lineHeight = 26.sp, fontFamily = Pretendard),
                 cursorBrush = SolidColor(MetallicGold),
                 modifier = Modifier.fillMaxSize().padding(bottom = 24.dp),
                 decorationBox = { innerTextField ->
                     if (uiState.inputText.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.hint_input),
-                            color = TextSub.copy(alpha = 0.5f),
-                            fontSize = 13.sp,
-                            lineHeight = 26.sp
-                        )
+                        Text(text = stringResource(R.string.hint_input), color = TextSub.copy(alpha = 0.5f), fontSize = 13.sp, lineHeight = 26.sp)
                     }
                     innerTextField()
                 }
             )
-
-            Text(
-                text = "${uiState.inputText.length} / 500",
-                color = TextSub.copy(alpha = 0.7f),
-                fontSize = 12.sp,
-                modifier = Modifier.align(Alignment.BottomEnd)
-            )
+            Text(text = "${uiState.inputText.length} / 500", color = TextSub.copy(alpha = 0.7f), fontSize = 12.sp, modifier = Modifier.align(Alignment.BottomEnd))
         }
-
         Spacer(Modifier.height(40.dp))
 
         Row(
@@ -559,20 +405,11 @@ private fun InputView(
                 modifier = Modifier
                     .size(60.dp)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(GoldGradientStart, GoldGradientEnd)
-                        )
-                    )
+                    .background(Brush.horizontalGradient(listOf(GoldGradientStart, GoldGradientEnd)))
                     .clickable(onClick = onRefresh),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = "Refresh",
-                    tint = DarkBg,
-                    modifier = Modifier.size(24.dp)
-                )
+                Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh", tint = DarkBg, modifier = Modifier.size(24.dp))
             }
 
             Box(
@@ -580,26 +417,14 @@ private fun InputView(
                     .weight(1f)
                     .height(60.dp)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(GoldGradientStart, GoldGradientEnd)
-                        )
-                    )
-                    .clickable(
-                        enabled = !uiState.isLoading && uiState.remainingCount > 0,
-                        onClick = onInterpret
-                    ),
+                    .background(Brush.horizontalGradient(listOf(GoldGradientStart, GoldGradientEnd)))
+                    .clickable(enabled = !uiState.isLoading && uiState.remainingCount > 0, onClick = onInterpret),
                 contentAlignment = Alignment.Center
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.AutoAwesome, null, tint = DarkBg)
                     Spacer(Modifier.width(10.dp))
-                    Text(
-                        text = stringResource(R.string.button_interpret),
-                        color = DarkBg,
-                        fontSize = 17.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Text(text = stringResource(R.string.button_interpret), color = DarkBg, fontSize = 17.sp, fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -607,41 +432,18 @@ private fun InputView(
                 modifier = Modifier
                     .size(60.dp)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(
-                        if (uiState.isListening) {
-                            Brush.linearGradient(listOf(Color(0xFFFF5252), Color(0xFFFF1744)))
-                        } else {
-                            Brush.horizontalGradient(listOf(GoldGradientStart, GoldGradientEnd))
-                        }
-                    )
+                    .background(if (uiState.isListening) Brush.linearGradient(listOf(Color(0xFFFF5252), Color(0xFFFF1744))) else Brush.horizontalGradient(listOf(GoldGradientStart, GoldGradientEnd)))
                     .clickable(onClick = onMicClick),
                 contentAlignment = Alignment.Center
             ) {
                 val icon = if (uiState.isListening) Icons.Default.Mic else Icons.Default.MicNone
-                val iconTint = if (uiState.isListening) Color.White else DarkBg
-
-                Icon(
-                    imageVector = icon,
-                    contentDescription = "Mic",
-                    tint = iconTint,
-                    modifier = Modifier.size(24.dp)
-                )
+                Icon(imageVector = icon, contentDescription = "Mic", tint = if (uiState.isListening) Color.White else DarkBg, modifier = Modifier.size(24.dp))
             }
         }
-
         Spacer(Modifier.weight(1f))
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(bottom = 30.dp).alpha(0.5f)
-        ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(bottom = 30.dp).alpha(0.5f)) {
             Spacer(Modifier.height(4.dp))
-            Text(
-                text = stringResource(R.string.dream_mirror),
-                color = TextSub,
-                fontSize = 10.sp,
-                fontFamily = Pretendard
-            )
+            Text(text = stringResource(R.string.dream_mirror), color = TextSub, fontSize = 10.sp, fontFamily = Pretendard)
         }
     }
 }
@@ -661,32 +463,19 @@ private fun LoadingView() {
                 }
             )
             Spacer(Modifier.height(20.dp))
-            Text(
-                text = stringResource(R.string.dream_interpreting),
-                color = MetallicGold,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.alpha(0.9f)
-            )
+            Text(text = stringResource(R.string.dream_interpreting), color = MetallicGold, fontSize = 18.sp, fontWeight = FontWeight.Medium, modifier = Modifier.alpha(0.9f))
         }
     }
 }
 
 @Composable
-private fun ResultView(
-    resultText: String,
-    onReset: () -> Unit,
-    onShare: () -> Unit
-) {
+private fun ResultView(resultText: String, onReset: () -> Unit, onShare: () -> Unit) {
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-
-    // ✨ 애니메이션을 위한 섹션 파싱
+    // ✨ 이모지 기반 파싱 로직 사용
     val sections = remember(resultText) { parseToDreamSections(resultText) }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 24.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 24.dp),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -696,44 +485,21 @@ private fun ResultView(
                 .heightIn(max = screenHeight * 0.85f)
                 .clip(RoundedCornerShape(24.dp))
                 .background(CardBg)
-                .border(
-                    width = 1.5.dp,
-                    brush = Brush.verticalGradient(
-                        colors = listOf(MetallicGold.copy(alpha = 0.6f), Color.Transparent)
-                    ),
-                    shape = RoundedCornerShape(24.dp)
-                )
+                .border(width = 1.5.dp, brush = Brush.verticalGradient(colors = listOf(MetallicGold.copy(alpha = 0.6f), Color.Transparent)), shape = RoundedCornerShape(24.dp))
         ) {
-            Column(
-                modifier = Modifier.padding(24.dp)
-            ) {
+            Column(modifier = Modifier.padding(24.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.AutoAwesome,
-                            contentDescription = null,
-                            tint = MetallicGold,
-                            modifier = Modifier.size(20.dp)
-                        )
+                        Icon(imageVector = Icons.Default.AutoAwesome, contentDescription = null, tint = MetallicGold, modifier = Modifier.size(20.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.explain_dream),
-                            color = MetallicGold,
-                            fontSize = 19.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = Pretendard
-                        )
+                        Text(text = stringResource(R.string.explain_dream), color = MetallicGold, fontSize = 19.sp, fontWeight = FontWeight.Bold, fontFamily = Pretendard)
                     }
-
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = onShare) {
-                            Icon(Icons.Default.Share, contentDescription = "Share", tint = TextSub)
-                        }
-
+                        IconButton(onClick = onShare) { Icon(Icons.Default.Share, contentDescription = "Share", tint = TextSub) }
                         Box(
                             modifier = Modifier
                                 .size(36.dp)
@@ -742,95 +508,53 @@ private fun ResultView(
                                 .background(Color.White.copy(alpha = 0.1f)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Close",
-                                tint = TextMain,
-                                modifier = Modifier.size(20.dp)
-                            )
+                            Icon(Icons.Default.Close, contentDescription = "Close", tint = TextMain, modifier = Modifier.size(20.dp))
                         }
                     }
                 }
-
                 Spacer(Modifier.height(16.dp))
                 HorizontalDivider(color = GlassBorder)
 
-                // ✨ 스크롤 컨텐츠 영역
                 Box(modifier = Modifier.weight(1f, fill = false)) {
-                    Column(
-                        modifier = Modifier
-                            .verticalScroll(rememberScrollState())
-                            .padding(vertical = 16.dp)
-                    ) {
-                        // 섹션별 뭉태기 애니메이션 렌더링
+                    Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(vertical = 16.dp)) {
                         sections.forEachIndexed { index, section ->
-                            AnimatedDreamSection(
-                                section = section,
-                                delayMillis = index * 400 // 각 덩어리마다 0.4초 간격
-                            )
+                            AnimatedDreamSection(section = section, delayMillis = index * 400)
                             Spacer(Modifier.height(24.dp))
                         }
-
-                        // 섹션 파싱에 실패했을 경우 원본 텍스트 표시 (Fallback)
+                        // Fallback: 파싱 결과가 없으면 원본 표시
                         if (sections.isEmpty() && resultText.isNotBlank()) {
-                            Text(
-                                text = resultText,
-                                color = TextMain,
-                                fontSize = 15.sp,
-                                lineHeight = 24.sp
-                            )
+                            Text(text = resultText, color = TextMain, fontSize = 15.sp, lineHeight = 24.sp)
                         }
                     }
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(20.dp)
-                            .align(Alignment.TopCenter)
-                            .background(
-                                Brush.verticalGradient(
-                                    colors = listOf(CardBg, Color.Transparent)
-                                )
-                            )
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(40.dp)
-                            .align(Alignment.BottomCenter)
-                            .background(
-                                Brush.verticalGradient(
-                                    colors = listOf(Color.Transparent, CardBg)
-                                )
-                            )
-                    )
+                    Box(modifier = Modifier.fillMaxWidth().height(20.dp).align(Alignment.TopCenter).background(Brush.verticalGradient(colors = listOf(CardBg, Color.Transparent))))
+                    Box(modifier = Modifier.fillMaxWidth().height(40.dp).align(Alignment.BottomCenter).background(Brush.verticalGradient(colors = listOf(Color.Transparent, CardBg))))
                 }
             }
         }
     }
 }
 
-// 📌 데이터 구조 및 파싱 로직
-data class DreamSection(
-    val title: String,
-    val content: String,
-    val headerColor: Color
-)
+// 📌 데이터 구조
+data class DreamSection(val title: String, val content: String, val headerColor: Color)
 
+// 📌 핵심: 이모지 기반 파싱 로직 (다국어 지원)
 fun parseToDreamSections(raw: String): List<DreamSection> {
-    val cleanText = raw.replace(Regex("(?m)^\\s*#{1,4}\\s*"), "")
-        .replace("**", "")
-        .replace(Regex("`{1,3}"), "")
-
     val sections = mutableListOf<DreamSection>()
-    val lines = cleanText.lines()
+    val lines = raw.lines()
+
     var currentTitle = ""
     var currentContent = StringBuilder()
     var currentColor = MetallicGold
 
-    fun addSection() {
-        if (currentTitle.isNotEmpty()) {
+    // 이모지 정의 (strings.xml에 정의된 아이콘들)
+    val iconMessage = "☁️"
+    val iconSymbol = "🧠"
+    val iconPremonition = "📌"
+    val iconTip = "💡"
+    val iconAction = "⚡"
+
+    fun saveSection() {
+        if (currentTitle.isNotBlank()) {
             sections.add(DreamSection(currentTitle, currentContent.toString().trim(), currentColor))
         }
         currentContent.clear()
@@ -838,91 +562,64 @@ fun parseToDreamSections(raw: String): List<DreamSection> {
 
     for (line in lines) {
         val trimmed = line.trim()
-        if (trimmed.isBlank()) continue
+        if (trimmed.isEmpty()) continue
 
-        // 헤더 감지 로직 (이모지 포함)
-        val headerMatch = Regex("^([☁️🧠📌💡⚡].*?|.*?):(.*)$").find(trimmed)
-        if (headerMatch != null) {
-            addSection() // 이전 섹션 저장
+        // ❌ 구분선 무시
+        if (trimmed.startsWith("---") || trimmed.contains("---")) continue
 
-            val headerPart = headerMatch.groupValues[1].trim()
-            // 색상 결정
+        // 헤더 감지 (이모지로 시작하는지 확인)
+        val isHeader = trimmed.startsWith(iconMessage) ||
+                trimmed.startsWith(iconSymbol) ||
+                trimmed.startsWith(iconPremonition) ||
+                trimmed.startsWith(iconTip) ||
+                trimmed.startsWith(iconAction)
+
+        if (isHeader) {
+            saveSection() // 이전 섹션 저장
+            currentTitle = trimmed
+            // 이모지에 따른 색상 매핑
             currentColor = when {
-                headerPart.contains("Message", true) || headerPart.contains("☁️") -> ColorMessage
-                headerPart.contains("Symbol", true) || headerPart.contains("🧠") -> ColorSymbol
-                headerPart.contains("Premonition", true) || headerPart.contains("📌") -> ColorPremonition
-                headerPart.contains("Tip", true) || headerPart.contains("Advice", true) || headerPart.contains("💡") -> ColorTips
-                headerPart.contains("Action", true) || headerPart.contains("⚡") -> ColorAction
+                trimmed.startsWith(iconMessage) -> ColorMessage
+                trimmed.startsWith(iconSymbol) -> ColorSymbol
+                trimmed.startsWith(iconPremonition) -> ColorPremonition
+                trimmed.startsWith(iconTip) -> ColorTips
+                trimmed.startsWith(iconAction) -> ColorAction
                 else -> MetallicGold
             }
-            currentTitle = headerPart
-
-            // 헤더와 같은 줄에 내용이 있으면 추가
-            val inlineContent = headerMatch.groupValues[2].trim()
-            if (inlineContent.isNotEmpty()) {
-                currentContent.append(inlineContent).append("\n")
-            }
         } else {
-            // 내용 라인
+            // 내용 추가
             currentContent.append(trimmed).append("\n")
         }
     }
-    addSection() // 마지막 섹션 저장
+    saveSection() // 마지막 섹션 저장
 
     return sections
 }
 
+fun cleanTextContent(text: String): String {
+    return text.lines().joinToString("\n") { line ->
+        line.replace(Regex("^(\\s*[-•\\d.]+)\\s*[:]\\s*"), "$1 ")
+    }
+}
 
-// 📌 뭉태기 애니메이션 컴포넌트
 @Composable
 fun AnimatedDreamSection(section: DreamSection, delayMillis: Int) {
     var visible by remember { mutableStateOf(false) }
-
     LaunchedEffect(Unit) {
         delay(delayMillis.toLong())
         visible = true
     }
+    val alpha by animateFloatAsState(targetValue = if (visible) 1f else 0f, animationSpec = tween(800, easing = LinearOutSlowInEasing), label = "alpha")
+    val offsetY by animateFloatAsState(targetValue = if (visible) 0f else 40f, animationSpec = tween(800, easing = LinearOutSlowInEasing), label = "offset")
 
-    // 투명도 및 위치 애니메이션
-    val alpha by animateFloatAsState(
-        targetValue = if (visible) 1f else 0f,
-        animationSpec = tween(durationMillis = 800, easing = LinearOutSlowInEasing),
-        label = "alpha"
-    )
-    val offsetY by animateFloatAsState(
-        targetValue = if (visible) 0f else 40f,
-        animationSpec = tween(durationMillis = 800, easing = LinearOutSlowInEasing),
-        label = "offset"
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .alpha(alpha)
-            .graphicsLayer { translationY = offsetY }
-    ) {
-        Text(
-            text = section.title,
-            style = TextStyle(
-                color = section.headerColor,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = Pretendard
-            )
-        )
+    Column(modifier = Modifier.fillMaxWidth().alpha(alpha).graphicsLayer { translationY = offsetY }) {
+        Text(text = section.title, style = TextStyle(color = section.headerColor, fontSize = 16.sp, fontWeight = FontWeight.Bold, fontFamily = Pretendard))
         Spacer(Modifier.height(8.dp))
-        Text(
-            text = section.content,
-            style = TextStyle(
-                color = TextMain,
-                fontSize = 15.sp,
-                lineHeight = 24.sp,
-                fontFamily = Pretendard
-            )
-        )
+        Text(text = cleanTextContent(section.content), style = TextStyle(color = TextMain, fontSize = 15.sp, lineHeight = 24.sp, fontFamily = Pretendard))
     }
 }
 
+// --- ETC Components (Ads, Dialogs, Shares) ---
 
 @Composable
 private fun BannerAd(adUnitResId: Int) {
@@ -942,44 +639,16 @@ private fun BannerAd(adUnitResId: Int) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AdPromptBottomSheet(onWatchAd: () -> Unit, onRequestSubscription: () -> Unit, onDismiss: () -> Unit) {
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        containerColor = Color(0xFF1E212B),
-        windowInsets = WindowInsets.navigationBars
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 40.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.ad_prompt_title),
-                color = TextMain,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
+    ModalBottomSheet(onDismissRequest = onDismiss, containerColor = Color(0xFF1E212B), windowInsets = WindowInsets.navigationBars) {
+        Column(modifier = Modifier.padding(horizontal = 24.dp).padding(bottom = 16.dp)) {
+            Text(text = stringResource(R.string.ad_prompt_title), color = TextMain, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(16.dp))
-            Button(
-                onClick = onWatchAd,
-                colors = ButtonDefaults.buttonColors(containerColor = MetallicGold),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = stringResource(R.string.ad_prompt_watch_ad),
-                    color = DarkBg,
-                    fontWeight = FontWeight.Bold
-                )
+            Button(onClick = onWatchAd, colors = ButtonDefaults.buttonColors(containerColor = MetallicGold), modifier = Modifier.fillMaxWidth()) {
+                Text(text = stringResource(R.string.ad_prompt_watch_ad), color = DarkBg, fontWeight = FontWeight.Bold)
             }
             Spacer(Modifier.height(12.dp))
-            OutlinedButton(
-                onClick = onRequestSubscription,
-                modifier = Modifier.fillMaxWidth(),
-                border = BorderStroke(1.dp, TextSub)
-            ) {
-                Text(
-                    text = stringResource(R.string.sub_buy_cta),
-                    color = TextMain
-                )
+            OutlinedButton(onClick = onRequestSubscription, modifier = Modifier.fillMaxWidth(), border = BorderStroke(1.dp, TextSub)) {
+                Text(text = stringResource(R.string.sub_buy_cta), color = TextMain)
             }
         }
     }
@@ -996,13 +665,17 @@ private fun LimitAlertDialog(onDismiss: () -> Unit) {
     )
 }
 
+enum class ShareTarget(val label: String, val iconRes: Int, val packageName: String?) {
+    Save("Save", 0, null),
+    Instagram("Instagram", R.drawable.instagram, "com.instagram.android"),
+    Facebook("Facebook", R.drawable.facebook, "com.facebook.katana"),
+    KakaoTalk("KakaoTalk", R.drawable.kakaotalk, "com.kakao.talk"),
+    WhatsApp("WhatsApp", R.drawable.whatsapp, "com.whatsapp")
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ShareBottomSheet(
-    dreamInput: String,
-    resultText: String,
-    onDismiss: () -> Unit
-) {
+private fun ShareBottomSheet(dreamInput: String, resultText: String, onDismiss: () -> Unit) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var isGenerating by remember { mutableStateOf(false) }
@@ -1010,41 +683,22 @@ private fun ShareBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = Color(0xFF1E212B),
-        // ✨ 바닥에 딱 붙게 설정 (Insets 처리 및 드래그 핸들 색상)
         windowInsets = WindowInsets.navigationBars,
         dragHandle = { BottomSheetDefaults.DragHandle(color = TextSub.copy(alpha = 0.4f)) }
     ) {
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 50.dp)
-        ) {
-            Text(
-                "Share Your Dream",
-                color = TextMain,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
+        Column(modifier = Modifier.padding(horizontal = 24.dp).padding(bottom = 50.dp)) {
+            Text("Share Your Dream", color = TextMain, fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.align(Alignment.CenterHorizontally))
             Spacer(Modifier.height(30.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 ShareTarget.values().forEach { target ->
-                    ShareIconItem(
-                        target = target,
-                        enabled = !isGenerating,
-                        onClick = {
-                            isGenerating = true
-                            coroutineScope.launch {
-                                shareDreamSpecific(context, target, dreamInput, resultText)
-                                isGenerating = false
-                                onDismiss()
-                            }
+                    ShareIconItem(target = target, enabled = !isGenerating, onClick = {
+                        isGenerating = true
+                        coroutineScope.launch {
+                            shareDreamSpecific(context, target, dreamInput, resultText)
+                            isGenerating = false
+                            onDismiss()
                         }
-                    )
+                    })
                 }
             }
         }
@@ -1055,27 +709,13 @@ private fun ShareBottomSheet(
 fun ShareIconItem(target: ShareTarget, enabled: Boolean, onClick: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
-            modifier = Modifier
-                .size(56.dp)
-                .clip(CircleShape)
-                .background(GlassBg)
-                .clickable(enabled = enabled, onClick = onClick),
+            modifier = Modifier.size(56.dp).clip(CircleShape).background(GlassBg).clickable(enabled = enabled, onClick = onClick),
             contentAlignment = Alignment.Center
         ) {
             if (target == ShareTarget.Save) {
-                Icon(
-                    imageVector = Icons.Default.Download,
-                    contentDescription = "Save",
-                    tint = TextMain,
-                    modifier = Modifier.size(28.dp)
-                )
+                Icon(imageVector = Icons.Default.Download, contentDescription = "Save", tint = TextMain, modifier = Modifier.size(28.dp))
             } else {
-                Image(
-                    painter = painterResource(id = target.iconRes),
-                    contentDescription = target.label,
-                    modifier = Modifier.size(32.dp),
-                    contentScale = ContentScale.Fit
-                )
+                Image(painter = painterResource(id = target.iconRes), contentDescription = target.label, modifier = Modifier.size(32.dp), contentScale = ContentScale.Fit)
             }
         }
         Spacer(Modifier.height(8.dp))
@@ -1085,76 +725,39 @@ fun ShareIconItem(target: ShareTarget, enabled: Boolean, onClick: () -> Unit) {
 
 private fun shareDreamSpecific(context: Context, target: ShareTarget, dream: String, result: String) {
     try {
-        val width = 1080
-        val height = 1920
+        val width = 1080; val height = 1920
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
 
         val bgPaint = Paint().apply {
             style = Paint.Style.FILL
-            shader = android.graphics.LinearGradient(
-                0f, 0f, 0f, height.toFloat(),
-                intArrayOf(0xFF050505.toInt(), 0xFF151A25.toInt()),
-                null,
-                android.graphics.Shader.TileMode.CLAMP
-            )
+            shader = android.graphics.LinearGradient(0f, 0f, 0f, height.toFloat(), intArrayOf(0xFF050505.toInt(), 0xFF151A25.toInt()), null, android.graphics.Shader.TileMode.CLAMP)
         }
         canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), bgPaint)
 
         val starPaint = Paint().apply { color = 0xFFFFF176.toInt(); alpha = 180 }
         for (i in 0..50) {
-            val x = (Math.random() * width).toFloat()
-            val y = (Math.random() * height).toFloat()
-            val r = (Math.random() * 3 + 1).toFloat()
+            val x = (Math.random() * width).toFloat(); val y = (Math.random() * height).toFloat(); val r = (Math.random() * 3 + 1).toFloat()
             starPaint.alpha = (Math.random() * 150 + 50).toInt()
             canvas.drawCircle(x, y, r, starPaint)
         }
 
+        val headerPaint = TextPaint().apply { color = 0xFFB0BEC5.toInt(); textSize = 34f; typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL); isAntiAlias = true; textAlign = Paint.Align.CENTER }
+        val dateStr = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault()).format(Date())
+        canvas.drawText("Dream In Dream · $dateStr", width / 2f, 130f, headerPaint)
+
+        val quotePaint = TextPaint().apply { color = 0xFFD4AF37.toInt(); textSize = 100f; typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD); isAntiAlias = true }
+        val dreamBodyPaint = TextPaint().apply { color = 0xFFECEFF1.toInt(); textSize = 46f; typeface = Typeface.create(Typeface.SERIF, Typeface.NORMAL); isAntiAlias = true }
+
         val padding = 100f
         val textWidth = width - (padding * 2)
-        val headerHeight = 250f
-
-        val serifBold = Typeface.create(Typeface.SERIF, Typeface.BOLD)
-        val serifNormal = Typeface.create(Typeface.SERIF, Typeface.NORMAL)
-        val sansSerifLight = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL)
-
-        val headerPaint = TextPaint().apply {
-            color = 0xFFB0BEC5.toInt()
-            textSize = 34f
-            typeface = sansSerifLight
-            isAntiAlias = true
-            textAlign = Paint.Align.CENTER
-        }
-        val dateStr = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault()).format(Date())
-        canvas.drawText("Dream Interpreter · $dateStr", width / 2f, 130f, headerPaint)
-
-        val quotePaint = TextPaint().apply {
-            color = 0xFFD4AF37.toInt()
-            textSize = 100f
-            typeface = serifBold
-            isAntiAlias = true
-        }
-        val dreamBodyPaint = TextPaint().apply {
-            color = 0xFFECEFF1.toInt()
-            textSize = 46f
-            typeface = serifNormal
-            isAntiAlias = true
-        }
-
         val dreamSnippet = if (dream.length > 80) dream.take(80) + "..." else dream
         val dreamLayout = StaticLayout.Builder.obtain(dreamSnippet, 0, dreamSnippet.length, dreamBodyPaint, textWidth.toInt())
-            .setAlignment(Layout.Alignment.ALIGN_NORMAL)
-            .setLineSpacing(20f, 1.2f)
-            .setMaxLines(3)
-            .build()
+            .setAlignment(Layout.Alignment.ALIGN_NORMAL).setLineSpacing(20f, 1.2f).setMaxLines(3).build()
 
-        var currentY = headerHeight
+        var currentY = 250f
         canvas.drawText("“", padding - 20, currentY + 60f, quotePaint)
-        canvas.save()
-        canvas.translate(padding + 40, currentY + 80f)
-        dreamLayout.draw(canvas)
-        canvas.restore()
-
+        canvas.save(); canvas.translate(padding + 40, currentY + 80f); dreamLayout.draw(canvas); canvas.restore()
         currentY += dreamLayout.height + 100f
         canvas.drawText("”", width - padding - 40, currentY - 40f, quotePaint)
 
@@ -1162,78 +765,89 @@ private fun shareDreamSpecific(context: Context, target: ShareTarget, dream: Str
         canvas.drawLine(width/2f - 100f, currentY + 40f, width/2f + 100f, currentY + 40f, linePaint)
         currentY += 120f
 
-        val resultTitlePaint = TextPaint().apply {
-            color = 0xFF90CAF9.toInt()
-            textSize = 42f
-            typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD_ITALIC)
-            isAntiAlias = true
-            textAlign = Paint.Align.CENTER
-        }
+        val resultTitlePaint = TextPaint().apply { color = 0xFF90CAF9.toInt(); textSize = 42f; typeface = Typeface.create(Typeface.SERIF, Typeface.BOLD_ITALIC); isAntiAlias = true; textAlign = Paint.Align.CENTER }
         canvas.drawText("Interpretation", width / 2f, currentY, resultTitlePaint)
         currentY += 80f
 
-        val resultBodyPaint = TextPaint().apply {
-            color = 0xFFCFD8DC.toInt()
-            textSize = 38f
-            typeface = serifNormal
-            isAntiAlias = true
-        }
-
-        val cleanResult = result.replace(Regex("[#*]"), "").trim()
+        val resultBodyPaint = TextPaint().apply { color = 0xFFCFD8DC.toInt(); textSize = 38f; typeface = Typeface.create(Typeface.SERIF, Typeface.NORMAL); isAntiAlias = true }
+        val cleanResult = cleanTextContent(result).replace(Regex("[#*]"), "").trim()
         val availableHeight = height - currentY - 150f
-
         val resultLayout = StaticLayout.Builder.obtain(cleanResult, 0, cleanResult.length, resultBodyPaint, textWidth.toInt())
-            .setAlignment(Layout.Alignment.ALIGN_CENTER)
-            .setLineSpacing(16f, 1.1f)
-            .setEllipsize(android.text.TextUtils.TruncateAt.END)
-            .setMaxLines((availableHeight / 45f).toInt())
-            .build()
+            .setAlignment(Layout.Alignment.ALIGN_CENTER).setLineSpacing(16f, 1.1f).setEllipsize(android.text.TextUtils.TruncateAt.END).setMaxLines((availableHeight / 45f).toInt()).build()
 
-        canvas.save()
-        canvas.translate(padding, currentY)
-        resultLayout.draw(canvas)
-        canvas.restore()
+        canvas.save(); canvas.translate(padding, currentY); resultLayout.draw(canvas); canvas.restore()
 
-        val path = MediaStore.Images.Media.insertImage(
-            context.contentResolver,
-            bitmap,
-            "DreamInDream_${System.currentTimeMillis()}",
-            "Dream Interpretation Result"
-        )
-
-        if (path == null) {
-            Toast.makeText(context, "Failed to create image", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        val uri = Uri.parse(path)
+        val path = MediaStore.Images.Media.insertImage(context.contentResolver, bitmap, "DreamInDream_${System.currentTimeMillis()}", "Dream Interpretation Result")
+        val uri = Uri.parse(path ?: return)
 
         if (target == ShareTarget.Instagram) {
             try {
-                val storiesIntent = Intent("com.instagram.share.ADD_TO_STORY").apply {
-                    setDataAndType(uri, "image/*")
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    setPackage("com.instagram.android")
-                }
+                val storiesIntent = Intent("com.instagram.share.ADD_TO_STORY").apply { setDataAndType(uri, "image/*"); addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); setPackage("com.instagram.android") }
                 context.startActivity(storiesIntent)
             } catch (e: Exception) {
-                val generalIntent = Intent(Intent.ACTION_SEND).apply {
-                    type = "image/*"
-                    putExtra(Intent.EXTRA_STREAM, uri)
-                }
-                context.startActivity(Intent.createChooser(generalIntent, "Share Dream"))
+                val shareIntent = Intent(Intent.ACTION_SEND).apply { type = "image/*"; putExtra(Intent.EXTRA_STREAM, uri) }
+                context.startActivity(Intent.createChooser(shareIntent, "Share Dream"))
             }
         } else {
-            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                type = "image/*"
-                putExtra(Intent.EXTRA_STREAM, uri)
-                if (target.packageName != null) setPackage(target.packageName)
-            }
+            val shareIntent = Intent(Intent.ACTION_SEND).apply { type = "image/*"; putExtra(Intent.EXTRA_STREAM, uri); target.packageName?.let { setPackage(it) } }
             context.startActivity(Intent.createChooser(shareIntent, "Share Dream"))
         }
-
     } catch (e: Exception) {
         e.printStackTrace()
-        Toast.makeText(context, "Error sharing: ${e.message}", Toast.LENGTH_SHORT).show()
     }
 }
+
+// Effect Components
+@Composable
+fun NightSkyEffect() {
+    Box(Modifier.fillMaxSize()) {
+        TwinklingStars()
+        ShootingStar()
+    }
+}
+
+@Composable
+fun TwinklingStars() {
+    val density = LocalDensity.current
+    val stars = remember { List(20) { StarData(Math.random().toFloat(), Math.random().toFloat(), (Math.random() * 0.4 + 0.1).toFloat(), Math.random().toFloat() * 2000f, (Math.random() * 0.06 + 0.02).toFloat()) } }
+    val infiniteTransition = rememberInfiniteTransition(label = "stars_time")
+    val time by infiniteTransition.animateFloat(initialValue = 0f, targetValue = 1000f, animationSpec = infiniteRepeatable(tween(120000, easing = LinearEasing), RepeatMode.Restart), label = "time")
+
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val width = size.width; val height = size.height
+        stars.forEach { star ->
+            val rawSin = sin((time * star.speed + star.offset).toDouble()).toFloat()
+            val alpha = (((rawSin + 1) / 2).pow(30) * 0.7f).coerceIn(0f, 1f)
+            if (alpha > 0.01f) drawCircle(color = Color.White.copy(alpha = alpha), radius = star.size * density.density, center = Offset(star.x * width, star.y * height))
+        }
+    }
+}
+
+@Composable
+fun ShootingStar() {
+    val progress = remember { Animatable(0f) }
+    var startX by remember { mutableFloatStateOf(0f) }
+    var startY by remember { mutableFloatStateOf(0f) }
+    var scale by remember { mutableFloatStateOf(1f) }
+
+    LaunchedEffect(Unit) {
+        while(true) {
+            delay(Random.nextLong(3000, 5000))
+            startX = Random.nextFloat() * 0.5f + 0.4f; startY = Random.nextFloat() * 0.3f; scale = Random.nextFloat() * 0.5f + 0.5f
+            progress.snapTo(0f); progress.animateTo(1f, tween(800, easing = LinearEasing))
+        }
+    }
+
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        if (progress.value > 0f && progress.value < 1f) {
+            val width = size.width; val height = size.height
+            val moveDistance = width * 0.4f
+            val currentX = (startX * width) - (moveDistance * progress.value); val currentY = (startY * height) + (moveDistance * progress.value)
+            val tailLength = 100f * scale
+            val alpha = if (progress.value < 0.1f) progress.value * 10f else if (progress.value > 0.8f) (1f - progress.value) * 5f else 1f
+            drawLine(brush = Brush.linearGradient(colors = listOf(Color.White.copy(alpha = 0f), Color.White.copy(alpha = alpha)), start = Offset(currentX + tailLength * 0.7f, currentY - tailLength * 0.7f), end = Offset(currentX, currentY)), start = Offset(currentX + tailLength * 0.7f, currentY - tailLength * 0.7f), end = Offset(currentX, currentY), strokeWidth = 2f * scale, cap = StrokeCap.Round)
+            drawCircle(color = Color.White.copy(alpha = alpha), radius = 1.5f * scale, center = Offset(currentX, currentY))
+        }
+    }
+}
+private data class StarData(val x: Float, val y: Float, val size: Float, val offset: Float, val speed: Float)

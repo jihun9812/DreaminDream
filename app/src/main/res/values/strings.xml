@@ -257,6 +257,49 @@
         <item>밤하늘의 별자리를 연결하는 중...</item>
         <item>심층 심리의 문을 여는 중...</item>
     </string-array>
+    <!-- 언어명 -->
+
+    <string name="lang_korean">한국어</string>
+    <string name="lang_arabic">아랍어</string>
+    <string name="lang_english">영어</string>
+    <string name="lang_hindi">힌디어</string>
+    <string name="lang_chinese">중국어</string>
+
+    <!-- 안내 메시지 -->
+    <string name="toast_speak_language">%1$s로 말씀하세요. (기기 설정 언어)</string>
+
+    <!-- 오류 메시지 -->
+    <string name="error_no_match">인식된 음성이 없습니다. (기기 언어 확인)</string>
+    <string name="error_network">네트워크 연결을 확인해주세요.</string>
+    <string name="error_permissions">마이크 권한이 필요합니다.</string>
+    <string name="error_client">마이크 오류 또는 다른 앱이 사용 중입니다.</string>
+    <string name="error_timeout">시간이 초과되었습니다. 다시 시도해주세요.</string>
+    <string name="error_generic">음성 인식 오류 (%1$d). 다시 시도해주세요.</string>
+
+    <!-- 시작 오류 -->
+    <string name="error_start_failed">음성 인식을 시작할 수 없습니다: %1$s</string>
+
+
+        <string name="alert_edit_profile_title">프로필 수정 주의</string>
+        <string name="alert_edit_profile_msg">이름, 생년월일, 국가는 운세 및 사주 분석의 고유 기준점입니다.\n\n정확한 정보를 입력해야 하며, 변경 시 기존 운세 데이터와의 연결이 끊길 수 있습니다.\n\n수정을 진행하시겠습니까?</string>
+
+        <string name="alert_save_confirm_title">정보 저장 확인</string>
+        <string name="alert_save_confirm_msg">입력하신 정보가 정확한가요?\n이 정보로 운세 데이터가 생성됩니다.</string>
+
+        <string name="label_country">국가 (Country)</string>
+        <string name="hint_search_country">국가 검색 (예: Korea, US)</string>
+        <string name="country_select_title">국가 선택</string>
+
+        <string name="btn_yes_edit">네, 수정할래요</string>
+        <string name="btn_save_final">확인 및 저장</string>
+
+
+        <string name="toast_input_error">필수 입력 항목이 비어 있습니다. 정보를 확인해주세요.</string>
+
+
+
+
+
 
 
 
@@ -264,7 +307,7 @@
     <string name="profile_zodiac">별자리</string>
     <string name="profile_mbti">MBTI</string>
     <string name="edit_profile_title">프로필 수정</string>
-    <string name="label_nickname">닉네임</string>
+    <string name="label_nickname">이름</string>
 
     <string name="btn_confirm">확인</string>
 
@@ -361,6 +404,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
 
 문의: dreamindream@dreamindream.app
     </string>
+    <string name="error_speech_not_supported">🚫 이 기기는 음성 인식을 지원하지 않거나 Google 서비스 앱이 필요합니다.</string>
 
 
     <string name="profile_edit_title">Edit profile</string>
@@ -454,7 +498,7 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
 
         
         <string name="common_ok">확인</string>
-        <string name="common_cancel">취소</string>
+
         <string name="common_delete">삭제</string>
 
         
@@ -635,6 +679,23 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="chart_accessibility_top">최고치: %1$s %2$d</string>
 
 
+    <string name="ai_report_pred_category_career">커리어 &amp; 성공</string>
+    <string name="ai_report_pred_category_relation">대인 관계</string>
+    <string name="ai_report_pred_category_inner">내면의 성장</string>
+    <string name="ai_report_pred_category_love">사랑 &amp; 연애</string>
+    <string name="ai_report_pred_category_wealth">재정 &amp; 풍요</string>
+    <string name="ai_report_pred_category_health">건강 &amp; 에너지</string>
+
+
+    <string name="theme_label_relationships">관계</string>
+    <string name="theme_label_achievement">성취</string>
+    <string name="theme_label_change">변화 &amp; 진화</string>
+    <string name="theme_label_anxiety">무의식적 불안</string>
+
+
+
+
+    <string name="dream_original_content_header">꿈 내용</string>
 
 
     <string name="daily_date_format">yyyy년 M월 d일</string>
@@ -645,27 +706,54 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="realistic_advice_multi">현실적인 조언 </string>
 
     <string name="dream_prompt_template">
-    너는 예지몽을 알려주는 꿈해몽 전문분석가야.
-        아래 꿈 내용을 바탕으로 현실적이고 신뢰감 있게 해석해.
-    구조:
-    - <ns0:g id="msg">%2$s</ns0:g>
-    - <ns0:g id="sym">%3$s</ns0:g>
-    - <ns0:g id="pre">%4$s</ns0:g>
-    - <ns0:g id="tip">%5$s</ns0:g>
-    - <ns0:g id="act">%6$s</ns0:g>
-    [꿈 내용] "<ns0:g id="dream">%1$s</ns0:g>"
+    [꿈 내용]\n
+    \"%1$s\"\n\n
+
+    [해석 규칙]\n
+    위 꿈을 분석하여 신비롭지만 실질적인 해석을 제시하세요.\n
+    아래 제시된 구조를 반드시 그대로 따르며, 제공된 헤더 외의 서론이나 결론은 추가하지 마세요.\n\n
+
+    문체는 공감적이고, 신비로우며, 격려하는 느낌을 유지합니다.\n
+    단, 텍스트에 **(별표)나 #(샵) 같은 마크다운 문법을 절대 사용하지 마세요.\n
+    강조하고 싶은 단어가 있다면 따옴표(\"\")를 사용하거나 문장 흐름으로 자연스럽게 표현하세요.\n
+    ---\n
+    %2$s\n
+    (꿈의 핵심 주제와 감정적 분위기를 2–3문장으로 요약합니다.)\n\n
+
+    %3$s\n
+    (핵심 상징 2가지를 선택하여 \'단어: 의미\' 형태로 풀이합니다. 이때 단어에 별표(**)를 붙이지 마세요.)\n\n
+
+    %4$s\n
+    (이 꿈이 암시하는 미래의 흐름, 기회, 에너지 변화를 신비롭게 통찰합니다.)\n\n
+
+    %5$s\n
+    (오늘 하루, 꿈의 에너지를 활용하기 위한 실질적이고 즉각적인 팁 하나를 제공합니다.)\n\n
+
+    %6$s\n
+    (오늘 바로 실천 가능한 구체적이고 현실적인 행동 두 가지를 제시합니다.\n
+     단, \"명상하기\", \"물 마시기\" 같은 일반적인 웰빙 조언은 금지합니다.\n
+     작은 퀘스트처럼 느껴지도록 표현하세요.)\n
+    1. [행동 1]\n
+    2. [행동 2]\n
+    ---
 </string>
 
-    <string name="explain_dream">해석</string>
+    <string name="dream_section_message">☁️ 핵심 메시지</string>
+    <string name="dream_section_symbols">🧠 주요 상징 해석</string>
+    <string name="dream_section_premonition">📌 예지 &amp; 통찰</string>
+    <string name="dream_section_tips_today">💡 오늘의 실천 팁</string>
+    <string name="dream_section_actions_three">⚡ 두 가지 행동 과제</string>
 
-    <string name="dream_section_message">💭 꿈이 전하는 메시지</string>
-    <string name="dream_section_symbols">🧠 핵심 상징 해석</string>
-    <string name="dream_section_premonition">📌 예지 포인트</string>
-    <string name="dream_section_tips_today">☀️ 오늘의 활용 팁</string>
-    <string name="dream_section_actions_three">🎯 오늘의 행동 3가지</string>
 
+
+    <string name="dream_select_title">분석할 꿈 선택</string>
+    <string name="dream_select_desc">가장 정확한 분석을 위해 최대 4개의 꿈을 선택해주세요.</string>
+    <string name="dream_select_confirm">분석하기 (%d)</string>
+
+    <string name="error_parsing_result">결과를 정리하는 중 문제가 발생했습니다. 원본 내용을 표시합니다.</string>
+    <string name="back_press_exit">뒤로가기를 한 번 더 누르면 종료됩니다.</string>
     <string name="dream_interpreter"> 오늘의 꿈은?</string>
-
+    <string name ="explain_dream">해석</string>
     <string name="dream_image_prefix">DreamInDream_%1$d</string>
 
     <string name="dream_image_description">꿈 해석 결과</string>
@@ -965,7 +1053,26 @@ HTTPS, 접근권한 최소화, 접근기록 관리 등
     <string name="mood_fair">기복이 있으니 속도를 조절해도 좋습니다.</string>
     <string name="mood_low">기대치보다 낮아 기본을 단단히 하기 좋은 날입니다.</string>
 
-    
+
+
+    <string name="common_close">닫기</string>
+    <string name="ai_report_tab_prediction">예측</string>
+    <string name="ai_report_prediction_title">다음 주 긍정 예측</string>
+    <string name="ai_report_prediction_subtitle">무의식이 보내는 현실적인 신호입니다.</string>
+    <string name="ai_report_prediction_empty">분석된 예측 데이터가 없습니다.\n꿈을 더 기록하고 다시 분석해보세요.</string>
+
+
+
+
+
+
+
+
+
+
+
+
+
     <string name="sec_love_text">관계에서는 %1$s 말보다 태도가 신뢰를 만듭니다. 감정선을 과장하지 말고, 편안한 주제로 속도를 맞춰보세요.</string>
     <string name="sec_study_text">학습 집중도는 %1$s 분량을 줄여도 꾸준함을 유지하면 성과가 납니다. 핵심 키워드를 먼저 붙잡아 보세요.</string>
     <string name="sec_work_text">업무 흐름은 %1$s 목표를 하나로 좁히면 효율이 올라갑니다. 산만함을 줄이고 우선순위를 재정렬해 보세요.</string>
@@ -1080,13 +1187,70 @@ eep prompt 템플릿 --&gt;
         <string name="ai_report_stat_score">꿈 점수</string>
         <string name="ai_report_keywords_title">✨ 주요 키워드</string>
         <string name="ai_report_deep_title">주간 심화 분석</string>
-        <string name="ai_report_pro_cta">심화 분석 하기</string>
-        <string name="ai_report_pro_completed">분석 완료</string>
+         <string name="ai_report_pro_completed">분석 완료</string>
         <string name="chart_emotion_title">감정 분포</string>
         <string name="chart_theme_title">테마 비중</string>
     <string name="fortune_start_btn">오늘의 운세 확인하기</string>
         <string name="chart_info_msg">기본 분석은 무료로 제공되며, 심화 분석은 구독이 필요합니다. 꿈은 2개 이상(최대 4개까지) 기록해야 심화 분석이 가능하며, 분석은 매주 월요일 초기화되지만 지난 기록은 계속 확인할 수 있습니다.</string>
     <string name="fortune_already_seen">오늘의 운세를 이미 확인하셨습니다.</string>
+    <string name="ai_report_growth_msg_high">현재 긍정적인 에너지가 넘칩니다. 이 흐름을 타고 새로운 도전을 시작하기에 완벽한 시기입니다.</string>
+    <string name="ai_report_growth_msg_mid">내면의 균형을 찾아가고 있습니다. 조금 더 자신을 믿고 나아가면 큰 성장을 이룰 수 있습니다.</string>
+    <string name="ai_report_growth_msg_low">잠시 휴식과 재충전이 필요한 시기입니다. 꿈이 보내는 신호에 귀 기울이며 자신을 돌보세요.</string>
+
+    <string name="ai_report_growth_current_energy_label">현재 에너지</string>
+    <string name="ai_report_growth_point_label">포인트</string>
+    <string name="ai_report_growth_potential_title">성장 잠재력</string>
+    <string name="ai_report_growth_next_step_title">다음 단계</string>
+
+
+    <string name="ai_report_chart_info_title">차트 정보</string>
+    <string name="ai_report_chart_info_ok">확인</string>
+    <string name="ai_report_chart_info_button_content_description">차트 정보 보기</string>
+    <string name="fortune_luck_index">행운지수</string>
+
+    <string name="ai_report_weekly_insight_subtitle">주간 인사이트</string>
+    <string name="ai_report_history_content_description">기록 히스토리</string>
+
+    <string name="ai_report_stat_core_emotion">핵심 감정</string>
+    <string name="ai_report_stat_total_dreams">총 꿈 개수</string>
+
+
+    <string name="ai_report_tab_insight">심층 분석</string>
+    <string name="ai_report_tab_symbols">핵심 상징</string>
+    <string name="ai_report_tab_action">실천 가이드</string>
+    <string name="ai_report_default_title">인사이트</string>
+
+    <string name="ai_report_symbols_description">이 꿈을 관통하는 핵심 키워드입니다.</string>
+    <string name="ai_report_symbols_empty">분석된 키워드가 없습니다.</string>
+
+    <string name="ai_report_action_lucky_label">럭키 리추얼</string>
+    <string name="ai_report_action_practical_title">실제적인 조언</string>
+
+    <string name="ai_report_history_title">꿈 기록</string>
+    <string name="ai_report_history_empty">아직 기록된 히스토리가 없어요.</string>
+    <string name="ai_report_history_group_others">기타</string>
+    <string name="ai_report_history_week_label">%1$s주차</string>
+
+    <string name="ai_report_analysis_summary_title">분석 요약</string>
+
+    <string name="ai_report_tab_theme">테마 차트</string>
+    <string name="ai_report_tab_growth">성장 포인트</string>
+
+    <string name="ai_report_theme_chart_title">테마 분포</string>
+    <string name="ai_report_theme_chart_subtitle">이번 주 꿈에서 가장 자주 나타난 주제입니다.</string>
+
+    <string name="ai_report_growth_energy_title">현재 에너지</string>
+    <string name="ai_report_growth_energy_point">포인트</string>
+    <string name="ai_report_growth_potential">성장 잠재력</string>
+    <string name="ai_report_growth_point_title">성장 포인트</string>
+
+    <string name="ai_report_pro_cta">AI 심층 분석 열기</string>
+
+    <!-- 선택 -->
+    <string name="ai_report_chart_info_default_message">차트 데이터에 대한 설명입니다.</string>
+
+
+
 
     <string name="chart_info_title">차트안내</string>
     <string name="msg_analysis_failed">분석에 실패했습니다.</string>
@@ -1222,9 +1386,109 @@ eep prompt 템플릿 --&gt;
         <item>결단력</item>
     </string-array>
 
-    
+
+
+
+        <string name="loading_text">별을 읽는 중...</string>
+
+        <string name="destiny_awaits">운명이 당신을 기다립니다</string>
+        <string name="hello_user">안녕하세요, %s님</string>
+        <string name="btn_open_fortune">운세 열기</string>
+
+        <string name="daily_oracle_title">오늘의 오라클</string>
+        <string name="lotto_default_title">행운의 번호</string>
+
+        <string name="card_overview">오늘의 총운</string>
+        <string name="card_wealth">재물운</string>
+        <string name="card_love">사랑운</string>
+        <string name="card_health">건강운</string>
+        <string name="card_action">오늘의 행동 팁</string>
+
+        <string name="missions_title">데일리 미션</string>
+
+        <string name="deep_unlock_title">심층 분석 열기</string>
+        <string name="deep_view_full">전체 리포트 보기</string>
+        <string name="deep_premium_content">프리미엄 콘텐츠</string>
+
+        <string name="tab_verdict">종합운</string>
+        <string name="tab_trend">흐름</string>
+        <string name="tab_money">금전</string>
+        <string name="tab_love">사랑</string>
+        <string name="tab_health">건강</string>
+        <string name="tab_career">직업/학업</string>
+        <string name="tab_mind">마음</string>
+        <string name="tab_risk">위험</string>
+        <string name="tab_action">행동</string>
+
+        <string name="keywords_placeholder">집중 • 인내</string>
+        <string name="lucky_item">행운의 아이템</string>
+        <string name="pros_opportunity">기회</string>
+        <string name="cons_caution">주의</string>
+        <string name="masters_verdict">마스터 한마디</string>
+        <string name="trend_flow_title">오늘의 운세 흐름</string>
+        <string name="trend_summary">요약</string>
+
+        <string name="title_financial">금전운 분석</string>
+        <string name="title_relationship">사랑 &amp; 관계</string>
+        <string name="title_vitality">건강 &amp; 활력</string>
+        <string name="title_career">직업 &amp; 학업</string>
+        <string name="title_emotional">감정 균형(마음)</string>
+        <string name="title_risk">위험 경고</string>
+        <string name="title_action">행동 가이드</string>
+
+        <string name="profile_req_title">프로필 필요</string>
+        <string name="profile_req_msg">설정에서 프로필(이름, 생년월일)을 완성해 주세요.</string>
+        <string name="btn_go_settings">설정으로 이동</string>
+
+    <string name="keywords_title">오늘의 키워드</string>
+
+
+    <string name="cal_tap_to_change">탭하여 변경</string>
+    <string name="cal_select_date_title">날짜 선택</string>
+    <string name="common_confirm">확인</string>
+    <string name="common_cancel">취소</string>
+    <string name="date_month_unit">월</string>
+
+    <string name="day_short_sun">일</string>
+    <string name="day_short_mon">월</string>
+    <string name="day_short_tue">화</string>
+    <string name="day_short_wed">수</string>
+    <string name="day_short_thu">목</string>
+    <string name="day_short_fri">금</string>
+    <string name="day_short_sat">토</string>
+
+    <string name="dream_record_prefix">꿈 기록 #</string>
+
+    <string name="dream_interpretation_title">꿈 해석</string>
+    <string name="dream_original_title">원본 꿈 내용</string>
+    <string name="dream_analysis_default_title">꿈 분석</string>
+
+    <string name="share_sheet_title">꿈 공유하기</string>
+    <string name="share_target_save">갤러리에 저장</string>
+    <string name="share_target_instagram">인스타그램</string>
+    <string name="share_target_facebook">페이스북</string>
+    <string name="share_target_kakao">카카오톡</string>
+    <string name="share_target_whatsapp">왓츠앱</string>
+
+    <string name="share_canvas_app_title">Dream In Dream</string>
+    <string name="share_canvas_interpretation_header">해석</string>
+    <string name="share_error_msg">공유 오류: %s</string>
+    <string name="image_saved_msg">이미지가 갤러리에 저장되었습니다.</string>
+    <string name="app_not_found_msg">%s 앱을 찾을 수 없습니다.</string>
+
+    <string name="share_insta_chooser_title">인스타그램에 공유</string>
+
+    <string name="dream_image_file_prefix">Dream_Analysis_%d</string>
+    <string name="dream_image_desc">AI가 생성한 꿈 해석 이미지입니다.</string>
+
+
+
+
+
+
+
     <string name="birth_time_not_selected">선택안함</string>
-    <string name="guest_prefix">guest-</string>
+    <string name="guest_prefix">게스트 -</string>
     <string name="device_fallback">device</string>
 
     

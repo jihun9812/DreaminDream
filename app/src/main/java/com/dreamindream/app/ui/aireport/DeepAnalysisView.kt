@@ -1,7 +1,5 @@
 package com.dreamindream.app.ui.aireport
 
-
-
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -27,19 +25,17 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.SubcomposeAsyncImage
-import coil.request.ImageRequest
 import kotlinx.coroutines.delay
+import org.json.JSONArray
 import org.json.JSONObject
 import com.dreamindream.app.R
+
 // --- Luxury Theme Colors ---
 private val CardBg = Color(0xFF1E212B)
 private val TextMain = Color(0xFFEEEEEE)
@@ -49,17 +45,17 @@ private val DeepPurple = Color(0xFF7E57C2)
 private val MidnightBlue = Color(0xFF1A237E)
 
 @Composable
-fun DeepAnalysisResultView(jsonString: String, imageUrl: String = "") {
+fun DeepAnalysisResultView(jsonString: String) { // imageUrl 인자 제거됨
     val data = remember(jsonString) { try { JSONObject(jsonString) } catch (e: Exception) { null } }
     var visibleStep by remember { mutableIntStateOf(0) }
 
+    // 애니메이션 스텝 재조정 (이미지가 빠지면서 순서 당겨짐)
     LaunchedEffect(Unit) {
-        delay(300); visibleStep = 1
-        delay(500); visibleStep = 2
-        delay(500); visibleStep = 3
-        delay(600); visibleStep = 4
-        delay(600); visibleStep = 5
-        delay(600); visibleStep = 6 // 이미지 스텝 추가
+        delay(300); visibleStep = 1 // Title & Summary
+        delay(500); visibleStep = 2 // Core Themes
+        delay(500); visibleStep = 3 // Deep Analysis
+        delay(600); visibleStep = 4 // Subconscious Message
+        delay(600); visibleStep = 5 // Advice & Lucky Action
     }
 
     if (data == null) {
@@ -75,52 +71,8 @@ fun DeepAnalysisResultView(jsonString: String, imageUrl: String = "") {
             .padding(horizontal = 16.dp, vertical = 24.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        // ★ 1. AI Dream Image (가장 먼저 보여줌)
-        if (imageUrl.isNotBlank()) {
-            AnimatedSection(visible = visibleStep >= 1) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp)
-                        .shadow(16.dp, RoundedCornerShape(24.dp), spotColor = DeepPurple)
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(CardBg)
-                ) {
-                    SubcomposeAsyncImage(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(imageUrl)
-                            .crossfade(true)
-                            .build(),
-                        contentDescription = "AI Dream Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                        loading = {
-                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator(color = AccentGold)
-                            }
-                        }
-                    )
-                    // 이미지 위 오버레이
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.6f))))
-                    )
-                    Text(
-                        text = "AI가 그린 당신의 꿈",
-                        color = AccentGold,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(20.dp)
-                    )
-                }
-            }
-        }
-
-        // 2. Title & Summary
-        AnimatedSection(visible = visibleStep >= 2) {
+        // 1. Title & Summary (이제 가장 먼저 나옴)
+        AnimatedSection(visible = visibleStep >= 1) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Default.AutoAwesome, null, tint = AccentGold, modifier = Modifier.size(36.dp))
                 Spacer(Modifier.height(12.dp))
@@ -142,8 +94,8 @@ fun DeepAnalysisResultView(jsonString: String, imageUrl: String = "") {
             }
         }
 
-        // 3. Core Themes
-        AnimatedSection(visible = visibleStep >= 3) {
+        // 2. Core Themes
+        AnimatedSection(visible = visibleStep >= 2) {
             val themes = data.optJSONArray("core_themes")
             if (themes != null && themes.length() > 0) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
@@ -164,18 +116,30 @@ fun DeepAnalysisResultView(jsonString: String, imageUrl: String = "") {
             }
         }
 
-        // 4. Deep Analysis
-        AnimatedSection(visible = visibleStep >= 4) {
+        // 3. Deep Analysis (배열 텍스트 정제 로직 포함)
+        AnimatedSection(visible = visibleStep >= 3) {
+            val rawDeep = data.opt("deep_analysis")
+            val cleanDeepContent = if (rawDeep is JSONArray) {
+                // 배열이면 줄바꿈으로 합치기
+                (0 until rawDeep.length()).joinToString("\n\n") { rawDeep.getString(it) }
+            } else {
+                // 문자열이면 혹시 모를 대괄호/따옴표 제거
+                data.optString("deep_analysis", "")
+                    .replace(Regex("^\\[\"|\"\\]$"), "") // 시작 [" 과 끝 "] 제거
+                    .replace("\",\"", "\n\n")      // 중간 구분자 교체
+                    .replace("\", \"", "\n\n")     // 공백 포함 구분자 교체
+            }
+
             AnalysisCard(
                 title = "심층 심리 분석",
                 icon = Icons.Default.Psychology,
                 highlightColor = DeepPurple,
-                content = data.optString("deep_analysis")
+                content = cleanDeepContent
             )
         }
 
-        // 5. Subconscious Message
-        AnimatedSection(visible = visibleStep >= 5) {
+        // 4. Subconscious Message
+        AnimatedSection(visible = visibleStep >= 4) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -200,8 +164,8 @@ fun DeepAnalysisResultView(jsonString: String, imageUrl: String = "") {
             }
         }
 
-        // 6. Advice & Lucky Action
-        AnimatedSection(visible = visibleStep >= 6) {
+        // 5. Advice & Lucky Action
+        AnimatedSection(visible = visibleStep >= 5) {
             Column(verticalArrangement = Arrangement.spacedBy(24.dp)) {
                 val adviceArray = data.optJSONArray("actionable_advice")
                 AnalysisCard(
@@ -263,6 +227,7 @@ fun LuxuryChip(text: String) {
         }
     }
 }
+
 @Composable
 fun AnalysisCard(
     title: String,
@@ -293,7 +258,7 @@ fun AnalysisCard(
             if (content.isNotBlank()) {
                 val paragraphs = content
                     .split("\n\n")
-                    .map { it.trim() }
+                    .map { it.trim().removePrefix("\"").removeSuffix("\"") }
                     .filter { it.isNotEmpty() }
 
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {

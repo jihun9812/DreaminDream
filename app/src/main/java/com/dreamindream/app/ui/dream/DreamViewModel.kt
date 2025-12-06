@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +12,7 @@ import com.dreamindream.app.FirestoreManager
 import com.dreamindream.app.SubscriptionManager
 import com.dreamindream.app.R
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -40,6 +39,9 @@ class DreamViewModel(
 
     private val prefKeyDate = "dream_last_date"
     private val prefKeyCount = "dream_count"
+    // ✨ 누적 카운트 키 (리뷰 요청용)
+    private val prefKeyTotalCumulative = "dream_total_cumulative_count"
+
     private val dateFmt = SimpleDateFormat("yyyy-MM-dd", Locale.US)
 
     // 욕설 및 비속어 필터링 키워드
@@ -50,7 +52,7 @@ class DreamViewModel(
 
     private val http by lazy {
         OkHttpClient.Builder()
-            .connectTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .connectTimeout(45, java.util.concurrent.TimeUnit.SECONDS) // 타임아웃 약간 증가
             .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
             .build()
     }
@@ -74,13 +76,18 @@ class DreamViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        ongoingCall?.cancel()
-        ongoingCall = null
+        try {
+            ongoingCall?.cancel()
+            ongoingCall = null
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     // --- Public Events ---
 
     fun onRefreshClicked() {
+        if (uiState.value.isLoading) return // 로딩 중 조작 방지
         _uiState.update { it.copy(inputText = "") }
         refreshUsageCounts()
     }
@@ -120,7 +127,15 @@ class DreamViewModel(
         _uiState.update { it.copy(showShareDialog = true) }
     }
 
+    // ✨ 리뷰 팝업 완료 후 상태 초기화
+    fun onReviewRequested() {
+        _uiState.update { it.copy(showReviewRequest = false) }
+    }
+
     fun onInterpretClicked() {
+        // ✨ [병목 방지] 이미 로딩 중이면 중복 요청 차단
+        if (uiState.value.isLoading) return
+
         val input = uiState.value.inputText.trim()
 
         // 1. 유효성 검사 (실패 시 카운트 차감 없이 종료)
@@ -155,7 +170,8 @@ class DreamViewModel(
     fun onRewardedAdEarned() {
         val latest = pendingInputForAd ?: uiState.value.inputText.trim()
         pendingInputForAd = null
-        if (validateInput(latest)) {
+        // 광고 시청 후에도 유효성 검사 및 로딩 상태 확인
+        if (!uiState.value.isLoading && validateInput(latest)) {
             _uiState.update { it.copy(showAdPrompt = false, showSubscriptionUpsell = false) }
             startInterpret(latest)
         }
@@ -190,9 +206,6 @@ class DreamViewModel(
         refreshUsageCounts()
     }
 
-    /**
-     * 강화된 입력 검증 로직
-     */
     private fun validateInput(input: String): Boolean {
         val app = getApplication<Application>()
 
@@ -244,11 +257,17 @@ class DreamViewModel(
 
         return true
     }
+
     @SuppressLint("StringFormatMatches")
     private fun startInterpret(prompt: String) {
         val app = getApplication<Application>()
+
+        // ✨ [중복 호출 방지] 한번 더 체크
+        if (_uiState.value.isLoading) return
+
         _uiState.update { it.copy(isLoading = true, errorMessage = null, resultText = "") }
 
+        // ✨ 중요: strings.xml에 정의된 구조화된 템플릿 사용
         val content = try {
             app.getString(
                 R.string.dream_prompt_template,
@@ -260,17 +279,17 @@ class DreamViewModel(
                 app.getString(R.string.dream_section_actions_three)
             )
         } catch (e: Exception) {
-            "Analyze this dream: $prompt"
+            // 리소스 로드 실패 시 안전 장치
+            "Analyze this dream strictly into 5 sections (Message, Symbols, Premonition, Daily Tip, 2 Actions): $prompt"
         }
 
+        // 시스템 지시사항 강화
         val systemInstruction = """
              You are a mystical and professional dream interpreter. 
-             Do NOT give generic wellness advice (no “drink water,” “rest,” “meditate,” “breathe deeply,” etc.).
-             Every action must be a realistic, doable behavior that a person could actually perform today.
-             Each action must come directly from specific symbols in the user’s dream. No symbol = no action.
-             The actions should feel like a subtle, grounded, mystical quest, not a ritual or fantasy.
-             Keep the mystical tone in the description, but keep the action itself practical and real-world.
-             No exaggeration, no impossible tasks.
+             Your output MUST adhere strictly to the structure provided by the user template.
+             Use the exact headers provided.
+             Do NOT give generic wellness advice (no “drink water,” “rest,” “meditate,” etc.).
+             Keep the mystical tone.
         """.trimIndent()
 
         val messages = JSONArray()
@@ -278,8 +297,8 @@ class DreamViewModel(
             .put(JSONObject().put("role", "user").put("content", content))
 
         val body = JSONObject().apply {
-            put("model", "gpt-4o-mini")
-            put("temperature", 0.6)
+            put("model", "gpt-4o-mini") // 또는 gpt-3.5-turbo
+            put("temperature", 0.7) // 약간의 창의성 허용
             put("messages", messages)
         }.toString().toRequestBody("application/json".toMediaType())
 
@@ -303,18 +322,28 @@ class DreamViewModel(
                             return
                         }
                         val raw = resp.body?.string().orEmpty()
+
+                        // ✨ [JSON 파싱 안전 장치 강화]
                         val result = try {
-                            JSONObject(raw).getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content").trim()
+                            val jsonObject = JSONObject(raw)
+                            val choices = jsonObject.optJSONArray("choices")
+                            if (choices != null && choices.length() > 0) {
+                                choices.getJSONObject(0).optJSONObject("message")?.optString("content")?.trim()
+                            } else {
+                                null
+                            }
                         } catch (e: Exception) {
+                            e.printStackTrace()
                             null
                         }
 
-                        if (result != null) {
+                        if (!result.isNullOrBlank()) {
+                            // UI 업데이트는 메인 스레드(viewModelScope)에서
                             viewModelScope.launch {
                                 onResultArrived(prompt, result)
                             }
                         } else {
-                            _uiState.update { it.copy(isLoading = false, errorMessage = "Parsing error") }
+                            _uiState.update { it.copy(isLoading = false, errorMessage = "Interpretation Failed") }
                         }
                     }
                 }
@@ -324,20 +353,40 @@ class DreamViewModel(
 
     private fun onResultArrived(prompt: String, result: String) {
         increaseTodayCount()
-        _uiState.update { it.copy(isLoading = false, resultText = result) }
+
+        // ✨ [인앱 리뷰 로직 추가]
+        // 1. 전체 누적 횟수 증가
+        val currentTotal = prefs.getInt(prefKeyTotalCumulative, 0) + 1
+        prefs.edit { putInt(prefKeyTotalCumulative, currentTotal) }
+
+        // 2. 리뷰 요청 조건 확인 (3번째, 10번째, 이후 30회마다)
+        val shouldRequestReview = currentTotal == 3 || currentTotal == 10 || (currentTotal > 10 && currentTotal % 30 == 0)
+
+        // 3. 상태 업데이트 (결과 표시 + 리뷰 요청 여부)
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                resultText = result,
+                showReviewRequest = shouldRequestReview
+            )
+        }
+
         saveDream(prompt, result)
     }
 
     private fun saveDream(dream: String, result: String) {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid
-        if (uid != null) {
-            FirestoreManager.saveDream(uid, dream, result)
-        }
+        // 비동기 처리 (IO Dispatcher) 권장
+        viewModelScope.launch(Dispatchers.IO) {
+            val uid = FirebaseAuth.getInstance().currentUser?.uid
+            if (uid != null) {
+                FirestoreManager.saveDream(uid, dream, result)
+            }
 
-        val dayKey = todayKey()
-        val prev = prefs.getString(dayKey, "[]") ?: "[]"
-        val arr = try { JSONArray(prev) } catch(e: Exception) { JSONArray() }
-        arr.put(JSONObject().put("dream", dream).put("result", result))
-        prefs.edit { putString(dayKey, arr.toString()) }
+            val dayKey = todayKey()
+            val prev = prefs.getString(dayKey, "[]") ?: "[]"
+            val arr = try { JSONArray(prev) } catch(e: Exception) { JSONArray() }
+            arr.put(JSONObject().put("dream", dream).put("result", result))
+            prefs.edit { putString(dayKey, arr.toString()) }
+        }
     }
 }

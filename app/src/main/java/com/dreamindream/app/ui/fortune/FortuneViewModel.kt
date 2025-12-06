@@ -2,45 +2,64 @@ package com.dreamindream.app.ui.fortune
 
 import android.app.Application
 import android.content.Context
+import android.provider.Settings
 import androidx.lifecycle.AndroidViewModel
 import com.dreamindream.app.FirestoreManager
 import com.dreamindream.app.FortuneApi
 import com.dreamindream.app.FortuneStorage
 import com.dreamindream.app.R
 import com.dreamindream.app.SubscriptionManager
+import com.dreamindream.app.lottery.generateLotteryNumbers
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import org.json.JSONObject
+import kotlin.random.Random
 
 class FortuneViewModel(app: Application) : AndroidViewModel(app) {
 
     private val ctx: Application get() = getApplication()
     private val storage = FortuneStorage(ctx)
     private val api = FortuneApi(ctx, storage)
-    private val prefs = storage.prefs
+    private val internalPrefs = storage.prefs
 
-    private val _uiState = MutableStateFlow(FortuneUiState())
+    // [핵심] API 중복 호출 방지를 위한 플래그
+    @Volatile private var isDeepFetchingInProgress = false
+
+    private fun getUserPrefs() = ctx.getSharedPreferences(
+        "dream_profile_" + (FirebaseAuth.getInstance().currentUser?.uid ?:
+        Settings.Secure.getString(ctx.contentResolver, Settings.Secure.ANDROID_ID)),
+        Context.MODE_PRIVATE
+    )
+
+    private val _uiState = MutableStateFlow(FortuneUiState(isInitializing = true))
     val uiState: StateFlow<FortuneUiState> = _uiState.asStateFlow()
-
     private var lastPayload: JSONObject? = null
 
     init {
         storage.syncProfileFromFirestore {
-            fetchUserName()
+            refreshConfig()
             checkInitialState()
         }
     }
 
-    private fun fetchUserName() {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid
-        if (uid != null) {
-            FirestoreManager.getUserProfile(uid) { data ->
-                val name = data?.get("name")?.toString() ?: data?.get("nickname")?.toString() ?: ""
-                _uiState.update { it.copy(userName = name) }
-            }
+    fun refreshConfig() {
+        val prefs = getUserPrefs()
+        val countryName = prefs.getString("country_name", "") ?: ""
+        val countryFlag = prefs.getString("country_flag", "") ?: ""
+        val countryCode = prefs.getString("country_code", "") ?: ""
+
+        val displayFlag = if (countryFlag.isBlank()) "" else countryFlag
+        val displayName = if (countryName.isBlank()) "" else countryName
+
+        _uiState.update { it.copy(userFlag = displayFlag, userCountryName = displayName) }
+
+        if (lastPayload != null && countryCode.isNotBlank()) {
+            val userInfo = storage.loadUserInfoStrict()
+            val seed = storage.seedForToday(userInfo)
+            updateLotteryInfo(countryCode, seed)
         }
     }
 
@@ -50,24 +69,21 @@ class FortuneViewModel(app: Application) : AndroidViewModel(app) {
             lastPayload = cached
             parseAndBindBasic(cached)
             checkDeepState()
+            _uiState.update { it.copy(showStartButton = false, showFortuneCard = true, isInitializing = false) }
         } else {
-            _uiState.update { it.copy(showStartButton = true, showFortuneCard = false) }
+            _uiState.update { it.copy(showStartButton = true, showFortuneCard = false, isInitializing = false) }
         }
     }
 
     private fun checkDeepState() {
         val todayKey = storage.todayPersonaKey()
         val deepCached = storage.getCachedDeep(todayKey)
-
         if (deepCached != null) {
             parseAndBindDeep(deepCached)
         } else {
-            val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
-            FirestoreManager.getDeepFortune(uid, storage.todayKey()) { json ->
-                if (json != null) {
-                    storage.cacheDeep(todayKey, json)
-                    parseAndBindDeep(json)
-                }
+            // [안전장치] 앱 시작 시, 이미 기본 운세가 있고 구독자라면 조용히 미리 로딩 시도
+            if (SubscriptionManager.isSubscribedNow() && lastPayload != null) {
+                prefetchDeepAnalysis(isBackground = true)
             }
         }
     }
@@ -88,59 +104,93 @@ class FortuneViewModel(app: Application) : AndroidViewModel(app) {
                 lastPayload = json
                 storage.cacheTodayPayload(json)
                 storage.markSeenToday()
-
-                val uid = FirebaseAuth.getInstance().currentUser?.uid
-                if (uid != null) {
-                    FirestoreManager.saveDailyFortune(uid, storage.todayKey(), json)
-                }
+                FirestoreManager.saveDailyFortune(
+                    FirebaseAuth.getInstance().currentUser?.uid ?: "guest",
+                    storage.todayKey(),
+                    json
+                )
                 parseAndBindBasic(json)
+
+                // [안전장치] 기본 운세 로딩 성공 후, 구독자라면 즉시 백그라운드 프리페칭 시작
+                if (SubscriptionManager.isSubscribedNow()) {
+                    prefetchDeepAnalysis(isBackground = true)
+                }
+
+                _uiState.update { it.copy(isLoading = false, showFortuneCard = true, showStartButton = false) }
             },
             onError = { msg ->
-                _uiState.update { state ->
-                    state.copy(isLoading = false, showStartButton = true, snackbarMessage = msg)
-                }
+                _uiState.update { it.copy(isLoading = false, showStartButton = true, snackbarMessage = msg) }
             }
         )
     }
 
+    // [New] 안전한 프리페칭 함수 (백그라운드 여부에 따라 에러 처리 분기)
+    private fun prefetchDeepAnalysis(isBackground: Boolean) {
+        // 1. 이미 데이터가 있거나, 현재 네트워크 요청 중이라면 절대 중복 실행하지 않음
+        if (_uiState.value.deepResult != null || isDeepFetchingInProgress) return
+
+        val userInfo = storage.loadUserInfoStrict()
+        val seed = storage.seedForToday(userInfo)
+        val payload = lastPayload ?: return
+
+        isDeepFetchingInProgress = true
+
+        // 사용자가 직접 누른 경우에만 로딩 상태 표시
+        if (!isBackground) {
+            _uiState.update { it.copy(isDeepLoading = true) }
+        }
+
+        api.fetchDeep(userInfo, payload, seed) { deepJson ->
+            isDeepFetchingInProgress = false // [중요] 락 해제
+
+            if (deepJson != null) {
+                // 성공 로직
+                storage.cacheDeep(storage.todayPersonaKey(), deepJson)
+                FirestoreManager.saveDeepFortune(
+                    FirebaseAuth.getInstance().currentUser?.uid ?: "guest",
+                    storage.todayKey(),
+                    deepJson
+                )
+                parseAndBindDeep(deepJson)
+
+                // 로딩창 끄고 다이얼로그 띄우기 (데이터가 있으면 UI에서 자동 감지됨)
+                _uiState.update { it.copy(isDeepLoading = false, showDeepDialog = true) }
+            } else {
+                // 실패 로직
+                if (isBackground) {
+                    // 백그라운드면 사용자에게 알리지 않고 조용히 종료 (다음에 버튼 누르면 재시도됨)
+                    _uiState.update { it.copy(isDeepLoading = false) }
+                } else {
+                    // 사용자가 기다리고 있었다면 에러 메시지 표시
+                    _uiState.update { it.copy(isDeepLoading = false, snackbarMessage = ctx.getString(R.string.parse_error)) }
+                }
+            }
+        }
+    }
+
+    // [UI Action] 사용자가 심화 분석 버튼 클릭 시
     fun onDeepAnalysisClick(context: Context) {
+        // 1. 이미 데이터가 있으면(프리페칭 성공) 바로 보여줌
         if (_uiState.value.deepResult != null) {
             _uiState.update { it.copy(showDeepDialog = true) }
             return
         }
 
-        val payload = lastPayload ?: return
-
+        // 2. 구독 확인
         if (!SubscriptionManager.isSubscribedNow()) {
             _uiState.update { it.copy(navigateToSubscription = true) }
             return
         }
 
-        if (_uiState.value.isDeepLoading) return
-
-        _uiState.update { it.copy(isDeepLoading = true) }
-
-        val userInfo = storage.loadUserInfoStrict()
-        val seed = storage.seedForToday(userInfo)
-
-        api.fetchDeep(userInfo, payload, seed) { deepJson ->
-            if (deepJson != null) {
-                val todayKey = storage.todayPersonaKey()
-                storage.cacheDeep(todayKey, deepJson)
-
-                val uid = FirebaseAuth.getInstance().currentUser?.uid
-                if (uid != null) {
-                    FirestoreManager.saveDeepFortune(uid, storage.todayKey(), deepJson)
-                }
-
-                parseAndBindDeep(deepJson)
-                _uiState.update { it.copy(isDeepLoading = false, showDeepDialog = true) }
-            } else {
-                _uiState.update {
-                    it.copy(isDeepLoading = false, snackbarMessage = ctx.getString(R.string.parse_error))
-                }
-            }
+        // 3. 현재 백그라운드에서 가져오는 중이라면?
+        if (isDeepFetchingInProgress) {
+            // 로딩창만 띄워주고 기다리게 함 (콜백이 오면 자동으로 다이얼로그 뜸)
+            _uiState.update { it.copy(isDeepLoading = true) }
+            return
         }
+
+        // 4. 아무것도 안 하고 있었다면 지금 요청 시작 (Foreground 모드)
+        prefetchDeepAnalysis(isBackground = false)
     }
 
     private fun parseAndBindBasic(json: JSONObject) {
@@ -154,81 +204,36 @@ class FortuneViewModel(app: Application) : AndroidViewModel(app) {
                 "Social" to (radar?.optInt("social") ?: 50)
             )
 
-            val summary = json.optString("summary", "")
-            val kws = json.optJSONArray("keywords")
-            val keywords = (0 until (kws?.length() ?: 0)).map { kws!!.getString(it) }
+            val basicInfo = json.optJSONObject("basic_info")
+            val basicFortune = BasicFortuneInfo(
+                overall = sanitizeText(basicInfo?.optString("overall") ?: ""),
+                moneyText = sanitizeText(basicInfo?.optString("money_text") ?: ""),
+                loveText = sanitizeText(basicInfo?.optString("love_text") ?: ""),
+                healthText = sanitizeText(basicInfo?.optString("health_text") ?: ""),
+                actionTip = sanitizeText(basicInfo?.optString("action_tip") ?: "")
+            )
 
-            val lucky = json.optJSONObject("lucky")
-            val color = lucky?.optString("colorHex") ?: "#FFD54F"
-            val number = lucky?.optInt("number")
-            val time = lucky?.optString("time") ?: "-"
-            val direction = lucky?.optString("direction") ?: "-"
-
-            val rawChecklist = json.optJSONArray("checklist")
+            val rawMissions = json.optJSONArray("missions")
             val todayKey = storage.todayPersonaKey()
-            val checklist = if (rawChecklist != null) {
-                (0 until rawChecklist.length()).mapIndexed { index, _ ->
-                    val text = rawChecklist.getString(index)
-                    val isChecked = prefs.getBoolean("fortune_check_${todayKey}_$index", false)
+            val checklist = if (rawMissions != null) {
+                (0 until rawMissions.length()).map { index ->
+                    val text = sanitizeText(rawMissions.getString(index))
+                    val isChecked = internalPrefs.getBoolean("fortune_check_${todayKey}_$index", false)
                     ChecklistItemUi(index, text, isChecked)
                 }
             } else emptyList()
 
-            // 로또 번호 파싱 (배열 -> 문자열)
-            val lottoArr = json.optJSONArray("lottoNumbers")
-            val lottoText = if (lottoArr != null && lottoArr.length() > 0) {
-                (0 until lottoArr.length()).map { lottoArr.getInt(it) }.joinToString(", ")
-            } else {
-                "번호 생성 중..."
-            }
-
-            val sectionsJson = json.optJSONObject("sections")
-            val sectionsList = mutableListOf<FortuneSectionUi>()
-
-            val sectionMap = listOf(
-                Triple("overall", R.string.fortune_overall, 80),
-                Triple("love", R.string.fortune_love, radarMap["Love"] ?: 0),
-                Triple("money", R.string.fortune_money, radarMap["Money"] ?: 0),
-                Triple("work", R.string.fortune_work, radarMap["Work"] ?: 0),
-                Triple("health", R.string.fortune_health, radarMap["Health"] ?: 0),
-                Triple("social", R.string.fortune_social, radarMap["Social"] ?: 0),
-                Triple("lotto", R.string.fortune_lotto, 0)
-            )
-
-            sectionMap.forEach { (key, titleRes, defaultScore) ->
-                val s = sectionsJson?.optJSONObject(key)
-                if (s != null || key == "lotto") {
-                    val isLotto = key == "lotto"
-                    val score = if (isLotto) null else s?.optInt("score") ?: defaultScore
-
-                    // ★ 수정됨: 로또면 위에서 만든 lottoText 사용, 아니면 섹션 텍스트 사용
-                    val body = if (isLotto) lottoText else s?.optString("text") ?: ""
-
-                    sectionsList.add(FortuneSectionUi(
-                        key = key,
-                        titleResId = titleRes,
-                        score = score,
-                        colorInt = if (isLotto) 0 else api.scoreColor(score ?: 0),
-                        body = body,
-                        isLotto = isLotto
-                    ))
-                }
-            }
+            val userPrefs = getUserPrefs()
+            val countryCode = userPrefs.getString("country_code", "KR") ?: "KR"
+            val userInfo = storage.loadUserInfoStrict()
+            val seed = storage.seedForToday(userInfo)
+            updateLotteryInfo(countryCode, seed)
 
             _uiState.update {
                 it.copy(
-                    isLoading = false,
-                    showFortuneCard = true,
-                    showStartButton = false,
                     radarChartData = radarMap,
-                    oneLineSummary = summary,
-                    keywords = keywords,
-                    luckyColorHex = color,
-                    luckyNumber = number,
-                    luckyTime = time,
-                    luckyDirection = direction,
+                    basicFortune = basicFortune,
                     checklist = checklist,
-                    sections = sectionsList,
                     deepButtonEnabled = true
                 )
             }
@@ -238,67 +243,68 @@ class FortuneViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun parseAndBindDeep(json: JSONObject) {
-        try {
-            val flowArr = json.optJSONArray("flow_curve")
-            val flowList = if (flowArr != null && flowArr.length() >= 7) {
-                (0 until 7).map { flowArr.getInt(it) }
-            } else listOf(50, 50, 50, 50, 50, 50, 50)
-
-            val highArr = json.optJSONArray("highlights")
-            val highlights = (0 until (highArr?.length() ?: 0)).map { highArr!!.getString(it) }
-
-            val result = DeepFortuneResult(
-                flowCurve = flowList,
-                highlights = highlights,
-                riskAndOpportunity = json.optString("risk_opp"),
-                solution = json.optString("solution"),
-                tomorrowPreview = json.optString("tomorrow_preview")
-            )
-
-            _uiState.update {
-                it.copy(isDeepLoading = false, deepResult = result)
+    private fun updateLotteryInfo(countryCode: String, seed: Int) {
+        val lotteryData = generateLotteryNumbers(countryCode, seed)
+        _uiState.update {
+            if (lotteryData != null) {
+                it.copy(lottoName = lotteryData.first, lottoNumbers = lotteryData.second, luckyNumber = null)
+            } else {
+                val rand = Random(seed)
+                it.copy(lottoName = null, lottoNumbers = null, luckyNumber = rand.nextInt(1, 100))
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            _uiState.update { it.copy(isDeepLoading = false, snackbarMessage = ctx.getString(R.string.parse_error)) }
         }
     }
 
-    fun onRadarClick() {
-        _uiState.update { it.copy(showRadarDetail = true) }
+    private fun parseAndBindDeep(json: JSONObject) {
+        val flowArr = json.optJSONArray("flow_curve")
+        val flowList = if (flowArr != null && flowArr.length() >= 7) {
+            (0 until 7).map { flowArr.getInt(it) }
+        } else listOf(50, 55, 60, 58, 65, 70, 60)
+
+        val summaryObj = json.optJSONObject("summary_data")
+        val luckySummary = LuckySummary(
+            color = sanitizeText(summaryObj?.optString("lucky_color") ?: "Gold"),
+            item = sanitizeText(summaryObj?.optString("lucky_item") ?: "Watch"),
+            time = sanitizeText(summaryObj?.optString("lucky_time") ?: "12 PM"),
+            direction = sanitizeText(summaryObj?.optString("lucky_direction") ?: "East")
+        )
+
+        val prosConsObj = json.optJSONObject("pros_cons")
+        val prosCons = ProsCons(
+            positive = sanitizeText(prosConsObj?.optString("positive") ?: ""),
+            negative = sanitizeText(prosConsObj?.optString("negative") ?: "")
+        )
+
+        val result = DeepFortuneResult(
+            flowCurve = flowList,
+            timeLabels = listOf("6AM", "9AM", "12PM", "3PM", "6PM", "9PM", "11PM"),
+            todayKeyword = sanitizeText(summaryObj?.optString("keywords") ?: ""),
+            luckySummary = luckySummary,
+            prosCons = prosCons,
+            overallVerdict = formatParagraphs(json.optString("overall_verdict")),
+            moneyAnalysis = formatParagraphs(json.optString("money_analysis")),
+            loveAnalysis = formatParagraphs(json.optString("love_analysis")),
+            healthAnalysis = formatParagraphs(json.optString("health_analysis")),
+            careerAnalysis = formatParagraphs(json.optString("career_analysis")),
+            riskWarning = formatParagraphs(json.optString("risk_warning")),
+            emotionalAnalysis = formatParagraphs(json.optString("emotional_analysis")),
+            actionGuide = formatParagraphs(json.optString("action_guide"))
+        )
+        // [수정] showDeepDialog 플래그는 버튼 클릭 로직에서 제어하므로 여기선 데이터만 채워넣음
+        _uiState.update { it.copy(deepResult = result) }
     }
 
-    fun closeRadarDialog() {
-        _uiState.update { it.copy(showRadarDetail = false) }
-    }
+    private fun sanitizeText(input: String): String = input.replace(";", ".").replace("- ", "").trim()
+    private fun formatParagraphs(input: String): String = input.replace("\\n", "\n").trim()
 
-    fun closeDeepDialog() {
-        _uiState.update { it.copy(showDeepDialog = false) }
-    }
-
-    fun onSectionClick(key: String) {
-        val section = _uiState.value.sections.find { it.key == key }
-        _uiState.update { it.copy(sectionDialog = section) }
-    }
-
-    fun closeSectionDialog() {
-        _uiState.update { it.copy(sectionDialog = null) }
-    }
+    fun closeDeepDialog() { _uiState.update { it.copy(showDeepDialog = false) } }
 
     fun onChecklistToggle(id: Int, checked: Boolean) {
         val todayKey = storage.todayPersonaKey()
-        prefs.edit().putBoolean("fortune_check_${todayKey}_$id", checked).apply()
-
-        _uiState.update { state ->
-            val newChecklist = state.checklist.map { item ->
-                if (item.id == id) item.copy(checked = checked) else item
-            }
-            state.copy(checklist = newChecklist)
-        }
+        internalPrefs.edit().putBoolean("fortune_check_${todayKey}_$id", checked).apply()
+        _uiState.update { s -> s.copy(checklist = s.checklist.map { if (it.id == id) it.copy(checked = checked) else it }) }
     }
 
     fun onSubscriptionNavHandled() { _uiState.update { it.copy(navigateToSubscription = false) } }
     fun onProfileDialogDismiss() { _uiState.update { it.copy(showProfileDialog = false) } }
-    fun onSnackbarShown() { _uiState.update { it.copy(snackbarMessage = null) } }
 }

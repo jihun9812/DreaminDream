@@ -1,59 +1,42 @@
 package com.dreamindream.app.ui.aireport
 
-import android.annotation.SuppressLint
-import android.widget.TextView
-import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.rounded.ArrowForward
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.text.HtmlCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.dreamindream.app.AdPageScaffold
 import com.dreamindream.app.R
-import com.dreamindream.app.chart.renderPercentBars
-import com.dreamindream.app.chart.richEmotionColor
-import com.dreamindream.app.chart.richThemeColor
-import com.dreamindream.app.chart.setupBarChart
-import com.dreamindream.app.chart.useRoundedBars
-import com.github.mikephil.charting.charts.BarChart
+import com.dreamindream.app.WeekEntry
+import com.dreamindream.app.SubscriptionManager
 
-// --- Fonts ---
-private val PretendardBold = FontFamily(Font(R.font.pretendard_bold, FontWeight.Bold))
-private val PretendardMedium = FontFamily(Font(R.font.pretendard_medium, FontWeight.Medium))
-
-// --- Colors ---
-private val DeepNavy = Color(0xFF121626)
-private val TextWhite = Color(0xFFEEEEEE)
-private val TextGray = Color(0xFFB0BEC5)
-private val AccentGold = Color(0xFFFFD54F)
-private val CardBg = Color(0x1AFFFFFF)
+// --- Reuse Fortune Colors locally for UI consistency ---
+private val PremiumGold = Color(0xFFD4AF37)
+private val TextPrimary = Color(0xFFEEEEEE)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,16 +48,16 @@ fun AIReportRoute(
     viewModel: AIReportViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    LaunchedEffect(weekKeyArg) { viewModel.onStart(weekKeyArg) }
+    val isSubscribed by SubscriptionManager.isSubscribed.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(weekKeyArg) { viewModel.onStart(weekKeyArg) }
     LaunchedEffect(uiState.navigateToSubscription) {
         if (uiState.navigateToSubscription) {
             viewModel.onSubscriptionNavigationHandled()
             onNavigateToSubscription()
         }
     }
-
-    val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(uiState.snackbarMessage) {
         uiState.snackbarMessage?.let {
             snackbarHostState.showSnackbar(it)
@@ -82,53 +65,69 @@ fun AIReportRoute(
         }
     }
 
-    // History BottomSheet
+    if (uiState.showChartInfoDialog) {
+        AlertDialog(
+            onDismissRequest = viewModel::onChartInfoDialogDismiss,
+            title = { Text(stringResource(R.string.ai_report_chart_info_title), color = ColorTextMain, fontFamily = FontBold) },
+            text = { Text(uiState.chartInfoMessage, color = ColorTextSub, fontFamily = FontMedium) },
+            confirmButton = {
+                TextButton(onClick = viewModel::onChartInfoDialogDismiss) {
+                    Text(stringResource(R.string.ai_report_chart_info_ok), color = ColorGold)
+                }
+            },
+            containerColor = ColorCardSurface
+        )
+    }
+
+    // ★ Dream Selection Dialog (3개 이상일 때)
+    if (uiState.showDreamSelectionDialog) {
+        DreamSelectionDialog(
+            dreams = uiState.availableDreamsForSelection,
+            onDismiss = viewModel::onDreamSelectionDialogDismiss,
+            onConfirm = viewModel::onDreamsSelectedForAnalysis
+        )
+    }
+
     if (uiState.showHistorySheet) {
         ModalBottomSheet(
-            onDismissRequest = { viewModel.onHistorySheetDismiss() },
-            containerColor = DeepNavy,
-            scrimColor = Color.Black.copy(alpha = 0.5f)
+            onDismissRequest = viewModel::onHistorySheetDismiss,
+            containerColor = ColorBgDark,
+            scrimColor = Color.Black.copy(0.6f)
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = stringResource(id = R.string.ai_report_history),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontFamily = PretendardBold,
-                    color = TextWhite,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                // History List Implementation...
-            }
+            HistoryTimelineSheet(
+                weeks = uiState.historyWeeks,
+                onWeekSelected = viewModel::onHistoryWeekPicked
+            )
         }
     }
 
-
-     AdPageScaffold(adUnitRes = R.string.ad_unit_ai_banner) { innerPadding ->
+    AdPageScaffold(adUnitRes = R.string.ad_unit_ai_banner) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(DeepNavy)
+                .background(Brush.verticalGradient(listOf(ColorBgDark, Color(0xFF000000))))
                 .padding(innerPadding)
-
         ) {
-            // Background Art
             Image(
                 painter = painterResource(R.drawable.main_ground),
                 contentDescription = null,
-                modifier = Modifier.fillMaxSize().alpha(0.4f),
+                modifier = Modifier.fillMaxSize().alpha(0.2f),
                 contentScale = ContentScale.Crop
             )
 
             AIReportScreen(
                 state = uiState,
+                isSubscribed = isSubscribed,
                 onClickHistory = viewModel::onHistoryClicked,
                 onClickChartInfo = viewModel::onChartInfoClicked,
                 onClickPro = { if (viewModel.onProButtonClicked()) viewModel.onProGateUnlocked() }
             )
 
-            SnackbarHost(hostState = snackbarHostState, modifier = Modifier.align(Alignment.BottomCenter))
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
 
-            // Creative Loading Overlay
             if (uiState.isLoading || uiState.isProSpinnerVisible) {
                 CreativeLoadingView(message = uiState.loadingMessage)
             }
@@ -139,124 +138,123 @@ fun AIReportRoute(
 @Composable
 fun AIReportScreen(
     state: AIReportUiState,
+    isSubscribed: Boolean,
     onClickHistory: () -> Unit,
     onClickChartInfo: () -> Unit,
     onClickPro: () -> Unit
 ) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (state.showReportCard) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp, vertical = 10.dp) // 여백 조정
-            ) {
-                // --- Header ---
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().padding(top = 10.dp)
-                ) {
-                    Text(
-                        state.weekLabel,
-                        color = TextWhite,
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontFamily = PretendardBold,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    // History Button
-                    IconButton(onClick = onClickHistory) {
-                        Icon(Icons.Default.History, contentDescription = "History", tint = TextGray)
-                    }
-                }
-
-                Spacer(Modifier.height(20.dp))
-                StatsRow(state)
-                Spacer(Modifier.height(24.dp))
-
-                // --- Keywords ---
-                if (state.keywordsLine.isNotBlank()) {
-                    Text("# Keywords", color = AccentGold, fontFamily = PretendardBold, fontSize = 14.sp)
-                    Spacer(Modifier.height(8.dp))
-                    Text(state.keywordsLine, color = TextWhite, fontFamily = PretendardMedium, fontSize = 18.sp, lineHeight = 26.sp)
-                    Spacer(Modifier.height(24.dp))
-                }
-
-                // --- Charts ---
-                ChartSection(stringResource(R.string.chart_emotion_title), state.emotionLabels, state.emotionDist, true, onClickChartInfo)
-                Spacer(Modifier.height(24.dp))
-                ChartSection(stringResource(R.string.chart_theme_title), state.themeLabels, state.themeDist, false, null)
-                Spacer(Modifier.height(30.dp))
-
-                // --- Analysis Content (Switch between Basic & Pro) ---
-                Crossfade(targetState = state.isProCompleted, label = "AnalysisSwitch") { isPro ->
-                    if (isPro) {
-                        // ★ Deep Analysis View 연결
-                        DeepAnalysisResultView(jsonString = state.analysisJson)
-                    } else {
-                        // Basic Text View
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(20.dp))
-                                .background(CardBg)
-                                .border(1.dp, Color(0x1AFFFFFF), RoundedCornerShape(20.dp))
-                                .padding(20.dp)
-                        ) {
-                            Column {
-                                Text(stringResource(R.string.ai_report_deep_title), color = AccentGold, fontFamily = PretendardBold, fontSize = 16.sp)
-                                Spacer(Modifier.height(12.dp))
-                                HtmlRichText(state.analysisHtml)
-                            }
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(24.dp))
-
-                // --- Pro Unlock Button ---
-                if (!state.isProCompleted) {
-                    ProGradientButton(
-                        text = stringResource(R.string.ai_report_pro_cta),
-                        enabled = state.proButtonEnabled,
-                        alpha = state.proButtonAlpha,
-                        onClick = onClickPro
-                    )
-                }
-
-                // --- Dream Count Footer (4개 분석됨 표시) ---
-                Spacer(Modifier.height(30.dp))
-                Text(
-                    text = stringResource(
-                        R.string.this_week_dream_count,
-                        state.thisWeekDreamCount
-                    ),
-                    color = TextGray.copy(alpha = 0.6f),
-                    fontFamily = PretendardMedium,
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
+    if (state.showReportCard) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp)
+        ) {
+            // --- Header ---
+            Spacer(Modifier.height(20.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = painterResource(R.drawable.ic_chart),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
                 )
-
-                Spacer(Modifier.height(50.dp))
+                Spacer(Modifier.width(8.dp))
+                Column {
+                    Text(
+                        text = state.weekLabel,
+                        color = ColorTextMain,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontFamily = FontBold
+                    )
+                    Text(
+                        text = stringResource(R.string.ai_report_weekly_insight_subtitle),
+                        color = ColorGold,
+                        fontSize = 12.sp,
+                        fontFamily = FontMedium
+                    )
+                }
+                Spacer(Modifier.weight(1f))
+                IconButton(onClick = onClickHistory) {
+                    Icon(
+                        Icons.Default.History,
+                        contentDescription = stringResource(R.string.ai_report_history_content_description),
+                        tint = ColorTextSub
+                    )
+                }
             }
 
-        } else if (state.showEmptyState && !state.isLoading) {
-            // Empty State
-            Column(
-                modifier = Modifier.align(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_no_data), // 아이콘 필요
+            Spacer(Modifier.height(24.dp))
+
+            // --- Stats Dashboard ---
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                StatCard(
+                    label = stringResource(R.string.ai_report_stat_core_emotion),
+                    value = state.dominantEmotion,
+                    modifier = Modifier.weight(1f)
+                )
+                StatCard(
+                    label = stringResource(R.string.ai_report_stat_total_dreams),
+                    value = "${state.thisWeekDreamCount}",
+                    modifier = Modifier.weight(1f)
+                )
+                StatCard(
+                    label = stringResource(R.string.ai_report_stat_score),
+                    value = state.dreamGrade,
+                    modifier = Modifier.weight(1f),
+                    highlight = true
+                )
+            }
+
+            // --- Emotion Chart ---
+            Spacer(Modifier.height(30.dp))
+            ChartContainer(
+                title = stringResource(R.string.chart_emotion_title),
+                labels = state.emotionLabels,
+                values = state.emotionDist,
+                isEmo = true,
+                onInfo = onClickChartInfo
+            )
+
+            // --- Content Area ---
+            Spacer(Modifier.height(40.dp))
+            Divider(color = Color.White.copy(0.1f))
+            Spacer(Modifier.height(24.dp))
+
+            Crossfade(targetState = state.isProCompleted, label = "AnalysisContent") { isPro ->
+                if (isPro) {
+                    DeepAnalysisTabs(state)
+                } else {
+                    // ★ Storytelling for Basic
+                    BasicAnalysisView(state.analysisHtml)
+                }
+            }
+
+            Spacer(Modifier.height(30.dp))
+
+            // ★ Replaced Old Button with Fortune-Style Entry Card
+            if (!state.isProCompleted) {
+                DeepAnalysisEntry(isSubscribed = isSubscribed, onClick = onClickPro)
+            }
+
+            Spacer(Modifier.height(50.dp))
+        }
+    } else if (state.showEmptyState && !state.isLoading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    Icons.Default.NightsStay,
                     contentDescription = null,
-                    modifier = Modifier.size(80.dp).alpha(0.5f)
+                    tint = ColorTextSub,
+                    modifier = Modifier.size(64.dp)
                 )
                 Spacer(Modifier.height(16.dp))
                 Text(
                     stringResource(R.string.ai_report_empty),
-                    color = TextGray,
-                    fontFamily = PretendardMedium,
+                    color = ColorTextSub,
+                    fontFamily = FontMedium,
                     textAlign = TextAlign.Center
                 )
             }
@@ -264,153 +262,205 @@ fun AIReportScreen(
     }
 }
 
-// --- Creative Loading View ---
+// =========================================================
+// ★ Dream Selection Dialog (Human Selection Logic)
+// =========================================================
 @Composable
-fun CreativeLoadingView(message: String) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(DeepNavy.copy(alpha = 0.9f)) // 배경을 살짝 어둡게 깔아서 몰입감 증대
-            .clickable(enabled = false) {}, // 터치 차단
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            // 커스텀 로더 (또는 Lottie 애니메이션 권장)
-            CircularProgressIndicator(
-                color = AccentGold,
-                strokeWidth = 3.dp,
-                modifier = Modifier.size(48.dp)
-            )
-            Spacer(Modifier.height(24.dp))
+fun DreamSelectionDialog(
+    dreams: List<WeekEntry>,
+    onDismiss: () -> Unit,
+    onConfirm: (List<WeekEntry>) -> Unit
+) {
+    // Select latest 4 by default or all if <4
+    val initialSelection = remember {
+        dreams.sortedByDescending { it.ts }.take(4).map { it.id }.toSet()
+    }
+    var selectedIds by remember { mutableStateOf(initialSelection) }
 
-            // 감성적인 로딩 멘트
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = Color(0xFF1A1A1A),
+        title = {
+            // ★ [수정] 하드코딩된 "Select Dreams..." 제거 -> stringResource 사용
             Text(
-                text = message,
-                color = TextWhite,
-                fontFamily = PretendardBold,
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 32.dp)
+                text = stringResource(R.string.dream_select_title),
+                color = PremiumGold,
+                fontFamily = FontBold
             )
-        }
-    }
-}
-
-// --- Stats Row ---
-@Composable
-fun StatsRow(state: AIReportUiState) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        StatChip(stringResource(R.string.ai_report_stat_emotion), state.dominantEmotion, Modifier.weight(1f))
-        StatChip(stringResource(R.string.ai_report_stat_count), "${state.thisWeekDreamCount}", Modifier.weight(1f))
-        StatChip(stringResource(R.string.ai_report_stat_score), "${state.dreamGrade}", Modifier.weight(1f))
-    }
-}
-
-@Composable
-fun StatChip(title: String, value: String, modifier: Modifier) {
-    Box(
-        modifier = modifier
-            .height(80.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(CardBg)
-            .border(1.dp, Color(0x0DFFFFFF), RoundedCornerShape(16.dp)),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(title, fontFamily = PretendardMedium, fontSize = 11.sp, color = TextGray)
-            Spacer(Modifier.height(4.dp))
-            Text(value, fontFamily = PretendardBold, fontSize = 18.sp, color = TextWhite)
-        }
-    }
-}
-
-@Composable
-fun ChartSection(title: String, labels: List<String>, values: List<Float>, isEmo: Boolean, onInfo: (() -> Unit)?) {
-    Column {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(title, color = TextWhite, fontFamily = PretendardBold, fontSize = 16.sp)
-            Spacer(Modifier.weight(1f))
-            if (onInfo != null) {
-                Icon(
-                    imageVector = Icons.Default.Info, // 아이콘 변경
-                    contentDescription = "Info",
-                    tint = TextGray,
-                    modifier = Modifier.size(18.dp).clickable { onInfo() }
+        },
+        text = {
+            Column {
+                // ★ [수정] 하드코딩된 설명 제거
+                Text(
+                    text = stringResource(R.string.dream_select_desc),
+                    color = TextPrimary.copy(alpha = 0.7f),
+                    fontSize = 13.sp
+                )
+                Spacer(Modifier.height(16.dp))
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = 300.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    dreams.forEach { dream ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .clickable {
+                                    val isSelected = selectedIds.contains(dream.id)
+                                    if (isSelected) {
+                                        selectedIds = selectedIds - dream.id
+                                    } else {
+                                        if (selectedIds.size < 4) {
+                                            selectedIds = selectedIds + dream.id
+                                        }
+                                    }
+                                },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                if (selectedIds.contains(dream.id)) Icons.Rounded.CheckCircle else Icons.Rounded.RadioButtonUnchecked,
+                                contentDescription = null,
+                                tint = if (selectedIds.contains(dream.id)) PremiumGold else Color.Gray,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(Modifier.width(12.dp))
+                            Text(
+                                text = dream.dream.take(50) + if(dream.dream.length>50)"..." else "",
+                                color = TextPrimary,
+                                fontSize = 14.sp,
+                                maxLines = 2
+                            )
+                        }
+                        Divider(color = Color.White.copy(0.05f))
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    val selectedObjects = dreams.filter { selectedIds.contains(it.id) }
+                    onConfirm(selectedObjects)
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = PremiumGold),
+                enabled = selectedIds.isNotEmpty()
+            ) {
+                // ★ [수정] "Analyze" 버튼 텍스트 리소스화
+                Text(
+                    text = stringResource(R.string.dream_select_confirm, selectedIds.size),
+                    color = Color.Black
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                // ★ [수정] "Cancel" 버튼 텍스트 리소스화
+                Text(
+                    text = stringResource(R.string.common_cancel),
+                    color = Color.Gray
                 )
             }
         }
-        Spacer(Modifier.height(16.dp))
-        // Chart logic remains...
-        AndroidView(
-            factory = { ctx -> BarChart(ctx).apply { setupBarChart(this); useRoundedBars(this, 12f) } },
-            update = { chart ->
-                if (labels.isNotEmpty()) {
-                    renderPercentBars(chart, labels, values, if(isEmo) ::richEmotionColor else ::richThemeColor)
+    )
+}
+
+// ... (DeepAnalysisEntry, SecretTextPattern 기존 코드 동일) ...
+@Composable
+fun DeepAnalysisEntry(isSubscribed: Boolean, onClick: () -> Unit) {
+    val infiniteTransition = rememberInfiniteTransition(label = "border")
+    val alpha by infiniteTransition.animateFloat(
+        initialValue = 0.3f, targetValue = 1f,
+        animationSpec = infiniteRepeatable(tween(2000), RepeatMode.Reverse), label = "alpha"
+    )
+
+    val borderColor = if (isSubscribed) PremiumGold.copy(alpha = alpha) else Color.White.copy(alpha = 0.1f)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(130.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .border(1.dp, borderColor, RoundedCornerShape(20.dp))
+            .clickable { onClick() }
+    ) {
+        if (isSubscribed) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Brush.linearGradient(listOf(Color(0xFF2E004B), Color(0xFF190028))))
+            )
+        } else {
+            Box(Modifier.fillMaxSize().background(Color(0xFF0F0F0F)))
+
+            Box(modifier = Modifier.fillMaxSize().alpha(0.08f).rotate(-15f)) {
+                SecretTextPattern()
+            }
+
+            Box(
+                modifier = Modifier.fillMaxSize().background(
+                    Brush.radialGradient(
+                        colors = listOf(Color.Transparent, Color.Black.copy(alpha=0.9f)),
+                        radius = 400f
+                    )
+                )
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                if (isSubscribed) {
+                    Text(stringResource(R.string.deep_unlock_title), color = PremiumGold, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Spacer(Modifier.height(4.dp))
+                    Text(stringResource(R.string.deep_view_full), color = TextPrimary.copy(alpha=0.8f), fontSize = 13.sp)
+                } else {
+                    Text("Hidden Destiny Analysis", color = Color.White.copy(alpha = 0.9f), fontWeight = FontWeight.Bold, fontSize = 16.sp, letterSpacing = 1.sp)
+                    Spacer(Modifier.height(6.dp))
+                    Text(stringResource(R.string.deep_premium_content), color = PremiumGold.copy(alpha=0.8f), fontSize = 12.sp)
                 }
-            },
-            modifier = Modifier.fillMaxWidth().height(200.dp)
-        )
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(50.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(
+                        if (isSubscribed) SolidColor(PremiumGold)
+                        else Brush.linearGradient(listOf(Color(0xFFD4AF37), Color(0xFF8B7500)))
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    if (isSubscribed) Icons.Rounded.ArrowForward else Icons.Rounded.Lock,
+                    contentDescription = null,
+                    tint = Color.Black,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
     }
 }
 
-// Rich Text, Pro Button 등 나머지 컴포넌트는 기존과 동일하지만 폰트 적용
-@SuppressLint("SetTextI18n")
 @Composable
-fun HtmlRichText(html: String) {
-    AndroidView(
-        factory = { context ->
-            TextView(context).apply {
-                setTextColor(0xFFEEEEEE.toInt())
-                textSize = 15f
-                setLineSpacing(0f, 1.5f)
-                // typeface 설정 가능 (Pretendard 폰트 파일을 asset에서 로드해야 함)
+fun SecretTextPattern() {
+    Column(Modifier.fillMaxSize().wrapContentSize(unbounded = true)) {
+        repeat(8) {
+            Row {
+                repeat(12) {
+                    Text(
+                        text = "PREMIUM FUTURE ",
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(6.dp)
+                    )
+                }
             }
-        },
-        update = { it.text = HtmlCompat.fromHtml(html, HtmlCompat.FROM_HTML_MODE_LEGACY) }
-    )
-}
-@Composable
-fun ProGradientButton(
-    text: String,
-    enabled: Boolean,
-    alpha: Float,
-    onClick: () -> Unit
-) {
-    // 고급스러운 골드-블루 그라데이션
-    val gradient = Brush.linearGradient(
-        colors = listOf(Color(0xFFFEDCA6), Color(0xFF8BAAFF))
-    )
-
-    Button(
-        onClick = onClick,
-        enabled = enabled,
-        contentPadding = PaddingValues(0.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-        shape = RoundedCornerShape(12.dp),
-        modifier = Modifier
-            .height(54.dp) // 터치하기 좋게 높이 약간 증가
-            .fillMaxWidth()
-            .alpha(alpha)
-            .shadow(8.dp, RoundedCornerShape(12.dp), ambientColor = AccentGold, spotColor = AccentGold) // 살짝 빛나는 효과 추가
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            // 그라데이션 배경
-            Box(modifier = Modifier.matchParentSize().background(gradient))
-
-            // 텍스트 (Pretendard Bold 적용)
-            Text(
-                text = text,
-                color = Color(0xFF121626), // DeepNavy (가독성)
-                fontFamily = PretendardBold,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
         }
     }
 }

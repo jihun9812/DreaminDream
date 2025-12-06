@@ -88,13 +88,26 @@ nickname="%1$s"，mbti="%2$s"，birthdate="%3$s"，gender="%4$s"，birth_time="%
     <string name="profile_zodiac">星座</string>
     <string name="profile_mbti">MBTI 性格类型</string>
     <string name="edit_profile_title">编辑资料</string>
-    <string name="label_nickname">昵称</string>
+    <string name="label_nickname">姓名</string>
     <string name="btn_confirm">确认</string>
 
     <string name="logout_dialog_title">登出</string>
     <string name="logout_dialog_message">确定要登出吗？</string>
 
+    <string name="toast_input_error">必填项目为空。请检查您的信息。</string>
 
+    <string name="alert_edit_profile_title">修改资料提醒</string>
+    <string name="alert_edit_profile_msg">姓名、生日与国家是运势和命理分析的重要参考点。\n\n请确保信息准确，修改后可能与之前的运势数据断开连接。\n\n是否继续？</string>
+
+    <string name="alert_save_confirm_title">确认信息保存</string>
+    <string name="alert_save_confirm_msg">您输入的信息是否正确？\n运势数据将根据这些信息生成。</string>
+
+    <string name="label_country">国家 (Country)</string>
+    <string name="hint_search_country">搜索国家（例如：Korea、US）</string>
+    <string name="country_select_title">选择国家</string>
+
+    <string name="btn_yes_edit">是的，继续修改</string>
+    <string name="btn_save_final">确认并保存</string>
 
 
 
@@ -257,13 +270,21 @@ nickname="%1$s"，mbti="%2$s"，birthdate="%3$s"，gender="%4$s"，birth_time="%
         <string name="ai_report_stat_score">梦境评分</string>
         <string name="ai_report_keywords_title">✨ 关键词</string>
         <string name="ai_report_deep_title">每周深度分析</string>
-        <string name="ai_report_pro_cta">开始深度分析（PRO）</string>
-        <string name="ai_report_pro_completed">分析完成</string>
+         <string name="ai_report_pro_completed">分析完成</string>
         <string name="chart_emotion_title">情绪分布</string>
         <string name="chart_theme_title">主题比例</string>
 
         <string name="chart_info_msg">图表基于您的梦境数据分析。</string>
 
+    <string name="ai_report_growth_msg_high">你正充满积极能量，现在是开始新挑战的最佳时机。</string>
+    <string name="ai_report_growth_msg_mid">你的内在平衡正在提升，相信自己，你将获得显著成长。</string>
+    <string name="ai_report_growth_msg_low">你可能需要休息和恢复。请倾听梦境传达的信号。</string>
+    <string name="fortune_luck_index">幸运指数</string>
+
+    <string name="ai_report_growth_current_energy_label">当前能量</string>
+    <string name="ai_report_growth_point_label">分</string>
+    <string name="ai_report_growth_potential_title">成长潜力</string>
+    <string name="ai_report_growth_next_step_title">下一步</string>
 
 
     <string name="sub_status_active">当前已订阅</string>
@@ -325,6 +346,24 @@ nickname="%1$s"，mbti="%2$s"，birthdate="%3$s"，gender="%4$s"，birth_time="%
     <string name="placeholder_dash">-</string>
     <string name="percent_placeholder">0%%</string>
 
+    <string name="ai_report_pred_category_career">事业 &amp; 成就</string>
+    <string name="ai_report_pred_category_relation">人际关系</string>
+    <string name="ai_report_pred_category_inner">内在成长</string>
+
+    <string name="theme_label_relationships">人际关系</string>
+    <string name="theme_label_achievement">成就</string>
+    <string name="theme_label_change">变化 &amp; 演化</string>
+    <string name="theme_label_anxiety">潜意识焦虑</string>
+
+
+    <string name="common_close">关闭</string>
+    <string name="ai_report_tab_prediction">预测</string>
+    <string name="ai_report_prediction_title">下周积极预测</string>
+    <string name="ai_report_prediction_subtitle">来自潜意识的真实信号。</string>
+    <string name="ai_report_prediction_empty">没有可用的预测数据。\n请记录更多梦境后再次分析。</string>
+
+    <string name="dream_original_content_header">梦境内容</string>
+
     <string name="dream_input_label">• 输入梦境内容</string>
     <string name="usage_left_default">今天剩余次数：0次</string>
     <string name="usage_left_format">今天剩余次数：%1$d次</string>
@@ -353,6 +392,113 @@ nickname="%1$s"，mbti="%2$s"，birthdate="%3$s"，gender="%4$s"，birth_time="%
 
     <string name="checked">已选择</string>
     <string name="unchecked">取消选择</string>
+
+
+    <string name="cal_tap_to_change">点击以更改</string>
+    <string name="cal_select_date_title">选择日期</string>
+    <string name="common_confirm">确认</string>
+
+    <string name="date_month_unit">月</string>
+    <string name="error_speech_not_supported">🚫 此设备不支持语音识别，或者需要安装 Google 应用。</string>
+
+    <string name="day_short_sun">日</string>
+    <string name="day_short_mon">一</string>
+    <string name="day_short_tue">二</string>
+    <string name="day_short_wed">三</string>
+    <string name="day_short_thu">四</string>
+    <string name="day_short_fri">五</string>
+    <string name="day_short_sat">六</string>
+    <string name="error_parsing_result">处理结果时出现问题，将显示原始内容。</string>
+    <string name="back_press_exit">再次按返回键即可退出。</string>
+
+
+
+    <string name="dream_record_prefix">梦记录 #</string>
+
+    <string name="dream_interpretation_title">梦境解析</string>
+    <string name="dream_original_title">原始梦境</string>
+    <string name="dream_analysis_default_title">梦境分析</string>
+
+    <string name="share_sheet_title">分享你的梦境</string>
+    <string name="share_target_save">保存到相册</string>
+    <string name="share_target_instagram">Instagram</string>
+    <string name="share_target_facebook">Facebook</string>
+    <string name="share_target_kakao">KakaoTalk</string>
+    <string name="share_target_whatsapp">WhatsApp</string>
+
+    <string name="share_canvas_app_title">Dream In Dream</string>
+    <string name="share_canvas_interpretation_header">解析</string>
+    <string name="share_error_msg">分享出错：%s</string>
+    <string name="image_saved_msg">图片已保存到相册。</string>
+    <string name="app_not_found_msg">未找到 %s 应用。</string>
+
+    <string name="share_insta_chooser_title">分享到 Instagram</string>
+
+    <string name="dream_image_file_prefix">Dream_Analysis_%d</string>
+    <string name="dream_image_desc">由AI生成的梦境解析图像。</string>
+
+
+
+    <string name="loading_text">正在解读星象…</string>
+
+    <string name="keywords_title">今日关键词</string>
+
+    <string name="destiny_awaits">命运在等待你</string>
+    <string name="hello_user">你好，%s</string>
+    <string name="btn_open_fortune">打开运势</string>
+
+    <string name="daily_oracle_title">今日神谕</string>
+    <string name="lotto_default_title">幸运数字</string>
+
+    <string name="card_overview">今日概览</string>
+    <string name="card_wealth">财富</string>
+    <string name="card_love">爱情</string>
+    <string name="card_health">健康</string>
+    <string name="card_action">行动建议</string>
+
+    <string name="missions_title">每日任务</string>
+
+    <string name="deep_unlock_title">解锁深度解析</string>
+    <string name="deep_view_full">查看完整报告</string>
+    <string name="deep_premium_content">高级内容</string>
+
+    <string name="tab_verdict">总评</string>
+    <string name="tab_trend">走势</string>
+    <string name="tab_money">财运</string>
+    <string name="tab_love">爱情</string>
+    <string name="tab_health">健康</string>
+    <string name="tab_career">事业</string>
+    <string name="tab_mind">心境</string>
+    <string name="tab_risk">风险</string>
+    <string name="tab_action">行动</string>
+
+    <string name="keywords_placeholder">专注 • 耐心</string>
+    <string name="lucky_item">物品</string>
+    <string name="pros_opportunity">机遇</string>
+    <string name="cons_caution">注意</string>
+    <string name="masters_verdict">大师评语</string>
+    <string name="trend_flow_title">今日运势走向</string>
+    <string name="trend_summary">概要</string>
+
+    <string name="title_financial">财务分析</string>
+    <string name="title_relationship">爱情 &amp; 人际</string>
+    <string name="title_vitality">健康 &amp; 活力</string>
+    <string name="title_career">事业 &amp; 学业</string>
+    <string name="title_emotional">情绪平衡（心灵）</string>
+    <string name="title_risk">风险预警</string>
+    <string name="title_action">行动指南</string>
+
+    <string name="profile_req_title">需要个人资料</string>
+    <string name="profile_req_msg">请在设置中完善个人资料（姓名、生日）。</string>
+    <string name="btn_go_settings">前往设置</string>
+
+
+
+
+
+
+
+
 
     <string name="app_name">DreamInDream</string>
 
@@ -746,22 +892,56 @@ HTTPS、最小化权限、访问记录管理等
     <string name="daily_prompt_template">不带说明或叙事，请以专业解梦师的口吻，仅用一句话写出今天（%1$s）的建议。</string>
 
     <string name="dream_prompt_template">
-你是擅长提示预知梦的专业解梦分析师。
-基于下方的梦境内容，给出现实、可信的解析。
-结构:
-- <ns0:g id="msg">%2$s</ns0:g>
-- <ns0:g id="sym">%3$s</ns0:g>
-- <ns0:g id="pre">%4$s</ns0:g>
-- <ns0:g id="tip">%5$s</ns0:g>
-- <ns0:g id="act">%6$s</ns0:g>
-[梦境内容] "<ns0:g id="dream">%1$s</ns0:g>"
+    [梦境内容]\n
+    \"%1$s\"\n\n
+
+    [解析规则]\n
+    请分析以上梦境，并提供一种既神秘又实际的解读。\n
+    务必严格遵循下方给定的结构，不要添加所提供标题以外的任何开头或结尾。\n\n
+
+    文风需保持共情、神秘且具鼓励性。\n
+    不要使用星号或井号等 Markdown 符号。\n
+    若需强调某个词，请使用引号或通过句子表达自然呈现。\n
+    ---\n
+    %2$s\n
+    (用 2–3 句话总结梦境的核心主题和情绪氛围。)\n\n
+
+    %3$s\n
+    (选择两个关键符号，以“词语: 含义”的形式进行解析。不要使用星号。)\n\n
+
+    %4$s\n
+    (从神秘角度洞察梦境所暗示的未来走向、机会或能量变化。)\n\n
+
+    %5$s\n
+    (提供一个可立即执行的建议，以便在今天运用梦境的能量。)\n\n
+
+    %6$s\n
+    (提供两个今天即可实践的具体行动。\n
+     避免给出诸如冥想或喝水等常见养生建议。\n
+     让它们更像小任务。)\n
+    1. [行动 1]\n
+    2. [行动 2]\n
+    ---
 </string>
 
-    <string name="dream_section_message">💭 梦传达的信息</string>
-    <string name="dream_section_symbols">🧠 核心象征解析</string>
-    <string name="dream_section_premonition">📌 预知要点</string>
-    <string name="dream_section_tips_today">☀️ 今日应用提示</string>
-    <string name="dream_section_actions_three">🎯 今日三项行动</string>
+
+
+    <string name="dream_section_message">☁️ 核心信息（Core Message）</string>
+    <string name="dream_section_symbols">🧠 关键象征分析（Key Symbols）</string>
+    <string name="dream_section_premonition">📌 预兆与洞察（Premonition &amp; Insight）</string>
+    <string name="dream_section_tips_today">💡 今日实用提示（Practical Tip）</string>
+    <string name="dream_section_actions_three">⚡ 今日可执行的两项行动（2 Actionable Steps）</string>
+
+
+
+    <string name="ai_report_pred_category_love">爱 &amp; 恋爱</string>
+    <string name="ai_report_pred_category_wealth">财务 &amp; 丰盛</string>
+    <string name="ai_report_pred_category_health">健康 &amp; 能量</string>
+
+
+    <string name="dream_select_title">选择要分析的梦境</string>
+    <string name="dream_select_desc">为了获得最准确的分析，请选择最多 4 个梦境。</string>
+    <string name="dream_select_confirm">分析 (%d)</string>
 
     <string-array name="emotion_dict_positive">
         <item>喜悦</item><item>幸福</item><item>感谢</item><item>希望</item><item>心动</item>
@@ -1215,6 +1395,71 @@ HTTPS、最小化权限、访问记录管理等
     <string-array name="privacy_section6_items">
         <item>HTTPS 通信、最小化访问权限、访问记录管理等</item>
     </string-array>
+
+    <string name="ai_report_chart_info_title">图表信息</string>
+    <string name="ai_report_chart_info_ok">确定</string>
+    <string name="ai_report_chart_info_button_content_description">显示图表信息</string>
+
+    <string name="ai_report_weekly_insight_subtitle">每周洞察</string>
+    <string name="ai_report_history_content_description">历史记录</string>
+
+    <string name="ai_report_stat_core_emotion">核心情绪</string>
+    <string name="ai_report_stat_total_dreams">梦境总数</string>
+
+    <string name="ai_report_tab_theme">主题图表</string>
+    <string name="ai_report_tab_growth">成长要点</string>
+
+    <string name="ai_report_theme_chart_title">主题分布</string>
+    <string name="ai_report_theme_chart_subtitle">本周梦境中最常出现的主题。</string>
+
+    <string name="ai_report_growth_energy_title">当前能量</string>
+    <string name="ai_report_growth_energy_point">分</string>
+    <string name="ai_report_growth_potential">成长潜力</string>
+    <string name="ai_report_growth_point_title">成长要点</string>
+
+    <string name="ai_report_pro_cta">解锁AI深度分析</string>
+
+    <string name="ai_report_chart_info_default_message">这是图表数据的说明。</string>
+
+    <string name="ai_report_tab_insight">深度解析</string>
+    <string name="ai_report_tab_symbols">核心象征</string>
+    <string name="ai_report_tab_action">行动指南</string>
+    <string name="ai_report_default_title">洞察</string>
+
+    <string name="ai_report_symbols_description">这是贯穿这段梦境的核心关键词。</string>
+    <string name="ai_report_symbols_empty">暂无可分析的关键词。</string>
+
+    <string name="ai_report_action_lucky_label">幸运仪式</string>
+    <string name="ai_report_action_practical_title">实用建议</string>
+
+    <string name="ai_report_history_title">梦境日记</string>
+    <string name="ai_report_history_empty">尚未记录任何历史。</string>
+    <string name="ai_report_history_group_others">其他</string>
+    <string name="ai_report_history_week_label">第%1$s周</string>
+
+    <string name="ai_report_analysis_summary_title">分析摘要</string>
+
+    <string name="lang_korean">韩语</string>
+    <string name="lang_arabic">阿拉伯语</string>
+    <string name="lang_english">英语</string>
+    <string name="lang_hindi">印地语</string>
+    <string name="lang_chinese">中文</string>
+
+    <string name="toast_speak_language">请使用 %1$s 讲话。（设备语言）</string>
+
+    <string name="error_no_match">未识别到语音。（请检查设备语言）</string>
+    <string name="error_network">请检查网络连接。</string>
+    <string name="error_permissions">需要麦克风权限。</string>
+    <string name="error_client">麦克风错误或被其他应用占用。</string>
+    <string name="error_timeout">超时，请重试。</string>
+    <string name="error_generic">语音识别错误 (%1$d)。请重试。</string>
+    <string name="error_start_failed">无法启动语音识别：%1$s</string>
+
+
+
+
+
+
 
     <string name="btn_cancel">取消</string>
 

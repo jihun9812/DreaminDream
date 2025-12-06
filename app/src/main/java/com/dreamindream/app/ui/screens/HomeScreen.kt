@@ -1,46 +1,58 @@
 package com.dreamindream.app.ui.screens
 
+
+import android.app.Activity
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import android.content.Context
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.firebase.auth.FirebaseAuth
+import com.dreamindream.app.*
 import com.dreamindream.app.R
-import com.dreamindream.app.DailyMessageManager
-import com.dreamindream.app.FirestoreManager
-import com.dreamindream.app.WeekUtils
-import com.dreamindream.app.WeeklyReportData
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.tooling.preview.Preview
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.delay
+import org.json.JSONObject
+import java.lang.Math
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.random.Random
+
+private val FontJalnan = FontFamily(Font(R.font.jalnan))
+private val FontPretendardBold = FontFamily(Font(R.font.pretendard_bold, FontWeight.Bold))
+private val FontPretendardMed = FontFamily(Font(R.font.pretendard_medium, FontWeight.Medium))
+private val ColorGold = Color(0xFFFFD54F)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,286 +69,535 @@ fun HomeScreen(
     val auth = remember { FirebaseAuth.getInstance() }
     val user = auth.currentUser
     val uid = user?.uid
-    val isAnonymous = user?.isAnonymous == true
 
-    // 키워드 저장을 위한 SharedPreferences (키 이름 동일 유지)
-    val prefs = remember(uid) {
-        context.getSharedPreferences("dream_history_${uid.orEmpty()}", Context.MODE_PRIVATE)
+    val activity = context as? Activity
+    var backPressedTime by remember { mutableLongStateOf(0L) }
+
+    BackHandler(enabled = true) {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - backPressedTime <= 2000) {
+            // 2초 안에 다시 눌렀으면 앱 종료
+            activity?.finish()
+        } else {
+            // 첫 번째 눌렀을 때
+            backPressedTime = currentTime
+            Toast.makeText(
+                context,
+                context.getString(R.string.back_press_exit),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
+
+
+    // UI States
     var dailyMessage by remember { mutableStateOf(context.getString(R.string.ai_msg_loading)) }
     var aiReportTitle by remember { mutableStateOf(context.getString(R.string.ai_report_summary)) }
     var aiReportSummary by remember { mutableStateOf(context.getString(R.string.preparing_analysis)) }
     var isReportEnabled by remember { mutableStateOf(false) }
-    var cardVisible by remember { mutableStateOf(false) }
+    var showContent by remember { mutableStateOf(false) }
 
-    // 1. 데일리 메시지 로드
+    // 1. Load Daily Message (Locale aware)
     LaunchedEffect(Unit) {
-        // DailyMessageManager가 이제 언어별로 분리된 키를 사용하므로,
-        // 여기서는 기존과 동일하게 호출해도 내부적으로 언어에 맞는 메시지를 가져옵니다.
         DailyMessageManager.getMessage(context) { msg ->
-            val safe = msg.trim().takeIf { it.isNotEmpty() && !it.contains("불러올 수 없어요") }
-                ?: getDailyFallbacks(context).random()
+            val safe = msg.trim().takeIf { it.isNotEmpty() } ?: context.getString(R.string.daily_fallback_1)
             dailyMessage = safe
         }
-        kotlinx.coroutines.delay(100)
-        cardVisible = true
+        kotlinx.coroutines.delay(200)
+        showContent = true
     }
 
-    // 2. AI 리포트 요약 정보 로드
-    LaunchedEffect(uid, isAnonymous) {
-        if (uid == null || isAnonymous) {
-            aiReportTitle = context.getString(R.string.ai_report_summary)
+    // 2. Sync AI Report Data
+    LaunchedEffect(uid) {
+        if (uid == null) {
             aiReportSummary = context.getString(R.string.ai_report_need_login)
             isReportEnabled = true
             return@LaunchedEffect
         }
 
-        // 캐시된 데이터 먼저 확인
-        val cachedFeeling = prefs.getString("home_feeling", null)
-        val cachedKeywordsStr = prefs.getString("home_keywords", null)
-        val cachedKeywords = cachedKeywordsStr?.split("|")?.filter { it.isNotBlank() }
-
-        aiReportTitle = context.getString(R.string.ai_report_summary)
-
-        // 캐시 데이터가 있으면 먼저 보여주기
-        if (!cachedFeeling.isNullOrBlank() || !cachedKeywords.isNullOrEmpty()) {
-            aiReportSummary = buildWeeklySummaryLine(context, cachedFeeling, cachedKeywords)
-        } else {
-            aiReportSummary = context.getString(R.string.preparing_analysis)
-        }
-
-        // Firestore에서 최신 데이터 확인
         FirestoreManager.countDreamEntriesForWeek(uid, WeekUtils.weekKey()) { count ->
             if (count < 2) {
-                // 꿈 데이터가 부족할 때
-                aiReportTitle = context.getString(R.string.ai_report_summary)
                 aiReportSummary = context.getString(R.string.ai_report_guide)
                 isReportEnabled = true
             } else {
-                // 꿈 데이터 충분 -> 리포트 로드
-                FirestoreManager.loadWeeklyReportFull(
-                    context, uid, WeekUtils.weekKey()
-                ) { data: WeeklyReportData ->
-
-                    aiReportTitle = context.getString(R.string.ai_report_summary)
-                    // [핵심] 키워드 리스트 전체를 넘기면 buildWeeklySummaryLine 내부에서 첫 번째만 사용함
-                    aiReportSummary = buildWeeklySummaryLine(context, data.feeling, data.keywords)
-                    isReportEnabled = true
-
-                    // 로컬에 최신 상태 저장
-                    prefs.edit().apply {
-                        putString("home_feeling", data.feeling)
-                        // 리스트를 파이프로 연결해 저장
-                        putString("home_keywords", data.keywords.joinToString("|"))
-                        apply()
+                FirestoreManager.loadWeeklyReportFull(context, uid, WeekUtils.weekKey()) { data ->
+                    val finalKeywords = if (data.tier == "pro" && data.analysisJson.isNotBlank()) {
+                        val json = try { JSONObject(data.analysisJson) } catch (e: Exception) { null }
+                        val arr = json?.optJSONArray("core_themes")
+                        if (arr != null && arr.length() > 0) {
+                            (0 until arr.length()).take(2).map { arr.getString(it).replace("#", "").trim() }
+                        } else data.keywords.take(2)
+                    } else {
+                        data.keywords.take(2)
                     }
+
+                    aiReportSummary = buildSummary(context, data.feeling, finalKeywords)
+                    isReportEnabled = true
                 }
             }
         }
     }
 
+    // ✨ DreamScreen과 동일한 밤하늘 배경 적용
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color(0xFF090C14)) // DarkBg와 동일
     ) {
+        // DreamScreen과 동일한 배경 이미지 + 알파값
         Image(
             painter = painterResource(R.drawable.main_ground),
             contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(0.4f), // DreamScreen과 동일
             contentScale = ContentScale.Crop
         )
 
-        Box(modifier = Modifier.fillMaxSize().systemBarsPadding()) {
-            // 설정 버튼
+        // 🌌 은하수 + 반짝이는 별 + 유성효과 (이제 구현체가 아래에 포함되어 작동합니다)
+        NightSkyEffect()
+
+        // Main Content
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+        ) {
             SettingsButton(
                 onClick = onNavigateToSettings,
-                modifier = Modifier.align(Alignment.TopEnd).padding(top = 64.dp, end = 22.dp)
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 20.dp, end = 20.dp)
             )
 
             Column(
-                modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                GradientTitle(
+                // Title
+                Text(
                     text = stringResource(R.string.home_title),
-                    modifier = Modifier.padding(bottom = 24.dp).offset(y = (-12).dp)
+                    style = androidx.compose.ui.text.TextStyle(
+                        fontSize = 36.sp,
+                        fontFamily = FontJalnan,
+                        brush = Brush.linearGradient(
+                            listOf(
+                                Color(0xFFF9B84A),
+                                Color(0xFF7B61FF)
+                            )
+                        ),
+                        shadow = Shadow(
+                            color = Color(0xFFFDCA60),
+                            offset = Offset(0f, 4f),
+                            blurRadius = 8f
+                        ),
+                        textAlign = TextAlign.Center
+                    ),
+                    modifier = Modifier.padding(bottom = 30.dp)
                 )
 
-                // AI 리포트 카드 (애니메이션 적용)
                 AnimatedVisibility(
-                    visible = cardVisible,
-                    enter = slideInVertically(initialOffsetY = { -it }, animationSpec = tween(450)) + fadeIn(tween(450))
+                    visible = showContent,
+                    enter = slideInVertically(initialOffsetY = { 50 }) + fadeIn()
                 ) {
-                    AIReportCard(
-                        title = aiReportTitle,
-                        summary = aiReportSummary,
-                        isEnabled = !isAnonymous && isReportEnabled,
-                        onReportClick = {
-                            if (user == null || user.isAnonymous) onNavigateToSettings()
-                            else onNavigateToAIReport(WeekUtils.weekKey())
-                        },
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp)
-                    )
-                }
+                    Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                        // AI Report Widget
+                        HomeReportCard(
+                            title = aiReportTitle,
+                            summary = aiReportSummary,
+                            isEnabled = isReportEnabled,
+                            onClick = { onNavigateToAIReport(WeekUtils.weekKey()) }
+                        )
 
-                DailyMessageBubble(
-                    message = dailyMessage,
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp)
-                )
+                        // Daily Message Bubble
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(18.dp))
+                                .background(Color(0xFF1E212B).copy(alpha = 0.8f))
+                                .border(
+                                    1.dp,
+                                    Color.White.copy(0.1f),
+                                    RoundedCornerShape(18.dp)
+                                )
+                                .padding(16.dp)
+                        ) {
+                            Row {
+                                Image(
+                                    painter = painterResource(R.drawable.home_message),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(Modifier.width(12.dp))
+                                Text(
+                                    text = dailyMessage,
+                                    color = Color(0xFFEEEEEE),
+                                    fontSize = 13.sp,
+                                    fontFamily = FontPretendardMed,
+                                    lineHeight = 18.sp
+                                )
+                            }
+                        }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth().height(40.dp).offset(y = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    HomeButton(stringResource(R.string.btn_dream), R.drawable.ic_dream, onNavigateToDream, Modifier.weight(0.8f))
-                    HomeButton(stringResource(R.string.btn_calendar), R.drawable.ic_calendar_moon, onNavigateToCalendar, Modifier.weight(0.8f))
-                    HomeButton(stringResource(R.string.btn_fortune), R.drawable.ic_fortune, onNavigateToFortune, Modifier.weight(0.8f))
+                        // Navigation Buttons
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            NavButton(
+                                text = stringResource(R.string.btn_dream),
+                                iconRes = R.drawable.ic_dream,
+                                onClick = onNavigateToDream,
+                                modifier = Modifier.weight(1f)
+                            )
+                            NavButton(
+                                text = stringResource(R.string.btn_calendar),
+                                iconRes = R.drawable.ic_calendar_moon,
+                                onClick = onNavigateToCalendar,
+                                modifier = Modifier.weight(1f)
+                            )
+                            NavButton(
+                                text = stringResource(R.string.btn_fortune),
+                                iconRes = R.drawable.ic_fortune,
+                                onClick = onNavigateToFortune,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
                 }
             }
 
             CommunityButton(
                 onClick = onNavigateToCommunity,
-                modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 32.dp)
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 30.dp)
             )
         }
     }
 }
 
-// ----- 보조 컴포넌트들 -----
+// --- Components ---
 
 @Composable
-private fun GradientTitle(text: String, modifier: Modifier = Modifier) {
-    Text(
-        text = text,
-        style = TextStyle(
-            fontSize = 34.sp,
-            fontFamily = FontFamily(Font(R.font.jalnan)),
-            brush = Brush.linearGradient(listOf(Color(0xFFF9B84A), Color(0xFF7B61FF))),
-            shadow = Shadow(color = Color(0xFFFDCA60), offset = Offset(2f, 4f), blurRadius = 2f),
-            textAlign = TextAlign.Center
-        ),
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = modifier.fillMaxWidth()
-    )
-}
-
-@Composable
-private fun AIReportCard(title: String, summary: String, isEnabled: Boolean, onReportClick: () -> Unit, modifier: Modifier = Modifier) {
-    var scale by remember { mutableStateOf(0.96f) }
-    var alpha by remember { mutableStateOf(0f) }
-    LaunchedEffect(Unit) {
-        androidx.compose.animation.core.animate(initialValue = 0f, targetValue = 1f, animationSpec = tween(160)) { value, _ ->
-            scale = 0.96f + (0.04f * value)
-            alpha = value
+fun HomeReportCard(title: String, summary: String, isEnabled: Boolean, onClick: () -> Unit) {
+    // summary: "감정 • 키워드1, 키워드2" 형태
+    val (emotionPart, keywordPart) = remember(summary) {
+        val parts = summary.split("•")
+        if (parts.size >= 2) {
+            parts[0].trim() to parts[1].trim()
+        } else {
+            summary.trim() to ""
         }
     }
+
+    val borderBrush = Brush.linearGradient(
+        listOf(Color(0xFF7B61FF).copy(alpha = 0.4f), ColorGold.copy(alpha = 0.4f))
+    )
+
     Card(
-        modifier = modifier.scale(scale).graphicsLayer { this.alpha = alpha },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0x14D7D7DB)),
-        elevation = CardDefaults.cardElevation(0.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(96.dp) // 🔼 살짝 더 키워서 2줄 구조 여유 확보
+            .clickable(enabled = isEnabled, onClick = onClick),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF1E212B).copy(alpha = 0.95f)
+        ),
+        border = BorderStroke(
+            1.dp,
+            if (isEnabled) borderBrush else SolidColor(Color.White.copy(0.1f))
+        ),
+        elevation = CardDefaults.cardElevation(8.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().height(52.dp).padding(horizontal = 16.dp, vertical = 1.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 20.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(painter = painterResource(R.drawable.ic_ai_report), contentDescription = stringResource(R.string.ai_report), modifier = Modifier.size(18.dp).padding(end = 8.dp))
-            Column(Modifier.weight(1f)) {
-                Text(text = title, style = TextStyle(fontSize = 13.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)), color = Color(0xFFE4E2E2)), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                // 요약 텍스트 (감정 + 키워드)
-                Text(text = summary, style = TextStyle(fontSize = 11.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)), color = Color(0xFFC6D4DF)), maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top = 2.dp))
+            // 아이콘 박스
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(
+                        Brush.linearGradient(
+                            listOf(Color(0xFF2C3040), Color(0xFF3F455A))
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_ai_report),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
             }
-            GradientButton(text = stringResource(R.string.ai_report_btn), onClick = onReportClick, enabled = isEnabled, modifier = Modifier.padding(start = 8.dp))
+
+            Spacer(Modifier.width(16.dp))
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.Center
+            ) {
+                // 상단 작은 타이틀
+                Text(
+                    text = title,
+                    color = Color(0xFF90949F),
+                    fontSize = 10.sp,
+                    fontFamily = FontPretendardMed,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(Modifier.height(4.dp))
+
+                // 메인 감정 한 줄
+                Text(
+                    text = emotionPart,
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontFamily = FontPretendardBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                // 🔽 키워드는 그 아래 줄에 따로
+                if (keywordPart.isNotEmpty()) {
+                    Spacer(Modifier.height(2.dp))
+                    Text(
+                        text = keywordPart, // "자아 발견, ..." 이런 형태
+                        color = ColorGold,
+                        fontSize = 13.sp,
+                        fontFamily = FontPretendardMed,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+
+            if (isEnabled) {
+                Icon(
+                    imageVector = Icons.Default.ArrowForwardIos,
+                    contentDescription = null,
+                    tint = ColorGold.copy(alpha = 0.8f),
+                    modifier = Modifier.size(12.dp)
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun DailyMessageBubble(message: String, modifier: Modifier = Modifier) {
-    Row(modifier = modifier.padding(horizontal = 12.dp, vertical = 10.dp)) {
-        Image(painter = painterResource(R.drawable.home_message), contentDescription = stringResource(R.string.ai_avatar), modifier = Modifier.size(22.dp).padding(end = 8.dp))
-        Text(text = message, style = TextStyle(fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)), color = Color.White, lineHeight = 15.sp), modifier = Modifier.weight(1f))
+fun NavButton(text: String, iconRes: Int, onClick: () -> Unit, modifier: Modifier) {
+    var isPressed by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(if (isPressed) 0.95f else 1f)
+
+    val borderBrush = Brush.linearGradient(
+        listOf(Color(0xFF7B61FF).copy(alpha = 0.4f), ColorGold.copy(alpha = 0.4f))
+    )
+    val bgBrush = Brush.verticalGradient(
+        listOf(Color(0xFF2C3040).copy(0.7f), Color(0xFF1E212B).copy(0.9f))
+    )
+
+    Column(
+        modifier = modifier
+            .scale(scale)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = {
+                        isPressed = true
+                        tryAwaitRelease()
+                        isPressed = false
+                    },
+                    onTap = { onClick() }
+                )
+            },
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .clip(RoundedCornerShape(18.dp))
+                .background(bgBrush)
+                .border(1.dp, borderBrush, RoundedCornerShape(18.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(iconRes),
+                contentDescription = null,
+                tint = Color(0xFFE0E0E0),
+                modifier = Modifier.size(22.dp)
+            )
+        }
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = text,
+            color = Color(0xFFB0B4C0),
+            fontSize = 12.sp,
+            fontFamily = FontPretendardMed
+        )
     }
 }
 
 @Composable
-private fun HomeButton(text: String, iconRes: Int, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    var scale by remember { mutableStateOf(1f) }
+fun SettingsButton(onClick: () -> Unit, modifier: Modifier) {
+    IconButton(onClick = onClick, modifier = modifier) {
+        Icon(
+            painter = painterResource(R.drawable.ic_setting),
+            contentDescription = null,
+            tint = Color.White.copy(0.8f),
+            modifier = Modifier.size(24.dp)
+        )
+    }
+}
+
+@Composable
+fun CommunityButton(onClick: () -> Unit, modifier: Modifier) {
     Button(
         onClick = onClick,
-        modifier = modifier.height(40.dp).scale(scale).pointerInput(Unit) { detectTapGestures(onPress = { scale = 0.95f; tryAwaitRelease(); scale = 1f }) },
-        shape = RoundedCornerShape(14.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0x33FFFFFF), contentColor = Color(0xFFC6D4DF)),
-        contentPadding = PaddingValues(horizontal = 8.dp)
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color(0xFF1E212B),
+            contentColor = Color.White
+        ),
+        shape = RoundedCornerShape(30.dp),
+        border = BorderStroke(1.dp, Color.White.copy(0.1f)),
+        modifier = modifier.height(48.dp)
     ) {
-        Icon(painter = painterResource(iconRes), contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFC6D4DF))
-        Spacer(Modifier.width(7.dp))
-        Text(text = text, style = TextStyle(fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium))))
+        Text("Community", fontSize = 13.sp, fontFamily = FontPretendardMed)
+    }
+}
+
+private fun buildSummary(context: Context, emotion: String?, keywords: List<String>): String {
+    val emo = emotion?.takeIf { it.isNotBlank() } ?: "..."
+    val kwStr = if (keywords.isNotEmpty()) keywords.joinToString(", ") else "..."
+    return "$emo • $kwStr"
+}
+
+
+// ------------------------------------------------------------------------
+// 🌌 Night Sky Effect Implementation
+// (Moved from DreamScreen.kt to ensure availability in HomeScreen)
+// ------------------------------------------------------------------------
+
+@Composable
+fun NightSkyEffect() {
+    Box(Modifier.fillMaxSize()) {
+        TwinklingStars()
+        ShootingStar()
     }
 }
 
 @Composable
-private fun GradientButton(text: String, onClick: () -> Unit, enabled: Boolean, modifier: Modifier = Modifier) {
-    val colors = if (enabled) listOf(Color(0xFFFEDCA6), Color(0xFF8BAAFF)) else listOf(Color(0x66FEDCA6), Color(0x668BAAFF))
-    Box(
-        modifier = modifier.height(32.dp).clip(RoundedCornerShape(14.dp)).background(brush = Brush.linearGradient(colors)).clickable(enabled = true) { onClick() }.padding(horizontal = 10.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = text, style = TextStyle(fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium)), color = Color(0xFF17212B)))
+fun TwinklingStars() {
+    val density = LocalDensity.current
+    val stars = remember {
+        List(20) {
+            StarData(
+                x = Math.random().toFloat(),
+                y = Math.random().toFloat(),
+                size = (Math.random() * 0.4 + 0.1).toFloat(),
+                offset = Math.random().toFloat() * 2000f,
+                speed = (Math.random() * 0.06 + 0.02).toFloat()
+            )
+        }
+    }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "stars_time")
+    val time by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(120000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "time"
+    )
+
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val width = size.width
+        val height = size.height
+
+        stars.forEach { star ->
+            val rawSin = sin((time * star.speed + star.offset).toDouble()).toFloat()
+            val alphaBase = ((rawSin + 1) / 2).pow(30)
+            val alpha = alphaBase * 0.7f
+
+            if (alpha > 0.01f) {
+                drawCircle(
+                    color = Color.White.copy(alpha = alpha.coerceIn(0f, 1f)),
+                    radius = star.size * density.density,
+                    center = Offset(star.x * width, star.y * height)
+                )
+            }
+        }
     }
 }
 
 @Composable
-private fun SettingsButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    var scale by remember { mutableStateOf(1f) }
-    IconButton(onClick = onClick, modifier = modifier.size(33.dp).scale(scale).pointerInput(Unit) { detectTapGestures(onPress = { scale = 1.4f; tryAwaitRelease(); scale = 1f }) }) {
-        Image(painter = painterResource(R.drawable.ic_setting), contentDescription = stringResource(R.string.settings), modifier = Modifier.size(24.dp))
+fun ShootingStar() {
+    val progress = remember { Animatable(0f) }
+    var startX by remember { mutableFloatStateOf(0f) }
+    var startY by remember { mutableFloatStateOf(0f) }
+    var scale by remember { mutableFloatStateOf(1f) }
+
+    LaunchedEffect(Unit) {
+        while(true) {
+            val waitTime = Random.nextLong(3000, 5000)
+            delay(waitTime)
+            startX = Random.nextFloat() * 0.5f + 0.4f
+            startY = Random.nextFloat() * 0.3f
+            scale = Random.nextFloat() * 0.5f + 0.5f
+            progress.snapTo(0f)
+            progress.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(800, easing = LinearEasing)
+            )
+        }
+    }
+
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        if (progress.value > 0f && progress.value < 1f) {
+            val width = size.width
+            val height = size.height
+            val moveDistance = width * 0.4f
+            val currentX = (startX * width) - (moveDistance * progress.value)
+            val currentY = (startY * height) + (moveDistance * progress.value)
+            val tailLength = 100f * scale
+            val headX = currentX
+            val headY = currentY
+            val tailX = currentX + (tailLength * 0.7f)
+            val tailY = currentY - (tailLength * 0.7f)
+            val alpha = if (progress.value < 0.1f) progress.value * 10f else if (progress.value > 0.8f) (1f - progress.value) * 5f else 1f
+
+            drawLine(
+                brush = Brush.linearGradient(
+                    colors = listOf(Color.White.copy(alpha = 0f), Color.White.copy(alpha = alpha)),
+                    start = Offset(tailX, tailY),
+                    end = Offset(headX, headY)
+                ),
+                start = Offset(tailX, tailY),
+                end = Offset(headX, headY),
+                strokeWidth = 2f * scale,
+                cap = StrokeCap.Round
+            )
+            drawCircle(
+                color = Color.White.copy(alpha = alpha),
+                radius = 1.5f * scale,
+                center = Offset(headX, headY)
+            )
+        }
     }
 }
 
-@Composable
-private fun CommunityButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
-    var scale by remember { mutableStateOf(1f) }
-    Button(
-        onClick = onClick, modifier = modifier.size(72.dp).scale(scale).pointerInput(Unit) { detectTapGestures(onPress = { scale = 0.95f; tryAwaitRelease(); scale = 1f }) },
-        shape = RoundedCornerShape(36.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0x33FFFFFF), contentColor = Color.White)
-    ) {
-        Text(text = "커뮤니티", style = TextStyle(fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.pretendard_medium))))
-    }
-}
-
-// [수정] 1개의 핵심 키워드만 선별하여 보여주는 로직
-private fun buildWeeklySummaryLine(context: Context, topEmotion: String?, keywords: List<String>?): String {
-    val emo = topEmotion?.trim().orEmpty()
-
-    // 키워드 리스트 중 첫 번째(Index 0)만 가져옴. # 제거.
-    val singleKeyword = keywords?.asSequence()
-        ?.filter { it.isNotBlank() }
-        ?.map { it.replace("#", "").trim() }
-        ?.firstOrNull()
-        .orEmpty()
-
-    val emoLabel = context.getString(R.string.label_emotion)
-    val kwLabel  = context.getString(R.string.label_keywords)
-
-    // "감정: 긍정 • 키워드: 탈출" 형태로 포맷팅
-    return when {
-        emo.isNotEmpty() && singleKeyword.isNotEmpty() -> "$emoLabel: $emo • $kwLabel: $singleKeyword"
-        emo.isNotEmpty() -> "$emoLabel: $emo"
-        singleKeyword.isNotEmpty()  -> "$kwLabel: $singleKeyword"
-        else -> context.getString(R.string.home_ai_sub)
-    }
-}
-
-private fun getDailyFallbacks(context: Context): List<String> = listOf(
-    context.getString(R.string.daily_fallback_1), context.getString(R.string.daily_fallback_2),
-    context.getString(R.string.daily_fallback_3), context.getString(R.string.daily_fallback_4), context.getString(R.string.daily_fallback_5)
+private data class StarData(
+    val x: Float, val y: Float, val size: Float, val offset: Float, val speed: Float
 )
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun HomeScreenPreview() {
-    HomeScreen({}, {}, {}, {}, {}, {})
-}

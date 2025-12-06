@@ -2,10 +2,6 @@ package com.dreamindream.app.ui.settings
 
 import androidx.compose.runtime.Immutable
 
-/**
- * Settings 화면의 UI 상태를 정의합니다.
- * Immutable 어노테이션을 통해 Compose 리컴포지션 성능을 최적화합니다.
- */
 @Immutable
 data class SettingsUiState(
     // 화면 상태
@@ -22,13 +18,18 @@ data class SettingsUiState(
     val birthTimeCode: String = "none", // none, 23_01, 01_03 ...
     val birthTimeLabel: String = "",
 
-    // 계산된 정보 (별자리, 띠, 나이)
+    // ★ 국가 설정 (New)
+    val countryCode: String = "",
+    val countryName: String = "",
+    val countryFlag: String = "",
+
+    // ★ 프로필 잠금 (New) - 이름, 생년월일, 국가는 1회 설정 후 변경 불가
+    val isProfileLocked: Boolean = false,
+
+    // 계산된 정보
     val age: Int = -1,
-    val zodiacSign: String = "",    // 서양 별자리 (아이콘 + 이름)
-    val zodiacAnimal: String = "",  // 십이지신 (아이콘 + 이름)
-
-
-
+    val zodiacSign: String = "",    // 서양 별자리
+    val zodiacAnimal: String = "",  // 십이지신
 
     // 통계 데이터
     val gptUsedToday: Int = 0,
@@ -36,11 +37,12 @@ data class SettingsUiState(
 
     // 계정 연결 상태
     val email: String = "",
-    val accountProviderLabel: String = "", // "Google", "Guest" 등
+    val accountProviderLabel: String = "",
     val isGuest: Boolean = true,
     val googleButtonLabel: String = "",
     val googleButtonEnabled: Boolean = true,
     val linkInProgress: Boolean = false,
-    //프리미엄감지 다이아몬드 뱃지
+
+    // 프리미엄 상태
     val isPremium: Boolean = false
 )

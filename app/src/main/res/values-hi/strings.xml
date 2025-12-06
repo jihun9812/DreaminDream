@@ -30,16 +30,133 @@
     <string name="error_sharing">साझा करने में त्रुटि: %1$s</string>
 
 
+
+    <string name="loading_text">सितारों को पढ़ा जा रहा है...</string>
+    <string name="destiny_awaits">भाग्य आपका इंतज़ार कर रहा है</string>
+    <string name="hello_user">नमस्ते, %s</string>
+    <string name="btn_open_fortune">भाग्य खोलें</string>
+
+    <string name="daily_oracle_title">दैनिक भविष्यवाणी</string>
+    <string name="lotto_default_title">लकी नंबर</string>
+    <string name="cal_tap_to_change">बदलने के लिए टैप करें</string>
+    <string name="cal_select_date_title">तारीख चुनें</string>
+    <string name="common_confirm">पुष्टि करें</string>
+    <string name="date_month_unit">महीना</string>
+    <string name="error_speech_not_supported">🚫 यह डिवाइस वॉइस रिकग्निशन का समर्थन नहीं करता, या Google ऐप की आवश्यकता है।</string>
+
+    <string name="error_parsing_result">परिणाम को संसाधित करते समय समस्या हुई। मूल सामग्री प्रदर्शित की जाएगी।</string>
+    <string name="back_press_exit">बाहर निकलने के लिए वापस बटन फिर से दबाएँ।</string>
+
+
+    <string name="day_short_sun">रवि</string>
+    <string name="day_short_mon">सोम</string>
+    <string name="day_short_tue">मंगल</string>
+    <string name="day_short_wed">बुध</string>
+    <string name="day_short_thu">गुरु</string>
+    <string name="day_short_fri">शुक्र</string>
+    <string name="day_short_sat">शनि</string>
+
+    <string name="dream_record_prefix">सपना रिकॉर्ड #</string>
+     <string name="dream_interpretation_title">सपने की व्याख्या</string>
+    <string name="dream_original_title">मूल सपना</string>
+    <string name="dream_analysis_default_title">सपना विश्लेषण</string>
+
+    <string name="share_sheet_title">अपना सपना साझा करें</string>
+    <string name="share_target_save">गैलरी में सहेजें</string>
+    <string name="share_target_instagram">इंस्टाग्राम</string>
+    <string name="share_target_facebook">फेसबुक</string>
+    <string name="share_target_kakao">काकाओटॉक</string>
+    <string name="share_target_whatsapp">व्हाट्सएप</string>
+
+    <string name="share_canvas_app_title">Dream In Dream</string>
+    <string name="share_canvas_interpretation_header">व्याख्या</string>
+    <string name="share_error_msg">साझा करते समय त्रुटि: %s</string>
+    <string name="image_saved_msg">छवि गैलरी में सहेजी गई।</string>
+    <string name="app_not_found_msg">%s ऐप नहीं मिला।</string>
+    <string name="share_insta_chooser_title">इंस्टाग्राम पर साझा करें</string>
+
+    <string name="dream_image_file_prefix">Dream_Analysis_%d</string>
+    <string name="dream_image_desc">AI द्वारा उत्पन्न सपना व्याख्या छवि।</string>
+
+    <string name="card_overview">आज का सारांश</string>
+    <string name="card_wealth">धन</string>
+    <string name="card_love">प्यार</string>
+    <string name="card_health">स्वास्थ्य</string>
+    <string name="card_action">आज की कार्रवाई सलाह</string>
+    <string name="keywords_title">आज के कीवर्ड</string>
+
+    <string name="missions_title">दैनिक मिशन</string>
+
+    <string name="deep_unlock_title">गहन विश्लेषण अनलॉक करें</string>
+    <string name="deep_view_full">पूरा रिपोर्ट देखें</string>
+    <string name="deep_premium_content">प्रीमियम सामग्री</string>
+
+    <string name="tab_verdict">निष्कर्ष</string>
+    <string name="tab_trend">रुझान</string>
+    <string name="tab_money">पैसा</string>
+    <string name="tab_love">प्यार</string>
+    <string name="tab_health">स्वास्थ्य</string>
+    <string name="tab_career">करियर</string>
+    <string name="tab_mind">मन</string>
+    <string name="tab_risk">जोखिम</string>
+    <string name="tab_action">कार्रवाई</string>
+
+    <string name="keywords_placeholder">फोकस • धैर्य</string>
+    <string name="lucky_item">वस्तु</string>
+    <string name="pros_opportunity">अवसर</string>
+    <string name="cons_caution">सावधानी</string>
+    <string name="masters_verdict">गुरु का निर्णय</string>
+    <string name="trend_flow_title">आज के भाग्य का प्रवाह</string>
+    <string name="trend_summary">सारांश</string>
+
+    <string name="title_financial">वित्तीय विश्लेषण</string>
+    <string name="title_relationship">प्यार &amp; संबंध</string>
+    <string name="title_vitality">स्वास्थ्य &amp; ऊर्जा</string>
+    <string name="title_career">करियर &amp; पढ़ाई</string>
+    <string name="title_emotional">भावनात्मक संतुलन (मन)</string>
+    <string name="title_risk">जोखिम चेतावनी</string>
+    <string name="title_action">कार्रवाई मार्गदर्शिका</string>
+
+    <string name="profile_req_title">प्रोफ़ाइल आवश्यक</string>
+    <string name="profile_req_msg">कृपया सेटिंग्स में अपनी प्रोफ़ाइल (नाम, जन्मतिथि) पूरी करें।</string>
+    <string name="btn_go_settings">सेटिंग्स पर जाएँ</string>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <string name="profile_age">उम्र</string>
     <string name="profile_zodiac">राशि</string>
     <string name="profile_mbti">एमबीटीआई (MBTI)</string>
     <string name="edit_profile_title">प्रोफ़ाइल संपादित करें</string>
-    <string name="label_nickname">उपनाम</string>
+    <string name="label_nickname">नाम</string>
     <string name="btn_confirm">पुष्टि करें</string>
+    <string name="toast_input_error">कुछ आवश्यक जानकारी खाली है। कृपया अपनी जानकारी जाँचें।</string>
 
     <string name="logout_dialog_title">लॉग आउट</string>
     <string name="logout_dialog_message">क्या आप वाकई लॉग आउट करना चाहते हैं?</string>
 
+    <string name="alert_edit_profile_title">प्रोफ़ाइल संपादन चेतावनी</string>
+    <string name="alert_edit_profile_msg">नाम, जन्मतिथि और देश आपकी राशि और ज्योतिषीय विश्लेषण के लिए महत्वपूर्ण आधार हैं।\n\nकृपया सही जानकारी दर्ज करें। परिवर्तन करने पर पुराने भाग्य डेटा का संबंध टूट सकता है।\n\nक्या आप जारी रखना चाहते हैं?</string>
+
+    <string name="alert_save_confirm_title">जानकारी की पुष्टि</string>
+    <string name="alert_save_confirm_msg">क्या दर्ज की गई जानकारी सही है?\nआपके भाग्य डेटा इसी जानकारी के आधार पर बनाया जाएगा।</string>
+
+    <string name="label_country">देश (Country)</string>
+    <string name="hint_search_country">देश खोजें (उदा: Korea, US)</string>
+    <string name="country_select_title">देश चुनें</string>
+
+    <string name="btn_yes_edit">हाँ, संपादित करें</string>
+    <string name="btn_save_final">पुष्टि करें और सहेजें</string>
 
 
 
@@ -157,14 +274,29 @@
         <string name="lucky_number">संख्या</string>
         <string name="lucky_time">समय</string>
 
-        <string name="ai_report_title">इस सप्ताह की रिपोर्ट</string>
+    <string name="fortune_luck_index">भाग्य सूचकांक</string>
+
+    <string name="ai_report_growth_msg_high">आप सकारात्मक ऊर्जा से भरे हुए हैं। नई चुनौती शुरू करने का यह एक उत्तम समय है।</string>
+    <string name="ai_report_growth_msg_mid">आपका आंतरिक संतुलन बेहतर हो रहा है। स्वयं पर भरोसा करें और आप बड़ी प्रगति करेंगे।</string>
+    <string name="ai_report_growth_msg_low">आपको आराम और पुनर्स्थापन की आवश्यकता हो सकती है। अपने सपनों के संकेतों को सुनें।</string>
+
+    <string name="ai_report_growth_current_energy_label">वर्तमान ऊर्जा</string>
+    <string name="ai_report_growth_point_label">पॉइंट</string>
+    <string name="ai_report_growth_potential_title">विकास क्षमता</string>
+    <string name="ai_report_growth_next_step_title">अगला कदम</string>
+
+
+
+
+
+
+    <string name="ai_report_title">इस सप्ताह की रिपोर्ट</string>
 
         <string name="ai_report_stat_emotion">मुख्य भावना</string>
         <string name="ai_report_stat_count">इस सप्ताह के सपने</string>
         <string name="ai_report_stat_score">सपनों का स्कोर</string>
         <string name="ai_report_keywords_title">✨ प्रमुख कीवर्ड</string>
         <string name="ai_report_deep_title">साप्ताहिक गहन विश्लेषण</string>
-        <string name="ai_report_pro_cta">गहन विश्लेषण शुरू करें</string>
         <string name="ai_report_pro_completed">विश्लेषण पूरा हुआ</string>
         <string name="chart_emotion_title">भावनाओं का वितरण</string>
         <string name="chart_theme_title">थीम अनुपात</string>
@@ -569,6 +701,105 @@ HTTPS, न्यूनतम एक्सेस अधिकार, एक्स
         <item>गहन मनोविज्ञान के द्वार खोल रहे हैं...</item>
     </string-array>
 
+    <string name="ai_report_chart_info_title">चार्ट जानकारी</string>
+    <string name="ai_report_chart_info_ok">ठीक है</string>
+    <string name="ai_report_chart_info_button_content_description">चार्ट की जानकारी दिखाएं</string>
+
+
+    <string name="ai_report_pred_category_career">करियर &amp; सफलता</string>
+    <string name="ai_report_pred_category_relation">संबंध</string>
+    <string name="ai_report_pred_category_inner">आंतरिक विकास</string>
+
+    <string name="theme_label_relationships">संबंध</string>
+    <string name="theme_label_achievement">उपलब्धि</string>
+    <string name="theme_label_change">परिवर्तन &amp; विकास</string>
+    <string name="theme_label_anxiety">अवचेतन चिंता</string>
+
+
+
+    <string name="dream_original_content_header">सपने की सामग्री</string>
+
+
+    <string name="common_close">बंद करें</string>
+    <string name="ai_report_tab_prediction">पूर्वानुमान</string>
+    <string name="ai_report_prediction_title">अगले सप्ताह का सकारात्मक पूर्वानुमान</string>
+    <string name="ai_report_prediction_subtitle">आपके अवचेतन से आने वाले वास्तविक संकेत।</string>
+    <string name="ai_report_prediction_empty">विश्लेषित पूर्वानुमान डेटा उपलब्ध नहीं है।\nऔर सपने रिकॉर्ड करें और फिर से विश्लेषण करें।</string>
+
+
+
+
+
+
+
+
+
+
+    <string name="ai_report_weekly_insight_subtitle">साप्ताहिक इनसाइट</string>
+    <string name="ai_report_history_content_description">इतिहास</string>
+
+    <string name="ai_report_stat_core_emotion">मुख्य भावना</string>
+    <string name="ai_report_stat_total_dreams">कुल सपने</string>
+
+    <string name="ai_report_tab_theme">थीम चार्ट</string>
+    <string name="ai_report_tab_growth">विकास बिंदु</string>
+
+    <string name="ai_report_theme_chart_title">थीम वितरण</string>
+    <string name="ai_report_theme_chart_subtitle">इस सप्ताह आपके सपनों में सबसे अधिक दिखाई देने वाले विषय।</string>
+
+    <string name="ai_report_growth_energy_title">वर्तमान ऊर्जा</string>
+    <string name="ai_report_growth_energy_point">पॉइंट</string>
+    <string name="ai_report_growth_potential">विकास क्षमता</string>
+    <string name="ai_report_growth_point_title">विकास बिंदु</string>
+
+    <string name="ai_report_pro_cta">एआई गहन विश्लेषण अनलॉक करें</string>
+
+    <string name="ai_report_chart_info_default_message">यह चार्ट डेटा का विवरण है।</string>
+
+
+
+
+
+
+
+    <string name="ai_report_tab_insight">गहन विश्लेषण</string>
+    <string name="ai_report_tab_symbols">मुख्य प्रतीक</string>
+    <string name="ai_report_tab_action">कार्रवाई मार्गदर्शिका</string>
+    <string name="ai_report_default_title">अंतर्दृष्टि</string>
+
+    <string name="ai_report_symbols_description">यह इस सपने के मुख्य कीवर्ड हैं।</string>
+    <string name="ai_report_symbols_empty">कोई विश्लेषित कीवर्ड नहीं हैं।</string>
+
+    <string name="ai_report_action_lucky_label">भाग्यशाली अनुष्ठान</string>
+    <string name="ai_report_action_practical_title">व्यावहारिक सलाह</string>
+
+    <string name="ai_report_history_title">सपनों की डायरी</string>
+    <string name="ai_report_history_empty">अभी तक कोई इतिहास दर्ज नहीं है।</string>
+    <string name="ai_report_history_group_others">अन्य</string>
+    <string name="ai_report_history_week_label">सप्ताह %1$s</string>
+
+    <string name="ai_report_analysis_summary_title">विश्लेषण सारांश</string>
+    <string name="lang_korean">कोरियाई</string>
+    <string name="lang_arabic">अरबी</string>
+    <string name="lang_english">अंग्रेज़ी</string>
+    <string name="lang_hindi">हिंदी</string>
+    <string name="lang_chinese">चीनी</string>
+
+    <string name="toast_speak_language">%1$s में बोलें। (डिवाइस भाषा)</string>
+
+    <string name="error_no_match">कोई भाषण पहचाना नहीं गया। (डिवाइस भाषा जाँचें)</string>
+    <string name="error_network">कृपया नेटवर्क कनेक्शन जाँचें।</string>
+    <string name="error_permissions">माइक्रोफ़ोन अनुमति आवश्यक है।</string>
+    <string name="error_client">माइक्रोफ़ोन त्रुटि या कोई अन्य ऐप इसका उपयोग कर रहा है।</string>
+    <string name="error_timeout">समय समाप्त हो गया। कृपया पुनः प्रयास करें।</string>
+    <string name="error_generic">वाक् पहचान त्रुटि (%1$d)। कृपया पुनः प्रयास करें।</string>
+    <string name="error_start_failed">वाक् पहचान शुरू नहीं हो सकी: %1$s</string>
+
+
+
+
+
+
 
     <string name="btn_save">सहेजें</string>
 
@@ -764,22 +995,56 @@ HTTPS, न्यूनतम एक्सेस अधिकार, एक्स
     <string name="daily_prompt_template">
         बिना विवरण और कथा के, एक पेशेवर स्वप्न-व्याख्याता के लहजे में आज (%1$s) के लिए सलाह केवल एक वाक्य, आदरसूचक शैली में लिखें।</string>
     <string name="dream_prompt_template">
-    आप पूर्वसूचक सपनों के संकेत बताने वाले स्वप्न-व्याख्या विशेषज्ञ विश्लेषक हैं.
-        नीचे दिए गए सपने के आधार पर यथार्थवादी और भरोसेमंद तरीके से व्याख्या करें।
-    संरचना:
-    - <ns0:g id="msg">%2$s</ns0:g>
-    - <ns0:g id="sym">%3$s</ns0:g>
-    - <ns0:g id="pre">%4$s</ns0:g>
-    - <ns0:g id="tip">%5$s</ns0:g>
-    - <ns0:g id="act">%6$s</ns0:g>
-    [सपने की सामग्री] "<ns0:g id="dream">%1$s</ns0:g>"
+    [सपने की सामग्री]\n
+    \"%1$s\"\n\n
+
+    [व्याख्या के नियम]\n
+    ऊपर दिए गए सपने का विश्लेषण करें और रहस्यमय लेकिन व्यावहारिक व्याख्या प्रस्तुत करें।\n
+    नीचे दी गई संरचना का ठीक उसी रूप में पालन करें और दिए गए हेडर के बाहर कोई प्रस्तावना या निष्कर्ष न जोड़ें।\n\n
+
+    लहजा सहानुभूतिपूर्ण, रहस्यमय और प्रोत्साहित करने वाला होना चाहिए।\n
+    अस्टरिस्क या हैशटैग जैसे मार्कडाउन चिन्हों का उपयोग न करें।\n
+    यदि किसी शब्द पर जोर देना हो, तो उद्धरण चिह्नों का उपयोग करें या वाक्य के प्रवाह में स्वाभाविक रूप से व्यक्त करें।\n
+    ---\n
+    %2$s\n
+    (सपने के मुख्य विषय और भावनात्मक वातावरण को 2–3 वाक्यों में संक्षेप करें.)\n\n
+
+    %3$s\n
+    (दो मुख्य प्रतीकों को चुनकर \"शब्द: अर्थ\" रूप में व्याख्या करें। अस्टरिस्क का उपयोग न करें.)\n\n
+
+    %4$s\n
+    (सपने द्वारा सुझाए गए भविष्य के प्रवाह, अवसरों या ऊर्जा परिवर्तन का रहस्यमय दृष्टिकोण दें.)\n\n
+
+    %5$s\n
+    (आज के दिन सपने की ऊर्जा का उपयोग करने के लिए एक व्यावहारिक और तुरंत लागू होने वाली टिप दें.)\n\n
+
+    %6$s\n
+    (आज ही किए जा सकने वाले दो ठोस और वास्तविक कदम सुझाएँ।\n
+     \"ध्यान करना\" या \"पानी पीना\" जैसी सामान्य वेलनेस सलाह से बचें।\n
+     इन्हें छोटे क्वेस्ट जैसा महसूस कराएँ.)\n
+    1. [क्रिया 1]\n
+    2. [क्रिया 2]\n
+    ---
 </string>
 
-    <string name="dream_section_message">💭 सपना जो संदेश देता है</string>
-    <string name="dream_section_symbols">🧠 मुख्य प्रतीकों की व्याख्या</string>
-    <string name="dream_section_premonition">📌 पूर्वानुमान बिंदु</string>
-    <string name="dream_section_tips_today">☀️ आज के उपयोगी सुझाव</string>
-    <string name="dream_section_actions_three">🎯 आज की 3 क्रियाएँ</string>
+
+
+    <string name="dream_select_title">विश्लेषण करने के लिए सपना चुनें</string>
+    <string name="dream_select_desc">सबसे सटीक विश्लेषण के लिए कृपया अधिकतम 4 सपने चुनें।</string>
+    <string name="dream_select_confirm">विश्लेषण करें (%d)</string>
+
+
+    <string name="dream_section_message">☁️ मुख्य संदेश (Core Message)</string>
+    <string name="dream_section_symbols">🧠 प्रमुख प्रतीक विश्लेषण (Key Symbols)</string>
+    <string name="dream_section_premonition">📌 पूर्वाभास और अंतर्दृष्टि (Premonition &amp; Insight)</string>
+    <string name="dream_section_tips_today">💡 आज का उपयोगी सुझाव (Practical Tip)</string>
+    <string name="dream_section_actions_three">⚡ आज के 2 क्रियात्मक कदम (2 Actionable Steps)</string>
+
+
+    <string name="ai_report_pred_category_love">प्यार &amp; रोमांस</string>
+    <string name="ai_report_pred_category_wealth">वित्त &amp; समृद्धि</string>
+    <string name="ai_report_pred_category_health">स्वास्थ्य &amp; ऊर्जा</string>
+
 
     <string-array name="emotion_dict_positive">
         <item>आनंद</item><item>खुशी</item><item>कृतज्ञता</item><item>आशा</item><item>उत्सुकता</item>

@@ -17,6 +17,9 @@ data class DreamUiState(
     val showAdPrompt: Boolean = false,
     val isSecondAd: Boolean = false, // true면 "두 번째 광고" -> 구독 유도 강화
 
+    // 리뷰 요청 상태
+    val showReviewRequest: Boolean = false,
+
     // 공유 관련
     val showShareDialog: Boolean = false,
 
